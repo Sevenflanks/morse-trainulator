@@ -126,40 +126,40 @@ async function replayLetter(letter, seq) {
 function setupScenarios(engine, replayFn = replayLetter, keyActions = null) {
   const scenarios = [
     {
-      title: "1. 單一字母 E (點 Dit)",
-      desc: "測試單次短按。按鍵時間低於門檻 (<200ms)，判定為點 Dit (·)，電路導線流向右側圓形節點 E 並成功結算。",
+      title: "1. 字母 E (點 Dit)",
+      desc: "短按測試：按鍵時間低於門檻 (<200ms) 判定為點 Dit (·)，電路流向右側節點 E 並結算。",
       actions: [
         { label: "模擬按壓 100ms (點 Dit)", dur: 100, char: "E", seq: "." }
       ]
     },
     {
-      title: "2. 單一字母 T (劃 Dah)",
-      desc: "測試長按。按鍵時間大於門檻 (>200ms)，判定為劃 Dah (—)，電路導線流向左側方形節點 T 並成功結算。",
+      title: "2. 字母 T (劃 Dah)",
+      desc: "長按測試：按鍵時間大於門檻 (>200ms) 判定為劃 Dah (—)，電路流向左側節點 T 並結算。",
       actions: [
         { label: "模擬按壓 300ms (劃 Dah)", dur: 300, char: "T", seq: "-" }
       ]
     },
     {
-      title: "3. 遇險信號 SOS (· · · — — — · · ·)",
-      desc: "國際遇險求救信號。依序發送 3 個點 (S)、靜音等待字元結算，再發送 3 個劃 (O)，最後發送 3 個點 (S)。",
+      title: "3. 求救 SOS (· · · — — — · · ·)",
+      desc: "依序發送 3 個點 (S)、等待結算，再發送 3 個劃 (O)，最後發送 3 個點 (S)。",
       actions: [
         { label: "發報字母 'S' (...)", pattern: '...', char: "S", seq: "..." },
         { label: "發報字母 'O' (---)", pattern: '---', char: "O", seq: "---" },
         { label: "發報字母 'S' (...)", pattern: '...', char: "S", seq: "..." },
-        { label: "完整發送 SOS (... --- ...)", pattern: '... --- ...' }
+        { label: "發送 SOS (... --- ...)", pattern: '... --- ...' }
       ]
     },
     {
-      title: "4. 判別門檻臨界測試 (Boundary)",
-      desc: "測試臨界點手感：190ms (判定為點 Dit) vs 210ms (判定為劃 Dah)。可在設定面板調整門檻以驗證發報靈敏度。",
+      title: "4. 門檻測試 (Boundary)",
+      desc: "長短音臨界手感：190ms (點 Dit) 與 210ms (劃 Dah)。可於右側面板調整門檻。",
       actions: [
-        { label: "測試 190ms (近門檻點 Dit)", dur: 190 },
-        { label: "測試 210ms (剛過門檻劃 Dah)", dur: 210 }
+        { label: "測試 190ms (點 Dit)", dur: 190 },
+        { label: "測試 210ms (劃 Dah)", dur: 210 }
       ]
     },
     {
-      title: "5. 筆誤更正訊號 (<HH> / 8 點)",
-      desc: "國際電報筆誤更正符號 (Error / Correction Prosign: <HH>)。連發 8 個點 (........) 即可作廢並刪除剛剛送出的最後一個單字。",
+      title: "5. 筆誤更正 (<HH> / 8 點)",
+      desc: "連發 8 個點 (........) 觸發更正碼 <HH>，自動退格刪除剛送出的最後一個單字。",
       actions: [
         { label: "先發報單字 SOS", pattern: '... --- ...' },
         { label: "發報更正碼 <HH> (8 點)", pattern: '........', char: "<HH>", seq: "........" }

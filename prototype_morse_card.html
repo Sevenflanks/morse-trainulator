@@ -1347,12 +1347,12 @@
 
   <header>
     <h1>📻 摩斯訓練儀 (Morse Trainulator)</h1>
-    <div class="subtitle">專業級互動式電報模擬與報務員訓練體系 (Simulator & Trainer) · 支援直鍵 / 雙撥片 / 機械震報鍵 · PCB 二元樹尋路 · 即時節奏儀表</div>
+    <div class="subtitle">電報模擬與練習工具 · 支援直鍵 / 雙撥片 / 機械震報鍵 · PCB 二元樹尋路 · 節奏儀表</div>
     <div class="layout-switch-container">
-      <button type="button" class="layout-switch-btn active" id="btn-layout-2col" title="切換為雙欄沉浸專注佈局">
+      <button type="button" class="layout-switch-btn active" id="btn-layout-2col" title="切換為雙欄專注佈局">
         <span>🎛️ 雙欄專注</span>
       </button>
-      <button type="button" class="layout-switch-btn" id="btn-layout-3col" title="切換為三欄專業 CW 工作台">
+      <button type="button" class="layout-switch-btn" id="btn-layout-3col" title="切換為三欄工作台">
         <span>🖥️ 三欄工作台</span>
       </button>
     </div>
@@ -1441,7 +1441,7 @@
         </div>
       </div>
 
-      <div style="font-size: 0.78rem; color: var(--text-muted); text-align: center; margin-top: 4px;">💡 點擊板上任何字母或數字，可試聽示範發報音並查看點亮軌跡</div>
+      <div style="font-size: 0.78rem; color: var(--text-muted); text-align: center; margin-top: 4px;">💡 點選字母或數字，可試聽發報音並查看走線</div>
     </div>
 
     <!-- Training Core Column: Mode Tabs & Drill Exercises -->
@@ -1453,7 +1453,7 @@
           <span>⚡ 自由發報</span>
         </button>
         <button class="mode-tab-btn" id="tab-mode-text" style="flex: 1; padding: 10px; font-size: 0.88rem; font-weight: bold; border-radius: 8px; cursor: pointer; border: 1.5px solid #363a46; background: #15171d; color: #aaa; display: flex; align-items: center; justify-content: center; gap: 4px;">
-          <span>📖 報文挑戰</span>
+          <span>📖 文章模式</span>
         </button>
         <button class="mode-tab-btn" id="tab-mode-koch" style="flex: 1; padding: 10px; font-size: 0.88rem; font-weight: bold; border-radius: 8px; cursor: pointer; border: 1.5px solid #363a46; background: #15171d; color: #aaa; display: flex; align-items: center; justify-content: center; gap: 4px;">
           <span>🎯 國際科赫闖關</span>
@@ -1484,14 +1484,14 @@
             <button class="sample-pill" data-text="CQ CQ DE">CQ CQ DE</button>
             <button class="sample-pill" data-text="CQ 73 DE BV2A">CQ 73 DE BV2A</button>
             <button class="sample-pill" data-text="HELLO 88">HELLO 88</button>
-            <button class="sample-pill" data-text="12345 67890">12345 67890 (全數字)</button>
+            <button class="sample-pill" data-text="12345 67890">12345 67890 (數字)</button>
             <button class="sample-pill" data-text="THE QUICK BROWN FOX JUMPS OVER A LAZY DOG">A–Z 全字母句</button>
           </div>
 
           <!-- Playback Actions -->
           <div style="display: flex; gap: 8px; flex-wrap: wrap;">
             <button id="btn-play-auto" style="flex: 1.2; padding: 9px; background: linear-gradient(135deg, #ffd700, #ff9100); color: #000; font-weight: bold; border: none; border-radius: 6px; cursor: pointer; font-size: 0.85rem; display: flex; align-items: center; justify-content: center; gap: 5px; box-shadow: 0 0 10px rgba(255, 215, 0, 0.3);">
-              <span>▶ 自動示範發報</span>
+              <span>▶ 示範播放</span>
             </button>
             <button id="btn-pause-auto" disabled style="flex: 0.8; padding: 9px; background: #222530; border: 1.5px solid #3d4252; color: #666; border-radius: 6px; cursor: not-allowed; font-size: 0.85rem;">
               <span>⏸ 暫停</span>
@@ -1520,7 +1520,7 @@
         <!-- 2. Passage Display & Comparison -->
         <div class="panel">
           <div class="panel-title">
-            <span>報文比對</span>
+            <span>文章比對</span>
             <span id="text-progress-badge" style="font-size:0.75rem; color:var(--gold); font-weight: bold;">進度: 0/6 · 正確率: 100%</span>
           </div>
           
@@ -1539,7 +1539,7 @@
         <!-- 3. Completion Scorecard (Hidden until complete) -->
         <div class="panel" id="text-scorecard" style="display: none; border-color: var(--gold); background: #161715;">
           <div class="panel-title" style="color: var(--gold-light);">
-            <span>🎉 報文發報挑戰完成！</span>
+            <span>🎉 文章練習完成！</span>
             <span id="scorecard-speed-tag" style="color:#ffb703; font-size: 0.8rem;">15 WPM</span>
           </div>
           <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; margin: 10px 0; text-align: center;">
@@ -1803,16 +1803,16 @@
 
       <!-- Guided Walkthrough Scenarios (Free Mode only) -->
       <div class="panel" id="free-mode-scenarios">
-        <div class="panel-title">新手引導情境 (Tutorial Scenarios)</div>
+        <div class="panel-title">新手範例 (Tutorial)</div>
         <div class="tabs" id="scenario-tabs">
-          <button class="tab-btn active" data-tab="0">1. 單一字母 E (點 Dit)</button>
-          <button class="tab-btn" data-tab="1">2. 單一字母 T (劃 Dah)</button>
-          <button class="tab-btn" data-tab="2">3. 遇險信號 SOS</button>
-          <button class="tab-btn" data-tab="3">4. 判別門檻臨界測試</button>
-          <button class="tab-btn" data-tab="4">5. 筆誤更正訊號</button>
+          <button class="tab-btn active" data-tab="0">1. 字母 E (點 Dit)</button>
+          <button class="tab-btn" data-tab="1">2. 字母 T (劃 Dah)</button>
+          <button class="tab-btn" data-tab="2">3. 求救 SOS</button>
+          <button class="tab-btn" data-tab="3">4. 門檻測試</button>
+          <button class="tab-btn" data-tab="4">5. 筆誤更正</button>
         </div>
         <div class="scenario-body" id="scenario-desc">
-          點擊下方模擬發報，測試短按點 Dit (·) 尋路到 E 點位並結算。
+          點擊下方模擬發報，測試短按點 Dit (·) 尋路並結算。
         </div>
         <div class="scenario-steps" id="scenario-actions">
           <!-- Dynamic steps buttons -->
@@ -1822,7 +1822,7 @@
       <!-- Shared: Keying & Gap Meter Panel -->
       <div class="panel" id="meter-panel">
         <div class="panel-title">
-          <span>發報節奏與時序儀 (Keying & Gap Meter)</span>
+          <span>發報與間隔儀表 (Key & Gap Meter)</span>
           <span id="meter-status" style="font-size:0.8rem; color:#aaa;">閒置</span>
         </div>
 
@@ -1830,7 +1830,7 @@
           <!-- 1. Hold Duration Track -->
           <div class="meter-subtrack">
             <div class="meter-track-header">
-              <span>① 按壓時長 (Press Duration)</span>
+              <span>① 按鍵時長 (Key Duration)</span>
               <span id="readout-symbol" style="font-weight:bold; color:#fff;">無</span>
             </div>
             <div class="meter-container" id="meter-container">
@@ -1869,7 +1869,7 @@
         <!-- 3. Real-time CW Oscilloscope Ribbon -->
         <div style="display:flex; justify-content:space-between; align-items:center; font-size:0.75rem; color:var(--text-muted); margin-bottom:4px; margin-top:6px;">
           <span>③ 即時示波紙帶 (CW Oscilloscope Ribbon)</span>
-          <span style="font-size:0.7rem; color:#888;">60 FPS 歷史方波 · 點劃時序視覺化</span>
+          <span style="font-size:0.7rem; color:#888;">60 FPS 方波 · 時序視覺化</span>
         </div>
         <div style="background: #08090d; border: 1.5px solid #282c3a; border-radius: 6px; overflow: hidden; position: relative; height: 58px; box-shadow: inset 0 2px 8px rgba(0,0,0,0.9);">
           <canvas id="cw-ribbon" width="500" height="58" style="width: 100%; height: 100%; display: block;"></canvas>
@@ -1890,7 +1890,7 @@
 
         <!-- 6-Tier Speed Presets -->
         <div style="margin-bottom: 14px;">
-          <div style="font-size: 0.76rem; color: var(--text-muted); margin-bottom: 6px;">定型化速度等級 (點選直接套用全組參數)：</div>
+          <div style="font-size: 0.76rem; color: var(--text-muted); margin-bottom: 6px;">速度預設 (點選直接套用)：</div>
           <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px;">
             <button class="preset-btn" data-preset="novice">
               <span style="font-weight: bold; color: #a8dadc; font-size: 0.88rem;">入門</span>
@@ -1932,25 +1932,25 @@
         <div id="paddle-settings-box" style="background: #121319; border: 1px solid #2e3342; border-radius: 6px; padding: 8px 10px; margin-bottom: 12px;">
           <div style="font-size:0.76rem; font-weight:bold; color:var(--gold); margin-bottom:8px; display:flex; justify-content:space-between; align-items:center;">
             <span>雙撥片設定 (Iambic Paddle)</span>
-            <span style="font-size:0.68rem; color:#888;">Curtis 8044 標準狀態機</span>
+            <span style="font-size:0.68rem; color:#888;">Curtis 8044</span>
           </div>
           <div style="display:flex; justify-content:space-between; align-items:center; font-size:0.8rem; margin-bottom:8px;">
             <label style="display:flex; align-items:center; gap:6px; cursor:pointer; color:#ccc;">
               <input type="checkbox" id="chk-paddle-reverse" style="accent-color:var(--gold);">
               <span>左右撥片互換 (左劃 Dah / 右點 Dit)</span>
             </label>
-            <span style="font-size:0.7rem; color:#888;">適配左手或個人發報習慣</span>
+            <span style="font-size:0.7rem; color:#888;">適配左手或接線</span>
           </div>
           <div style="display:flex; justify-content:space-between; align-items:center; font-size:0.8rem;">
             <label style="color:#ccc;">Iambic 夾發模式：</label>
             <div style="display:flex; gap:12px; font-size:0.78rem;">
               <label style="cursor:pointer; display:flex; align-items:center; gap:4px; color:#ffd700;">
                 <input type="radio" name="iambic-mode" id="radio-mode-b" value="B" checked style="accent-color:var(--gold);">
-                <span>Mode B (夾發補發反向音)</span>
+                <span style="white-space:nowrap;">Mode B (自動補音)</span>
               </label>
               <label style="cursor:pointer; display:flex; align-items:center; gap:4px; color:#aaa;">
                 <input type="radio" name="iambic-mode" id="radio-mode-a" value="A" style="accent-color:var(--gold);">
-                <span>Mode A (放開立即停止)</span>
+                <span style="white-space:nowrap;">Mode A (放開即停)</span>
               </label>
             </div>
           </div>
@@ -1960,19 +1960,19 @@
         <div id="farnsworth-settings-box" style="background: #121319; border: 1px solid #2e3342; border-radius: 6px; padding: 8px 10px; margin-bottom: 12px;">
           <div style="font-size:0.76rem; font-weight:bold; color:var(--neon-blue); margin-bottom:8px; display:flex; justify-content:space-between; align-items:center;">
             <span>法恩斯沃斯節奏 (Farnsworth Timing)</span>
-            <span style="font-size:0.68rem; color:#888;">國際標準音形訓練法</span>
+            <span style="font-size:0.68rem; color:#888;">音形訓練法</span>
           </div>
           <div style="display:flex; justify-content:space-between; align-items:center; font-size:0.8rem; margin-bottom:8px;">
             <label style="display:flex; align-items:center; gap:6px; cursor:pointer; color:#ccc;">
               <input type="checkbox" id="chk-farnsworth" style="accent-color:var(--neon-blue);">
-              <span>啟用法恩斯沃斯節奏 (字元音形高速 · 間距放寬)</span>
+              <span>啟用法恩斯沃斯 (音形高速 · 間距放寬)</span>
             </label>
             <span style="font-size:0.7rem; color:#888;" id="tag-farnsworth-status">已關閉</span>
           </div>
           <div id="farnsworth-controls" style="display:none; padding-top:6px; border-top:1px dashed #2a2e3a;">
             <div style="display:flex; justify-content:space-between; align-items:center; font-size:0.75rem; color:#aaa; margin-bottom:4px;">
-              <span>字元發報速度 (Character Speed): <strong id="tag-farnsworth-wpm" style="color:var(--neon-blue);">18 WPM (67ms)</strong></span>
-              <span style="font-size:0.68rem; color:#777;">音形俐落 · 間隔依上方套組</span>
+              <span>字元速度 (Character Speed): <strong id="tag-farnsworth-wpm" style="color:var(--neon-blue);">18 WPM (67ms)</strong></span>
+              <span style="font-size:0.68rem; color:#777; white-space:nowrap;">間隔依上方預設</span>
             </div>
             <input type="range" id="param-farnsworth-wpm" min="15" max="40" step="1" value="18" style="width:100%; accent-color:var(--neon-blue);">
           </div>
@@ -1981,56 +1981,56 @@
         <!-- Atmospheric RF Noise (QRN) Box -->
         <div id="qrn-settings-box" style="background: #121319; border: 1px solid #2e3342; border-radius: 6px; padding: 8px 10px; margin-bottom: 12px;">
           <div style="font-size:0.76rem; font-weight:bold; color:#ffb703; margin-bottom:8px; display:flex; justify-content:space-between; align-items:center;">
-            <span>天電背景底噪 (QRN)</span>
-            <span style="font-size:0.68rem; color:#888;">短波帶通晶體濾波</span>
+            <span>電台背景雜音 (QRN)</span>
+            <span style="font-size:0.68rem; color:#888;">短波濾波</span>
           </div>
           <div style="display:flex; justify-content:space-between; align-items:center; font-size:0.8rem; margin-bottom:6px;">
             <label style="display:flex; align-items:center; gap:6px; cursor:pointer; color:#ccc;">
               <input type="checkbox" id="chk-qrn" style="accent-color:#ffb703;">
-              <span>開啟電台背景雜音 (短波接收機氛圍)</span>
+              <span>開啟背景雜音 (短波情境)</span>
             </label>
             <span style="font-size:0.7rem; color:#888;" id="tag-qrn-status">已靜音</span>
           </div>
           <div id="qrn-controls" style="display:none; padding-top:6px; border-top:1px dashed #2a2e3a;">
             <div style="display:flex; justify-content:space-between; align-items:center; font-size:0.75rem; color:#aaa; margin-bottom:4px;">
-              <span>底噪強度 (Noise Volume): <strong id="tag-qrn-vol" style="color:#ffb703;">20%</strong></span>
-              <span style="font-size:0.68rem; color:#777;">微弱真實感</span>
+              <span>雜音強度 (Volume): <strong id="tag-qrn-vol" style="color:#ffb703;">20%</strong></span>
+              <span style="font-size:0.68rem; color:#777;">環境底噪</span>
             </div>
             <input type="range" id="param-qrn-vol" min="0.01" max="0.10" step="0.01" value="0.04" style="width:100%; accent-color:#ffb703;">
           </div>
         </div>
 
         <div class="settings-row">
-          <label>基礎時間單位 T (Dit 基準長度)
+          <label>時間單位 T (Dit 基準)
             <span>1T 長度 (1200 / WPM)</span>
           </label>
           <input type="range" id="param-unit-t" min="15" max="300" step="5" value="80">
           <div class="val-tag" id="tag-unit-t">80ms</div>
         </div>
         <div class="settings-row">
-          <label>長短音判別門檻 (Threshold)
+          <label>長短音門檻 (Threshold)
             <span>低於為點 Dit，高於為劃 Dah (2T)</span>
           </label>
           <input type="range" id="param-threshold" min="30" max="600" step="5" value="160">
           <div class="val-tag" id="tag-threshold">160ms</div>
         </div>
         <div class="settings-row">
-          <label>字元結算間隔 (Letter Gap)
-            <span>放開逾時自動結算字元 (3T)</span>
+          <label>字元間隔 (Letter Gap)
+            <span>逾時自動結算 (3T)</span>
           </label>
           <input type="range" id="param-gap" min="50" max="1000" step="10" value="240">
           <div class="val-tag" id="tag-gap">240ms</div>
         </div>
         <div class="settings-row">
-          <label>單字空格間隔 (Word Gap)
-            <span>靜音超過此時長插入單字空格 (7T)</span>
+          <label>單字間隔 (Word Gap)
+            <span>逾時自動插入空格 (7T)</span>
           </label>
           <input type="range" id="param-word-gap" min="100" max="2500" step="20" value="560">
           <div class="val-tag" id="tag-word-gap">560ms</div>
         </div>
         <div class="settings-row">
           <label>側音頻率 (CW Sidetone)
-            <span>純正弦波電報監聽音頻率</span>
+            <span>正弦波側音頻率</span>
           </label>
           <input type="range" id="param-freq" min="400" max="1000" step="20" value="680">
           <div class="val-tag" id="tag-freq">680Hz</div>
@@ -2039,7 +2039,7 @@
         <!-- Keyboard Keybindings Box -->
         <div id="keybindings-settings-box" style="background: #121319; border: 1px solid #2e3342; border-radius: 6px; padding: 8px 10px; margin-top: 14px; margin-bottom: 8px;">
           <div style="font-size:0.76rem; font-weight:bold; color:#00e5ff; margin-bottom:8px; display:flex; justify-content:space-between; align-items:center;">
-            <span>⌨️ 鍵盤按鍵對應 (Keybindings)</span>
+            <span>⌨️ 鍵盤按鍵對應</span>
             <span id="tag-current-profile" style="font-size:0.68rem; color:#888;">標準鍵位</span>
           </div>
 
@@ -2066,34 +2066,34 @@
           <!-- Interactive Key Binding Remap Buttons -->
           <div style="display:flex; flex-direction:column; gap:6px; font-size:0.75rem; background:#0c0d12; padding:8px; border-radius:5px;">
             <div style="display:flex; justify-content:space-between; align-items:center;">
-              <span style="color:#aaa;">直鍵發報 (Straight Key):</span>
+              <span style="color:#aaa;">直鍵 (Straight):</span>
               <button id="btn-bind-straight" class="bind-btn" style="background:#1f2330; border:1px solid #3d465c; color:#fff; border-radius:4px; padding:2px 10px; font-family:monospace; font-size:0.75rem; cursor:pointer;">
                 K
               </button>
             </div>
             <div style="display:flex; justify-content:space-between; align-items:center;">
-              <span style="color:#aaa;">點撥片 (Dit / 震報連發):</span>
+              <span style="color:#aaa;">點撥片 (Dit):</span>
               <button id="btn-bind-dit" class="bind-btn" style="background:#1f2330; border:1px solid #3d465c; color:#00e5ff; border-radius:4px; padding:2px 10px; font-family:monospace; font-size:0.75rem; cursor:pointer;">
                 [ / ,
               </button>
             </div>
             <div style="display:flex; justify-content:space-between; align-items:center;">
-              <span style="color:#aaa;">劃撥片 (Dah / 震報手動):</span>
+              <span style="color:#aaa;">劃撥片 (Dah):</span>
               <button id="btn-bind-dah" class="bind-btn" style="background:#1f2330; border:1px solid #3d465c; color:#ffd700; border-radius:4px; padding:2px 10px; font-family:monospace; font-size:0.75rem; cursor:pointer;">
                 ] / .
               </button>
             </div>
           </div>
           <div style="font-size:0.68rem; color:#777; margin-top:6px; text-align:center;">
-            💡 點擊右側按鍵按鈕後，按下鍵盤任意鍵即可重新設定
+            💡 點選按鍵後，按下鍵盤任意鍵即可更換
           </div>
         </div>
 
         <!-- Factory Reset & Storage Status Footer -->
         <div style="display:flex; justify-content:space-between; align-items:center; margin-top:14px; padding-top:8px; border-top:1px solid #252834;">
-          <span style="font-size:0.7rem; color:#888;">💾 所有設定全時自動記憶</span>
+          <span style="font-size:0.7rem; color:#888;">💾 設定將自動保存</span>
           <button id="btn-factory-reset" style="background:none; border:1px solid #444; color:#aaa; padding:4px 8px; border-radius:4px; font-size:0.72rem; cursor:pointer;">
-            🔄 回復原廠預設值
+            🔄 重設為預設值
           </button>
         </div>
       </div>
@@ -4470,7 +4470,7 @@
 
         if (char === ' ') {
           if (chip) chip.classList.add('state-playing');
-          evalStatus.textContent = `自動示範：單字間隔 (${engine.config.wordGap}ms)`;
+          evalStatus.textContent = `示範播放：單字間隔 (${engine.config.wordGap}ms)`;
           evalStatus.style.color = 'var(--gold)';
           await new Promise(r => setTimeout(r, engine.config.wordGap));
           if (chip) {
@@ -4487,7 +4487,7 @@
         }
 
         if (chip) chip.classList.add('state-playing');
-        evalStatus.textContent = `自動示範：[${char}] (${seq})`;
+        evalStatus.textContent = `示範播放：[${char}] (${seq})`;
         evalStatus.style.color = '#ffd700';
 
         // Play each dit/dah element
@@ -4712,10 +4712,10 @@
           descEl.textContent = '🟢 簡化模式：無超時限制，適合熟悉新字母與手感。';
           descEl.style.color = '#889';
         } else if (mode === 'standard') {
-          descEl.textContent = '🏆 正規考核：計時連續考核，啟用 2.0s 反射倒數，時限結束正確率 ≥90% 通關。可隨時手動結束結算。';
+          descEl.textContent = '🏆 正規考核：計時連續考核，啟用 2.0s 反射倒數，正確率 ≥90% 通關。';
           descEl.style.color = '#00e5ff';
         } else if (mode === 'challenge') {
-          descEl.textContent = '🔥 極限挑戰：極限直覺連續考核，啟用 2.0s 反射倒數，失誤直接重置計時！可隨時手動結束結算。';
+          descEl.textContent = '🔥 極限挑戰：限時連續考核，啟用 2.0s 反射倒數，正確率跌破 90% 重置計時。';
           descEl.style.color = '#ff9100';
         }
       }
@@ -6086,21 +6086,21 @@
     // Scenario Walkthroughs setup
     const scenarios = [
       {
-        title: "1. 單一字母 E (點 Dit)",
+        title: "1. 字母 E (點 Dit)",
         desc: "測試單次短按。持續時間低於門檻 (<200ms)，判定為短音 (·)，導線流向右側圓形節點 E 並成功結算。",
         actions: [
           { label: "模擬按壓 100ms (Dit)", dur: 100 }
         ]
       },
       {
-        title: "2. 單一字母 T (劃 Dah)",
+        title: "2. 字母 T (劃 Dah)",
         desc: "測試長按。持續時間大於門檻 (>200ms)，判定為長音 (—)，導線流向左側方形節點 T 並成功結算。",
         actions: [
           { label: "模擬按壓 300ms (Dah)", dur: 300 }
         ]
       },
       {
-        title: "3. 遇險信號 SOS (· · · — — — · · ·)",
+        title: "3. 求救 SOS (· · · — — — · · ·)",
         desc: "國際求救信號。依序輸入 3 個短音 (S)、等待結算，再輸入 3 個長音 (O)，最後輸入 3 個短音 (S)。",
         actions: [
           { label: "發報 'S' (...)", pattern: '...' },
@@ -6109,7 +6109,7 @@
         ]
       },
       {
-        title: "4. 判別門檻臨界測試 (Boundary)",
+        title: "4. 門檻測試 (Boundary)",
         desc: "測試臨界點手感：190ms (判定為 Dit) vs 210ms (判定為 Dah)。可在設定中調整門檻以驗證靈敏度。",
         actions: [
           { label: "測試 190ms (近門檻點音)", dur: 190 },
@@ -6117,7 +6117,7 @@
         ]
       },
       {
-        title: "5. 筆誤更正訊號 (<HH> / 8短音)",
+        title: "5. 筆誤更正 (<HH> / 8短音)",
         desc: "國際電報更正訊號 (Error / Correction Prosign: <HH>)。連發 8 個短音 (........) 即可作廢並刪除已確認的最後一個單字。",
         actions: [
           { label: "先發報單字 SOS", pattern: '... --- ...' },

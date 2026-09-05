@@ -165,13 +165,13 @@ function setKochAssessmentMode(mode) {
 
   if (descEl) {
     if (mode === 'quick') {
-      descEl.textContent = '🟢 基礎練習：無超時限制，適合熟悉新字元音形與電鍵手感。';
+      descEl.textContent = '🟢 基礎練習：無超時限制，適合熟悉新字元音形與手感。';
       descEl.style.color = '#889';
     } else if (mode === 'standard') {
-      descEl.textContent = '🏆 正規考核：計時連續考核，啟用 2.0s 反射倒數，時限結束正確率 ≥90% 通關。可隨時手動結束結算。';
+      descEl.textContent = '🏆 正規考核：計時連續考核，啟用 2.0s 反射倒數，正確率 ≥90% 通關。';
       descEl.style.color = '#00e5ff';
     } else if (mode === 'challenge') {
-      descEl.textContent = '🔥 極限挑戰：極限直覺連續考核，啟用 2.0s 反射倒數，失誤直接重置計時！可隨時手動結束結算。';
+      descEl.textContent = '🔥 極限挑戰：限時連續考核，啟用 2.0s 反射倒數，正確率跌破 90% 重置計時。';
       descEl.style.color = '#ff9100';
     }
   }

@@ -274,11 +274,11 @@ function finishTextModePassage() {
   }
 
   if (evalStatus) {
-    evalStatus.textContent = `🎉 報文挑戰完成！正確率 ${accuracy}%`;
+    evalStatus.textContent = `🎉 文章練習完成！正確率 ${accuracy}%`;
     evalStatus.style.color = accuracy >= 80 ? '#00e676' : '#ffb703';
   }
   if (textModeStatus) {
-    textModeStatus.textContent = '挑戰完成';
+    textModeStatus.textContent = '練習完成';
     textModeStatus.style.color = '#00e676';
   }
 }
@@ -306,7 +306,7 @@ async function startAutoPlay() {
       btnPauseAuto.innerHTML = '<span>⏸ 暫停</span>';
     }
     if (textModeStatus) {
-      textModeStatus.textContent = '自動示範中...';
+      textModeStatus.textContent = '示範播放中...';
       textModeStatus.style.color = 'var(--gold)';
     }
     return;
@@ -332,7 +332,7 @@ async function startAutoPlay() {
     btnStopAuto.style.color = '#fff';
   }
   if (textModeStatus) {
-    textModeStatus.textContent = '自動示範中...';
+    textModeStatus.textContent = '示範播放中...';
     textModeStatus.style.color = 'var(--gold)';
   }
 
@@ -355,7 +355,7 @@ async function startAutoPlay() {
     if (char === ' ') {
       if (chip) chip.classList.add('state-playing');
       if (evalStatus) {
-        evalStatus.textContent = `自動示範：單字間隔 (${engine.config.wordGap}ms)`;
+        evalStatus.textContent = `示範播放：單字間隔 (${engine.config.wordGap}ms)`;
         evalStatus.style.color = 'var(--gold)';
       }
       await new Promise(r => setTimeout(r, engine.config.wordGap));
@@ -374,7 +374,7 @@ async function startAutoPlay() {
 
     if (chip) chip.classList.add('state-playing');
     if (evalStatus) {
-      evalStatus.textContent = `自動示範：[${char}] (${seq})`;
+      evalStatus.textContent = `示範播放：[${char}] (${seq})`;
       evalStatus.style.color = '#ffd700';
     }
 
@@ -423,11 +423,11 @@ async function startAutoPlay() {
   if (typeof simulateKeyVisualRelease === 'function') simulateKeyVisualRelease();
   resetAutoPlayButtons();
   if (evalStatus) {
-    evalStatus.textContent = textState.autoPlayAbort ? '自動示範已停止' : '自動示範發報完成！';
+    evalStatus.textContent = textState.autoPlayAbort ? '示範已停止' : '示範播放完成！';
     evalStatus.style.color = textState.autoPlayAbort ? '#aaa' : '#00e676';
   }
   if (textModeStatus) {
-    textModeStatus.textContent = textState.autoPlayAbort ? '已停止' : '示範完畢';
+    textModeStatus.textContent = textState.autoPlayAbort ? '已停止' : '播放完畢';
     textModeStatus.style.color = textState.autoPlayAbort ? '#aaa' : '#00e676';
   }
   if (meterBar) meterBar.style.width = '0%';
