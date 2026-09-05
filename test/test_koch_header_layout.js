@@ -11,7 +11,7 @@ assert(html.includes('id="koch-stage-badge"'), 'koch-stage-badge must exist in i
 assert(html.includes('white-space: nowrap; flex-shrink: 0;'), 'koch-stage-badge must have white-space: nowrap and flex-shrink: 0');
 
 // 2. Verify Koch title has nowrap and no redundant (Koch Method)
-assert(html.includes('<span style="white-space: nowrap;">🎯 國際科赫闖關</span>'), 'Koch title must be concise and have white-space: nowrap');
+assert(html.includes('<span style="white-space: nowrap;"><i class="mdi mdi-bullseye-arrow"></i> 國際科赫闖關</span>'), 'Koch title must use MDI icon and have white-space: nowrap');
 assert(!html.includes('🎯 國際科赫闖關 (Koch Method)'), 'Redundant Koch Method text must be removed to save horizontal space');
 
 // 3. Verify flex-wrap and gap on panel-title

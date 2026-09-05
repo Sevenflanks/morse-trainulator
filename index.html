@@ -28,14 +28,14 @@
 <body>
 
   <header>
-    <h1>📻 摩斯訓練儀 (Morse Trainulator)</h1>
+    <h1><i class="mdi mdi-radio-handheld"></i> 摩斯訓練儀 (Morse Trainulator)</h1>
     <div class="subtitle">電報模擬與練習工具 · 支援直鍵 / 雙撥片 / 機械震報鍵 · PCB 二元樹尋路 · 節奏儀表</div>
     <div class="layout-switch-container">
       <button type="button" class="layout-switch-btn active" id="btn-layout-2col" title="切換為雙欄專注佈局">
-        <span>🎛️ 雙欄專注</span>
+        <span><i class="mdi mdi-view-column"></i> 雙欄專注</span>
       </button>
       <button type="button" class="layout-switch-btn" id="btn-layout-3col" title="切換為三欄工作台">
-        <span>🖥️ 三欄工作台</span>
+        <span><i class="mdi mdi-view-dashboard-variant"></i> 三欄工作台</span>
       </button>
     </div>
   </header>
@@ -123,7 +123,7 @@
         </div>
       </div>
 
-      <div style="font-size: 0.76rem; color: var(--text-muted); text-align: center; margin-top: 4px;">💡 點選字母或數字，可試聽發報音並查看走線</div>
+      <div style="font-size: 0.76rem; color: var(--text-muted); text-align: center; margin-top: 4px;"><i class="mdi mdi-lightbulb-outline"></i> 點選字母或數字，可試聽發報音並查看走線</div>
     </div>
 
     <!-- Training Core Column: Mode Tabs & Drill Exercises -->
@@ -132,13 +132,13 @@
       <!-- Mode Switcher Tabs -->
       <div style="display: flex; gap: 8px; width: 100%; margin-bottom: 4px;">
         <button class="mode-tab-btn active" id="tab-mode-free" style="flex: 1; padding: 10px; font-size: 0.88rem; font-weight: bold; border-radius: 8px; cursor: pointer; border: 1.5px solid var(--gold); background: #2a2512; color: var(--gold-light); display: flex; align-items: center; justify-content: center; gap: 4px;">
-          <span>⚡ 自由發報</span>
+          <span><i class="mdi mdi-flash"></i> 自由發報</span>
         </button>
         <button class="mode-tab-btn" id="tab-mode-text" style="flex: 1; padding: 10px; font-size: 0.88rem; font-weight: bold; border-radius: 8px; cursor: pointer; border: 1.5px solid #363a46; background: #15171d; color: #aaa; display: flex; align-items: center; justify-content: center; gap: 4px;">
-          <span>📖 文章模式</span>
+          <span><i class="mdi mdi-book-open-page-variant"></i> 文章模式</span>
         </button>
         <button class="mode-tab-btn" id="tab-mode-koch" style="flex: 1; padding: 10px; font-size: 0.88rem; font-weight: bold; border-radius: 8px; cursor: pointer; border: 1.5px solid #363a46; background: #15171d; color: #aaa; display: flex; align-items: center; justify-content: center; gap: 4px;">
-          <span>🎯 科赫闖關</span>
+          <span><i class="mdi mdi-bullseye-arrow"></i> 科赫闖關</span>
         </button>
       </div>
 
@@ -256,7 +256,7 @@
         <div class="panel" id="koch-setup-card" style="border-color: #007799; background: #0c1218;">
           <div class="panel-title" style="color: var(--neon-blue); flex-wrap: wrap; gap: 8px 12px;">
             <div style="display:flex; align-items:center; gap:8px; flex-wrap: wrap;">
-              <span style="white-space: nowrap;">🎯 國際科赫闖關</span>
+              <span style="white-space: nowrap;"><i class="mdi mdi-bullseye-arrow"></i> 國際科赫闖關</span>
               <span id="koch-stage-badge" style="background:#00364d; color:var(--neon-blue); padding:2px 8px; border-radius:12px; font-size:0.75rem; border:1px solid #005b82; white-space: nowrap; flex-shrink: 0;">第 1 關 / 共 35 關</span>
             </div>
             <div style="display:flex; gap:6px; align-items:center; flex-shrink: 0;">
