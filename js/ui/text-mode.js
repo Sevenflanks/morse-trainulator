@@ -274,7 +274,7 @@ function finishTextModePassage() {
   }
 
   if (evalStatus) {
-    evalStatus.textContent = `🎉 文章練習完成！正確率 ${accuracy}%`;
+    evalStatus.innerHTML = `<i class="mdi mdi-party-popper"></i> 文章練習完成！正確率 ${accuracy}%`;
     evalStatus.style.color = accuracy >= 80 ? '#00e676' : '#ffb703';
   }
   if (textModeStatus) {

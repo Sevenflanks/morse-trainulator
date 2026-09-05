@@ -1117,7 +1117,7 @@ function finishKochDrillSession(isManualStop = false) {
 
       if (btnKochNextStage) {
         btnKochNextStage.style.display = 'inline-block';
-        btnKochNextStage.innerHTML = `<span>前往第 ${kochManager.maxUnlockedLevel} 關 (解鎖 ${newChar}) ➔ <span style="font-size:0.7rem; background:#332200; color:#ffd700; padding:1px 5px; border-radius:2px; margin-left:3px;">Enter</span></span>`;
+        btnKochNextStage.innerHTML = `<span>前往第 ${kochManager.maxUnlockedLevel} 關 (解鎖 ${newChar}) <i class="mdi mdi-arrow-right"></i> <span style="font-size:0.7rem; background:#332200; color:#ffd700; padding:1px 5px; border-radius:2px; margin-left:3px;">Enter</span></span>`;
       }
 
       setTimeout(() => {
@@ -1136,7 +1136,7 @@ function finishKochDrillSession(isManualStop = false) {
       }
       if (btnKochNextStage) {
         btnKochNextStage.style.display = 'inline-block';
-        btnKochNextStage.innerHTML = `<span>進入下一關 ➔ <span style="font-size:0.7rem; background:#332200; color:#ffd700; padding:1px 5px; border-radius:2px; margin-left:3px;">Enter</span></span>`;
+        btnKochNextStage.innerHTML = `<span>進入下一關 <i class="mdi mdi-arrow-right"></i> <span style="font-size:0.7rem; background:#332200; color:#ffd700; padding:1px 5px; border-radius:2px; margin-left:3px;">Enter</span></span>`;
       }
     } else {
       if (kochScDesc) {

@@ -2125,7 +2125,7 @@
               <span><i class="mdi mdi-restore"></i> 再次挑戰本關 <span style="font-size:0.7rem; background:#293547; color:#fff; padding:1px 4px; border-radius:2px; margin-left:3px;">R</span></span>
             </button>
             <button id="btn-koch-next-stage" style="display:none; padding: 7px 16px; background: linear-gradient(135deg, #ffd700, #ff9100); border: none; color: #000; font-weight: bold; border-radius: 5px; font-size: 0.8rem; cursor: pointer; box-shadow: 0 0 10px rgba(255,215,0,0.3);">
-              <span>前往下一關 ➔ <span style="font-size:0.7rem; background:#332200; color:#ffd700; padding:1px 5px; border-radius:2px; margin-left:3px;">Enter</span></span>
+              <span>前往下一關 <i class="mdi mdi-arrow-right"></i> <span style="font-size:0.7rem; background:#332200; color:#ffd700; padding:1px 5px; border-radius:2px; margin-left:3px;">Enter</span></span>
             </button>
           </div>
         </div>
@@ -3334,7 +3334,7 @@
         ctx.fillStyle = this.activePulse ? '#ff5252' : '#666';
         ctx.font = 'bold 7.5px monospace';
         ctx.textAlign = 'right';
-        ctx.fillText(this.activePulse ? '⚡ TX' : 'IDLE', W - 4, H - 4);
+        ctx.fillText(this.activePulse ? 'TX' : 'IDLE', W - 4, H - 4);
       }
     }
 
@@ -4539,7 +4539,7 @@
       stateDuration.textContent = `${res.duration} ms`;
 
       if (res.letter === '<HH>') {
-        evalStatus.textContent = '⚠️ 檢測到更正訊號 (Error: 8 Dits)';
+        evalStatus.innerHTML = '<i class="mdi mdi-alert"></i> 檢測到更正訊號 (Error: 8 Dits)';
         evalStatus.style.color = '#ff9100';
         highlightPath('.....', false);
       } else if (res.isValid) {
@@ -4589,7 +4589,7 @@
       // FREE MODE LOGIC
       if (res.isErrorSignal || res.letter === '<HH>') {
         const erasedStr = (res.erased && res.erased.length > 0) ? `「${res.erased.join('')}」` : '';
-        evalStatus.textContent = `⚠️ 筆誤更正 <HH>：已作廢刪除上一單字 ${erasedStr}`.trim();
+        evalStatus.innerHTML = `<i class="mdi mdi-alert"></i> 筆誤更正 &lt;HH&gt;：已作廢刪除上一單字 ${erasedStr}`.trim();
         evalStatus.style.color = '#ff9100';
         highlightPath('', false);
         updateCommittedView();
@@ -4890,7 +4890,7 @@
       textScorecard.style.display = 'block';
       textScorecard.scrollIntoView({ behavior: 'smooth' });
 
-      evalStatus.textContent = `🎉 測驗完成！正確率 ${accuracy}%`;
+      evalStatus.innerHTML = `<i class="mdi mdi-party-popper"></i> 測驗完成！正確率 ${accuracy}%`;
       evalStatus.style.color = accuracy >= 80 ? '#00e676' : '#ffb703';
       textModeStatus.textContent = '測驗完成';
       textModeStatus.style.color = '#00e676';
@@ -6139,7 +6139,7 @@
 
           if (btnKochNextStage) {
             btnKochNextStage.style.display = 'inline-block';
-            btnKochNextStage.innerHTML = `<span>前往第 ${kochManager.maxUnlockedLevel} 關 (解鎖 ${newChar}) ➔ <span style="font-size:0.7rem; background:#332200; color:#ffd700; padding:1px 5px; border-radius:2px; margin-left:3px;">Enter</span></span>`;
+            btnKochNextStage.innerHTML = `<span>前往第 ${kochManager.maxUnlockedLevel} 關 (解鎖 ${newChar}) <i class="mdi mdi-arrow-right"></i> <span style="font-size:0.7rem; background:#332200; color:#ffd700; padding:1px 5px; border-radius:2px; margin-left:3px;">Enter</span></span>`;
           }
 
           setTimeout(() => {
@@ -6158,7 +6158,7 @@
           }
           if (btnKochNextStage) {
             btnKochNextStage.style.display = 'inline-block';
-            btnKochNextStage.innerHTML = `<span>進入下一關 ➔ <span style="font-size:0.7rem; background:#332200; color:#ffd700; padding:1px 5px; border-radius:2px; margin-left:3px;">Enter</span></span>`;
+            btnKochNextStage.innerHTML = `<span>進入下一關 <i class="mdi mdi-arrow-right"></i> <span style="font-size:0.7rem; background:#332200; color:#ffd700; padding:1px 5px; border-radius:2px; margin-left:3px;">Enter</span></span>`;
           }
         } else {
           if (kochScDesc) {
@@ -6307,7 +6307,7 @@
       ledDahMem.classList.toggle('latch-active', dahMem);
       squeezeBanner.classList.toggle('squeezing', isSqueezing);
       if (isSqueezing) {
-        squeezeStatus.innerHTML = '<strong style="color:var(--gold);">⚡ 雙片夾壓中 (Squeezing)</strong> · 自動點劃交替中 (Iambic)';
+        squeezeStatus.innerHTML = '<strong style="color:var(--gold);"><i class="mdi mdi-flash"></i> 雙片夾壓中 (Squeezing)</strong> · 自動點劃交替中 (Iambic)';
       } else if (ditMem || dahMem) {
         squeezeStatus.innerHTML = `預先排程記憶: ${ditMem ? '· Dit 鎖存' : ''} ${dahMem ? '— Dah 鎖存' : ''}`;
       } else {
@@ -6380,7 +6380,7 @@
         paddleLeftName.innerHTML = '<span style="font-size:1.3rem;">·</span> 點 Dit (自動連發)';
         paddleRightName.innerHTML = '<span style="font-size:1.3rem;">—</span> 劃 Dah (手動長音)';
         squeezeBanner.classList.remove('squeezing');
-        squeezeStatus.innerHTML = '📻 <strong>半自動機械震報鍵 (Bug Key)</strong>：左撥片自動連發點 · 右撥片純手動長劃';
+        squeezeStatus.innerHTML = '<i class="mdi mdi-radio-handheld"></i> <strong>半自動機械震報鍵 (Bug Key)</strong>：左撥片自動連發點 · 右撥片純手動長劃';
         return;
       }
       const isRev = keyer.reversed;
@@ -6418,7 +6418,7 @@
         paddleContainer.style.display = 'flex';
         keyer.isBugMode = true;
         updatePaddleLabels();
-        evalStatus.textContent = '📻 已切換至半自動機械震報鍵 (Bug Key) 模式';
+        evalStatus.innerHTML = '<i class="mdi mdi-radio-handheld"></i> 已切換至半自動機械震報鍵 (Bug Key) 模式';
         evalStatus.style.color = '#ffb703';
       }
 
@@ -6517,12 +6517,12 @@
       if (currentMode === 'text') {
         initTextModePassage(textInput.value || textState.rawText);
         window.scrollTo({ top: 0, behavior: 'smooth' });
-        evalStatus.textContent = '🔄 已重新開始發報挑戰！';
+        evalStatus.innerHTML = '<i class="mdi mdi-restore"></i> 已重新開始發報挑戰！';
         evalStatus.style.color = '#00e5ff';
       } else if (currentMode === 'koch') {
         startKochDrill();
         window.scrollTo({ top: 0, behavior: 'smooth' });
-        evalStatus.textContent = '🔄 已重新開始本關闖關考驗！';
+        evalStatus.innerHTML = '<i class="mdi mdi-restore"></i> 已重新開始本關闖關考驗！';
         evalStatus.style.color = '#00e5ff';
       } else {
         engine.reset();
@@ -6530,7 +6530,7 @@
         updateCommittedView();
         stateSeq.textContent = '—';
         stateLetter.textContent = '—';
-        evalStatus.textContent = '🔄 已重設並清除送出文字！';
+        evalStatus.innerHTML = '<i class="mdi mdi-restore"></i> 已重設並清除送出文字！';
         evalStatus.style.color = 'var(--gold)';
         highlightPath('', false);
         const clearBtn = document.getElementById('btn-clear-committed');
@@ -6764,7 +6764,7 @@
         e.stopPropagation();
         engine.committedLetters = [];
         updateCommittedView();
-        evalStatus.textContent = '🔄 已清除送出文字！';
+        evalStatus.innerHTML = '<i class="mdi mdi-delete-sweep"></i> 已清除送出文字！';
         evalStatus.style.color = 'var(--gold)';
       });
     }

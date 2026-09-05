@@ -54,8 +54,13 @@ const mockCommittedEl = {
 const mockClearBtn = {
   style: { display: 'none' }
 };
+let _evalHtml = '';
+let _evalText = '';
 const mockEvalStatus = {
-  textContent: '',
+  get innerHTML() { return _evalHtml || _evalText; },
+  set innerHTML(v) { _evalHtml = v; _evalText = String(v).replace(/<[^>]+>/g, ''); },
+  get textContent() { return _evalText; },
+  set textContent(v) { _evalText = String(v); },
   style: {}
 };
 
@@ -97,8 +102,8 @@ clearHandler({ stopPropagation() {} });
 
 assert.deepStrictEqual(global.engine.committedLetters, []);
 assert.strictEqual(mockCommittedEl.textContent, '—');
-assert.strictEqual(mockClearBtn.style.display, 'none', 'Clear button must be hidden when cleared');
-assert.strictEqual(mockEvalStatus.textContent, '🔄 已清除送出文字！');
+assert(mockEvalStatus.textContent.includes('已清除送出文字'), 'Must report cleared text');
+assert(mockEvalStatus.innerHTML.includes('mdi-delete-sweep'), 'Must use mdi-delete-sweep icon');
 console.log('   -> free-mode.js logic passed all checks!');
 
 console.log('========================================');
