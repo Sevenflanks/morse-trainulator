@@ -27,6 +27,17 @@ class KochManager {
     this.mode = 'quick'; // 'quick' | 'standard' | 'challenge'
     this.duration = 180; // Assessment duration in seconds (60, 180, 300)
     this.reflexTimeout = 2000; // Reflex timeout in ms for standard & challenge
+
+    // Clearance Records: { [stage]: { highest: 'quick'|'standard'|'challenge', modes: {}, accuracy: number } }
+    this.clears = {};
+    try {
+      if (this.storage) {
+        const clearsRaw = this.storage.getItem('morse_koch_clears');
+        if (clearsRaw) {
+          this.clears = JSON.parse(clearsRaw);
+        }
+      }
+    } catch(_) {}
   }
 
   getUnlockedPool(lvl = this.currentLevel) {
@@ -37,10 +48,52 @@ class KochManager {
     return _KOCH_SEQUENCE[lvl];
   }
 
+  recordClear(stage, mode, accuracy = 100) {
+    const stageKey = stage.toString();
+    const MODE_RANK = { 'quick': 1, 'standard': 2, 'challenge': 3 };
+    if (!this.clears[stageKey]) {
+      this.clears[stageKey] = {
+        highest: mode,
+        modes: { [mode]: true },
+        accuracy: accuracy
+      };
+    } else {
+      const prev = this.clears[stageKey];
+      prev.modes = prev.modes || {};
+      prev.modes[mode] = true;
+      const prevRank = MODE_RANK[prev.highest] || 0;
+      const newRank = MODE_RANK[mode] || 0;
+      if (newRank >= prevRank) {
+        prev.highest = mode;
+      }
+      if (accuracy > (prev.accuracy || 0)) {
+        prev.accuracy = accuracy;
+      }
+    }
+    this.saveProgress();
+    return this.clears[stageKey];
+  }
+
+  getStageClear(stage) {
+    return this.clears[stage.toString()] || null;
+  }
+
+  getClearanceCounts() {
+    let quick = 0, standard = 0, challenge = 0;
+    for (const [_, info] of Object.entries(this.clears)) {
+      if (!info || !info.highest) continue;
+      if (info.highest === 'challenge') challenge++;
+      else if (info.highest === 'standard') standard++;
+      else if (info.highest === 'quick') quick++;
+    }
+    return { quick, standard, challenge, totalCleared: quick + standard + challenge };
+  }
+
   saveProgress() {
     try {
       if (this.storage) {
         this.storage.setItem('morse_koch_stage', this.maxUnlockedLevel.toString());
+        this.storage.setItem('morse_koch_clears', JSON.stringify(this.clears));
       }
     } catch(_) {}
   }
@@ -48,6 +101,7 @@ class KochManager {
   resetProgress() {
     this.maxUnlockedLevel = 1;
     this.currentLevel = 1;
+    this.clears = {};
     this.saveProgress();
   }
 

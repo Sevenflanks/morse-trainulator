@@ -457,3 +457,233 @@
   box-shadow: 0 0 8px rgba(255, 82, 82, 0.5);
 }
 
+/* ====================================================
+ * KOCH STAGE MATRIX & CLEARANCE TIERS
+ * ==================================================== */
+
+.koch-trophy-summary {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+  align-items: center;
+  margin: 6px 0 10px 0;
+}
+
+.trophy-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 3px 8px;
+  border-radius: 12px;
+  font-size: 0.72rem;
+  font-weight: 600;
+  background: #10151f;
+  border: 1px solid #233042;
+  color: #99aabf;
+  white-space: nowrap;
+}
+
+.trophy-pill strong {
+  font-family: monospace;
+  font-size: 0.8rem;
+}
+
+.trophy-pill.pill-challenge {
+  background: #1c1706;
+  border-color: #634b12;
+  color: #ffd700;
+  box-shadow: 0 0 6px rgba(255, 215, 0, 0.15);
+}
+.trophy-pill.pill-challenge strong {
+  color: #fff;
+}
+
+.trophy-pill.pill-standard {
+  background: #081a24;
+  border-color: #0c4d6b;
+  color: #00e5ff;
+}
+.trophy-pill.pill-standard strong {
+  color: #fff;
+}
+
+.trophy-pill.pill-quick {
+  background: #0a1c12;
+  border-color: #15572e;
+  color: #00e676;
+}
+.trophy-pill.pill-quick strong {
+  color: #fff;
+}
+
+.trophy-pill.pill-total {
+  background: #12141a;
+  border-color: #2b303d;
+  color: #889;
+  margin-left: auto;
+}
+
+/* Koch Stage Matrix Map */
+.koch-matrix-card {
+  background: #0a0f16;
+  border: 1px solid #1c2738;
+  border-radius: 8px;
+  padding: 10px;
+  margin-bottom: 12px;
+}
+
+.koch-stage-grid {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 5px;
+  max-height: 220px;
+  overflow-y: auto;
+  padding-right: 2px;
+}
+
+.koch-stage-grid::-webkit-scrollbar {
+  width: 4px;
+}
+.koch-stage-grid::-webkit-scrollbar-thumb {
+  background: #253347;
+  border-radius: 2px;
+}
+
+@media (max-width: 520px) {
+  .koch-stage-grid {
+    grid-template-columns: repeat(5, 1fr);
+    gap: 4px;
+    max-height: 260px;
+  }
+}
+
+.stage-cell {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 38px;
+  padding: 2px 4px;
+  background: #111722;
+  border: 1px solid #233145;
+  border-radius: 5px;
+  color: #ccc;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  user-select: none;
+}
+
+.stage-cell:hover:not(:disabled) {
+  background: #1b2638;
+  border-color: #3f5575;
+  color: #fff;
+}
+
+.stage-cell.active-stage {
+  border-color: var(--neon-blue) !important;
+  background: #102436 !important;
+  box-shadow: 0 0 10px rgba(0, 229, 255, 0.45);
+  transform: scale(1.03);
+  z-index: 2;
+}
+
+.stage-cell.cell-cleared-challenge {
+  background: #1c1706;
+  border-color: #785a14;
+  box-shadow: 0 0 5px rgba(255, 215, 0, 0.12);
+}
+.stage-cell.cell-cleared-challenge .stage-char {
+  color: #ffd700;
+  font-weight: bold;
+}
+
+.stage-cell.cell-cleared-standard {
+  background: #081c29;
+  border-color: #0c597d;
+}
+.stage-cell.cell-cleared-standard .stage-char {
+  color: #00e5ff;
+  font-weight: bold;
+}
+
+.stage-cell.cell-cleared-quick {
+  background: #091c13;
+  border-color: #175e33;
+}
+.stage-cell.cell-cleared-quick .stage-char {
+  color: #00e676;
+}
+
+.stage-cell.cell-locked {
+  background: #0b0e14;
+  border-color: #171f2b;
+  color: #445063;
+  cursor: not-allowed;
+  opacity: 0.55;
+}
+
+.stage-cell-top {
+  display: flex;
+  justify-content: space-between;
+  width: 100%;
+  font-size: 0.58rem;
+  line-height: 1;
+  margin-bottom: 2px;
+}
+
+.stage-num {
+  color: #728296;
+  font-family: monospace;
+}
+
+.stage-medal {
+  font-size: 0.66rem;
+  line-height: 1;
+}
+
+.stage-char {
+  font-size: 0.86rem;
+  font-weight: 800;
+  font-family: 'Arial Black', sans-serif;
+  line-height: 1.1;
+  color: #fff;
+}
+
+/* Tier Badges on Active Stage Card */
+.badge-tier {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  padding: 2px 7px;
+  border-radius: 10px;
+  font-size: 0.72rem;
+  font-weight: bold;
+  white-space: nowrap;
+}
+
+.badge-tier.tier-challenge {
+  background: #2b2207;
+  border: 1px solid #9e771a;
+  color: #ffd700;
+  box-shadow: 0 0 6px rgba(255, 215, 0, 0.25);
+}
+
+.badge-tier.tier-standard {
+  background: #002d3d;
+  border: 1px solid #006f9c;
+  color: #00e5ff;
+}
+
+.badge-tier.tier-quick {
+  background: #0d2818;
+  border: 1px solid #196b34;
+  color: #00e676;
+}
+
+.badge-tier.tier-none {
+  background: #141822;
+  border: 1px solid #283244;
+  color: #889;
+}
+

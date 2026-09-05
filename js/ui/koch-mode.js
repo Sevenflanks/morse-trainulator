@@ -92,6 +92,103 @@ function renderPoolChips(container, pool, engine) {
   });
 }
 
+function getClearBadgeHtml(clearInfo) {
+  if (!clearInfo || !clearInfo.highest) {
+    return '<span class="badge-tier tier-none">⚪ 尚未通關</span>';
+  }
+  if (clearInfo.highest === 'challenge') {
+    return '<span class="badge-tier tier-challenge">👑 極限征服</span>';
+  }
+  if (clearInfo.highest === 'standard') {
+    return '<span class="badge-tier tier-standard">🏆 正規合格</span>';
+  }
+  if (clearInfo.highest === 'quick') {
+    return '<span class="badge-tier tier-quick">🟢 基礎通過</span>';
+  }
+  return '<span class="badge-tier tier-none">⚪ 尚未通關</span>';
+}
+
+function selectKochStage(lvl) {
+  const kochManager = window.kochManager;
+  if (!kochManager) return;
+  if (lvl < 1 || lvl > kochManager.maxUnlockedLevel) return;
+  kochManager.currentLevel = lvl;
+  updateKochUI();
+  updatePcbKochVisuals();
+}
+
+function renderStageMatrix() {
+  const kochManager = window.kochManager;
+  if (!kochManager) return;
+  const grid = document.getElementById('koch-stage-grid');
+  if (!grid) return;
+  grid.innerHTML = '';
+
+  const curLvl = kochManager.currentLevel;
+  const maxLvl = kochManager.maxUnlockedLevel;
+  const seqList = (typeof KOCH_SEQUENCE !== 'undefined') ? KOCH_SEQUENCE : [];
+
+  for (let i = 1; i <= 35; i++) {
+    const isUnlocked = (i <= maxLvl);
+    const clearInfo = typeof kochManager.getStageClear === 'function' ? kochManager.getStageClear(i) : null;
+    const charLabel = (i === 1) ? 'K,M' : (seqList[i] || i);
+
+    const btn = document.createElement('button');
+    btn.type = 'button';
+    btn.className = 'stage-cell';
+    if (!btn.dataset) btn.dataset = {};
+    btn.dataset.level = i;
+    if (typeof btn.setAttribute === 'function') {
+      btn.setAttribute('data-level', i);
+    }
+
+    let medalIcon = '';
+    if (!isUnlocked) {
+      btn.classList.add('cell-locked');
+      btn.disabled = true;
+      btn.title = `第 ${i} 關 (${charLabel}) - 尚未解鎖`;
+      medalIcon = '🔒';
+    } else {
+      if (i === curLvl) {
+        btn.classList.add('active-stage');
+      }
+      if (clearInfo && clearInfo.highest) {
+        if (clearInfo.highest === 'challenge') {
+          btn.classList.add('cell-cleared-challenge');
+          btn.title = `第 ${i} 關 (${charLabel}) · 👑 極限挑戰征服 (最高含金量)`;
+          medalIcon = '👑';
+        } else if (clearInfo.highest === 'standard') {
+          btn.classList.add('cell-cleared-standard');
+          btn.title = `第 ${i} 關 (${charLabel}) · 🏆 正規考核合格`;
+          medalIcon = '🏆';
+        } else if (clearInfo.highest === 'quick') {
+          btn.classList.add('cell-cleared-quick');
+          btn.title = `第 ${i} 關 (${charLabel}) · 🟢 基礎練習通過`;
+          medalIcon = '🟢';
+        }
+      } else {
+        btn.classList.add('cell-unlocked');
+        btn.title = `第 ${i} 關 (${charLabel}) · 已解鎖 (未通關)`;
+      }
+
+      btn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        selectKochStage(i);
+      });
+    }
+
+    btn.innerHTML = `
+      <div class="stage-cell-top">
+        <span class="stage-num">${i}</span>
+        <span class="stage-medal">${medalIcon}</span>
+      </div>
+      <span class="stage-char">${charLabel}</span>
+    `;
+
+    grid.appendChild(btn);
+  }
+}
+
 function updateKochUI() {
   const kochManager = window.kochManager;
   const engine = window.engine;
@@ -113,12 +210,36 @@ function updateKochUI() {
   const kochPoolText = document.getElementById('koch-pool-text');
   const kochPoolStage1 = document.getElementById('koch-pool-stage1');
   const kochStageSelect = document.getElementById('koch-stage-select');
+  const stage1ClearBadge = document.getElementById('koch-stage1-clear-badge');
+  const targetClearBadge = document.getElementById('koch-target-clear-badge');
 
   if (kochStageBadge) kochStageBadge.textContent = `第 ${curLvl} 關 / 共 35 關`;
   const unlockedCount = maxLvl + 1;
   const masteryPct = Math.round((unlockedCount / 36) * 100);
   if (kochMasteryText) kochMasteryText.textContent = `已解鎖 ${unlockedCount} / 36 (${masteryPct}%)`;
   if (kochMasteryBar) kochMasteryBar.style.width = `${masteryPct}%`;
+
+  // Update trophy summary counts
+  if (typeof kochManager.getClearanceCounts === 'function') {
+    const counts = kochManager.getClearanceCounts();
+    const cntCh = document.getElementById('trophy-cnt-challenge');
+    const cntStd = document.getElementById('trophy-cnt-standard');
+    const cntQk = document.getElementById('trophy-cnt-quick');
+    const cntTot = document.getElementById('trophy-cnt-total');
+    if (cntCh) cntCh.textContent = counts.challenge;
+    if (cntStd) cntStd.textContent = counts.standard;
+    if (cntQk) cntQk.textContent = counts.quick;
+    if (cntTot) cntTot.textContent = counts.totalCleared;
+  }
+
+  // Render 35 Stage Matrix
+  renderStageMatrix();
+
+  // Update active stage clear badges
+  const curClear = typeof kochManager.getStageClear === 'function' ? kochManager.getStageClear(curLvl) : null;
+  const badgeHtml = getClearBadgeHtml(curClear);
+  if (stage1ClearBadge) stage1ClearBadge.innerHTML = badgeHtml;
+  if (targetClearBadge) targetClearBadge.innerHTML = badgeHtml;
 
   if (curLvl === 1) {
     if (kochStage1Card) kochStage1Card.style.display = 'flex';
@@ -132,14 +253,21 @@ function updateKochUI() {
     if (kochPoolText) renderPoolChips(kochPoolText, pool, engine);
   }
 
-  // Re-populate stage selector
+  // Re-populate stage selector with clear honors
   if (kochStageSelect) {
     kochStageSelect.innerHTML = '';
     const seqList = (typeof KOCH_SEQUENCE !== 'undefined') ? KOCH_SEQUENCE : [];
     for (let i = 1; i <= maxLvl; i++) {
       const opt = document.createElement('option');
       opt.value = i;
-      opt.textContent = (i === 1) ? `第 1 關 (入門雙星 K, M)` : `第 ${i} 關 (新字元 ${seqList[i] || i})`;
+      const clearInfo = typeof kochManager.getStageClear === 'function' ? kochManager.getStageClear(i) : null;
+      let prefix = '';
+      if (clearInfo && clearInfo.highest) {
+        if (clearInfo.highest === 'challenge') prefix = '👑 [極限] ';
+        else if (clearInfo.highest === 'standard') prefix = '🏆 [正規] ';
+        else if (clearInfo.highest === 'quick') prefix = '🟢 [基礎] ';
+      }
+      opt.textContent = (i === 1) ? `${prefix}第 1 關 (入門雙星 K, M)` : `${prefix}第 ${i} 關 (新字元 ${seqList[i] || i})`;
       if (i === curLvl) opt.selected = true;
       kochStageSelect.appendChild(opt);
     }
@@ -952,13 +1080,38 @@ function finishKochDrillSession(isManualStop = false) {
       ? `<br><span style="color:#ffb703;">⚠️ 考核期間重置計時：<strong>${kochState.challengeResetCount}</strong> 次（累計發報 ${allTotal} 題）</span>`
       : '';
 
+    const MODE_NAMES = {
+      'quick': '🟢 基礎練習',
+      'standard': '🏆 正規考核',
+      'challenge': '👑 極限挑戰'
+    };
+    const prevClear = typeof kochManager.getStageClear === 'function' ? kochManager.getStageClear(currentLvl) : null;
+    const prevHighest = prevClear ? prevClear.highest : null;
+    const prevRank = { 'quick': 1, 'standard': 2, 'challenge': 3 }[prevHighest] || 0;
+    const newRank = { 'quick': 1, 'standard': 2, 'challenge': 3 }[kochState.mode] || 1;
+
+    if (typeof kochManager.recordClear === 'function') {
+      kochManager.recordClear(currentLvl, kochState.mode, accuracy);
+    }
+
+    let honorNotice = '';
+    if (!prevHighest) {
+      honorNotice = `<br><span style="color:#ffd700;">🎖️ 通關榮譽：獲得<strong>【${MODE_NAMES[kochState.mode]}】</strong>認證！</span>`;
+    } else if (newRank > prevRank) {
+      honorNotice = `<br><span style="color:#ffd700;">🎉 榮譽晉升！本關由【${MODE_NAMES[prevHighest]}】升級為<strong>【${MODE_NAMES[kochState.mode]}】</strong>最高榮譽！</span>`;
+    } else if (kochState.mode === prevHighest) {
+      honorNotice = `<br><span style="color:#00e5ff;">🎖️ 保持<strong>【${MODE_NAMES[prevHighest]}】</strong>榮譽紀錄！</span>`;
+    } else {
+      honorNotice = `<br><span style="color:#889;">本關曾以含金量更高的<strong>【${MODE_NAMES[prevHighest]}】</strong>通關，紀錄予以保留。</span>`;
+    }
+
     if (currentLvl === maxLvl && maxLvl < 35) {
       kochManager.maxUnlockedLevel++;
       kochManager.saveProgress();
       const newChar = KOCH_SEQUENCE[kochManager.maxUnlockedLevel];
 
       if (kochScDesc) {
-        kochScDesc.innerHTML = `太棒了！正確率達到 <strong>${accuracy}%</strong>（高於 90% 通關標準）！${resetNotice}<br>
+        kochScDesc.innerHTML = `太棒了！正確率達到 <strong>${accuracy}%</strong>（高於 90% 通關標準）！${resetNotice}${honorNotice}<br>
           已永久在 PCB 電路板上點亮並解鎖新字元：<strong style="color:var(--gold); font-size:1.1rem;">[ ${newChar} ]</strong> (${engine ? engine.getSequenceForLetter(newChar) : ''})！`;
       }
 
@@ -979,7 +1132,7 @@ function finishKochDrillSession(isManualStop = false) {
       }, 300);
     } else if (currentLvl < maxLvl) {
       if (kochScDesc) {
-        kochScDesc.innerHTML = `考核完成！正確率達 <strong>${accuracy}%</strong>！反射神經極佳！${resetNotice}`;
+        kochScDesc.innerHTML = `考核完成！正確率達 <strong>${accuracy}%</strong>！反射神經極佳！${resetNotice}${honorNotice}`;
       }
       if (btnKochNextStage) {
         btnKochNextStage.style.display = 'inline-block';
@@ -987,12 +1140,14 @@ function finishKochDrillSession(isManualStop = false) {
       }
     } else {
       if (kochScDesc) {
-        kochScDesc.innerHTML = `🏆 傳奇誕生！您已全通 36 關！整張 PCB 電路板與數字匯流排已全面通電！${resetNotice}`;
+        kochScDesc.innerHTML = `🏆 傳奇誕生！您已全通 36 關！整張 PCB 電路板與數字匯流排已全面通電！${resetNotice}${honorNotice}`;
       }
       if (btnKochNextStage) {
         btnKochNextStage.style.display = 'none';
       }
     }
+
+    updateKochUI();
 
     if (evalStatus) {
       evalStatus.textContent = `🎉 關卡突破！正確率 ${accuracy}%`;
@@ -1035,6 +1190,9 @@ function finishKochDrillSession(isManualStop = false) {
 
 if (typeof window !== 'undefined') {
   window.startKochSessionTiming = startKochSessionTiming;
+  window.renderStageMatrix = renderStageMatrix;
+  window.getClearBadgeHtml = getClearBadgeHtml;
+  window.selectKochStage = selectKochStage;
 }
 
 if (typeof module !== 'undefined' && module.exports) {
@@ -1042,6 +1200,9 @@ if (typeof module !== 'undefined' && module.exports) {
     kochState,
     updatePcbKochVisuals,
     updateKochUI,
+    renderStageMatrix,
+    getClearBadgeHtml,
+    selectKochStage,
     setKochAssessmentMode,
     startKochDrill,
     stopKochDrill,

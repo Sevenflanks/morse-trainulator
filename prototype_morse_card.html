@@ -1093,6 +1093,233 @@
       box-shadow: 0 0 8px rgba(255, 82, 82, 0.5);
     }
 
+    /* KOCH STAGE MATRIX & CLEARANCE TIERS */
+    .koch-trophy-summary {
+      display: flex;
+      gap: 6px;
+      flex-wrap: wrap;
+      align-items: center;
+      margin: 6px 0 10px 0;
+    }
+
+    .trophy-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      padding: 3px 8px;
+      border-radius: 12px;
+      font-size: 0.72rem;
+      font-weight: 600;
+      background: #10151f;
+      border: 1px solid #233042;
+      color: #99aabf;
+      white-space: nowrap;
+    }
+
+    .trophy-pill strong {
+      font-family: monospace;
+      font-size: 0.8rem;
+    }
+
+    .trophy-pill.pill-challenge {
+      background: #1c1706;
+      border-color: #634b12;
+      color: #ffd700;
+      box-shadow: 0 0 6px rgba(255, 215, 0, 0.15);
+    }
+    .trophy-pill.pill-challenge strong {
+      color: #fff;
+    }
+
+    .trophy-pill.pill-standard {
+      background: #081a24;
+      border-color: #0c4d6b;
+      color: #00e5ff;
+    }
+    .trophy-pill.pill-standard strong {
+      color: #fff;
+    }
+
+    .trophy-pill.pill-quick {
+      background: #0a1c12;
+      border-color: #15572e;
+      color: #00e676;
+    }
+    .trophy-pill.pill-quick strong {
+      color: #fff;
+    }
+
+    .trophy-pill.pill-total {
+      background: #12141a;
+      border-color: #2b303d;
+      color: #889;
+      margin-left: auto;
+    }
+
+    /* Koch Stage Matrix Map */
+    .koch-matrix-card {
+      background: #0a0f16;
+      border: 1px solid #1c2738;
+      border-radius: 8px;
+      padding: 10px;
+      margin-bottom: 12px;
+    }
+
+    .koch-stage-grid {
+      display: grid;
+      grid-template-columns: repeat(7, 1fr);
+      gap: 5px;
+      max-height: 220px;
+      overflow-y: auto;
+      padding-right: 2px;
+    }
+
+    .koch-stage-grid::-webkit-scrollbar {
+      width: 4px;
+    }
+    .koch-stage-grid::-webkit-scrollbar-thumb {
+      background: #253347;
+      border-radius: 2px;
+    }
+
+    @media (max-width: 520px) {
+      .koch-stage-grid {
+        grid-template-columns: repeat(5, 1fr);
+        gap: 4px;
+        max-height: 260px;
+      }
+    }
+
+    .stage-cell {
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      min-height: 38px;
+      padding: 2px 4px;
+      background: #111722;
+      border: 1px solid #233145;
+      border-radius: 5px;
+      color: #ccc;
+      cursor: pointer;
+      transition: all 0.15s ease;
+      user-select: none;
+    }
+
+    .stage-cell:hover:not(:disabled) {
+      background: #1b2638;
+      border-color: #3f5575;
+      color: #fff;
+    }
+
+    .stage-cell.active-stage {
+      border-color: var(--neon-blue) !important;
+      background: #102436 !important;
+      box-shadow: 0 0 10px rgba(0, 229, 255, 0.45);
+      transform: scale(1.03);
+      z-index: 2;
+    }
+
+    .stage-cell.cell-cleared-challenge {
+      background: #1c1706;
+      border-color: #785a14;
+      box-shadow: 0 0 5px rgba(255, 215, 0, 0.12);
+    }
+    .stage-cell.cell-cleared-challenge .stage-char {
+      color: #ffd700;
+      font-weight: bold;
+    }
+
+    .stage-cell.cell-cleared-standard {
+      background: #081c29;
+      border-color: #0c597d;
+    }
+    .stage-cell.cell-cleared-standard .stage-char {
+      color: #00e5ff;
+      font-weight: bold;
+    }
+
+    .stage-cell.cell-cleared-quick {
+      background: #091c13;
+      border-color: #175e33;
+    }
+    .stage-cell.cell-cleared-quick .stage-char {
+      color: #00e676;
+    }
+
+    .stage-cell.cell-locked {
+      background: #0b0e14;
+      border-color: #171f2b;
+      color: #445063;
+      cursor: not-allowed;
+      opacity: 0.55;
+    }
+
+    .stage-cell-top {
+      display: flex;
+      justify-content: space-between;
+      width: 100%;
+      font-size: 0.58rem;
+      line-height: 1;
+      margin-bottom: 2px;
+    }
+
+    .stage-num {
+      color: #728296;
+      font-family: monospace;
+    }
+
+    .stage-medal {
+      font-size: 0.66rem;
+      line-height: 1;
+    }
+
+    .stage-char {
+      font-size: 0.86rem;
+      font-weight: 800;
+      font-family: 'Arial Black', sans-serif;
+      line-height: 1.1;
+      color: #fff;
+    }
+
+    /* Tier Badges on Active Stage Card */
+    .badge-tier {
+      display: inline-flex;
+      align-items: center;
+      gap: 3px;
+      padding: 2px 7px;
+      border-radius: 10px;
+      font-size: 0.72rem;
+      font-weight: bold;
+      white-space: nowrap;
+    }
+
+    .badge-tier.tier-challenge {
+      background: #2b2207;
+      border: 1px solid #9e771a;
+      color: #ffd700;
+      box-shadow: 0 0 6px rgba(255, 215, 0, 0.25);
+    }
+
+    .badge-tier.tier-standard {
+      background: #002d3d;
+      border: 1px solid #006f9c;
+      color: #00e5ff;
+    }
+
+    .badge-tier.tier-quick {
+      background: #0d2818;
+      border: 1px solid #196b34;
+      color: #00e676;
+    }
+
+    .badge-tier.tier-none {
+      background: #141822;
+      border: 1px solid #283244;
+      color: #889;
+    }
+
     /* SVG PCB Traces & Nodes */
     .wire {
       stroke: var(--wire-base);
@@ -1607,13 +1834,48 @@
           </div>
 
           <!-- Overall card mastery progress bar -->
-          <div style="margin: 8px 0 12px 0;">
+          <div style="margin: 8px 0 10px 0;">
             <div style="display:flex; justify-content:space-between; font-size:0.72rem; color:#888; margin-bottom:4px;">
-              <span>PCB 點亮掌握度 (Mastery)</span>
+              <span>PCB 掌握度 (Mastery)</span>
               <span id="koch-mastery-text" style="color:var(--neon-blue); font-weight:bold;">已解鎖 2 / 36 (6%)</span>
             </div>
             <div style="width:100%; height:6px; background:#181d28; border-radius:3px; overflow:hidden;">
               <div id="koch-mastery-bar" style="width:6%; height:100%; background:linear-gradient(90deg, #00e5ff, #ffd700); transition: width 0.3s ease;"></div>
+            </div>
+          </div>
+
+          <!-- Clearance Trophy Summary -->
+          <div class="koch-trophy-summary" id="koch-trophy-summary">
+            <span class="trophy-pill pill-challenge" title="極限挑戰征服關卡數">
+              <span>👑 極限征服:</span> <strong id="trophy-cnt-challenge">0</strong>
+            </span>
+            <span class="trophy-pill pill-standard" title="正規考核合格關卡數">
+              <span>🏆 正規合格:</span> <strong id="trophy-cnt-standard">0</strong>
+            </span>
+            <span class="trophy-pill pill-quick" title="基礎練習通過關卡數">
+              <span>🟢 基礎通過:</span> <strong id="trophy-cnt-quick">0</strong>
+            </span>
+            <span class="trophy-pill pill-total" title="通關總進度">
+              <span>通關: <strong id="trophy-cnt-total">0</strong>/35</span>
+            </span>
+          </div>
+
+          <!-- 35 Stage Map Matrix -->
+          <div class="koch-matrix-card" id="koch-matrix-card">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
+              <div style="display: flex; align-items: center; gap: 6px;">
+                <span style="font-size: 0.76rem; font-weight: bold; color: var(--neon-blue);">🗺️ 關卡地圖 (點擊切換關卡)</span>
+              </div>
+              <div style="display: flex; align-items: center; gap: 6px; font-size: 0.68rem;">
+                <span style="color: #ffd700;" title="極限挑戰征服">👑極限</span>
+                <span style="color: #00e5ff;" title="正規考核合格">🏆正規</span>
+                <span style="color: #00e676;" title="基礎練習通過">🟢基礎</span>
+                <span style="color: #667;" title="尚未通關">⚪未過</span>
+                <span style="color: #445;" title="未解鎖關卡">🔒鎖定</span>
+              </div>
+            </div>
+            <div class="koch-stage-grid" id="koch-stage-grid">
+              <!-- Dynamically populated 35 stages -->
             </div>
           </div>
 
@@ -1625,8 +1887,9 @@
             </div>
             <div style="flex:1; display:flex; flex-direction:column; justify-content:center; gap:4px;">
               <div style="display:flex; justify-content:space-between; align-items:center;">
-                <div style="font-size:0.85rem; font-weight:bold; color:#fff;">
-                  摩斯碼: <span id="koch-target-seq" style="color:var(--gold); letter-spacing:2px; font-family:monospace; font-size:1.1rem;">--</span>
+                <div style="font-size:0.85rem; font-weight:bold; color:#fff; display:flex; align-items:center; gap:8px;">
+                  <span>摩斯碼: <span id="koch-target-seq" style="color:var(--gold); letter-spacing:2px; font-family:monospace; font-size:1.1rem;">--</span></span>
+                  <span id="koch-target-clear-badge" class="badge-tier tier-none">⚪ 尚未通關</span>
                 </div>
                 <button id="btn-koch-target-listen" style="background:#1b2636; border:1px solid #3d506b; color:#00e5ff; border-radius:4px; padding:3px 8px; font-size:0.75rem; cursor:pointer; display:flex; align-items:center; gap:4px;">
                   <span>🔊 試聽音形</span>
@@ -3516,6 +3779,56 @@
         this.mode = 'quick';
         this.duration = 180;
         this.reflexTimeout = 2000;
+
+        // Clearance Records: { [stage]: { highest: 'quick'|'standard'|'challenge', modes: {}, accuracy: number } }
+        this.clears = {};
+        try {
+          const clearsRaw = localStorage.getItem('morse_koch_clears');
+          if (clearsRaw) {
+            this.clears = JSON.parse(clearsRaw);
+          }
+        } catch(_) {}
+      }
+
+      recordClear(stage, mode, accuracy = 100) {
+        const stageKey = stage.toString();
+        const MODE_RANK = { 'quick': 1, 'standard': 2, 'challenge': 3 };
+        if (!this.clears[stageKey]) {
+          this.clears[stageKey] = {
+            highest: mode,
+            modes: { [mode]: true },
+            accuracy: accuracy
+          };
+        } else {
+          const prev = this.clears[stageKey];
+          prev.modes = prev.modes || {};
+          prev.modes[mode] = true;
+          const prevRank = MODE_RANK[prev.highest] || 0;
+          const newRank = MODE_RANK[mode] || 0;
+          if (newRank >= prevRank) {
+            prev.highest = mode;
+          }
+          if (accuracy > (prev.accuracy || 0)) {
+            prev.accuracy = accuracy;
+          }
+        }
+        this.saveProgress();
+        return this.clears[stageKey];
+      }
+
+      getStageClear(stage) {
+        return this.clears[stage.toString()] || null;
+      }
+
+      getClearanceCounts() {
+        let quick = 0, standard = 0, challenge = 0;
+        for (const [_, info] of Object.entries(this.clears)) {
+          if (!info || !info.highest) continue;
+          if (info.highest === 'challenge') challenge++;
+          else if (info.highest === 'standard') standard++;
+          else if (info.highest === 'quick') quick++;
+        }
+        return { quick, standard, challenge, totalCleared: quick + standard + challenge };
       }
 
       getUnlockedPool(lvl = this.currentLevel) {
@@ -3529,12 +3842,14 @@
       saveProgress() {
         try {
           localStorage.setItem('morse_koch_stage', this.maxUnlockedLevel.toString());
+          localStorage.setItem('morse_koch_clears', JSON.stringify(this.clears));
         } catch(_) {}
       }
 
       resetProgress() {
         this.maxUnlockedLevel = 1;
         this.currentLevel = 1;
+        this.clears = {};
         this.saveProgress();
       }
 
@@ -4768,6 +5083,100 @@
       }
     }
 
+    function getClearBadgeHtml(clearInfo) {
+      if (!clearInfo || !clearInfo.highest) {
+        return '<span class="badge-tier tier-none">⚪ 尚未通關</span>';
+      }
+      if (clearInfo.highest === 'challenge') {
+        return '<span class="badge-tier tier-challenge">👑 極限征服</span>';
+      }
+      if (clearInfo.highest === 'standard') {
+        return '<span class="badge-tier tier-standard">🏆 正規合格</span>';
+      }
+      if (clearInfo.highest === 'quick') {
+        return '<span class="badge-tier tier-quick">🟢 基礎通過</span>';
+      }
+      return '<span class="badge-tier tier-none">⚪ 尚未通關</span>';
+    }
+
+    function selectKochStage(lvl) {
+      if (!kochManager) return;
+      if (lvl < 1 || lvl > kochManager.maxUnlockedLevel) return;
+      kochManager.currentLevel = lvl;
+      updateKochUI();
+      updatePcbKochVisuals();
+    }
+
+    function renderStageMatrix() {
+      if (!kochManager) return;
+      const grid = document.getElementById('koch-stage-grid');
+      if (!grid) return;
+      grid.innerHTML = '';
+
+      const curLvl = kochManager.currentLevel;
+      const maxLvl = kochManager.maxUnlockedLevel;
+
+      for (let i = 1; i <= 35; i++) {
+        const isUnlocked = (i <= maxLvl);
+        const clearInfo = typeof kochManager.getStageClear === 'function' ? kochManager.getStageClear(i) : null;
+        const charLabel = (i === 1) ? 'K,M' : (KOCH_SEQUENCE[i] || i);
+
+        const btn = document.createElement('button');
+        btn.type = 'button';
+        btn.className = 'stage-cell';
+        if (!btn.dataset) btn.dataset = {};
+        btn.dataset.level = i;
+        if (typeof btn.setAttribute === 'function') {
+          btn.setAttribute('data-level', i);
+        }
+
+        let medalIcon = '';
+        if (!isUnlocked) {
+          btn.classList.add('cell-locked');
+          btn.disabled = true;
+          btn.title = `第 ${i} 關 (${charLabel}) - 尚未解鎖`;
+          medalIcon = '🔒';
+        } else {
+          if (i === curLvl) {
+            btn.classList.add('active-stage');
+          }
+          if (clearInfo && clearInfo.highest) {
+            if (clearInfo.highest === 'challenge') {
+              btn.classList.add('cell-cleared-challenge');
+              btn.title = `第 ${i} 關 (${charLabel}) · 👑 極限挑戰征服 (最高含金量)`;
+              medalIcon = '👑';
+            } else if (clearInfo.highest === 'standard') {
+              btn.classList.add('cell-cleared-standard');
+              btn.title = `第 ${i} 關 (${charLabel}) · 🏆 正規考核合格`;
+              medalIcon = '🏆';
+            } else if (clearInfo.highest === 'quick') {
+              btn.classList.add('cell-cleared-quick');
+              btn.title = `第 ${i} 關 (${charLabel}) · 🟢 基礎練習通過`;
+              medalIcon = '🟢';
+            }
+          } else {
+            btn.classList.add('cell-unlocked');
+            btn.title = `第 ${i} 關 (${charLabel}) · 已解鎖 (未通關)`;
+          }
+
+          btn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            selectKochStage(i);
+          });
+        }
+
+        btn.innerHTML = `
+          <div class="stage-cell-top">
+            <span class="stage-num">${i}</span>
+            <span class="stage-medal">${medalIcon}</span>
+          </div>
+          <span class="stage-char">${charLabel}</span>
+        `;
+
+        grid.appendChild(btn);
+      }
+    }
+
     function updateKochUI() {
       const curLvl = kochManager.currentLevel;
       const maxLvl = kochManager.maxUnlockedLevel;
@@ -4775,24 +5184,55 @@
       const targetSeq = engine.getSequenceForLetter(targetChar) || '';
       const pool = kochManager.getUnlockedPool(curLvl);
 
-      kochStageBadge.textContent = `第 ${curLvl} 關 / 共 35 關`;
+      if (kochStageBadge) kochStageBadge.textContent = `第 ${curLvl} 關 / 共 35 關`;
       const unlockedCount = maxLvl + 1;
       const masteryPct = Math.round((unlockedCount / 36) * 100);
-      kochMasteryText.textContent = `已解鎖 ${unlockedCount} / 36 (${masteryPct}%)`;
-      kochMasteryBar.style.width = `${masteryPct}%`;
+      if (kochMasteryText) kochMasteryText.textContent = `已解鎖 ${unlockedCount} / 36 (${masteryPct}%)`;
+      if (kochMasteryBar) kochMasteryBar.style.width = `${masteryPct}%`;
 
-      kochTargetChar.textContent = targetChar;
-      kochTargetSeq.textContent = targetSeq;
-      kochPoolText.textContent = pool.join(', ');
+      if (kochTargetChar) kochTargetChar.textContent = targetChar;
+      if (kochTargetSeq) kochTargetSeq.textContent = targetSeq;
+      if (kochPoolText) kochPoolText.textContent = pool.join(', ');
 
-      // Re-populate stage selector
-      kochStageSelect.innerHTML = '';
-      for (let i = 1; i <= maxLvl; i++) {
-        const opt = document.createElement('option');
-        opt.value = i;
-        opt.textContent = `第 ${i} 關 (${KOCH_SEQUENCE[i]})`;
-        if (i === curLvl) opt.selected = true;
-        kochStageSelect.appendChild(opt);
+      // Update trophy summary counts
+      if (typeof kochManager.getClearanceCounts === 'function') {
+        const counts = kochManager.getClearanceCounts();
+        const cntCh = document.getElementById('trophy-cnt-challenge');
+        const cntStd = document.getElementById('trophy-cnt-standard');
+        const cntQk = document.getElementById('trophy-cnt-quick');
+        const cntTot = document.getElementById('trophy-cnt-total');
+        if (cntCh) cntCh.textContent = counts.challenge;
+        if (cntStd) cntStd.textContent = counts.standard;
+        if (cntQk) cntQk.textContent = counts.quick;
+        if (cntTot) cntTot.textContent = counts.totalCleared;
+      }
+
+      // Render 35 Stage Matrix
+      renderStageMatrix();
+
+      // Update active stage clear badge
+      const curClear = typeof kochManager.getStageClear === 'function' ? kochManager.getStageClear(curLvl) : null;
+      const badgeHtml = getClearBadgeHtml(curClear);
+      const targetClearBadge = document.getElementById('koch-target-clear-badge');
+      if (targetClearBadge) targetClearBadge.innerHTML = badgeHtml;
+
+      // Re-populate stage selector with honor prefix
+      if (kochStageSelect) {
+        kochStageSelect.innerHTML = '';
+        for (let i = 1; i <= maxLvl; i++) {
+          const opt = document.createElement('option');
+          opt.value = i;
+          const clearInfo = typeof kochManager.getStageClear === 'function' ? kochManager.getStageClear(i) : null;
+          let prefix = '';
+          if (clearInfo && clearInfo.highest) {
+            if (clearInfo.highest === 'challenge') prefix = '👑 [極限] ';
+            else if (clearInfo.highest === 'standard') prefix = '🏆 [正規] ';
+            else if (clearInfo.highest === 'quick') prefix = '🟢 [基礎] ';
+          }
+          opt.textContent = (i === 1) ? `${prefix}第 1 關 (${KOCH_SEQUENCE[1]})` : `${prefix}第 ${i} 關 (${KOCH_SEQUENCE[i]})`;
+          if (i === curLvl) opt.selected = true;
+          kochStageSelect.appendChild(opt);
+        }
       }
     }
 
@@ -5547,13 +5987,38 @@
           ? `<br><span style="color:#ffb703;">⚠️ 考核期間重置計時：<strong>${kochState.challengeResetCount}</strong> 次（累計發報 ${allTotal} 題）</span>`
           : '';
 
+        const MODE_NAMES = {
+          'quick': '🟢 基礎練習',
+          'standard': '🏆 正規考核',
+          'challenge': '👑 極限挑戰'
+        };
+        const prevClear = typeof kochManager.getStageClear === 'function' ? kochManager.getStageClear(currentLvl) : null;
+        const prevHighest = prevClear ? prevClear.highest : null;
+        const prevRank = { 'quick': 1, 'standard': 2, 'challenge': 3 }[prevHighest] || 0;
+        const newRank = { 'quick': 1, 'standard': 2, 'challenge': 3 }[kochState.mode] || 1;
+
+        if (typeof kochManager.recordClear === 'function') {
+          kochManager.recordClear(currentLvl, kochState.mode, accuracy);
+        }
+
+        let honorNotice = '';
+        if (!prevHighest) {
+          honorNotice = `<br><span style="color:#ffd700;">🎖️ 通關榮譽：獲得<strong>【${MODE_NAMES[kochState.mode]}】</strong>認證！</span>`;
+        } else if (newRank > prevRank) {
+          honorNotice = `<br><span style="color:#ffd700;">🎉 榮譽晉升！本關由【${MODE_NAMES[prevHighest]}】升級為<strong>【${MODE_NAMES[kochState.mode]}】</strong>最高榮譽！</span>`;
+        } else if (kochState.mode === prevHighest) {
+          honorNotice = `<br><span style="color:#00e5ff;">🎖️ 保持<strong>【${MODE_NAMES[prevHighest]}】</strong>榮譽紀錄！</span>`;
+        } else {
+          honorNotice = `<br><span style="color:#889;">本關曾以含金量更高的<strong>【${MODE_NAMES[prevHighest]}】</strong>通關，紀錄予以保留。</span>`;
+        }
+
         if (currentLvl === maxLvl && maxLvl < 35) {
           kochManager.maxUnlockedLevel++;
           kochManager.saveProgress();
           const newChar = KOCH_SEQUENCE[kochManager.maxUnlockedLevel];
 
           if (kochScDesc) {
-            kochScDesc.innerHTML = `太棒了！正確率達到 <strong>${accuracy}%</strong>（高於 90% 通關標準）！${resetNotice}<br>
+            kochScDesc.innerHTML = `太棒了！正確率達到 <strong>${accuracy}%</strong>（高於 90% 通關標準）！${resetNotice}${honorNotice}<br>
               已永久在 PCB 電路板上點亮並解鎖新字元：<strong style="color:var(--gold); font-size:1.1rem;">[ ${newChar} ]</strong> (${engine ? engine.getSequenceForLetter(newChar) : ''})！`;
           }
 
@@ -5574,7 +6039,7 @@
           }, 300);
         } else if (currentLvl < maxLvl) {
           if (kochScDesc) {
-            kochScDesc.innerHTML = `考核完成！正確率達 <strong>${accuracy}%</strong>！反射神經極佳！${resetNotice}`;
+            kochScDesc.innerHTML = `考核完成！正確率達 <strong>${accuracy}%</strong>！反射神經極佳！${resetNotice}${honorNotice}`;
           }
           if (btnKochNextStage) {
             btnKochNextStage.style.display = 'inline-block';
@@ -5582,7 +6047,7 @@
           }
         } else {
           if (kochScDesc) {
-            kochScDesc.innerHTML = `🏆 傳奇誕生！您已全通 36 關！整張 PCB 電路板與數字匯流排已全面通電！${resetNotice}`;
+            kochScDesc.innerHTML = `🏆 傳奇誕生！您已全通 36 關！整張 PCB 電路板與數字匯流排已全面通電！${resetNotice}${honorNotice}`;
           }
           if (btnKochNextStage) {
             btnKochNextStage.style.display = 'none';

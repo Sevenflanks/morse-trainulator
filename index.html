@@ -265,13 +265,48 @@
           </div>
 
           <!-- Overall card mastery progress bar -->
-          <div style="margin: 8px 0 12px 0;">
+          <div style="margin: 8px 0 10px 0;">
             <div style="display:flex; justify-content:space-between; font-size:0.72rem; color:#888; margin-bottom:4px;">
               <span>PCB 掌握度 (Mastery)</span>
               <span id="koch-mastery-text" style="color:var(--neon-blue); font-weight:bold;">已解鎖 2 / 36 (6%)</span>
             </div>
             <div style="width:100%; height:6px; background:#181d28; border-radius:3px; overflow:hidden;">
               <div id="koch-mastery-bar" style="width:6%; height:100%; background:linear-gradient(90deg, #00e5ff, #ffd700); transition: width 0.3s ease;"></div>
+            </div>
+          </div>
+
+          <!-- Clearance Trophy Summary -->
+          <div class="koch-trophy-summary" id="koch-trophy-summary">
+            <span class="trophy-pill pill-challenge" title="極限挑戰征服關卡數">
+              <span>👑 極限征服:</span> <strong id="trophy-cnt-challenge">0</strong>
+            </span>
+            <span class="trophy-pill pill-standard" title="正規考核合格關卡數">
+              <span>🏆 正規合格:</span> <strong id="trophy-cnt-standard">0</strong>
+            </span>
+            <span class="trophy-pill pill-quick" title="基礎練習通過關卡數">
+              <span>🟢 基礎通過:</span> <strong id="trophy-cnt-quick">0</strong>
+            </span>
+            <span class="trophy-pill pill-total" title="通關總進度">
+              <span>通關: <strong id="trophy-cnt-total">0</strong>/35</span>
+            </span>
+          </div>
+
+          <!-- 35 Stage Map Matrix -->
+          <div class="koch-matrix-card" id="koch-matrix-card">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
+              <div style="display: flex; align-items: center; gap: 6px;">
+                <span style="font-size: 0.76rem; font-weight: bold; color: var(--neon-blue);">🗺️ 關卡地圖 (點擊切換關卡)</span>
+              </div>
+              <div style="display: flex; align-items: center; gap: 6px; font-size: 0.68rem;">
+                <span style="color: #ffd700;" title="極限挑戰征服">👑極限</span>
+                <span style="color: #00e5ff;" title="正規考核合格">🏆正規</span>
+                <span style="color: #00e676;" title="基礎練習通過">🟢基礎</span>
+                <span style="color: #667;" title="尚未通關">⚪未過</span>
+                <span style="color: #445;" title="未解鎖關卡">🔒鎖定</span>
+              </div>
+            </div>
+            <div class="koch-stage-grid" id="koch-stage-grid">
+              <!-- Dynamically populated 35 stages -->
             </div>
           </div>
 
@@ -283,7 +318,7 @@
                 <span style="font-size: 0.82rem; font-weight: bold; color: var(--neon-blue); display: flex; align-items: center; gap: 6px;">
                   🌟 第 1 關入門雙星：K 與 M
                 </span>
-                <span style="font-size: 0.72rem; color: #889;">先聽辨點劃音形節奏再開始！</span>
+                <span id="koch-stage1-clear-badge" class="badge-tier tier-none">⚪ 尚未通關</span>
               </div>
               
               <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
@@ -335,8 +370,9 @@
               </div>
               <div style="flex:1; display:flex; flex-direction:column; justify-content:center; gap:4px;">
                 <div style="display:flex; justify-content:space-between; align-items:center;">
-                  <div style="font-size:0.85rem; font-weight:bold; color:#fff;">
-                    點劃編碼: <span id="koch-target-seq" style="color:var(--gold); letter-spacing:2px; font-family:monospace; font-size:1.1rem;">--</span>
+                  <div style="font-size:0.85rem; font-weight:bold; color:#fff; display:flex; align-items:center; gap:8px;">
+                    <span>點劃編碼: <span id="koch-target-seq" style="color:var(--gold); letter-spacing:2px; font-family:monospace; font-size:1.1rem;">--</span></span>
+                    <span id="koch-target-clear-badge" class="badge-tier tier-none">⚪ 尚未通關</span>
                   </div>
                   <button id="btn-koch-target-listen" style="background:#1b2636; border:1px solid #3d506b; color:#00e5ff; border-radius:4px; padding:3px 8px; font-size:0.75rem; cursor:pointer; display:flex; align-items:center; gap:4px;">
                     <span>🔊 試聽音形</span>
