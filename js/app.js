@@ -277,7 +277,7 @@ function setupKeyerCallbacks() {
 
     if (res.letter === '<HH>') {
       if (dom.evalStatus) {
-        dom.evalStatus.textContent = '⚠️ 檢測到更正訊號 (Error: 8 Dits)';
+        dom.evalStatus.innerHTML = '<i class="mdi mdi-alert"></i> 檢測到更正訊號 (Error: 8 Dits)';
         dom.evalStatus.style.color = '#ff9100';
       }
       highlightPath('.....', false, engine, dom.antennaShape);
@@ -310,7 +310,7 @@ function setupKeyerCallbacks() {
     if (dom.squeezeBanner) dom.squeezeBanner.classList.toggle('squeezing', isSqueezing);
     if (dom.squeezeStatus) {
       if (isSqueezing) {
-        dom.squeezeStatus.innerHTML = '<strong style="color:var(--gold);">⚡ 雙片夾壓中 (Squeezing)</strong> · 自動點劃交替中 (Iambic)';
+        dom.squeezeStatus.innerHTML = '<strong style="color:var(--gold);"><i class="mdi mdi-flash"></i> 雙片夾壓中 (Squeezing)</strong> · 自動點劃交替中 (Iambic)';
       } else if (ditMem || dahMem) {
         dom.squeezeStatus.innerHTML = `預先排程記憶: ${ditMem ? '· Dit 鎖存' : ''} ${dahMem ? '— Dah 鎖存' : ''}`;
       } else {
@@ -397,7 +397,7 @@ function updatePaddleLabels() {
     if (dom.paddleLeftName) dom.paddleLeftName.innerHTML = '<span style="font-size:1.3rem;">·</span> 點 Dit (自動連發)';
     if (dom.paddleRightName) dom.paddleRightName.innerHTML = '<span style="font-size:1.3rem;">—</span> 劃 Dah (手動長音)';
     if (dom.squeezeBanner) dom.squeezeBanner.classList.remove('squeezing');
-    if (dom.squeezeStatus) dom.squeezeStatus.innerHTML = '📻 <strong>半自動機械震報鍵 (Bug Key)</strong>：左撥片自動連發點 · 右撥片純手動長劃';
+    if (dom.squeezeStatus) dom.squeezeStatus.innerHTML = '<i class="mdi mdi-radio-handheld"></i> <strong>半自動機械震報鍵 (Bug Key)</strong>：左撥片自動連發點 · 右撥片純手動長劃';
     return;
   }
   const isRev = keyer.reversed;
@@ -441,7 +441,7 @@ function switchKeyerDevice(device, saveToSettings = true) {
     keyer.isBugMode = true;
     updatePaddleLabels();
     if (dom.evalStatus) {
-      dom.evalStatus.textContent = '📻 已切換至半自動機械震報鍵 (Bug Key) 模式';
+      dom.evalStatus.innerHTML = '<i class="mdi mdi-radio-handheld"></i> 已切換至半自動機械震報鍵 (Bug Key) 模式';
       dom.evalStatus.style.color = '#ffb703';
     }
   }
@@ -541,7 +541,7 @@ function handleKeyUp() {
 
   if (res.letter === '<HH>') {
     if (dom.evalStatus) {
-      dom.evalStatus.textContent = '⚠️ 檢測到更正訊號 (Error: 8 Dits)';
+      dom.evalStatus.innerHTML = '<i class="mdi mdi-alert"></i> 檢測到更正訊號 (Error: 8 Dits)';
       dom.evalStatus.style.color = '#ff9100';
     }
     highlightPath('.....', false, engine, dom.antennaShape);
@@ -579,7 +579,7 @@ function finalizeLetter() {
   if (res.isErrorSignal || res.letter === '<HH>') {
     const erasedStr = (res.erased && res.erased.length > 0) ? `「${res.erased.join('')}」` : '';
     if (dom.evalStatus) {
-      dom.evalStatus.textContent = `⚠️ 筆誤更正 <HH>：已作廢刪除上一單字 ${erasedStr}`.trim();
+      dom.evalStatus.innerHTML = `<i class="mdi mdi-alert"></i> 筆誤更正 &lt;HH&gt;：已作廢刪除上一單字 ${erasedStr}`.trim();
       dom.evalStatus.style.color = '#ff9100';
     }
     highlightPath('', false, engine, dom.antennaShape);
@@ -642,14 +642,14 @@ function restartKeying() {
     initTextModePassage(dom.textInput.value || textState.rawText);
     window.scrollTo({ top: 0, behavior: 'smooth' });
     if (dom.evalStatus) {
-      dom.evalStatus.textContent = '🔄 已重新開始發報挑戰！';
+      dom.evalStatus.innerHTML = '<i class="mdi mdi-restore"></i> 已重新開始發報挑戰！';
       dom.evalStatus.style.color = '#00e5ff';
     }
   } else if (currentMode === 'koch') {
     startKochDrill();
     window.scrollTo({ top: 0, behavior: 'smooth' });
     if (dom.evalStatus) {
-      dom.evalStatus.textContent = '🔄 已重新開始本關闖關考驗！';
+      dom.evalStatus.innerHTML = '<i class="mdi mdi-restore"></i> 已重新開始本關闖關考驗！';
       dom.evalStatus.style.color = '#00e5ff';
     }
   } else {
@@ -665,7 +665,7 @@ function restartKeying() {
     if (dom.stateSeq) dom.stateSeq.textContent = '—';
     if (dom.stateLetter) dom.stateLetter.textContent = '—';
     if (dom.evalStatus) {
-      dom.evalStatus.textContent = '🔄 已重設並清除送出文字！';
+      dom.evalStatus.innerHTML = '<i class="mdi mdi-restore"></i> 已重設並清除送出文字！';
       dom.evalStatus.style.color = 'var(--gold)';
     }
     highlightPath('', false, engine, dom.antennaShape);

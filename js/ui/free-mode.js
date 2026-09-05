@@ -34,7 +34,7 @@ function setupCommittedClear(engine) {
     updateCommittedView();
     const evalStatus = document.getElementById('eval-status');
     if (evalStatus) {
-      evalStatus.textContent = '🔄 已清除送出文字！';
+      evalStatus.innerHTML = '<i class="mdi mdi-delete-sweep"></i> 已清除送出文字！';
       evalStatus.style.color = 'var(--gold)';
     }
   });

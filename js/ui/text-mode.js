@@ -164,7 +164,7 @@ function finalizeLetterTextMode(res) {
   if (isMatch) {
     setCharResult(idx, true, res.letter, res.sequence);
     if (fbResult) {
-      fbResult.textContent = '✅ 正確！';
+      fbResult.innerHTML = '<i class="mdi mdi-check-bold"></i> 正確！';
       fbResult.style.color = '#00e676';
     }
     if (evalStatus) {
@@ -184,7 +184,7 @@ function finalizeLetterTextMode(res) {
     // Wrong letter
     if (textState.strictMode) {
       if (fbResult) {
-        fbResult.textContent = `❌ 錯誤！目標為 ${target}，請重試`;
+        fbResult.innerHTML = `<i class="mdi mdi-close-thick"></i> 錯誤！目標為 ${target}，請重試`;
         fbResult.style.color = '#ff5252';
       }
       if (evalStatus) {
@@ -214,7 +214,7 @@ function finalizeLetterTextMode(res) {
       // Flow through: mark error and advance
       setCharResult(idx, false, res.letter || '?', res.sequence);
       if (fbResult) {
-        fbResult.textContent = `❌ 錯誤 (目標: ${target})`;
+        fbResult.innerHTML = `<i class="mdi mdi-close-thick"></i> 錯誤 (目標: ${target})`;
         fbResult.style.color = '#ff5252';
       }
       if (evalStatus) {
@@ -274,7 +274,7 @@ function finishTextModePassage() {
   }
 
   if (evalStatus) {
-    evalStatus.textContent = `🎉 文章練習完成！正確率 ${accuracy}%`;
+    evalStatus.innerHTML = `<i class="mdi mdi-party-popper"></i> 文章練習完成！正確率 ${accuracy}%`;
     evalStatus.style.color = accuracy >= 80 ? '#00e676' : '#ffb703';
   }
   if (textModeStatus) {
@@ -303,7 +303,7 @@ async function startAutoPlay() {
       btnPauseAuto.disabled = false;
       btnPauseAuto.style.cursor = 'pointer';
       btnPauseAuto.style.color = '#fff';
-      btnPauseAuto.innerHTML = '<span>⏸ 暫停</span>';
+      btnPauseAuto.innerHTML = '<span><i class="mdi mdi-pause"></i> 暫停</span>';
     }
     if (textModeStatus) {
       textModeStatus.textContent = '示範播放中...';
@@ -445,13 +445,13 @@ function pauseAutoPlay() {
   if (textState.autoPlayPaused) {
     if (synth) synth.stop();
     if (typeof simulateKeyVisualRelease === 'function') simulateKeyVisualRelease();
-    if (btnPauseAuto) btnPauseAuto.innerHTML = '<span>▶ 繼續</span>';
+    if (btnPauseAuto) btnPauseAuto.innerHTML = '<span><i class="mdi mdi-play"></i> 繼續</span>';
     if (textModeStatus) {
       textModeStatus.textContent = '示範已暫停';
       textModeStatus.style.color = '#ff9100';
     }
   } else {
-    if (btnPauseAuto) btnPauseAuto.innerHTML = '<span>⏸ 暫停</span>';
+    if (btnPauseAuto) btnPauseAuto.innerHTML = '<span><i class="mdi mdi-pause"></i> 暫停</span>';
     if (textModeStatus) {
       textModeStatus.textContent = '自動示範中...';
       textModeStatus.style.color = 'var(--gold)';
@@ -487,7 +487,7 @@ function resetAutoPlayButtons() {
     btnPauseAuto.disabled = true;
     btnPauseAuto.style.cursor = 'not-allowed';
     btnPauseAuto.style.color = '#666';
-    btnPauseAuto.innerHTML = '<span>⏸ 暫停</span>';
+    btnPauseAuto.innerHTML = '<span><i class="mdi mdi-pause"></i> 暫停</span>';
   }
   if (btnStopAuto) {
     btnStopAuto.disabled = true;

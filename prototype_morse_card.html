@@ -4,6 +4,8 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>摩斯訓練儀 (Morse Trainulator) - 互動式電報模擬與報務員訓練器</title>
+  <!-- Material Design Icons (MDI) -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@mdi/font@7.4.47/css/materialdesignicons.min.css">
   <style>
     :root {
       --bg-dark: #101114;
@@ -1589,19 +1591,41 @@
       background: #331214 !important;
       animation: kochTargetPulse 1s infinite alternate ease-in-out;
     }
+
+    /* Material Design Icons (MDI) Base Standards */
+    .mdi {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      line-height: 1;
+      vertical-align: -0.125em;
+      font-size: 1.1em;
+    }
+
+    .mdi::before {
+      line-height: 1;
+    }
+
+    .mdi.mdi-sm {
+      font-size: 0.9em;
+    }
+
+    .mdi.mdi-lg {
+      font-size: 1.3em;
+    }
   </style>
 </head>
 <body>
 
   <header>
-    <h1>📻 摩斯訓練儀 (Morse Trainulator)</h1>
+    <h1><i class="mdi mdi-radio-handheld"></i> 摩斯訓練儀 (Morse Trainulator)</h1>
     <div class="subtitle">電報模擬與練習工具 · 支援直鍵 / 雙撥片 / 機械震報鍵 · PCB 二元樹尋路 · 節奏儀表</div>
     <div class="layout-switch-container">
       <button type="button" class="layout-switch-btn active" id="btn-layout-2col" title="切換為雙欄專注佈局">
-        <span>🎛️ 雙欄專注</span>
+        <span><i class="mdi mdi-view-column"></i> 雙欄專注</span>
       </button>
       <button type="button" class="layout-switch-btn" id="btn-layout-3col" title="切換為三欄工作台">
-        <span>🖥️ 三欄工作台</span>
+        <span><i class="mdi mdi-view-dashboard-variant"></i> 三欄工作台</span>
       </button>
     </div>
   </header>
@@ -1649,19 +1673,19 @@
       <!-- Keyer Device Switcher Tabs (放在 PCB 下面) -->
       <div class="keyer-device-tabs" style="margin-top: 10px; width: 100%;">
         <button id="dev-straight" class="keyer-tab" type="button">
-          <span>🔘 直鍵<br><span style="white-space: nowrap;">(Straight Key)</span></span>
+          <span><i class="mdi mdi-radiobox-marked"></i> 直鍵<br><span style="white-space: nowrap;">(Straight Key)</span></span>
         </button>
         <button id="dev-paddle" class="keyer-tab active" type="button">
-          <span>🎛️ 雙撥片<br><span style="white-space: nowrap;">(Iambic Paddle)</span></span>
+          <span><i class="mdi mdi-tune-vertical"></i> 雙撥片<br><span style="white-space: nowrap;">(Iambic Paddle)</span></span>
         </button>
         <button id="dev-bug" class="keyer-tab" type="button">
-          <span>📻 半自動震報鍵<br><span style="white-space: nowrap;">(Bug Key)</span></span>
+          <span><i class="mdi mdi-metronome"></i> 半自動震報鍵<br><span style="white-space: nowrap;">(Bug Key)</span></span>
         </button>
       </div>
 
       <!-- Device 1: Straight Key Trigger -->
       <button class="key-button" id="key-trigger" style="display:none; width: 100%;">
-        <span>⚡ 按住發報 (鍵盤「K」)</span>
+        <span><i class="mdi mdi-flash"></i> 按住發報 (鍵盤「K」)</span>
       </button>
 
       <!-- Device 2: Dual-Paddle Deck -->
@@ -1689,7 +1713,7 @@
         </div>
       </div>
 
-      <div style="font-size: 0.78rem; color: var(--text-muted); text-align: center; margin-top: 4px;">💡 點選字母或數字，可試聽發報音並查看走線</div>
+      <div style="font-size: 0.78rem; color: var(--text-muted); text-align: center; margin-top: 4px;"><i class="mdi mdi-lightbulb-outline"></i> 點選字母或數字，可試聽發報音並查看走線</div>
     </div>
 
     <!-- Training Core Column: Mode Tabs & Drill Exercises -->
@@ -1698,13 +1722,13 @@
       <!-- Mode Switcher Tabs -->
       <div style="display: flex; gap: 8px; width: 100%; margin-bottom: 4px;">
         <button class="mode-tab-btn active" id="tab-mode-free" style="flex: 1; padding: 10px; font-size: 0.88rem; font-weight: bold; border-radius: 8px; cursor: pointer; border: 1.5px solid var(--gold); background: #2a2512; color: var(--gold-light); display: flex; align-items: center; justify-content: center; gap: 4px;">
-          <span>⚡ 自由發報</span>
+          <span><i class="mdi mdi-flash"></i> 自由發報</span>
         </button>
         <button class="mode-tab-btn" id="tab-mode-text" style="flex: 1; padding: 10px; font-size: 0.88rem; font-weight: bold; border-radius: 8px; cursor: pointer; border: 1.5px solid #363a46; background: #15171d; color: #aaa; display: flex; align-items: center; justify-content: center; gap: 4px;">
-          <span>📖 文章模式</span>
+          <span><i class="mdi mdi-book-open-page-variant"></i> 文章模式</span>
         </button>
         <button class="mode-tab-btn" id="tab-mode-koch" style="flex: 1; padding: 10px; font-size: 0.88rem; font-weight: bold; border-radius: 8px; cursor: pointer; border: 1.5px solid #363a46; background: #15171d; color: #aaa; display: flex; align-items: center; justify-content: center; gap: 4px;">
-          <span>🎯 國際科赫闖關</span>
+          <span><i class="mdi mdi-bullseye-arrow"></i> 國際科赫闖關</span>
         </button>
       </div>
 
@@ -1739,16 +1763,16 @@
           <!-- Playback Actions -->
           <div style="display: flex; gap: 8px; flex-wrap: wrap;">
             <button id="btn-play-auto" style="flex: 1.2; padding: 9px; background: linear-gradient(135deg, #ffd700, #ff9100); color: #000; font-weight: bold; border: none; border-radius: 6px; cursor: pointer; font-size: 0.85rem; display: flex; align-items: center; justify-content: center; gap: 5px; box-shadow: 0 0 10px rgba(255, 215, 0, 0.3);">
-              <span>▶ 示範播放</span>
+              <span><i class="mdi mdi-play"></i> 示範播放</span>
             </button>
             <button id="btn-pause-auto" disabled style="flex: 0.8; padding: 9px; background: #222530; border: 1.5px solid #3d4252; color: #666; border-radius: 6px; cursor: not-allowed; font-size: 0.85rem;">
-              <span>⏸ 暫停</span>
+              <span><i class="mdi mdi-pause"></i> 暫停</span>
             </button>
             <button id="btn-stop-auto" disabled style="flex: 0.8; padding: 9px; background: #222530; border: 1.5px solid #3d4252; color: #666; border-radius: 6px; cursor: not-allowed; font-size: 0.85rem;">
-              <span>⏹ 停止</span>
+              <span><i class="mdi mdi-stop"></i> 停止</span>
             </button>
             <button id="btn-restart-text" style="flex: 0.9; padding: 9px; background: #1c1e26; border: 1.5px solid #3d4252; color: #eee; border-radius: 6px; cursor: pointer; font-size: 0.85rem;" title="快捷鍵: 按鍵 R">
-              <span>🔄 重新發報 (R)</span>
+              <span><i class="mdi mdi-restore"></i> 重新發報 (R)</span>
             </button>
           </div>
 
@@ -1787,7 +1811,7 @@
         <!-- 3. Completion Scorecard (Hidden until complete) -->
         <div class="panel" id="text-scorecard" style="display: none; border-color: var(--gold); background: #161715;">
           <div class="panel-title" style="color: var(--gold-light);">
-            <span>🎉 文章練習完成！</span>
+            <span><i class="mdi mdi-party-popper"></i> 文章練習完成！</span>
             <span id="scorecard-speed-tag" style="color:#ffb703; font-size: 0.8rem;">15 WPM</span>
           </div>
           <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; margin: 10px 0; text-align: center;">
@@ -1822,7 +1846,7 @@
         <div class="panel" id="koch-setup-card" style="border-color: #007799; background: #0c1218;">
           <div class="panel-title" style="color: var(--neon-blue); flex-wrap: wrap; gap: 8px 12px;">
             <div style="display:flex; align-items:center; gap:8px; flex-wrap: wrap;">
-              <span style="white-space: nowrap;">🎯 國際科赫闖關</span>
+              <span style="white-space: nowrap;"><i class="mdi mdi-bullseye-arrow"></i> 國際科赫闖關</span>
               <span id="koch-stage-badge" style="background:#00364d; color:var(--neon-blue); padding:2px 8px; border-radius:12px; font-size:0.75rem; border:1px solid #005b82; white-space: nowrap; flex-shrink: 0;">第 1 關 / 共 35 關</span>
             </div>
             <div style="display:flex; gap:6px; align-items:center; flex-shrink: 0;">
@@ -1847,13 +1871,13 @@
           <!-- Clearance Trophy Summary -->
           <div class="koch-trophy-summary" id="koch-trophy-summary">
             <span class="trophy-pill pill-challenge" title="極限挑戰征服關卡數">
-              <span>👑 極限征服:</span> <strong id="trophy-cnt-challenge">0</strong>
+              <span><i class="mdi mdi-crown"></i> 極限征服:</span> <strong id="trophy-cnt-challenge">0</strong>
             </span>
             <span class="trophy-pill pill-standard" title="正規考核合格關卡數">
-              <span>🏆 正規合格:</span> <strong id="trophy-cnt-standard">0</strong>
+              <span><i class="mdi mdi-trophy"></i> 正規合格:</span> <strong id="trophy-cnt-standard">0</strong>
             </span>
             <span class="trophy-pill pill-quick" title="基礎練習通過關卡數">
-              <span>🟢 基礎通過:</span> <strong id="trophy-cnt-quick">0</strong>
+              <span><i class="mdi mdi-check-circle"></i> 基礎通過:</span> <strong id="trophy-cnt-quick">0</strong>
             </span>
             <span class="trophy-pill pill-total" title="通關總進度">
               <span>通關: <strong id="trophy-cnt-total">0</strong>/35</span>
@@ -1864,14 +1888,14 @@
           <div class="koch-matrix-card" id="koch-matrix-card">
             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
               <div style="display: flex; align-items: center; gap: 6px;">
-                <span style="font-size: 0.76rem; font-weight: bold; color: var(--neon-blue);">🗺️ 關卡地圖 (點擊切換關卡)</span>
+                <span style="font-size: 0.76rem; font-weight: bold; color: var(--neon-blue);"><i class="mdi mdi-map-marker-path"></i> 關卡地圖 (點擊切換關卡)</span>
               </div>
               <div style="display: flex; align-items: center; gap: 6px; font-size: 0.68rem;">
-                <span style="color: #ffd700;" title="極限挑戰征服">👑極限</span>
-                <span style="color: #00e5ff;" title="正規考核合格">🏆正規</span>
-                <span style="color: #00e676;" title="基礎練習通過">🟢基礎</span>
-                <span style="color: #667;" title="尚未通關">⚪未過</span>
-                <span style="color: #445;" title="未解鎖關卡">🔒鎖定</span>
+                <span style="color: #ffd700;" title="極限挑戰征服"><i class="mdi mdi-crown"></i>極限</span>
+                <span style="color: #00e5ff;" title="正規考核合格"><i class="mdi mdi-trophy"></i>正規</span>
+                <span style="color: #00e676;" title="基礎練習通過"><i class="mdi mdi-check-circle"></i>基礎</span>
+                <span style="color: #667;" title="尚未通關"><i class="mdi mdi-circle-outline"></i>未過</span>
+                <span style="color: #445;" title="未解鎖關卡"><i class="mdi mdi-lock"></i>鎖定</span>
               </div>
             </div>
             <div class="koch-stage-grid" id="koch-stage-grid">
@@ -1879,27 +1903,81 @@
             </div>
           </div>
 
-          <!-- Active Target Card -->
-          <div style="display: flex; gap: 10px; align-items: stretch; background: #101620; border: 1px solid #202d3f; border-radius: 8px; padding: 10px;">
-            <div style="display:flex; flex-direction:column; align-items:center; justify-content:center; background:#00293d; border:2px solid var(--neon-blue); border-radius:8px; width:65px; min-height:65px; box-shadow:0 0 10px rgba(0,229,255,0.2);">
-              <span style="font-size:0.65rem; color:#888;">本關新字</span>
-              <span id="koch-target-char" style="font-size:1.8rem; font-weight:900; color:#fff; font-family:'Arial Black', sans-serif; line-height:1;">M</span>
-            </div>
-            <div style="flex:1; display:flex; flex-direction:column; justify-content:center; gap:4px;">
-              <div style="display:flex; justify-content:space-between; align-items:center;">
-                <div style="font-size:0.85rem; font-weight:bold; color:#fff; display:flex; align-items:center; gap:8px;">
-                  <span>摩斯碼: <span id="koch-target-seq" style="color:var(--gold); letter-spacing:2px; font-family:monospace; font-size:1.1rem;">--</span></span>
-                  <span id="koch-target-clear-badge" class="badge-tier tier-none">⚪ 尚未通關</span>
+          <!-- Active Target Card Container -->
+          <div id="koch-target-card-container">
+            <!-- Stage 1 Dual Introduction View (K & M) -->
+            <div id="koch-stage1-card" style="display: flex; flex-direction: column; gap: 10px; background: #101620; border: 1px solid #202d3f; border-radius: 8px; padding: 12px;">
+              <div style="display: flex; justify-content: space-between; align-items: center;">
+                <span style="font-size: 0.82rem; font-weight: bold; color: var(--neon-blue); display: flex; align-items: center; gap: 6px;">
+                  <i class="mdi mdi-star-face"></i> 第 1 關入門雙星：K 與 M
+                </span>
+                <span id="koch-stage1-clear-badge" class="badge-tier tier-none"><i class="mdi mdi-circle-outline"></i> 尚未通關</span>
+              </div>
+              
+              <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+                <!-- Subcard K -->
+                <div style="background: #09131d; border: 1.5px solid var(--neon-blue); border-radius: 6px; padding: 8px; display: flex; align-items: center; justify-content: space-between; box-shadow: 0 0 10px rgba(0,229,255,0.12);">
+                  <div style="display: flex; align-items: center; gap: 10px;">
+                    <div style="font-size: 1.7rem; font-weight: 900; color: #fff; font-family: 'Arial Black', sans-serif; min-width: 28px; text-align: center; line-height: 1;">K</div>
+                    <div>
+                      <div style="font-size: 0.88rem; font-weight: bold; color: var(--gold); font-family: monospace; letter-spacing: 2px;">-.-</div>
+                      <div style="font-size: 0.68rem; color: #889;">劃點劃 (Dah-Dit-Dah)</div>
+                    </div>
+                  </div>
+                  <button id="btn-koch-listen-k" style="background: #1b2636; border: 1px solid #3d506b; color: #00e5ff; border-radius: 4px; padding: 4px 8px; font-size: 0.75rem; cursor: pointer; display: flex; align-items: center; gap: 3px;">
+                    <span><i class="mdi mdi-volume-high"></i> 試聽 K</span>
+                  </button>
                 </div>
-                <button id="btn-koch-target-listen" style="background:#1b2636; border:1px solid #3d506b; color:#00e5ff; border-radius:4px; padding:3px 8px; font-size:0.75rem; cursor:pointer; display:flex; align-items:center; gap:4px;">
-                  <span>🔊 試聽音形</span>
-                </button>
+
+                <!-- Subcard M -->
+                <div style="background: #141208; border: 1.5px solid var(--gold); border-radius: 6px; padding: 8px; display: flex; align-items: center; justify-content: space-between; box-shadow: 0 0 10px rgba(255,215,0,0.12);">
+                  <div style="display: flex; align-items: center; gap: 10px;">
+                    <div style="font-size: 1.7rem; font-weight: 900; color: #fff; font-family: 'Arial Black', sans-serif; min-width: 28px; text-align: center; line-height: 1;">M</div>
+                    <div>
+                      <div style="font-size: 0.88rem; font-weight: bold; color: var(--gold); font-family: monospace; letter-spacing: 2px;">--</div>
+                      <div style="font-size: 0.68rem; color: #889;">劃劃 (Dah-Dah)</div>
+                    </div>
+                  </div>
+                  <button id="btn-koch-listen-m" style="background: #2a220b; border: 1px solid #6b551b; color: #ffd700; border-radius: 4px; padding: 4px 8px; font-size: 0.75rem; cursor: pointer; display: flex; align-items: center; gap: 3px;">
+                    <span><i class="mdi mdi-volume-high"></i> 試聽 M</span>
+                  </button>
+                </div>
               </div>
-              <div style="font-size:0.72rem; color:#aaa;">
-                已解鎖字元池: <span id="koch-pool-text" style="color:var(--gold-light); font-weight:bold; word-break:break-all;">K, M</span>
+
+              <div style="display: flex; justify-content: space-between; align-items: center; font-size: 0.72rem; color: #aaa; border-top: 1px solid #1c2635; padding-top: 8px;">
+                <div style="display: flex; align-items: center; gap: 6px;">
+                  <span>已解鎖字元池:</span>
+                  <span id="koch-pool-stage1" class="koch-pool-chips" style="display: inline-flex; gap: 4px;"></span>
+                </div>
+                <div style="font-size: 0.7rem; color: #778;">
+                  <i class="mdi mdi-lightbulb-outline"></i> 達 <strong>90% 正確率</strong> 即可晉級第 2 關解鎖新字元 R！
+                </div>
               </div>
-              <div style="font-size:0.7rem; color:#778;">
-                💡 科赫法全速發報，請憑「音形節奏」直接反射按鍵。達 <strong>90% 正確率</strong> 即可晉級點亮下一字！
+            </div>
+
+            <!-- Stage 2+ Standard Single Target View -->
+            <div id="koch-standard-card" style="display: none; gap: 10px; align-items: stretch; background: #101620; border: 1px solid #202d3f; border-radius: 8px; padding: 10px;">
+              <div style="display:flex; flex-direction:column; align-items:center; justify-content:center; background:#00293d; border:2px solid var(--neon-blue); border-radius:8px; width:65px; min-height:65px; box-shadow:0 0 10px rgba(0,229,255,0.2);">
+                <span style="font-size:0.65rem; color:#888;">本關新字元</span>
+                <span id="koch-target-char" style="font-size:1.8rem; font-weight:900; color:#fff; font-family:'Arial Black', sans-serif; line-height:1;">M</span>
+              </div>
+              <div style="flex:1; display:flex; flex-direction:column; justify-content:center; gap:4px;">
+                <div style="display:flex; justify-content:space-between; align-items:center;">
+                  <div style="font-size:0.85rem; font-weight:bold; color:#fff; display:flex; align-items:center; gap:8px;">
+                    <span>點劃編碼: <span id="koch-target-seq" style="color:var(--gold); letter-spacing:2px; font-family:monospace; font-size:1.1rem;">--</span></span>
+                    <span id="koch-target-clear-badge" class="badge-tier tier-none"><i class="mdi mdi-circle-outline"></i> 尚未通關</span>
+                  </div>
+                  <button id="btn-koch-target-listen" style="background:#1b2636; border:1px solid #3d506b; color:#00e5ff; border-radius:4px; padding:3px 8px; font-size:0.75rem; cursor:pointer; display:flex; align-items:center; gap:4px;">
+                    <span><i class="mdi mdi-volume-high"></i> 試聽音形</span>
+                  </button>
+                </div>
+                <div style="font-size:0.72rem; color:#aaa; display:flex; align-items:center; flex-wrap:wrap; gap:4px;">
+                  <span>已解鎖字元池:</span>
+                  <span id="koch-pool-text" class="koch-pool-chips" style="display:inline-flex; flex-wrap:wrap; gap:4px;">K, M</span>
+                </div>
+                <div style="font-size:0.7rem; color:#778;">
+                  <i class="mdi mdi-lightbulb-outline"></i> 科赫法全速發報，請憑「音形節奏」直接反射按鍵。達 <strong>90% 正確率</strong> 即可晉級點亮下一字元！
+                </div>
               </div>
             </div>
           </div>
@@ -1907,13 +1985,13 @@
           <!-- Drill Settings & Action Row -->
           <div class="koch-mode-tabs" id="koch-assessment-tabs" style="margin-top:12px;">
             <button type="button" class="koch-mode-tab active" id="tab-koch-quick" data-mode="quick">
-              <span>🟢 簡化模式</span>
+              <span><i class="mdi mdi-check-circle"></i> 基礎練習</span>
             </button>
             <button type="button" class="koch-mode-tab" id="tab-koch-standard" data-mode="standard">
-              <span>🏆 正規模式</span>
+              <span><i class="mdi mdi-trophy"></i> 正規考核</span>
             </button>
             <button type="button" class="koch-mode-tab tab-challenge" id="tab-koch-challenge" data-mode="challenge">
-              <span>🔥 挑戰模式</span>
+              <span><i class="mdi mdi-fire"></i> 極限挑戰</span>
             </button>
           </div>
 
@@ -1941,7 +2019,7 @@
               <label style="cursor:pointer; display:flex; align-items:center; gap:3px; white-space:nowrap;">
                 <input type="radio" name="koch-duration" value="300" style="accent-color:var(--neon-blue);"> 5 分鐘
               </label>
-              <span style="color:#889; font-size:0.72rem; margin-left:2px; white-space:nowrap;">⏱️ 反射限時 2.0s</span>
+              <span style="color:#889; font-size:0.72rem; margin-left:2px; white-space:nowrap;"><i class="mdi mdi-timer-sand"></i> 反射限時 2.0s</span>
             </div>
 
             <!-- Config 3: Challenge (Timed 3m/5m, zero tolerance) -->
@@ -1953,28 +2031,28 @@
               <label style="cursor:pointer; display:flex; align-items:center; gap:3px; white-space:nowrap;">
                 <input type="radio" name="koch-duration-ch" value="300" style="accent-color:#ff5252;"> 5 分鐘
               </label>
-              <span style="color:#ffb703; font-size:0.72rem; margin-left:2px; white-space:nowrap;">⏱️ 反射限時 2.0s</span>
+              <span style="color:#ffb703; font-size:0.72rem; margin-left:2px; white-space:nowrap;"><i class="mdi mdi-timer-sand"></i> 反射限時 2.0s</span>
             </div>
 
             <div style="display:flex; gap:6px; margin-left:auto; flex-shrink:0; align-items:center;">
               <button id="btn-start-koch-drill" style="padding: 6px 12px; background: linear-gradient(135deg, #00e5ff, #0077b6); color: #000; font-weight: bold; border: none; border-radius: 6px; cursor: pointer; font-size: 0.8rem; box-shadow: 0 0 10px rgba(0, 229, 255, 0.3); white-space:nowrap;">
-                <span>▶ 開始闖關 <span style="font-size:0.75rem; background:#00364d; color:#fff; padding:1px 5px; border-radius:3px; margin-left:4px;">R</span></span>
+                <span><i class="mdi mdi-play"></i> 開始闖關 <span style="font-size:0.75rem; background:#00364d; color:#fff; padding:1px 5px; border-radius:3px; margin-left:4px;">R</span></span>
               </button>
               <button id="btn-stop-koch-drill" class="btn-stop-koch" style="display:none;">
-                <span>⏹ 結束 <span style="font-size:0.75rem; background:#4a1518; color:#fff; padding:1px 5px; border-radius:3px; margin-left:4px;">Esc</span></span>
+                <span><i class="mdi mdi-stop"></i> 結束 <span style="font-size:0.75rem; background:#4a1518; color:#fff; padding:1px 5px; border-radius:3px; margin-left:4px;">Esc</span></span>
               </button>
             </div>
           </div>
           <div id="koch-mode-desc" style="font-size:0.72rem; color:#889; margin-top:6px;">
-            🟢 簡化模式：無超時限制，適合熟悉新字母與手感。
+            <i class="mdi mdi-check-circle"></i> 基礎練習：無超時限制，適合熟悉新字母與手感。
           </div>
         </div>
 
         <!-- Koch Focus HUD Bar (Active During Drill) -->
         <div id="koch-hud-header" class="koch-hud-bar" style="display:none;">
           <div class="koch-hud-left">
-            <span class="koch-hud-badge" id="koch-hud-stage-tag">🎯 第 1 關</span>
-            <span id="koch-hud-mode-tag" style="font-size:0.75rem; padding:2px 8px; border-radius:4px; background:#182230; color:var(--neon-blue); font-weight:bold;">🟢 簡化模式</span>
+            <span class="koch-hud-badge" id="koch-hud-stage-tag"><i class="mdi mdi-bullseye-arrow"></i> 第 1 關</span>
+            <span id="koch-hud-mode-tag" style="font-size:0.75rem; padding:2px 8px; border-radius:4px; background:#182230; color:var(--neon-blue); font-weight:bold;"><i class="mdi mdi-check-circle"></i> 基礎練習模式</span>
             <label style="font-size:0.75rem; color:#889; cursor:pointer; display:flex; align-items:center; gap:4px; margin-left:6px;" title="在題目字母下方顯示摩斯點劃提示">
               <input type="checkbox" id="chk-koch-hints" style="accent-color:var(--neon-blue);"> 提示
             </label>
@@ -1982,7 +2060,7 @@
           <div class="koch-hud-right">
             <span class="koch-hud-stats" id="koch-hud-stats">剩餘: --:-- · 正確率: 100%</span>
             <button id="btn-stop-koch-hud" class="koch-hud-stop" type="button" title="結束當前考核 (快捷鍵 Esc)">
-              <span>⏹ 結束 <span style="font-size:0.7rem; opacity:0.8;">(Esc)</span></span>
+              <span><i class="mdi mdi-stop"></i> 結束 <span style="font-size:0.7rem; opacity:0.8;">(Esc)</span></span>
             </button>
           </div>
         </div>
@@ -1991,7 +2069,7 @@
         <div class="panel" id="koch-drill-panel" style="display:none;">
           <div class="panel-title" style="display:none;">
             <span id="koch-progress-badge" style="font-size:0.75rem; color:var(--neon-blue); font-weight: bold;">進度: 0/24 · 正確率: 100%</span>
-            <button id="btn-stop-koch-panel" style="display:none; padding: 2px 8px; background: #2a1114; color: #ff5252; border: 1px solid #ff5252; border-radius: 4px; font-size: 0.72rem; cursor: pointer; font-weight: bold; white-space: nowrap;">⏹ 結束 (Esc)</button>
+            <button id="btn-stop-koch-panel" style="display:none; padding: 2px 8px; background: #2a1114; color: #ff5252; border: 1px solid #ff5252; border-radius: 4px; font-size: 0.72rem; cursor: pointer; font-weight: bold; white-space: nowrap;"><i class="mdi mdi-stop"></i> 結束 (Esc)</button>
           </div>
 
           <!-- Reflex countdown bar (for Standard & Challenge) -->
@@ -2015,7 +2093,7 @@
         <div class="panel" id="koch-scorecard" style="display: none; border-color: var(--neon-blue); background: #0b151e;">
           <div class="panel-title" style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:6px;">
             <div style="display:flex; align-items:center; gap:6px;">
-              <span id="koch-sc-title" style="color:#00e5ff; font-weight:bold;">🎉 關卡突破 (Stage Clear)!</span>
+              <span id="koch-sc-title" style="color:#00e5ff; font-weight:bold;"><i class="mdi mdi-party-popper"></i> 關卡突破 (Stage Clear)!</span>
               <span id="koch-sc-mode-tag" style="font-size:0.72rem; padding:1px 6px; border-radius:3px; background:#182230; color:#00e5ff;">基礎練習模式</span>
             </div>
             <span id="koch-sc-threshold-tag" style="color:#ffb703; font-size:0.78rem;">通關門檻: 90%</span>
@@ -2044,10 +2122,10 @@
           </div>
           <div style="display: flex; gap: 8px; justify-content: flex-end;">
             <button id="btn-koch-retry" style="padding: 7px 14px; background: #1d2531; border: 1px solid #3c4b60; color: #ccc; border-radius: 5px; font-size: 0.8rem; cursor: pointer;">
-              <span>🔄 再次挑戰本關 <span style="font-size:0.7rem; background:#293547; color:#fff; padding:1px 4px; border-radius:2px; margin-left:3px;">R</span></span>
+              <span><i class="mdi mdi-restore"></i> 再次挑戰本關 <span style="font-size:0.7rem; background:#293547; color:#fff; padding:1px 4px; border-radius:2px; margin-left:3px;">R</span></span>
             </button>
             <button id="btn-koch-next-stage" style="display:none; padding: 7px 16px; background: linear-gradient(135deg, #ffd700, #ff9100); border: none; color: #000; font-weight: bold; border-radius: 5px; font-size: 0.8rem; cursor: pointer; box-shadow: 0 0 10px rgba(255,215,0,0.3);">
-              <span>前往下一關 ➔ <span style="font-size:0.7rem; background:#332200; color:#ffd700; padding:1px 5px; border-radius:2px; margin-left:3px;">Enter</span></span>
+              <span>前往下一關 <i class="mdi mdi-arrow-right"></i> <span style="font-size:0.7rem; background:#332200; color:#ffd700; padding:1px 5px; border-radius:2px; margin-left:3px;">Enter</span></span>
             </button>
           </div>
         </div>
@@ -2372,15 +2450,15 @@
             </div>
           </div>
           <div style="font-size:0.68rem; color:#777; margin-top:6px; text-align:center;">
-            💡 點選按鍵後，按下鍵盤任意鍵即可更換
+            <i class="mdi mdi-lightbulb-outline"></i> 點選按鍵後，按下鍵盤任意鍵即可更換
           </div>
         </div>
 
         <!-- Factory Reset & Storage Status Footer -->
         <div style="display:flex; justify-content:space-between; align-items:center; margin-top:14px; padding-top:8px; border-top:1px solid #252834;">
-          <span style="font-size:0.7rem; color:#888;">💾 設定將自動保存</span>
+          <span style="font-size:0.7rem; color:#888;"><i class="mdi mdi-content-save-outline"></i> 設定將自動保存</span>
           <button id="btn-factory-reset" style="background:none; border:1px solid #444; color:#aaa; padding:4px 8px; border-radius:4px; font-size:0.72rem; cursor:pointer;">
-            🔄 重設為預設值
+            <i class="mdi mdi-restore"></i> 重設為預設值
           </button>
         </div>
       </div>
@@ -3256,7 +3334,7 @@
         ctx.fillStyle = this.activePulse ? '#ff5252' : '#666';
         ctx.font = 'bold 7.5px monospace';
         ctx.textAlign = 'right';
-        ctx.fillText(this.activePulse ? '⚡ TX' : 'IDLE', W - 4, H - 4);
+        ctx.fillText(this.activePulse ? 'TX' : 'IDLE', W - 4, H - 4);
       }
     }
 
@@ -3463,7 +3541,7 @@
         const leftHint = document.getElementById('paddle-left-hint');
         const rightHint = document.getElementById('paddle-right-hint');
 
-        if (straightSpan) straightSpan.textContent = `⚡ 按住發報 (鍵盤「${this.formatKeys(b.straight)}」)`;
+        if (straightSpan) straightSpan.innerHTML = `<i class="mdi mdi-flash"></i> 按住發報 (鍵盤「${this.formatKeys(b.straight)}」)`;
         if (leftHint) leftHint.textContent = `鍵盤 ${this.formatKeys(b.dit)}`;
         if (rightHint) rightHint.textContent = `鍵盤 ${this.formatKeys(b.dah)}`;
       }
@@ -4461,7 +4539,7 @@
       stateDuration.textContent = `${res.duration} ms`;
 
       if (res.letter === '<HH>') {
-        evalStatus.textContent = '⚠️ 檢測到更正訊號 (Error: 8 Dits)';
+        evalStatus.innerHTML = '<i class="mdi mdi-alert"></i> 檢測到更正訊號 (Error: 8 Dits)';
         evalStatus.style.color = '#ff9100';
         highlightPath('.....', false);
       } else if (res.isValid) {
@@ -4511,7 +4589,7 @@
       // FREE MODE LOGIC
       if (res.isErrorSignal || res.letter === '<HH>') {
         const erasedStr = (res.erased && res.erased.length > 0) ? `「${res.erased.join('')}」` : '';
-        evalStatus.textContent = `⚠️ 筆誤更正 <HH>：已作廢刪除上一單字 ${erasedStr}`.trim();
+        evalStatus.innerHTML = `<i class="mdi mdi-alert"></i> 筆誤更正 &lt;HH&gt;：已作廢刪除上一單字 ${erasedStr}`.trim();
         evalStatus.style.color = '#ff9100';
         highlightPath('', false);
         updateCommittedView();
@@ -4729,7 +4807,7 @@
 
       if (isMatch) {
         setCharResult(idx, true, res.letter, res.sequence);
-        fbResult.textContent = '✅ 正確！';
+        fbResult.innerHTML = '<i class="mdi mdi-check-bold"></i> 正確！';
         fbResult.style.color = '#00e676';
         evalStatus.textContent = `字元 [${res.letter}] 正確！`;
         evalStatus.style.color = '#00e676';
@@ -4745,7 +4823,7 @@
       } else {
         // Wrong letter
         if (textState.strictMode) {
-          fbResult.textContent = `❌ 錯誤！目標為 ${target}，請重試`;
+          fbResult.innerHTML = `<i class="mdi mdi-close-thick"></i> 錯誤！目標為 ${target}，請重試`;
           fbResult.style.color = '#ff5252';
           evalStatus.textContent = `打錯了，目標是 ${target} (${engine.getSequenceForLetter(target) || ''})，請再試一次`;
           evalStatus.style.color = '#ff5252';
@@ -4770,7 +4848,7 @@
         } else {
           // Flow through: mark error and advance
           setCharResult(idx, false, res.letter || '?', res.sequence);
-          fbResult.textContent = `❌ 錯誤 (目標: ${target})`;
+          fbResult.innerHTML = `<i class="mdi mdi-close-thick"></i> 錯誤 (目標: ${target})`;
           fbResult.style.color = '#ff5252';
           evalStatus.textContent = `發報失誤：輸入 [${res.letter || '?'}]，目標為 [${target}]`;
           evalStatus.style.color = '#ff5252';
@@ -4812,7 +4890,7 @@
       textScorecard.style.display = 'block';
       textScorecard.scrollIntoView({ behavior: 'smooth' });
 
-      evalStatus.textContent = `🎉 測驗完成！正確率 ${accuracy}%`;
+      evalStatus.innerHTML = `<i class="mdi mdi-party-popper"></i> 測驗完成！正確率 ${accuracy}%`;
       evalStatus.style.color = accuracy >= 80 ? '#00e676' : '#ffb703';
       textModeStatus.textContent = '測驗完成';
       textModeStatus.style.color = '#00e676';
@@ -4848,7 +4926,7 @@
         btnPauseAuto.disabled = false;
         btnPauseAuto.style.cursor = 'pointer';
         btnPauseAuto.style.color = '#fff';
-        btnPauseAuto.innerHTML = '<span>⏸ 暫停</span>';
+        btnPauseAuto.innerHTML = '<span><i class="mdi mdi-pause"></i> 暫停</span>';
         textModeStatus.textContent = '自動示範發報中...';
         textModeStatus.style.color = 'var(--gold)';
         return;
@@ -4968,11 +5046,11 @@
       if (textState.autoPlayPaused) {
         synth.stop();
         simulateKeyVisualRelease();
-        btnPauseAuto.innerHTML = '<span>▶ 繼續</span>';
+        btnPauseAuto.innerHTML = '<span><i class="mdi mdi-play"></i> 繼續</span>';
         textModeStatus.textContent = '表演已暫停';
         textModeStatus.style.color = '#ff9100';
       } else {
-        btnPauseAuto.innerHTML = '<span>⏸ 暫停</span>';
+        btnPauseAuto.innerHTML = '<span><i class="mdi mdi-pause"></i> 暫停</span>';
         textModeStatus.textContent = '自動示範發報中...';
         textModeStatus.style.color = 'var(--gold)';
       }
@@ -4997,7 +5075,7 @@
       btnPauseAuto.disabled = true;
       btnPauseAuto.style.cursor = 'not-allowed';
       btnPauseAuto.style.color = '#666';
-      btnPauseAuto.innerHTML = '<span>⏸ 暫停</span>';
+      btnPauseAuto.innerHTML = '<span><i class="mdi mdi-pause"></i> 暫停</span>';
       btnStopAuto.disabled = true;
       btnStopAuto.style.cursor = 'not-allowed';
       btnStopAuto.style.color = '#666';
@@ -5085,18 +5163,18 @@
 
     function getClearBadgeHtml(clearInfo) {
       if (!clearInfo || !clearInfo.highest) {
-        return '<span class="badge-tier tier-none">⚪ 尚未通關</span>';
+        return '<span class="badge-tier tier-none"><i class="mdi mdi-circle-outline"></i> 尚未通關</span>';
       }
       if (clearInfo.highest === 'challenge') {
-        return '<span class="badge-tier tier-challenge">👑 極限征服</span>';
+        return '<span class="badge-tier tier-challenge"><i class="mdi mdi-crown"></i> 極限征服</span>';
       }
       if (clearInfo.highest === 'standard') {
-        return '<span class="badge-tier tier-standard">🏆 正規合格</span>';
+        return '<span class="badge-tier tier-standard"><i class="mdi mdi-trophy"></i> 正規合格</span>';
       }
       if (clearInfo.highest === 'quick') {
-        return '<span class="badge-tier tier-quick">🟢 基礎通過</span>';
+        return '<span class="badge-tier tier-quick"><i class="mdi mdi-check-circle"></i> 基礎通過</span>';
       }
-      return '<span class="badge-tier tier-none">⚪ 尚未通關</span>';
+      return '<span class="badge-tier tier-none"><i class="mdi mdi-circle-outline"></i> 尚未通關</span>';
     }
 
     function selectKochStage(lvl) {
@@ -5135,7 +5213,7 @@
           btn.classList.add('cell-locked');
           btn.disabled = true;
           btn.title = `第 ${i} 關 (${charLabel}) - 尚未解鎖`;
-          medalIcon = '🔒';
+          medalIcon = '<i class="mdi mdi-lock"></i>';
         } else {
           if (i === curLvl) {
             btn.classList.add('active-stage');
@@ -5143,16 +5221,16 @@
           if (clearInfo && clearInfo.highest) {
             if (clearInfo.highest === 'challenge') {
               btn.classList.add('cell-cleared-challenge');
-              btn.title = `第 ${i} 關 (${charLabel}) · 👑 極限挑戰征服 (最高含金量)`;
-              medalIcon = '👑';
+              btn.title = `第 ${i} 關 (${charLabel}) · 極限挑戰征服 (最高含金量)`;
+              medalIcon = '<i class="mdi mdi-crown"></i>';
             } else if (clearInfo.highest === 'standard') {
               btn.classList.add('cell-cleared-standard');
-              btn.title = `第 ${i} 關 (${charLabel}) · 🏆 正規考核合格`;
-              medalIcon = '🏆';
+              btn.title = `第 ${i} 關 (${charLabel}) · 正規考核合格`;
+              medalIcon = '<i class="mdi mdi-trophy"></i>';
             } else if (clearInfo.highest === 'quick') {
               btn.classList.add('cell-cleared-quick');
-              btn.title = `第 ${i} 關 (${charLabel}) · 🟢 基礎練習通過`;
-              medalIcon = '🟢';
+              btn.title = `第 ${i} 關 (${charLabel}) · 基礎練習通過`;
+              medalIcon = '<i class="mdi mdi-check-circle"></i>';
             }
           } else {
             btn.classList.add('cell-unlocked');
@@ -5177,6 +5255,28 @@
       }
     }
 
+    function renderPoolChips(container, pool, engine) {
+      if (!container) return;
+      container.innerHTML = '';
+      pool.forEach(c => {
+        const chip = document.createElement('span');
+        chip.className = 'koch-pool-chip';
+        const seq = engine.getSequenceForLetter(c) || '';
+        chip.innerHTML = `${c} <span style="font-family:monospace; color:var(--gold); font-size:0.75rem; margin-left:2px;">${seq}</span>`;
+        chip.title = `點擊試聽 ${c} (${seq})`;
+        chip.style.cssText = 'display:inline-flex; align-items:center; background:#182230; border:1px solid #2d3b4e; border-radius:4px; padding:1px 6px; font-size:0.75rem; font-weight:bold; cursor:pointer; user-select:none; transition:all 0.15s;';
+        chip.addEventListener('mouseenter', () => { chip.style.borderColor = '#00e5ff'; chip.style.background = '#203045'; });
+        chip.addEventListener('mouseleave', () => { chip.style.borderColor = '#2d3b4e'; chip.style.background = '#182230'; });
+        chip.addEventListener('click', (e) => {
+          e.stopPropagation();
+          if (typeof replayLetter === 'function') {
+            replayLetter(c, seq);
+          }
+        });
+        container.appendChild(chip);
+      });
+    }
+
     function updateKochUI() {
       const curLvl = kochManager.currentLevel;
       const maxLvl = kochManager.maxUnlockedLevel;
@@ -5189,10 +5289,6 @@
       const masteryPct = Math.round((unlockedCount / 36) * 100);
       if (kochMasteryText) kochMasteryText.textContent = `已解鎖 ${unlockedCount} / 36 (${masteryPct}%)`;
       if (kochMasteryBar) kochMasteryBar.style.width = `${masteryPct}%`;
-
-      if (kochTargetChar) kochTargetChar.textContent = targetChar;
-      if (kochTargetSeq) kochTargetSeq.textContent = targetSeq;
-      if (kochPoolText) kochPoolText.textContent = pool.join(', ');
 
       // Update trophy summary counts
       if (typeof kochManager.getClearanceCounts === 'function') {
@@ -5210,26 +5306,45 @@
       // Render 35 Stage Matrix
       renderStageMatrix();
 
-      // Update active stage clear badge
+      // Update active stage clear badges
       const curClear = typeof kochManager.getStageClear === 'function' ? kochManager.getStageClear(curLvl) : null;
       const badgeHtml = getClearBadgeHtml(curClear);
+      const stage1ClearBadge = document.getElementById('koch-stage1-clear-badge');
       const targetClearBadge = document.getElementById('koch-target-clear-badge');
+      if (stage1ClearBadge) stage1ClearBadge.innerHTML = badgeHtml;
       if (targetClearBadge) targetClearBadge.innerHTML = badgeHtml;
 
-      // Re-populate stage selector with honor prefix
+      const kochStage1Card = document.getElementById('koch-stage1-card');
+      const kochStandardCard = document.getElementById('koch-standard-card');
+      const kochPoolStage1 = document.getElementById('koch-pool-stage1');
+
+      if (curLvl === 1) {
+        if (kochStage1Card) kochStage1Card.style.display = 'flex';
+        if (kochStandardCard) kochStandardCard.style.display = 'none';
+        if (kochPoolStage1) renderPoolChips(kochPoolStage1, pool, engine);
+      } else {
+        if (kochStage1Card) kochStage1Card.style.display = 'none';
+        if (kochStandardCard) kochStandardCard.style.display = 'flex';
+        if (kochTargetChar) kochTargetChar.textContent = targetChar;
+        if (kochTargetSeq) kochTargetSeq.textContent = targetSeq;
+        if (kochPoolText) renderPoolChips(kochPoolText, pool, engine);
+      }
+
+      // Re-populate stage selector with clear honors
       if (kochStageSelect) {
         kochStageSelect.innerHTML = '';
+        const seqList = (typeof KOCH_SEQUENCE !== 'undefined') ? KOCH_SEQUENCE : [];
         for (let i = 1; i <= maxLvl; i++) {
           const opt = document.createElement('option');
           opt.value = i;
           const clearInfo = typeof kochManager.getStageClear === 'function' ? kochManager.getStageClear(i) : null;
           let prefix = '';
           if (clearInfo && clearInfo.highest) {
-            if (clearInfo.highest === 'challenge') prefix = '👑 [極限] ';
-            else if (clearInfo.highest === 'standard') prefix = '🏆 [正規] ';
-            else if (clearInfo.highest === 'quick') prefix = '🟢 [基礎] ';
+            if (clearInfo.highest === 'challenge') prefix = '[極限] ';
+            else if (clearInfo.highest === 'standard') prefix = '[正規] ';
+            else if (clearInfo.highest === 'quick') prefix = '[基礎] ';
           }
-          opt.textContent = (i === 1) ? `${prefix}第 1 關 (${KOCH_SEQUENCE[1]})` : `${prefix}第 ${i} 關 (${KOCH_SEQUENCE[i]})`;
+          opt.textContent = (i === 1) ? `${prefix}第 1 關 (入門雙星 K, M)` : `${prefix}第 ${i} 關 (新字元 ${seqList[i] || i})`;
           if (i === curLvl) opt.selected = true;
           kochStageSelect.appendChild(opt);
         }
@@ -5255,13 +5370,13 @@
 
       if (descEl) {
         if (mode === 'quick') {
-          descEl.textContent = '🟢 簡化模式：無超時限制，適合熟悉新字母與手感。';
+          descEl.innerHTML = '<i class="mdi mdi-check-circle"></i> 基礎練習：無超時限制，適合熟悉新字母與手感。';
           descEl.style.color = '#889';
         } else if (mode === 'standard') {
-          descEl.textContent = '🏆 正規考核：計時連續考核，啟用 2.0s 反射倒數，正確率 ≥90% 通關。';
+          descEl.innerHTML = '<i class="mdi mdi-trophy"></i> 正規考核：計時連續考核，啟用 2.0s 反射倒數，正確率 ≥90% 通關。';
           descEl.style.color = '#00e5ff';
         } else if (mode === 'challenge') {
-          descEl.textContent = '🔥 極限挑戰：限時連續考核，啟用 2.0s 反射倒數，正確率跌破 90% 重置計時。';
+          descEl.innerHTML = '<i class="mdi mdi-fire"></i> 極限挑戰：限時連續考核，啟用 2.0s 反射倒數，正確率跌破 90% 重置計時。';
           descEl.style.color = '#ff9100';
         }
       }
@@ -5387,10 +5502,10 @@
 
         if (evalStatus) {
           if (kochState.mode === 'challenge') {
-            evalStatus.textContent = '🔥 極限挑戰進行中...失誤直接重置計時！可按 Esc 隨時結束。';
+            evalStatus.innerHTML = '<i class="mdi mdi-fire"></i> 極限挑戰進行中...失誤直接重置計時！可按 Esc 隨時結束。';
             evalStatus.style.color = '#ff9100';
           } else if (kochState.mode === 'standard') {
-            evalStatus.textContent = '🏆 正規考核進行中...請在 2.0s 內反射發報！可按 Esc 結束。';
+            evalStatus.innerHTML = '<i class="mdi mdi-trophy"></i> 正規考核進行中...請在 2.0s 內反射發報！可按 Esc 結束。';
             evalStatus.style.color = '#00e5ff';
           }
         }
@@ -5501,7 +5616,7 @@
       clearReflexTimer();
 
       const target = kochState.targetChars[idx];
-      if (kochFbInput) kochFbInput.textContent = '⏱️ 超時';
+      if (kochFbInput) kochFbInput.textContent = '超時';
       const chip = document.getElementById('koch-char-chip-' + idx);
       if (chip) {
         chip.classList.remove('state-current');
@@ -5512,13 +5627,13 @@
         char: target,
         isCorrect: false,
         isTimeout: true,
-        input: '⏱️',
+        input: '超時',
         seq: ''
       };
       kochState.timeoutCount++;
 
       if (kochFbResult) {
-        kochFbResult.textContent = `⏱️ 反射超時 (目標: ${target})`;
+        kochFbResult.innerHTML = `<i class="mdi mdi-timer-sand"></i> 反射超時 (目標: ${target})`;
         kochFbResult.style.color = '#ff9100';
       }
 
@@ -5536,18 +5651,18 @@
           kochState.runStartIndex = idx + 1; // 從下一點開始重新計算正確率！
           flashTimerReset();
           if (evalStatus) {
-            evalStatus.textContent = `⏱️ 反射超時！正確率跌破防線（${runAcc}% < 90%），挑戰計時重置為 ${formatTime(kochState.duration)}，由下一題重新起算！`;
+            evalStatus.innerHTML = `<i class="mdi mdi-timer-sand"></i> 反射超時！正確率跌破防線（${runAcc}% < 90%），挑戰計時重置為 ${formatTime(kochState.duration)}，由下一題重新起算！`;
             evalStatus.style.color = '#ff9100';
           }
         } else {
           if (evalStatus) {
-            evalStatus.textContent = `⏱️ 反射超時！當前正確率 ${runAcc}% 仍守住 90% 防線，請繼續發報！`;
+            evalStatus.innerHTML = `<i class="mdi mdi-timer-sand"></i> 反射超時！當前正確率 ${runAcc}% 仍守住 90% 防線，請繼續發報！`;
             evalStatus.style.color = '#ffb703';
           }
         }
       } else {
         if (evalStatus) {
-          evalStatus.textContent = `⏱️ 反射超時！未在 2.0s 內發報 (目標: ${target})`;
+          evalStatus.innerHTML = `<i class="mdi mdi-timer-sand"></i> 反射超時！未在 2.0s 內發報 (目標: ${target})`;
           evalStatus.style.color = '#ff9100';
         }
       }
@@ -5593,18 +5708,18 @@
         const curLvl = kochManager.currentLevel;
         const seqList = (typeof KOCH_SEQUENCE !== 'undefined') ? KOCH_SEQUENCE : [];
         const charName = (curLvl === 1) ? 'K, M' : (seqList[curLvl] || curLvl);
-        hudStageTag.textContent = `🎯 第 ${curLvl} 關 (${charName})`;
+        hudStageTag.innerHTML = `<i class="mdi mdi-bullseye-arrow"></i> 第 ${curLvl} 關 (${charName})`;
       }
 
       if (hudModeTag) {
         if (kochState.mode === 'quick') {
-          hudModeTag.textContent = '🟢 基礎練習模式';
+          hudModeTag.innerHTML = '<i class="mdi mdi-check-circle"></i> 基礎練習模式';
           hudModeTag.style.color = '#00e676';
         } else if (kochState.mode === 'standard') {
-          hudModeTag.textContent = '🏆 正規考核模式';
+          hudModeTag.innerHTML = '<i class="mdi mdi-trophy"></i> 正規考核模式';
           hudModeTag.style.color = 'var(--neon-blue)';
         } else if (kochState.mode === 'challenge') {
-          hudModeTag.textContent = '🔥 極限挑戰模式';
+          hudModeTag.innerHTML = '<i class="mdi mdi-fire"></i> 極限挑戰模式';
           hudModeTag.style.color = '#ff9100';
         }
       }
@@ -5621,14 +5736,14 @@
         const ss = (kochState.timeRemaining % 60).toString().padStart(2, '0');
         if (kochState.mode === 'challenge') {
           const resetInfo = kochState.challengeResetCount ? ` · 重置: ${kochState.challengeResetCount}次` : '';
-          const txt = `⏱️ 剩餘: ${mm}:${ss} · 題數: ${done} · 正確率: ${acc}%${resetInfo}`;
+          const txt = `剩餘: ${mm}:${ss} · 題數: ${done} · 正確率: ${acc}%${resetInfo}`;
           if (kochProgressBadge) {
             kochProgressBadge.textContent = txt;
             kochProgressBadge.style.color = '#ffb703';
           }
           if (hudStats) hudStats.textContent = txt;
         } else {
-          const txt = `⏱️ 剩餘: ${mm}:${ss} · 題數: ${done} · 正確率: ${acc}%`;
+          const txt = `剩餘: ${mm}:${ss} · 題數: ${done} · 正確率: ${acc}%`;
           if (kochProgressBadge) {
             kochProgressBadge.textContent = txt;
             kochProgressBadge.style.color = 'var(--neon-blue)';
@@ -5662,10 +5777,10 @@
       kochState.hasStarted = false;
 
       if (btnStartKochDrill) {
-        btnStartKochDrill.innerHTML = '<span>🔄 重新開始 <span style="font-size:0.75rem; background:#00364d; color:#fff; padding:1px 5px; border-radius:3px; margin-left:4px;">R</span></span>';
+        btnStartKochDrill.innerHTML = '<span><i class="mdi mdi-restore"></i> 重新開始 <span style="font-size:0.75rem; background:#00364d; color:#fff; padding:1px 5px; border-radius:3px; margin-left:4px;">R</span></span>';
       }
       if (btnStopKochDrill) {
-        btnStopKochDrill.innerHTML = '<span>⏹ 結束 <span style="font-size:0.75rem; background:#4a1518; color:#fff; padding:1px 5px; border-radius:3px; margin-left:4px;">Esc</span></span>';
+        btnStopKochDrill.innerHTML = '<span><i class="mdi mdi-stop"></i> 結束 <span style="font-size:0.75rem; background:#4a1518; color:#fff; padding:1px 5px; border-radius:3px; margin-left:4px;">Esc</span></span>';
         btnStopKochDrill.style.display = 'inline-flex';
       }
       if (btnStopKochPanel) btnStopKochPanel.style.display = 'inline-flex';
@@ -5740,13 +5855,13 @@
 
       if (evalStatus) {
         if (kochState.mode === 'challenge') {
-          evalStatus.textContent = '🔥 準備就緒！發報第 1 個字母開始計時 · 失誤重置 · 按 Esc 結束';
+          evalStatus.innerHTML = '<i class="mdi mdi-fire"></i> 準備就緒！發報第 1 個字母開始計時 · 失誤重置 · 按 Esc 結束';
           evalStatus.style.color = '#ff9100';
         } else if (kochState.mode === 'standard') {
-          evalStatus.textContent = '🏆 準備就緒！發報第 1 個字母開始計時 · 反射限時 2.0s · 按 Esc 結束';
+          evalStatus.innerHTML = '<i class="mdi mdi-trophy"></i> 準備就緒！發報第 1 個字母開始計時 · 反射限時 2.0s · 按 Esc 結束';
           evalStatus.style.color = '#00e5ff';
         } else {
-          evalStatus.textContent = '🟢 科赫闖關進行中...請依序發報！';
+          evalStatus.innerHTML = '<i class="mdi mdi-check-circle"></i> 科赫闖關進行中...請依序發報！';
           evalStatus.style.color = '#00e676';
         }
       }
@@ -5817,7 +5932,7 @@
 
       if (isMatch) {
         if (kochFbResult) {
-          kochFbResult.textContent = '✅ 正確！';
+          kochFbResult.innerHTML = '<i class="mdi mdi-check-bold"></i> 正確！';
           kochFbResult.style.color = '#00e676';
         }
         if (evalStatus) {
@@ -5827,7 +5942,7 @@
         highlightPath(res.sequence, true);
       } else {
         if (kochFbResult) {
-          kochFbResult.textContent = `❌ 失誤 (目標: ${target})`;
+          kochFbResult.innerHTML = `<i class="mdi mdi-close-thick"></i> 失誤 (目標: ${target})`;
           kochFbResult.style.color = '#ff5252';
         }
         const tSeq = engine ? (engine.getSequenceForLetter(target) || '') : '';
@@ -5838,12 +5953,12 @@
             kochState.runStartIndex = idx + 1; // 從下一點開始重新計算正確率！
             flashTimerReset();
             if (evalStatus) {
-              evalStatus.textContent = `❌ 正確率跌破防線（${runAcc}% < 90%）！挑戰計時重置為 ${formatTime(kochState.duration)}，由下一題重新起算！`;
+              evalStatus.innerHTML = `<i class="mdi mdi-close-thick"></i> 正確率跌破防線（${runAcc}% < 90%）！挑戰計時重置為 ${formatTime(kochState.duration)}，由下一題重新起算！`;
               evalStatus.style.color = '#ff5252';
             }
           } else {
             if (evalStatus) {
-              evalStatus.textContent = `⚠️ 失誤（目標是 ${target} ${tSeq}）：當前正確率 ${runAcc}% 仍守住 90% 防線，請繼續！`;
+              evalStatus.innerHTML = `<i class="mdi mdi-alert"></i> 失誤（目標是 ${target} ${tSeq}）：當前正確率 ${runAcc}% 仍守住 90% 防線，請繼續！`;
               evalStatus.style.color = '#ffb703';
             }
           }
@@ -5886,7 +6001,7 @@
       if (kochHudHeader) kochHudHeader.style.display = 'none';
 
       if (btnStartKochDrill) {
-        btnStartKochDrill.innerHTML = '<span>▶ 開始闖關 <span style="font-size:0.75rem; background:#00364d; color:#fff; padding:1px 5px; border-radius:3px; margin-left:4px;">R</span></span>';
+        btnStartKochDrill.innerHTML = '<span><i class="mdi mdi-play"></i> 開始闖關 <span style="font-size:0.75rem; background:#00364d; color:#fff; padding:1px 5px; border-radius:3px; margin-left:4px;">R</span></span>';
       }
       if (btnStopKochDrill) btnStopKochDrill.style.display = 'none';
       if (btnStopKochPanel) btnStopKochPanel.style.display = 'none';
@@ -5941,25 +6056,25 @@
 
         if (kochState.mode === 'challenge') {
           if (kochScTitle) {
-            kochScTitle.textContent = !isManualStop ? '👑 極限挑戰征服 (Challenge Conquered)!' : '🎉 挑戰考核合格 (Challenge Passed)!';
+            kochScTitle.innerHTML = !isManualStop ? '<i class="mdi mdi-crown"></i> 極限挑戰征服 (Challenge Conquered)!' : '<i class="mdi mdi-party-popper"></i> 挑戰考核合格 (Challenge Passed)!';
             kochScTitle.style.color = 'var(--gold)';
           }
           if (kochScModeTag) {
-            kochScModeTag.textContent = '🔥 挑戰模式';
+            kochScModeTag.innerHTML = '<i class="mdi mdi-fire"></i> 極限挑戰';
             kochScModeTag.style.background = '#3b1114';
             kochScModeTag.style.color = '#ffd700';
           }
           if (kochScThresholdTag) {
-            kochScThresholdTag.textContent = '防線門檻: 守住 90% 防線';
+            kochScThresholdTag.textContent = '防線門檻: 守住 90% 直覺反射防線';
             kochScThresholdTag.style.color = '#ffd700';
           }
         } else if (kochState.mode === 'standard') {
           if (kochScTitle) {
-            kochScTitle.textContent = '🏆 正規考核合格 (Standard Passed)!';
+            kochScTitle.innerHTML = '<i class="mdi mdi-trophy"></i> 正規考核合格 (Standard Passed)!';
             kochScTitle.style.color = '#00e676';
           }
           if (kochScModeTag) {
-            kochScModeTag.textContent = '🏆 正規模式';
+            kochScModeTag.innerHTML = '<i class="mdi mdi-trophy"></i> 正規考核';
             kochScModeTag.style.background = '#00364d';
             kochScModeTag.style.color = '#00e5ff';
           }
@@ -5969,11 +6084,11 @@
           }
         } else {
           if (kochScTitle) {
-            kochScTitle.textContent = '🎉 關卡突破 (Stage Clear)!';
+            kochScTitle.innerHTML = '<i class="mdi mdi-party-popper"></i> 關卡突破 (Stage Clear)!';
             kochScTitle.style.color = '#00e676';
           }
           if (kochScModeTag) {
-            kochScModeTag.textContent = '🟢 簡化模式';
+            kochScModeTag.innerHTML = '<i class="mdi mdi-check-circle"></i> 基礎練習';
             kochScModeTag.style.background = '#102218';
             kochScModeTag.style.color = '#00e676';
           }
@@ -5984,13 +6099,13 @@
         }
 
         const resetNotice = (kochState.mode === 'challenge' && kochState.challengeResetCount > 0)
-          ? `<br><span style="color:#ffb703;">⚠️ 考核期間重置計時：<strong>${kochState.challengeResetCount}</strong> 次（累計發報 ${allTotal} 題）</span>`
+          ? `<br><span style="color:#ffb703;"><i class="mdi mdi-alert"></i> 考核期間重置計時：<strong>${kochState.challengeResetCount}</strong> 次（累計發報 ${allTotal} 題）</span>`
           : '';
 
         const MODE_NAMES = {
-          'quick': '🟢 基礎練習',
-          'standard': '🏆 正規考核',
-          'challenge': '👑 極限挑戰'
+          'quick': '基礎練習',
+          'standard': '正規考核',
+          'challenge': '極限挑戰'
         };
         const prevClear = typeof kochManager.getStageClear === 'function' ? kochManager.getStageClear(currentLvl) : null;
         const prevHighest = prevClear ? prevClear.highest : null;
@@ -6003,11 +6118,11 @@
 
         let honorNotice = '';
         if (!prevHighest) {
-          honorNotice = `<br><span style="color:#ffd700;">🎖️ 通關榮譽：獲得<strong>【${MODE_NAMES[kochState.mode]}】</strong>認證！</span>`;
+          honorNotice = `<br><span style="color:#ffd700;"><i class="mdi mdi-medal"></i> 通關榮譽：獲得<strong>【${MODE_NAMES[kochState.mode]}】</strong>認證！</span>`;
         } else if (newRank > prevRank) {
-          honorNotice = `<br><span style="color:#ffd700;">🎉 榮譽晉升！本關由【${MODE_NAMES[prevHighest]}】升級為<strong>【${MODE_NAMES[kochState.mode]}】</strong>最高榮譽！</span>`;
+          honorNotice = `<br><span style="color:#ffd700;"><i class="mdi mdi-party-popper"></i> 榮譽晉升！本關由【${MODE_NAMES[prevHighest]}】升級為<strong>【${MODE_NAMES[kochState.mode]}】</strong>最高榮譽！</span>`;
         } else if (kochState.mode === prevHighest) {
-          honorNotice = `<br><span style="color:#00e5ff;">🎖️ 保持<strong>【${MODE_NAMES[prevHighest]}】</strong>榮譽紀錄！</span>`;
+          honorNotice = `<br><span style="color:#00e5ff;"><i class="mdi mdi-medal"></i> 保持<strong>【${MODE_NAMES[prevHighest]}】</strong>榮譽紀錄！</span>`;
         } else {
           honorNotice = `<br><span style="color:#889;">本關曾以含金量更高的<strong>【${MODE_NAMES[prevHighest]}】</strong>通關，紀錄予以保留。</span>`;
         }
@@ -6024,7 +6139,7 @@
 
           if (btnKochNextStage) {
             btnKochNextStage.style.display = 'inline-block';
-            btnKochNextStage.innerHTML = `<span>前往第 ${kochManager.maxUnlockedLevel} 關 (解鎖 ${newChar}) ➔ <span style="font-size:0.7rem; background:#332200; color:#ffd700; padding:1px 5px; border-radius:2px; margin-left:3px;">Enter</span></span>`;
+            btnKochNextStage.innerHTML = `<span>前往第 ${kochManager.maxUnlockedLevel} 關 (解鎖 ${newChar}) <i class="mdi mdi-arrow-right"></i> <span style="font-size:0.7rem; background:#332200; color:#ffd700; padding:1px 5px; border-radius:2px; margin-left:3px;">Enter</span></span>`;
           }
 
           setTimeout(() => {
@@ -6043,11 +6158,11 @@
           }
           if (btnKochNextStage) {
             btnKochNextStage.style.display = 'inline-block';
-            btnKochNextStage.innerHTML = `<span>進入下一關 ➔ <span style="font-size:0.7rem; background:#332200; color:#ffd700; padding:1px 5px; border-radius:2px; margin-left:3px;">Enter</span></span>`;
+            btnKochNextStage.innerHTML = `<span>進入下一關 <i class="mdi mdi-arrow-right"></i> <span style="font-size:0.7rem; background:#332200; color:#ffd700; padding:1px 5px; border-radius:2px; margin-left:3px;">Enter</span></span>`;
           }
         } else {
           if (kochScDesc) {
-            kochScDesc.innerHTML = `🏆 傳奇誕生！您已全通 36 關！整張 PCB 電路板與數字匯流排已全面通電！${resetNotice}${honorNotice}`;
+            kochScDesc.innerHTML = `<i class="mdi mdi-trophy"></i> 傳奇誕生！您已全通 36 關！整張 PCB 電路板與數字匯流排已全面通電！${resetNotice}${honorNotice}`;
           }
           if (btnKochNextStage) {
             btnKochNextStage.style.display = 'none';
@@ -6055,18 +6170,18 @@
         }
 
         if (evalStatus) {
-          evalStatus.textContent = `🎉 關卡突破！正確率 ${accuracy}%`;
+          evalStatus.innerHTML = `<i class="mdi mdi-party-popper"></i> 關卡突破！正確率 ${accuracy}%`;
           evalStatus.style.color = '#00e676';
         }
       } else {
         if (kochScTitle) {
-          kochScTitle.textContent = isManualStop ? '📋 考核手動結算 (Drill Settled)' : '⚠️ 未達通關門檻';
+          kochScTitle.innerHTML = isManualStop ? '<i class="mdi mdi-clipboard-text"></i> 考核手動結算 (Drill Settled)' : '<i class="mdi mdi-alert"></i> 未達通關門檻';
           kochScTitle.style.color = '#ffb703';
         }
         if (kochScorecard) kochScorecard.style.borderColor = '#ffb703';
 
         const resetNotice = (kochState.mode === 'challenge' && kochState.challengeResetCount > 0)
-          ? `<br><span style="color:#ffb703;">⚠️ 考核期間重置計時：<strong>${kochState.challengeResetCount}</strong> 次（累計發報 ${allTotal} 題）</span>`
+          ? `<br><span style="color:#ffb703;"><i class="mdi mdi-alert"></i> 考核期間重置計時：<strong>${kochState.challengeResetCount}</strong> 次（累計發報 ${allTotal} 題）</span>`
           : '';
 
         if (kochScDesc) {
@@ -6074,7 +6189,7 @@
             kochScDesc.innerHTML = `有效題目數過少（僅完成 ${total} 題），請重新發起考核並持續發報。${resetNotice}`;
           } else {
             const reason = isManualStop ? '手動結束考核。' : '';
-            kochScDesc.innerHTML = `${reason}本次正確率為 <strong>${accuracy}%</strong>，未達科赫法 <strong>90%</strong> 條件反射標準。${resetNotice}<br>
+            kochScDesc.innerHTML = `${reason}本次正確率為 <strong>${accuracy}%</strong>，未達科赫法 <strong>90%</strong> 直覺反射標準。${resetNotice}<br>
               請放鬆心情再試一次，讓耳朵與手指自然形成直覺反射！`;
           }
         }
@@ -6192,7 +6307,7 @@
       ledDahMem.classList.toggle('latch-active', dahMem);
       squeezeBanner.classList.toggle('squeezing', isSqueezing);
       if (isSqueezing) {
-        squeezeStatus.innerHTML = '<strong style="color:var(--gold);">⚡ 雙片夾壓中 (Squeezing)</strong> · 自動點劃交替中 (Iambic)';
+        squeezeStatus.innerHTML = '<strong style="color:var(--gold);"><i class="mdi mdi-flash"></i> 雙片夾壓中 (Squeezing)</strong> · 自動點劃交替中 (Iambic)';
       } else if (ditMem || dahMem) {
         squeezeStatus.innerHTML = `預先排程記憶: ${ditMem ? '· Dit 鎖存' : ''} ${dahMem ? '— Dah 鎖存' : ''}`;
       } else {
@@ -6265,7 +6380,7 @@
         paddleLeftName.innerHTML = '<span style="font-size:1.3rem;">·</span> 點 Dit (自動連發)';
         paddleRightName.innerHTML = '<span style="font-size:1.3rem;">—</span> 劃 Dah (手動長音)';
         squeezeBanner.classList.remove('squeezing');
-        squeezeStatus.innerHTML = '📻 <strong>半自動機械震報鍵 (Bug Key)</strong>：左撥片自動連發點 · 右撥片純手動長劃';
+        squeezeStatus.innerHTML = '<i class="mdi mdi-radio-handheld"></i> <strong>半自動機械震報鍵 (Bug Key)</strong>：左撥片自動連發點 · 右撥片純手動長劃';
         return;
       }
       const isRev = keyer.reversed;
@@ -6303,7 +6418,7 @@
         paddleContainer.style.display = 'flex';
         keyer.isBugMode = true;
         updatePaddleLabels();
-        evalStatus.textContent = '📻 已切換至半自動機械震報鍵 (Bug Key) 模式';
+        evalStatus.innerHTML = '<i class="mdi mdi-radio-handheld"></i> 已切換至半自動機械震報鍵 (Bug Key) 模式';
         evalStatus.style.color = '#ffb703';
       }
 
@@ -6402,12 +6517,12 @@
       if (currentMode === 'text') {
         initTextModePassage(textInput.value || textState.rawText);
         window.scrollTo({ top: 0, behavior: 'smooth' });
-        evalStatus.textContent = '🔄 已重新開始發報挑戰！';
+        evalStatus.innerHTML = '<i class="mdi mdi-restore"></i> 已重新開始發報挑戰！';
         evalStatus.style.color = '#00e5ff';
       } else if (currentMode === 'koch') {
         startKochDrill();
         window.scrollTo({ top: 0, behavior: 'smooth' });
-        evalStatus.textContent = '🔄 已重新開始本關闖關考驗！';
+        evalStatus.innerHTML = '<i class="mdi mdi-restore"></i> 已重新開始本關闖關考驗！';
         evalStatus.style.color = '#00e5ff';
       } else {
         engine.reset();
@@ -6415,7 +6530,7 @@
         updateCommittedView();
         stateSeq.textContent = '—';
         stateLetter.textContent = '—';
-        evalStatus.textContent = '🔄 已重設並清除送出文字！';
+        evalStatus.innerHTML = '<i class="mdi mdi-restore"></i> 已重設並清除送出文字！';
         evalStatus.style.color = 'var(--gold)';
         highlightPath('', false);
         const clearBtn = document.getElementById('btn-clear-committed');
@@ -6649,7 +6764,7 @@
         e.stopPropagation();
         engine.committedLetters = [];
         updateCommittedView();
-        evalStatus.textContent = '🔄 已清除送出文字！';
+        evalStatus.innerHTML = '<i class="mdi mdi-delete-sweep"></i> 已清除送出文字！';
         evalStatus.style.color = 'var(--gold)';
       });
     }
@@ -6812,6 +6927,20 @@
         replayLetter(char, seq);
       }
     });
+
+    const btnKochListenK = document.getElementById('btn-koch-listen-k');
+    if (btnKochListenK) {
+      btnKochListenK.addEventListener('click', () => {
+        replayLetter('K', '-.-');
+      });
+    }
+
+    const btnKochListenM = document.getElementById('btn-koch-listen-m');
+    if (btnKochListenM) {
+      btnKochListenM.addEventListener('click', () => {
+        replayLetter('M', '--');
+      });
+    }
 
     chkKochHints.addEventListener('change', (e) => {
       kochState.showHints = e.target.checked;

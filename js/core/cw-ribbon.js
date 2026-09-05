@@ -206,7 +206,7 @@ class CWRibbon {
     ctx.fillStyle = this.activePulse ? '#ff5252' : '#666';
     ctx.font = 'bold 7.5px monospace';
     ctx.textAlign = 'right';
-    ctx.fillText(this.activePulse ? '⚡ TX' : 'IDLE', W - 4, H - 4);
+    ctx.fillText(this.activePulse ? 'TX' : 'IDLE', W - 4, H - 4);
   }
 }
 

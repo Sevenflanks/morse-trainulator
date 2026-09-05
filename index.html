@@ -16,6 +16,9 @@
   <!-- Zero-Dependency Inline SVG Favicon -->
   <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='6' fill='%23121319'/%3E%3Ccircle cx='16' cy='16' r='6' fill='%23d4af37'/%3E%3Cpath d='M7 16 A 9 9 0 0 0 7 16' stroke='%2300e5ff' stroke-width='2' stroke-linecap='round'/%3E%3Cpath d='M5 11 A 12 12 0 0 0 5 21' fill='none' stroke='%2300e5ff' stroke-width='2' stroke-linecap='round'/%3E%3Cpath d='M27 11 A 12 12 0 0 1 27 21' fill='none' stroke='%2300e5ff' stroke-width='2' stroke-linecap='round'/%3E%3C/svg%3E">
   
+  <!-- Material Design Icons (MDI) -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@mdi/font@7.4.47/css/materialdesignicons.min.css">
+  
   <!-- CSS Stylesheets -->
   <link rel="stylesheet" href="css/base.css">
   <link rel="stylesheet" href="css/pcb-card.css">
@@ -25,14 +28,14 @@
 <body>
 
   <header>
-    <h1>📻 摩斯訓練儀 (Morse Trainulator)</h1>
+    <h1><i class="mdi mdi-radio-handheld"></i> 摩斯訓練儀 (Morse Trainulator)</h1>
     <div class="subtitle">電報模擬與練習工具 · 支援直鍵 / 雙撥片 / 機械震報鍵 · PCB 二元樹尋路 · 節奏儀表</div>
     <div class="layout-switch-container">
       <button type="button" class="layout-switch-btn active" id="btn-layout-2col" title="切換為雙欄專注佈局">
-        <span>🎛️ 雙欄專注</span>
+        <span><i class="mdi mdi-view-column"></i> 雙欄專注</span>
       </button>
       <button type="button" class="layout-switch-btn" id="btn-layout-3col" title="切換為三欄工作台">
-        <span>🖥️ 三欄工作台</span>
+        <span><i class="mdi mdi-view-dashboard-variant"></i> 三欄工作台</span>
       </button>
     </div>
   </header>
@@ -80,19 +83,19 @@
       <!-- Keyer Device Switcher Tabs (放在 PCB 下面) -->
       <div class="keyer-device-tabs" style="margin-top: 10px; width: 100%;">
         <button id="dev-straight" class="keyer-tab" type="button">
-          <span>🔘 直鍵<br><span style="white-space: nowrap;">(Straight Key)</span></span>
+          <span><i class="mdi mdi-radiobox-marked"></i> 直鍵<br><span style="white-space: nowrap;">(Straight Key)</span></span>
         </button>
         <button id="dev-paddle" class="keyer-tab active" type="button">
-          <span>🎛️ 雙撥片<br><span style="white-space: nowrap;">(Iambic Paddle)</span></span>
+          <span><i class="mdi mdi-tune-vertical"></i> 雙撥片<br><span style="white-space: nowrap;">(Iambic Paddle)</span></span>
         </button>
         <button id="dev-bug" class="keyer-tab" type="button">
-          <span>📻 機械震報鍵<br><span style="white-space: nowrap;">(Bug Key)</span></span>
+          <span><i class="mdi mdi-metronome"></i> 機械震報鍵<br><span style="white-space: nowrap;">(Bug Key)</span></span>
         </button>
       </div>
 
       <!-- Device 1: Straight Key Trigger -->
       <button class="key-button" id="key-trigger" style="display:none; width: 100%;">
-        <span>⚡ 按住發報 (鍵盤「K」)</span>
+        <span><i class="mdi mdi-flash"></i> 按住發報 (鍵盤「K」)</span>
       </button>
 
       <!-- Device 2: Dual-Paddle Deck -->
@@ -120,7 +123,7 @@
         </div>
       </div>
 
-      <div style="font-size: 0.76rem; color: var(--text-muted); text-align: center; margin-top: 4px;">💡 點選字母或數字，可試聽發報音並查看走線</div>
+      <div style="font-size: 0.76rem; color: var(--text-muted); text-align: center; margin-top: 4px;"><i class="mdi mdi-lightbulb-outline"></i> 點選字母或數字，可試聽發報音並查看走線</div>
     </div>
 
     <!-- Training Core Column: Mode Tabs & Drill Exercises -->
@@ -129,13 +132,13 @@
       <!-- Mode Switcher Tabs -->
       <div style="display: flex; gap: 8px; width: 100%; margin-bottom: 4px;">
         <button class="mode-tab-btn active" id="tab-mode-free" style="flex: 1; padding: 10px; font-size: 0.88rem; font-weight: bold; border-radius: 8px; cursor: pointer; border: 1.5px solid var(--gold); background: #2a2512; color: var(--gold-light); display: flex; align-items: center; justify-content: center; gap: 4px;">
-          <span>⚡ 自由發報</span>
+          <span><i class="mdi mdi-flash"></i> 自由發報</span>
         </button>
         <button class="mode-tab-btn" id="tab-mode-text" style="flex: 1; padding: 10px; font-size: 0.88rem; font-weight: bold; border-radius: 8px; cursor: pointer; border: 1.5px solid #363a46; background: #15171d; color: #aaa; display: flex; align-items: center; justify-content: center; gap: 4px;">
-          <span>📖 文章模式</span>
+          <span><i class="mdi mdi-book-open-page-variant"></i> 文章模式</span>
         </button>
         <button class="mode-tab-btn" id="tab-mode-koch" style="flex: 1; padding: 10px; font-size: 0.88rem; font-weight: bold; border-radius: 8px; cursor: pointer; border: 1.5px solid #363a46; background: #15171d; color: #aaa; display: flex; align-items: center; justify-content: center; gap: 4px;">
-          <span>🎯 科赫闖關</span>
+          <span><i class="mdi mdi-bullseye-arrow"></i> 科赫闖關</span>
         </button>
       </div>
 
@@ -170,16 +173,16 @@
           <!-- Playback Actions -->
           <div style="display: flex; gap: 8px; flex-wrap: wrap;">
             <button id="btn-play-auto" style="flex: 1.2; padding: 9px; background: linear-gradient(135deg, #ffd700, #ff9100); color: #000; font-weight: bold; border: none; border-radius: 6px; cursor: pointer; font-size: 0.85rem; display: flex; align-items: center; justify-content: center; gap: 5px; box-shadow: 0 0 10px rgba(255, 215, 0, 0.3);">
-              <span>▶ 示範播放</span>
+              <span><i class="mdi mdi-play"></i> 示範播放</span>
             </button>
             <button id="btn-pause-auto" disabled style="flex: 0.8; padding: 9px; background: #222530; border: 1.5px solid #3d4252; color: #666; border-radius: 6px; cursor: not-allowed; font-size: 0.85rem;">
-              <span>⏸ 暫停</span>
+              <span><i class="mdi mdi-pause"></i> 暫停</span>
             </button>
             <button id="btn-stop-auto" disabled style="flex: 0.8; padding: 9px; background: #222530; border: 1.5px solid #3d4252; color: #666; border-radius: 6px; cursor: not-allowed; font-size: 0.85rem;">
-              <span>⏹ 停止</span>
+              <span><i class="mdi mdi-stop"></i> 停止</span>
             </button>
             <button id="btn-restart-text" style="flex: 0.9; padding: 9px; background: #1c1e26; border: 1.5px solid #3d4252; color: #eee; border-radius: 6px; cursor: pointer; font-size: 0.85rem;" title="快捷鍵: 按鍵 R">
-              <span>🔄 重新發報 (R)</span>
+              <span><i class="mdi mdi-restore"></i> 重新發報 (R)</span>
             </button>
           </div>
 
@@ -218,7 +221,7 @@
         <!-- 3. Completion Scorecard (Hidden until complete) -->
         <div class="panel" id="text-scorecard" style="display: none; border-color: var(--gold); background: #161715;">
           <div class="panel-title" style="color: var(--gold-light);">
-            <span>🎉 文章練習完成！</span>
+            <span><i class="mdi mdi-party-popper"></i> 文章練習完成！</span>
             <span id="scorecard-speed-tag" style="color:#ffb703; font-size: 0.8rem;">15 WPM</span>
           </div>
           <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; margin: 10px 0; text-align: center;">
@@ -253,7 +256,7 @@
         <div class="panel" id="koch-setup-card" style="border-color: #007799; background: #0c1218;">
           <div class="panel-title" style="color: var(--neon-blue); flex-wrap: wrap; gap: 8px 12px;">
             <div style="display:flex; align-items:center; gap:8px; flex-wrap: wrap;">
-              <span style="white-space: nowrap;">🎯 國際科赫闖關</span>
+              <span style="white-space: nowrap;"><i class="mdi mdi-bullseye-arrow"></i> 國際科赫闖關</span>
               <span id="koch-stage-badge" style="background:#00364d; color:var(--neon-blue); padding:2px 8px; border-radius:12px; font-size:0.75rem; border:1px solid #005b82; white-space: nowrap; flex-shrink: 0;">第 1 關 / 共 35 關</span>
             </div>
             <div style="display:flex; gap:6px; align-items:center; flex-shrink: 0;">
@@ -278,13 +281,13 @@
           <!-- Clearance Trophy Summary -->
           <div class="koch-trophy-summary" id="koch-trophy-summary">
             <span class="trophy-pill pill-challenge" title="極限挑戰征服關卡數">
-              <span>👑 極限征服:</span> <strong id="trophy-cnt-challenge">0</strong>
+              <span><i class="mdi mdi-crown"></i> 極限征服:</span> <strong id="trophy-cnt-challenge">0</strong>
             </span>
             <span class="trophy-pill pill-standard" title="正規考核合格關卡數">
-              <span>🏆 正規合格:</span> <strong id="trophy-cnt-standard">0</strong>
+              <span><i class="mdi mdi-trophy"></i> 正規合格:</span> <strong id="trophy-cnt-standard">0</strong>
             </span>
             <span class="trophy-pill pill-quick" title="基礎練習通過關卡數">
-              <span>🟢 基礎通過:</span> <strong id="trophy-cnt-quick">0</strong>
+              <span><i class="mdi mdi-check-circle"></i> 基礎通過:</span> <strong id="trophy-cnt-quick">0</strong>
             </span>
             <span class="trophy-pill pill-total" title="通關總進度">
               <span>通關: <strong id="trophy-cnt-total">0</strong>/35</span>
@@ -295,14 +298,14 @@
           <div class="koch-matrix-card" id="koch-matrix-card">
             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
               <div style="display: flex; align-items: center; gap: 6px;">
-                <span style="font-size: 0.76rem; font-weight: bold; color: var(--neon-blue);">🗺️ 關卡地圖 (點擊切換關卡)</span>
+                <span style="font-size: 0.76rem; font-weight: bold; color: var(--neon-blue);"><i class="mdi mdi-map-marker-path"></i> 關卡地圖 (點擊切換關卡)</span>
               </div>
               <div style="display: flex; align-items: center; gap: 6px; font-size: 0.68rem;">
-                <span style="color: #ffd700;" title="極限挑戰征服">👑極限</span>
-                <span style="color: #00e5ff;" title="正規考核合格">🏆正規</span>
-                <span style="color: #00e676;" title="基礎練習通過">🟢基礎</span>
-                <span style="color: #667;" title="尚未通關">⚪未過</span>
-                <span style="color: #445;" title="未解鎖關卡">🔒鎖定</span>
+                <span style="color: #ffd700;" title="極限挑戰征服"><i class="mdi mdi-crown"></i>極限</span>
+                <span style="color: #00e5ff;" title="正規考核合格"><i class="mdi mdi-trophy"></i>正規</span>
+                <span style="color: #00e676;" title="基礎練習通過"><i class="mdi mdi-check-circle"></i>基礎</span>
+                <span style="color: #667;" title="尚未通關"><i class="mdi mdi-circle-outline"></i>未過</span>
+                <span style="color: #445;" title="未解鎖關卡"><i class="mdi mdi-lock"></i>鎖定</span>
               </div>
             </div>
             <div class="koch-stage-grid" id="koch-stage-grid">
@@ -316,9 +319,9 @@
             <div id="koch-stage1-card" style="display: flex; flex-direction: column; gap: 10px; background: #101620; border: 1px solid #202d3f; border-radius: 8px; padding: 12px;">
               <div style="display: flex; justify-content: space-between; align-items: center;">
                 <span style="font-size: 0.82rem; font-weight: bold; color: var(--neon-blue); display: flex; align-items: center; gap: 6px;">
-                  🌟 第 1 關入門雙星：K 與 M
+                  <i class="mdi mdi-star-face"></i> 第 1 關入門雙星：K 與 M
                 </span>
-                <span id="koch-stage1-clear-badge" class="badge-tier tier-none">⚪ 尚未通關</span>
+                <span id="koch-stage1-clear-badge" class="badge-tier tier-none"><i class="mdi mdi-circle-outline"></i> 尚未通關</span>
               </div>
               
               <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
@@ -332,7 +335,7 @@
                     </div>
                   </div>
                   <button id="btn-koch-listen-k" style="background: #1b2636; border: 1px solid #3d506b; color: #00e5ff; border-radius: 4px; padding: 4px 8px; font-size: 0.75rem; cursor: pointer; display: flex; align-items: center; gap: 3px;">
-                    <span>🔊 試聽 K</span>
+                    <span><i class="mdi mdi-volume-high"></i> 試聽 K</span>
                   </button>
                 </div>
 
@@ -346,7 +349,7 @@
                     </div>
                   </div>
                   <button id="btn-koch-listen-m" style="background: #2a220b; border: 1px solid #6b551b; color: #ffd700; border-radius: 4px; padding: 4px 8px; font-size: 0.75rem; cursor: pointer; display: flex; align-items: center; gap: 3px;">
-                    <span>🔊 試聽 M</span>
+                    <span><i class="mdi mdi-volume-high"></i> 試聽 M</span>
                   </button>
                 </div>
               </div>
@@ -357,7 +360,7 @@
                   <span id="koch-pool-stage1" class="koch-pool-chips" style="display: inline-flex; gap: 4px;"></span>
                 </div>
                 <div style="font-size: 0.7rem; color: #778;">
-                  💡 達 <strong>90% 正確率</strong> 即可晉級第 2 關解鎖新字元 R！
+                  <i class="mdi mdi-lightbulb-outline"></i> 達 <strong>90% 正確率</strong> 即可晉級第 2 關解鎖新字元 R！
                 </div>
               </div>
             </div>
@@ -372,10 +375,10 @@
                 <div style="display:flex; justify-content:space-between; align-items:center;">
                   <div style="font-size:0.85rem; font-weight:bold; color:#fff; display:flex; align-items:center; gap:8px;">
                     <span>點劃編碼: <span id="koch-target-seq" style="color:var(--gold); letter-spacing:2px; font-family:monospace; font-size:1.1rem;">--</span></span>
-                    <span id="koch-target-clear-badge" class="badge-tier tier-none">⚪ 尚未通關</span>
+                    <span id="koch-target-clear-badge" class="badge-tier tier-none"><i class="mdi mdi-circle-outline"></i> 尚未通關</span>
                   </div>
                   <button id="btn-koch-target-listen" style="background:#1b2636; border:1px solid #3d506b; color:#00e5ff; border-radius:4px; padding:3px 8px; font-size:0.75rem; cursor:pointer; display:flex; align-items:center; gap:4px;">
-                    <span>🔊 試聽音形</span>
+                    <span><i class="mdi mdi-volume-high"></i> 試聽音形</span>
                   </button>
                 </div>
                 <div style="font-size:0.72rem; color:#aaa; display:flex; align-items:center; flex-wrap:wrap; gap:4px;">
@@ -383,7 +386,7 @@
                   <span id="koch-pool-text" class="koch-pool-chips" style="display:inline-flex; flex-wrap:wrap; gap:4px;">K, M</span>
                 </div>
                 <div style="font-size:0.7rem; color:#778;">
-                  💡 科赫法全速發報，請憑「音形節奏」直接反射按鍵。達 <strong>90% 正確率</strong> 即可晉級點亮下一字元！
+                  <i class="mdi mdi-lightbulb-outline"></i> 科赫法全速發報，請憑「音形節奏」直接反射按鍵。達 <strong>90% 正確率</strong> 即可晉級點亮下一字元！
                 </div>
               </div>
             </div>
@@ -392,13 +395,13 @@
           <!-- Drill Settings & Action Row -->
           <div class="koch-mode-tabs" id="koch-assessment-tabs" style="margin-top:12px;">
             <button type="button" class="koch-mode-tab active" id="tab-koch-quick" data-mode="quick">
-              <span>🟢 基礎練習</span>
+              <span><i class="mdi mdi-check-circle"></i> 基礎練習</span>
             </button>
             <button type="button" class="koch-mode-tab" id="tab-koch-standard" data-mode="standard">
-              <span>🏆 正規考核</span>
+              <span><i class="mdi mdi-trophy"></i> 正規考核</span>
             </button>
             <button type="button" class="koch-mode-tab tab-challenge" id="tab-koch-challenge" data-mode="challenge">
-              <span>🔥 極限挑戰</span>
+              <span><i class="mdi mdi-fire"></i> 極限挑戰</span>
             </button>
           </div>
 
@@ -426,7 +429,7 @@
               <label style="cursor:pointer; display:flex; align-items:center; gap:3px; white-space:nowrap;">
                 <input type="radio" name="koch-duration" value="300" style="accent-color:var(--neon-blue);"> 5 分鐘
               </label>
-              <span style="color:#889; font-size:0.72rem; margin-left:2px; white-space:nowrap;">⏱️ 反射限時 2.0s</span>
+              <span style="color:#889; font-size:0.72rem; margin-left:2px; white-space:nowrap;"><i class="mdi mdi-timer-sand"></i> 反射限時 2.0s</span>
             </div>
 
             <!-- Config 3: Challenge (Timed 3m/5m, zero tolerance) -->
@@ -438,28 +441,28 @@
               <label style="cursor:pointer; display:flex; align-items:center; gap:3px; white-space:nowrap;">
                 <input type="radio" name="koch-duration-ch" value="300" style="accent-color:#ff5252;"> 5 分鐘
               </label>
-              <span style="color:#ffb703; font-size:0.72rem; margin-left:2px; white-space:nowrap;">⏱️ 反射限時 2.0s</span>
+              <span style="color:#ffb703; font-size:0.72rem; margin-left:2px; white-space:nowrap;"><i class="mdi mdi-timer-sand"></i> 反射限時 2.0s</span>
             </div>
 
             <div style="display:flex; gap:6px; margin-left:auto; flex-shrink:0; align-items:center;">
               <button id="btn-start-koch-drill" style="padding: 6px 12px; background: linear-gradient(135deg, #00e5ff, #0077b6); color: #000; font-weight: bold; border: none; border-radius: 6px; cursor: pointer; font-size: 0.8rem; box-shadow: 0 0 10px rgba(0, 229, 255, 0.3); white-space:nowrap;">
-                <span>▶ 開始考核 <span style="font-size:0.75rem; background:#00364d; color:#fff; padding:1px 5px; border-radius:3px; margin-left:4px;">R</span></span>
+                <span><i class="mdi mdi-play"></i> 開始考核 <span style="font-size:0.75rem; background:#00364d; color:#fff; padding:1px 5px; border-radius:3px; margin-left:4px;">R</span></span>
               </button>
               <button id="btn-stop-koch-drill" class="btn-stop-koch" style="display:none;">
-                <span>⏹ 結束 <span style="font-size:0.75rem; background:#4a1518; color:#fff; padding:1px 5px; border-radius:3px; margin-left:4px;">Esc</span></span>
+                <span><i class="mdi mdi-stop"></i> 結束 <span style="font-size:0.75rem; background:#4a1518; color:#fff; padding:1px 5px; border-radius:3px; margin-left:4px;">Esc</span></span>
               </button>
             </div>
           </div>
           <div id="koch-mode-desc" style="font-size:0.72rem; color:#889; margin-top:6px;">
-            🟢 基礎練習：無超時限制，適合熟悉新字元音形與電鍵手感。
+            <i class="mdi mdi-check-circle"></i> 基礎練習：無超時限制，適合熟悉新字元音形與電鍵手感。
           </div>
         </div>
 
         <!-- Koch Focus HUD Bar (Active During Drill) -->
         <div id="koch-hud-header" class="koch-hud-bar" style="display:none;">
           <div class="koch-hud-left">
-            <span class="koch-hud-badge" id="koch-hud-stage-tag">🎯 第 1 關</span>
-            <span id="koch-hud-mode-tag" style="font-size:0.75rem; padding:2px 8px; border-radius:4px; background:#182230; color:var(--neon-blue); font-weight:bold;">🟢 基礎練習模式</span>
+            <span class="koch-hud-badge" id="koch-hud-stage-tag"><i class="mdi mdi-bullseye-arrow"></i> 第 1 關</span>
+            <span id="koch-hud-mode-tag" style="font-size:0.75rem; padding:2px 8px; border-radius:4px; background:#182230; color:var(--neon-blue); font-weight:bold;"><i class="mdi mdi-check-circle"></i> 基礎練習模式</span>
             <label style="font-size:0.75rem; color:#889; cursor:pointer; display:flex; align-items:center; gap:4px; margin-left:6px;" title="在題目字母下方顯示摩斯點劃提示">
               <input type="checkbox" id="chk-koch-hints" style="accent-color:var(--neon-blue);"> 點劃提示
             </label>
@@ -467,7 +470,7 @@
           <div class="koch-hud-right">
             <span class="koch-hud-stats" id="koch-hud-stats">剩餘: --:-- · 正確率: 100%</span>
             <button id="btn-stop-koch-hud" class="koch-hud-stop" type="button" title="結束當前考核 (快捷鍵 Esc)">
-              <span>⏹ 結束 <span style="font-size:0.7rem; opacity:0.8;">(Esc)</span></span>
+              <span><i class="mdi mdi-stop"></i> 結束 <span style="font-size:0.7rem; opacity:0.8;">(Esc)</span></span>
             </button>
           </div>
         </div>
@@ -476,7 +479,7 @@
         <div class="panel" id="koch-drill-panel" style="display:none;">
           <div class="panel-title" style="display:none;">
             <span id="koch-progress-badge" style="font-size:0.75rem; color:var(--neon-blue); font-weight: bold;">進度: 0/24 · 正確率: 100%</span>
-            <button id="btn-stop-koch-panel" style="display:none; padding: 2px 8px; background: #2a1114; color: #ff5252; border: 1px solid #ff5252; border-radius: 4px; font-size: 0.72rem; cursor: pointer; font-weight: bold; white-space: nowrap;">⏹ 結束 (Esc)</button>
+            <button id="btn-stop-koch-panel" style="display:none; padding: 2px 8px; background: #2a1114; color: #ff5252; border: 1px solid #ff5252; border-radius: 4px; font-size: 0.72rem; cursor: pointer; font-weight: bold; white-space: nowrap;"><i class="mdi mdi-stop"></i> 結束 (Esc)</button>
           </div>
 
           <!-- Reflex countdown bar (for Standard & Challenge) -->
@@ -500,7 +503,7 @@
         <div class="panel" id="koch-scorecard" style="display: none; border-color: var(--neon-blue); background: #0b151e;">
           <div class="panel-title" style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:6px;">
             <div style="display:flex; align-items:center; gap:6px;">
-              <span id="koch-sc-title" style="color:#00e5ff; font-weight:bold;">🎉 關卡突破 (Stage Clear)!</span>
+              <span id="koch-sc-title" style="color:#00e5ff; font-weight:bold;"><i class="mdi mdi-party-popper"></i> 關卡突破 (Stage Clear)!</span>
               <span id="koch-sc-mode-tag" style="font-size:0.72rem; padding:1px 6px; border-radius:3px; background:#182230; color:#00e5ff;">簡化模式</span>
             </div>
             <span id="koch-sc-threshold-tag" style="color:#ffb703; font-size:0.78rem;">通關門檻: 90%</span>
@@ -529,10 +532,10 @@
           </div>
           <div style="display: flex; gap: 8px; justify-content: flex-end;">
             <button id="btn-koch-retry" style="padding: 7px 14px; background: #1d2531; border: 1px solid #3c4b60; color: #ccc; border-radius: 5px; font-size: 0.8rem; cursor: pointer;">
-              <span>🔄 再次挑戰本關 <span style="font-size:0.7rem; background:#293547; color:#fff; padding:1px 4px; border-radius:2px; margin-left:3px;">R</span></span>
+              <span><i class="mdi mdi-restore"></i> 再次挑戰本關 <span style="font-size:0.7rem; background:#293547; color:#fff; padding:1px 4px; border-radius:2px; margin-left:3px;">R</span></span>
             </button>
             <button id="btn-koch-next-stage" style="display:none; padding: 7px 16px; background: linear-gradient(135deg, #ffd700, #ff9100); border: none; color: #000; font-weight: bold; border-radius: 5px; font-size: 0.8rem; cursor: pointer; box-shadow: 0 0 10px rgba(255,215,0,0.3);">
-              <span>前往下一關 ➔ <span style="font-size:0.7rem; background:#332200; color:#ffd700; padding:1px 5px; border-radius:2px; margin-left:3px;">Enter</span></span>
+              <span>前往下一關 <i class="mdi mdi-arrow-right"></i> <span style="font-size:0.7rem; background:#332200; color:#ffd700; padding:1px 5px; border-radius:2px; margin-left:3px;">Enter</span></span>
             </button>
           </div>
         </div>
@@ -857,15 +860,15 @@
             </div>
           </div>
           <div style="font-size:0.68rem; color:#777; margin-top:6px; text-align:center;">
-            💡 點選按鍵後，按下鍵盤任意鍵即可更換
+            <i class="mdi mdi-lightbulb-outline"></i> 點選按鍵後，按下鍵盤任意鍵即可更換
           </div>
         </div>
 
         <!-- Factory Reset & Storage Status Footer -->
         <div style="display:flex; justify-content:space-between; align-items:center; margin-top:14px; padding-top:8px; border-top:1px solid #252834;">
-          <span style="font-size:0.7rem; color:#888;">💾 設定將自動保存</span>
+          <span style="font-size:0.7rem; color:#888;"><i class="mdi mdi-content-save-outline"></i> 設定將自動保存</span>
           <button id="btn-factory-reset" style="background:none; border:1px solid #444; color:#aaa; padding:4px 8px; border-radius:4px; font-size:0.72rem; cursor:pointer;">
-            🔄 重設為預設值
+            <i class="mdi mdi-restore"></i> 重設為預設值
           </button>
         </div>
       </div>

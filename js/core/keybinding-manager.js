@@ -83,7 +83,7 @@ class KeybindingManager {
     const leftHint = document.getElementById('paddle-left-hint');
     const rightHint = document.getElementById('paddle-right-hint');
 
-    if (straightSpan) straightSpan.textContent = `⚡ 按住發報 (鍵盤「${this.formatKeys(b.straight)}」)`;
+    if (straightSpan) straightSpan.innerHTML = `<i class="mdi mdi-flash"></i> 按住發報 (鍵盤「${this.formatKeys(b.straight)}」)`;
     if (leftHint) leftHint.textContent = `鍵盤 ${this.formatKeys(b.dit)}`;
     if (rightHint) rightHint.textContent = `鍵盤 ${this.formatKeys(b.dah)}`;
   }

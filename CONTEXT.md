@@ -130,6 +130,10 @@ _Avoid_: Custom hotkeys, macro shortcuts
 The automatic local storage synchronization mechanism that persists all timing configurations, keyer modes, audio parameters, keybindings, and training preferences across browser reloads.
 _Avoid_: Cookie save, session cache
 
+**Iconography Standard (UI 圖示規範)**:
+All iconography across interface buttons, status meters, and challenge indicators must strictly use Material Design Icons (MDI) via `<i class="mdi mdi-..."></i>` or inline SVG equivalents. Unicode emojis and emoticons (顏文字) are strictly prohibited in production UI to ensure vector crispness, uniform typography alignment, and cross-platform consistency.
+_Avoid_: Emoji, Unicode pictographs, emoticon, 顏文字
+
 ---
 
 ## Architecture & Modules (模組化架構)

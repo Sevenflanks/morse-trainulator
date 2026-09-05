@@ -62,14 +62,16 @@ function setupFakeDOM() {
         contains(c) { return this.classes.has(c); }
       },
       style: {},
-      get innerHTML() { return this._innerHTML || ''; },
+      get innerHTML() { return this._innerHTML || this._textContent || ''; },
       set innerHTML(val) {
         this._innerHTML = val;
+        this._textContent = String(val).replace(/<[^>]+>/g, '');
         if (val === '') {
           this.children = [];
         }
       },
-      textContent: '',
+      get textContent() { return this._textContent !== undefined ? this._textContent : (this._innerHTML || '').replace(/<[^>]+>/g, ''); },
+      set textContent(val) { this._textContent = val; },
       appendChild(child) {
         this.children = this.children || [];
         child.parent = this;
