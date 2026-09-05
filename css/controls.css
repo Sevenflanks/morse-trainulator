@@ -1,0 +1,413 @@
+/* Keying Meter */
+.meter-container {
+  position: relative;
+  height: 42px;
+  background: #0d0e12;
+  border-radius: 8px;
+  border: 1.5px solid #363a47;
+  overflow: hidden;
+  margin-bottom: 8px;
+}
+
+.meter-bar {
+  height: 100%;
+  width: 0%;
+  background: linear-gradient(90deg, #00b4d8, #00e5ff);
+  transition: width 0.03s linear;
+}
+
+.meter-bar.dah-active {
+  background: linear-gradient(90deg, #d4af37, #ffb703);
+}
+
+.meter-ghost {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 3px;
+  background: #ffffff;
+  opacity: 0;
+  transition: opacity 0.3s;
+  z-index: 4;
+  box-shadow: 0 0 6px #fff;
+}
+
+/* Threshold Markers */
+.marker {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 1.5px;
+  background: rgba(255, 255, 255, 0.35);
+  z-index: 3;
+}
+
+.marker-threshold {
+  background: #ff5252;
+  width: 2.5px;
+}
+
+.marker-label {
+  position: absolute;
+  bottom: 3px;
+  font-size: 10px;
+  font-weight: 600;
+  color: #aaa;
+  transform: translateX(-50%);
+  pointer-events: none;
+}
+
+.meter-readout {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.82rem;
+  color: var(--text-muted);
+  white-space: nowrap;
+  overflow: hidden;
+}
+
+.meter-readout strong {
+  color: #fff;
+}
+
+/* Dual Meter Side-by-Side Grid */
+.meter-dual-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  margin-bottom: 8px;
+}
+
+.meter-subtrack {
+  display: flex;
+  flex-direction: column;
+}
+
+.meter-subtrack .meter-container {
+  height: 36px;
+  margin-bottom: 4px;
+}
+
+.meter-subtrack .meter-readout {
+  font-size: 0.72rem;
+}
+
+.meter-subtrack .meter-track-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 0.74rem;
+  color: var(--text-muted);
+  margin-bottom: 3px;
+  min-height: 18px;
+  line-height: 18px;
+}
+
+@media (max-width: 580px) {
+  .meter-dual-grid {
+    grid-template-columns: 1fr;
+    gap: 8px;
+  }
+}
+
+/* Current State Display */
+.state-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+  font-size: 0.85rem;
+}
+
+.state-item {
+  background: #121318;
+  padding: 8px 12px;
+  border-radius: 6px;
+  border-left: 3px solid var(--gold);
+  min-width: 0;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.state-label {
+  font-size: 0.72rem;
+  color: var(--text-muted);
+  margin-bottom: 2px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.state-val {
+  font-size: 1.15rem;
+  font-weight: bold;
+  color: #fff;
+  font-family: monospace;
+  white-space: nowrap;
+  overflow-x: auto;
+  overflow-y: hidden;
+  text-overflow: clip;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+.state-val::-webkit-scrollbar {
+  display: none;
+}
+
+/* Interactive Big Key */
+.key-button {
+  width: 100%;
+  height: 64px;
+  background: linear-gradient(180deg, #2b2e38 0%, #1a1b22 100%);
+  border: 2px solid var(--border-brass);
+  border-radius: 12px;
+  color: var(--gold-light);
+  font-size: 1.1rem;
+  font-weight: bold;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  transition: all 0.05s ease;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.6);
+  touch-action: none;
+}
+
+.key-button:active, .key-button.active {
+  transform: translateY(2px);
+  background: linear-gradient(180deg, #443a1d 0%, #26200e 100%);
+  border-color: var(--gold);
+  box-shadow: 0 0 18px var(--gold-glow);
+}
+
+/* Keyer Device Switcher Tabs */
+.keyer-device-tabs {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 8px;
+}
+
+.keyer-tab {
+  flex: 1;
+  padding: 7px 10px;
+  border-radius: 6px;
+  border: 1px solid #363a46;
+  background: #15171e;
+  color: #aaa;
+  font-size: 0.8rem;
+  font-weight: bold;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  transition: all 0.15s ease;
+  text-align: center;
+  line-height: 1.25;
+}
+
+.keyer-tab.active {
+  border-color: var(--gold);
+  background: #2a2512;
+  color: var(--gold-light);
+  box-shadow: 0 0 10px rgba(212, 175, 55, 0.25);
+}
+
+/* Dual Paddle Visual Deck */
+.paddle-deck {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  background: #0d0e12;
+  border: 2px solid var(--border-brass);
+  border-radius: 12px;
+  padding: 10px;
+  box-shadow: inset 0 2px 8px rgba(0, 0, 0, 0.8), 0 4px 12px rgba(0, 0, 0, 0.6);
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+.paddle-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  position: relative;
+}
+
+.paddle-lever {
+  height: 80px;
+  background: linear-gradient(180deg, #252830 0%, #15171d 100%);
+  border: 2px solid #444b59;
+  border-radius: 10px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  touch-action: none;
+  transition: all 0.05s ease;
+  position: relative;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.5);
+}
+
+.paddle-lever:active, .paddle-lever.active {
+  transform: translateY(2px);
+  background: linear-gradient(180deg, #3d3419 0%, #1c1809 100%);
+  border-color: var(--gold);
+  box-shadow: 0 0 14px var(--gold-glow);
+}
+
+.paddle-lever.active-dah {
+  background: linear-gradient(180deg, #443216 0%, #201405 100%);
+  border-color: #ffb703;
+  box-shadow: 0 0 14px rgba(255, 183, 3, 0.5);
+}
+
+.paddle-name {
+  font-size: 1rem;
+  font-weight: 800;
+  color: #fff;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.paddle-key-hint {
+  font-size: 0.72rem;
+  color: var(--text-muted);
+  margin-top: 3px;
+  font-family: monospace;
+}
+
+.paddle-led {
+  position: absolute;
+  top: 6px;
+  right: 8px;
+  font-size: 0.62rem;
+  padding: 1px 5px;
+  border-radius: 3px;
+  background: #1d212a;
+  border: 1px solid #363d4e;
+  color: #555;
+  font-family: monospace;
+  transition: all 0.1s ease;
+}
+
+.paddle-led.latch-active {
+  background: #382d0b;
+  border-color: #ffd700;
+  color: #ffd700;
+  box-shadow: 0 0 8px rgba(255, 215, 0, 0.7);
+}
+
+.squeeze-banner {
+  font-size: 0.72rem;
+  text-align: center;
+  padding: 4px 8px;
+  border-radius: 5px;
+  background: #151820;
+  border: 1px dashed #363a46;
+  color: #888;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  transition: all 0.15s ease;
+}
+
+.squeeze-banner.squeezing {
+  background: #2b2207;
+  border-color: var(--gold);
+  color: var(--gold-light);
+  box-shadow: 0 0 10px rgba(255, 215, 0, 0.3);
+}
+
+/* Settings Controls */
+.settings-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 8px;
+  font-size: 0.8rem;
+}
+
+.settings-row label {
+  color: #bbb;
+  display: flex;
+  flex-direction: column;
+}
+
+.settings-row label span {
+  font-size: 0.7rem;
+  color: var(--text-muted);
+}
+
+.settings-row input[type="range"] {
+  width: 130px;
+  accent-color: var(--gold);
+  cursor: pointer;
+}
+
+.settings-row .val-tag {
+  font-family: monospace;
+  color: var(--gold);
+  width: 55px;
+  text-align: right;
+}
+
+/* Preset Profiles Buttons */
+.preset-btn {
+  background: #14151c;
+  border: 1.5px solid #363a46;
+  border-radius: 7px;
+  color: #e0e0e0;
+  padding: 6px 4px;
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  transition: all 0.15s ease;
+}
+
+.preset-btn:hover {
+  background: #1f222b;
+  border-color: #666;
+}
+
+.preset-btn.active-preset {
+  background: #2a2512 !important;
+  border-color: var(--gold) !important;
+  box-shadow: 0 0 10px rgba(212, 175, 55, 0.4);
+}
+
+/* Key Profile Buttons */
+.key-profile-btn {
+  transition: all 0.15s ease;
+}
+.key-profile-btn:hover {
+  border-color: #666 !important;
+  background: #252834 !important;
+}
+.key-profile-btn.active-key-profile {
+  border-color: var(--neon-blue) !important;
+  background: #002b3d !important;
+  color: #fff !important;
+  box-shadow: 0 0 8px rgba(0, 229, 255, 0.3);
+}
+
+.bind-btn {
+  transition: all 0.15s ease;
+}
+.bind-btn:hover {
+  filter: brightness(1.2);
+}
+.bind-btn.recording {
+  border-color: #ff5252 !important;
+  color: #ff5252 !important;
+  background: #331214 !important;
+  animation: kochTargetPulse 1s infinite alternate ease-in-out;
+}

@@ -1,0 +1,260 @@
+/**
+ * MORSE CODE DATA & CONSTANTS
+ * 摩斯密碼樹狀圖定義、坐標、線路與預設配置
+ */
+
+function seqToId(seq) {
+  if (!seq) return 'root';
+  return seq.replace(/\./g, 'dit').replace(/-/g, 'dah');
+}
+
+const nodeCoords = {
+  // Top Row (Y = 68)
+  'O': { x: 50,  y: 68 },
+  'M': { x: 105, y: 68 },
+  'T': { x: 160, y: 68 },
+  'root': { x: 200, y: 38 },
+  'E': { x: 240, y: 68 },
+  'I': { x: 295, y: 68 },
+  'S': { x: 345, y: 68 },
+  'H': { x: 382, y: 68 },
+
+  // Right side sub-branches
+  'U': { x: 295, y: 160 },
+  'F': { x: 295, y: 235 },
+  'V': { x: 345, y: 160 },
+
+  'A': { x: 240, y: 275 },
+  'R': { x: 295, y: 275 },
+  'L': { x: 350, y: 275 },
+  'W': { x: 240, y: 390 },
+  'P': { x: 295, y: 390 },
+  'J': { x: 240, y: 475 },
+
+  // Left side sub-branches
+  'G': { x: 105, y: 160 },
+  'Q': { x: 50,  y: 160 },
+  'Z': { x: 105, y: 235 },
+
+  'N': { x: 160, y: 275 },
+  'K': { x: 105, y: 275 },
+  'Y': { x: 50,  y: 275 },
+  'C': { x: 105, y: 355 },
+
+  'D': { x: 160, y: 390 },
+  'X': { x: 105, y: 390 },
+  'B': { x: 160, y: 475 },
+};
+
+const wireLinks = [
+  // Antenna drops vertically to junction, then branches left to T and right to E
+  { seq: '-', path: 'M 200,38 L 200,68 L 160,68' },
+  { seq: '.', path: 'M 200,38 L 200,68 L 240,68' },
+
+  // Top horizontal branch: T -> M -> O
+  { seq: '--', path: 'M 160,68 L 105,68' },
+  { seq: '---', path: 'M 105,68 L 50,68' },
+
+  // Top horizontal branch: E -> I -> S -> H
+  { seq: '..', path: 'M 240,68 L 295,68' },
+  { seq: '...', path: 'M 295,68 L 345,68' },
+  { seq: '....', path: 'M 345,68 L 382,68' },
+
+  // S -> V
+  { seq: '...-', path: 'M 345,68 L 345,160' },
+
+  // I -> U -> F
+  { seq: '..-', path: 'M 295,68 L 295,160' },
+  { seq: '..-.', path: 'M 295,160 L 295,235' },
+
+  // E down to A
+  { seq: '.-', path: 'M 240,68 L 240,275' },
+  // A right to R -> L
+  { seq: '.-.', path: 'M 240,275 L 295,275' },
+  { seq: '.-..', path: 'M 295,275 L 350,275' },
+  // A down to W
+  { seq: '.--', path: 'M 240,275 L 240,390' },
+  // W right to P, down to J
+  { seq: '.--.', path: 'M 240,390 L 295,390' },
+  { seq: '.---', path: 'M 240,390 L 240,475' },
+
+  // M down to G
+  { seq: '--.', path: 'M 105,68 L 105,160' },
+  // G left to Q, down to Z
+  { seq: '--.-', path: 'M 105,160 L 50,160' },
+  { seq: '--..', path: 'M 105,160 L 105,235' },
+
+  // T down to N
+  { seq: '-.', path: 'M 160,68 L 160,275' },
+  // N left to K -> Y
+  { seq: '-.-', path: 'M 160,275 L 105,275' },
+  { seq: '-.--', path: 'M 105,275 L 50,275' },
+  // K down to C
+  { seq: '-.-.', path: 'M 105,275 L 105,355' },
+  // N down to D
+  { seq: '-..', path: 'M 160,275 L 160,390' },
+  // D left to X, down to B
+  { seq: '-..-', path: 'M 160,390 L 105,390' },
+  { seq: '-...', path: 'M 160,390 L 160,475' },
+];
+
+const digitsData = [
+  { digit: '1', seq: '.----', x: 20, isDit: true },
+  { digit: '2', seq: '..---', x: 55, isDit: true },
+  { digit: '3', seq: '...--', x: 90, isDit: true },
+  { digit: '4', seq: '....-', x: 125, isDit: true },
+  { digit: '5', seq: '.....', x: 160, isDit: true },
+  { digit: '6', seq: '-....', x: 210, isDit: false },
+  { digit: '7', seq: '--...', x: 245, isDit: false },
+  { digit: '8', seq: '---..', x: 280, isDit: false },
+  { digit: '9', seq: '----.', x: 315, isDit: false },
+  { digit: '0', seq: '-----', x: 350, isDit: false }
+];
+
+const KOCH_SEQUENCE = [
+  'K', 'M', 'R', 'S', 'U', 'A', 'P', 'T', 'L', 'O',
+  'W', 'I', 'N', 'J', 'E', 'F', '0', 'Y', 'V', 'G',
+  '5', 'Q', '9', 'Z', 'H', '3', '8', 'B', '4', '2',
+  '7', 'C', '1', 'D', '6', 'X'
+];
+
+const KEY_PROFILES = {
+  standard: {
+    name: '標準電鍵',
+    desc: '直鍵: K · 撥片: [ , / ] .',
+    straight: ['KeyK'],
+    dit: ['BracketLeft', 'Comma'],
+    dah: ['BracketRight', 'Period']
+  },
+  homerow: {
+    name: '基準盲打 (F/J)',
+    desc: '直鍵: K · 撥片: F (左) / J (右)',
+    straight: ['KeyK'],
+    dit: ['KeyF'],
+    dah: ['KeyJ']
+  },
+  left_hand: {
+    name: '單手左手 (Z/X)',
+    desc: '直鍵: C · 撥片: Z (左) / X (右)',
+    straight: ['KeyC'],
+    dit: ['KeyZ'],
+    dah: ['KeyX']
+  },
+  arrows: {
+    name: '方向鍵操作',
+    desc: '直鍵: ↓ · 撥片: ← (左) / → (右)',
+    straight: ['ArrowDown'],
+    dit: ['ArrowLeft'],
+    dah: ['ArrowRight']
+  },
+  custom: {
+    name: '自訂鍵位',
+    desc: '自選按鍵映射',
+    straight: ['KeyK'],
+    dit: ['KeyF'],
+    dah: ['KeyJ']
+  }
+};
+
+const DEFAULT_SETTINGS = {
+  keyerDevice: 'paddle', // 'straight' | 'paddle' | 'bug'
+  speedPreset: 'intermediate',
+  unitT: 80,
+  threshold: 160,
+  letterGap: 240,
+  wordGap: 560,
+  freq: 680,
+  farnsworthEnabled: false,
+  farnsworthWpm: 18,
+  qrnEnabled: false,
+  qrnVolume: 0.04,
+  iambicMode: 'B',
+  paddleReverse: false,
+  keyProfile: 'standard',
+  customBindings: {
+    straight: ['KeyK'],
+    dit: ['BracketLeft', 'Comma'],
+    dah: ['BracketRight', 'Period']
+  },
+  textShowHints: true,
+  textStrictMode: false,
+  kochShowHints: false,
+  layoutMode: '2col' // '2col' | '3col'
+};
+
+const speedPresets = {
+  novice: {
+    name: '入門',
+    wpm: '5 WPM',
+    unitT: 240,
+    threshold: 480,
+    letterGap: 720,
+    wordGap: 1680,
+    freq: 600,
+    desc: '入門 (5 WPM)：短音 240ms · 長音 720ms · 字母間隔 720ms · 單字間隔 1680ms'
+  },
+  beginner: {
+    name: '基礎',
+    wpm: '10 WPM',
+    unitT: 120,
+    threshold: 240,
+    letterGap: 360,
+    wordGap: 840,
+    freq: 640,
+    desc: '基礎 (10 WPM)：短音 120ms · 長音 360ms · 字母間隔 360ms · 單字間隔 840ms'
+  },
+  intermediate: {
+    name: '熟練',
+    wpm: '15 WPM',
+    unitT: 80,
+    threshold: 160,
+    letterGap: 240,
+    wordGap: 560,
+    freq: 680,
+    desc: '熟練 (15 WPM)：短音 80ms · 長音 240ms · 字母間隔 240ms · 單字間隔 560ms'
+  },
+  proficient: {
+    name: '精通',
+    wpm: '20 WPM',
+    unitT: 60,
+    threshold: 120,
+    letterGap: 180,
+    wordGap: 420,
+    freq: 720,
+    desc: '精通 (20 WPM)：短音 60ms · 長音 180ms · 字母間隔 180ms · 單字間隔 420ms'
+  },
+  advanced: {
+    name: '神速',
+    wpm: '35 WPM',
+    unitT: 35,
+    threshold: 70,
+    letterGap: 105,
+    wordGap: 245,
+    freq: 760,
+    desc: '神速 (35 WPM)：短音 35ms · 長音 105ms · 字母間隔 105ms · 單字間隔 245ms'
+  },
+  competition: {
+    name: '極限',
+    wpm: '50+ WPM',
+    unitT: 24,
+    threshold: 48,
+    letterGap: 72,
+    wordGap: 168,
+    freq: 800,
+    desc: '極限 (50+ WPM)：短音 24ms · 長音 72ms · 字母間隔 72ms · 單字間隔 168ms'
+  }
+};
+
+// Export for Node.js test environment
+if (typeof module !== 'undefined' && module.exports) {
+  module.exports = {
+    seqToId,
+    nodeCoords,
+    wireLinks,
+    digitsData,
+    KOCH_SEQUENCE,
+    KEY_PROFILES,
+    DEFAULT_SETTINGS,
+    speedPresets
+  };
+}

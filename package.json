@@ -1,0 +1,23 @@
+{
+  "name": "morse-code-card",
+  "version": "1.0.0",
+  "description": "Pure web interactive Morse code training card reproducing binary decision tree PCB card layout, providing tactile keying practice, Iambic paddle keyer, Koch method drills, and Web Audio CW synthesis.",
+  "main": "index.html",
+  "scripts": {
+    "test": "node test/run-all.js"
+  },
+  "keywords": [
+    "morse-code",
+    "cw",
+    "amateur-radio",
+    "ham-radio",
+    "iambic-keyer",
+    "koch-method",
+    "farnsworth-timing",
+    "web-audio-api",
+    "svg",
+    "pcb"
+  ],
+  "author": "",
+  "license": "CC-BY-NC-SA-4.0"
+}

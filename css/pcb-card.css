@@ -1,0 +1,268 @@
+/* PCB Card Frame */
+.pcb-card {
+  width: 380px;
+  height: 590px;
+  background: radial-gradient(circle at 50% 25%, #23252c 0%, #121316 100%);
+  border: 3.5px solid var(--border-brass);
+  border-radius: 18px;
+  position: relative;
+  box-shadow: 0 12px 35px rgba(0, 0, 0, 0.8), inset 0 0 20px rgba(0, 0, 0, 0.9);
+  overflow: hidden;
+  padding: 8px;
+}
+
+/* Corner Lanyard Hole */
+.lanyard-hole {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  border: 2px solid var(--border-brass);
+  background: #090a0d;
+  box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.95);
+  z-index: 5;
+}
+
+/* SVG Layer */
+#pcb-svg {
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+
+/* SVG PCB Traces & Nodes */
+.wire {
+  stroke: var(--wire-base);
+  stroke-width: 2.8;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  fill: none;
+  transition: stroke 0.15s, stroke-width 0.15s, filter 0.15s;
+}
+
+.wire.active-wire {
+  stroke: var(--neon-blue);
+  stroke-width: 4.5;
+  filter: drop-shadow(0 0 5px var(--neon-glow));
+}
+
+.node-group {
+  cursor: pointer;
+}
+
+.node-shape {
+  fill: #18191f;
+  stroke: var(--border-brass);
+  stroke-width: 2.2;
+  transition: all 0.2s ease;
+}
+
+.node-group:hover .node-shape {
+  stroke: var(--gold-light);
+  filter: drop-shadow(0 0 6px var(--gold-glow));
+}
+
+.node-group.active-node .node-shape {
+  fill: #002b3d;
+  stroke: var(--neon-blue);
+  stroke-width: 3.2;
+  filter: drop-shadow(0 0 9px var(--neon-glow));
+}
+
+.node-group.committed-node .node-shape {
+  fill: #443505;
+  stroke: #ffd700;
+  stroke-width: 3.5;
+  filter: drop-shadow(0 0 14px rgba(255, 215, 0, 0.95));
+}
+
+.node-text {
+  fill: #edd69a;
+  font-family: "Arial Black", -apple-system, sans-serif;
+  font-size: 13.5px;
+  font-weight: bold;
+  text-anchor: middle;
+  dominant-baseline: central;
+  pointer-events: none;
+}
+
+.antenna-icon {
+  fill: var(--gold);
+  transition: all 0.2s;
+}
+
+.antenna-icon.active {
+  fill: var(--neon-blue);
+  filter: drop-shadow(0 0 8px var(--neon-blue));
+}
+
+.banner-text {
+  fill: var(--gold);
+  font-family: -apple-system, sans-serif;
+  font-weight: 900;
+  font-size: 15px;
+  letter-spacing: 4px;
+}
+
+/* PCB Number Bus Bar (Option A: 0-9 DIP Array) */
+.number-chip {
+  cursor: pointer;
+  user-select: none;
+  -webkit-user-select: none;
+  transition: all 0.15s ease;
+}
+
+.number-chip rect {
+  fill: #14161d;
+  stroke: #383c48;
+  stroke-width: 1.5;
+  rx: 4px;
+  ry: 4px;
+  transition: all 0.15s ease;
+}
+
+.number-chip:hover rect {
+  stroke: var(--gold);
+  fill: #222632;
+}
+
+.number-chip .num-digit {
+  fill: #bbb;
+  font-family: "Arial Black", -apple-system, sans-serif;
+  font-size: 13.5px;
+  font-weight: 900;
+  text-anchor: middle;
+  dominant-baseline: central;
+  pointer-events: none;
+  transition: all 0.15s ease;
+}
+
+.number-chip .num-code {
+  fill: #777d8c;
+  font-family: monospace;
+  font-size: 7.5px;
+  letter-spacing: 0.5px;
+  text-anchor: middle;
+  dominant-baseline: central;
+  pointer-events: none;
+  transition: all 0.15s ease;
+}
+
+.number-chip:hover .num-digit {
+  fill: #fff;
+}
+
+/* Active Highlight (Dit: 1-5, Dah: 6-0) */
+.number-chip.active-dit-chip rect {
+  fill: #00303d;
+  stroke: var(--neon-blue);
+  stroke-width: 2.2;
+  filter: drop-shadow(0 0 6px var(--neon-glow));
+}
+.number-chip.active-dit-chip .num-digit {
+  fill: #fff;
+}
+.number-chip.active-dit-chip .num-code {
+  fill: var(--neon-blue);
+  font-weight: bold;
+}
+
+.number-chip.active-dah-chip rect {
+  fill: #422d05;
+  stroke: var(--gold);
+  stroke-width: 2.2;
+  filter: drop-shadow(0 0 6px var(--gold-glow));
+}
+.number-chip.active-dah-chip .num-digit {
+  fill: #fff;
+}
+.number-chip.active-dah-chip .num-code {
+  fill: var(--gold);
+  font-weight: bold;
+}
+
+/* Koch Method Progressive Unlock Styles */
+.node-group.koch-locked {
+  opacity: 0.15;
+  filter: grayscale(1) brightness(0.6);
+  pointer-events: none;
+  transition: all 0.4s ease;
+}
+
+.node-group.koch-unlocked {
+  opacity: 1;
+  transition: all 0.4s ease;
+}
+
+.node-group.koch-target-node .node-shape {
+  stroke: var(--neon-blue) !important;
+  stroke-width: 3.5px !important;
+  filter: drop-shadow(0 0 10px var(--neon-blue)) !important;
+  animation: kochTargetPulse 1.6s infinite alternate ease-in-out;
+}
+
+.node-group.koch-target-node .node-text {
+  fill: #fff !important;
+  font-weight: 900 !important;
+}
+
+.node-group.koch-just-unlocked .node-shape {
+  stroke: #ffd700 !important;
+  stroke-width: 4px !important;
+  fill: #5a4505 !important;
+  filter: drop-shadow(0 0 16px rgba(255, 215, 0, 1)) !important;
+  animation: kochUnlockFlash 1.2s ease-out;
+}
+
+.number-chip.koch-locked {
+  opacity: 0.15;
+  filter: grayscale(1) brightness(0.6);
+  pointer-events: none;
+  transition: all 0.4s ease;
+}
+
+.number-chip.koch-unlocked {
+  opacity: 1;
+  transition: all 0.4s ease;
+}
+
+.number-chip.koch-target-node rect {
+  stroke: var(--neon-blue) !important;
+  stroke-width: 2.8px !important;
+  filter: drop-shadow(0 0 8px var(--neon-blue)) !important;
+  animation: kochTargetPulse 1.6s infinite alternate ease-in-out;
+}
+
+.number-chip.koch-just-unlocked rect {
+  stroke: #ffd700 !important;
+  stroke-width: 3px !important;
+  fill: #5a4505 !important;
+  filter: drop-shadow(0 0 16px rgba(255, 215, 0, 1)) !important;
+  animation: kochUnlockFlash 1.2s ease-out;
+}
+
+@keyframes kochTargetPulse {
+  0% {
+    filter: drop-shadow(0 0 4px var(--neon-blue));
+  }
+  100% {
+    filter: drop-shadow(0 0 14px var(--neon-blue));
+  }
+}
+
+@keyframes kochUnlockFlash {
+  0% {
+    transform: scale(1);
+    filter: drop-shadow(0 0 25px rgba(255, 215, 0, 1));
+  }
+  50% {
+    transform: scale(1.15);
+    filter: drop-shadow(0 0 35px rgba(255, 255, 255, 1));
+  }
+  100% {
+    transform: scale(1);
+    filter: drop-shadow(0 0 12px rgba(255, 215, 0, 0.9));
+  }
+}
