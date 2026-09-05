@@ -1673,19 +1673,19 @@
       <!-- Keyer Device Switcher Tabs (放在 PCB 下面) -->
       <div class="keyer-device-tabs" style="margin-top: 10px; width: 100%;">
         <button id="dev-straight" class="keyer-tab" type="button">
-          <span>🔘 直鍵<br><span style="white-space: nowrap;">(Straight Key)</span></span>
+          <span><i class="mdi mdi-radiobox-marked"></i> 直鍵<br><span style="white-space: nowrap;">(Straight Key)</span></span>
         </button>
         <button id="dev-paddle" class="keyer-tab active" type="button">
-          <span>🎛️ 雙撥片<br><span style="white-space: nowrap;">(Iambic Paddle)</span></span>
+          <span><i class="mdi mdi-tune-vertical"></i> 雙撥片<br><span style="white-space: nowrap;">(Iambic Paddle)</span></span>
         </button>
         <button id="dev-bug" class="keyer-tab" type="button">
-          <span>📻 半自動震報鍵<br><span style="white-space: nowrap;">(Bug Key)</span></span>
+          <span><i class="mdi mdi-metronome"></i> 半自動震報鍵<br><span style="white-space: nowrap;">(Bug Key)</span></span>
         </button>
       </div>
 
       <!-- Device 1: Straight Key Trigger -->
       <button class="key-button" id="key-trigger" style="display:none; width: 100%;">
-        <span>⚡ 按住發報 (鍵盤「K」)</span>
+        <span><i class="mdi mdi-flash"></i> 按住發報 (鍵盤「K」)</span>
       </button>
 
       <!-- Device 2: Dual-Paddle Deck -->
@@ -1763,16 +1763,16 @@
           <!-- Playback Actions -->
           <div style="display: flex; gap: 8px; flex-wrap: wrap;">
             <button id="btn-play-auto" style="flex: 1.2; padding: 9px; background: linear-gradient(135deg, #ffd700, #ff9100); color: #000; font-weight: bold; border: none; border-radius: 6px; cursor: pointer; font-size: 0.85rem; display: flex; align-items: center; justify-content: center; gap: 5px; box-shadow: 0 0 10px rgba(255, 215, 0, 0.3);">
-              <span>▶ 示範播放</span>
+              <span><i class="mdi mdi-play"></i> 示範播放</span>
             </button>
             <button id="btn-pause-auto" disabled style="flex: 0.8; padding: 9px; background: #222530; border: 1.5px solid #3d4252; color: #666; border-radius: 6px; cursor: not-allowed; font-size: 0.85rem;">
-              <span>⏸ 暫停</span>
+              <span><i class="mdi mdi-pause"></i> 暫停</span>
             </button>
             <button id="btn-stop-auto" disabled style="flex: 0.8; padding: 9px; background: #222530; border: 1.5px solid #3d4252; color: #666; border-radius: 6px; cursor: not-allowed; font-size: 0.85rem;">
-              <span>⏹ 停止</span>
+              <span><i class="mdi mdi-stop"></i> 停止</span>
             </button>
             <button id="btn-restart-text" style="flex: 0.9; padding: 9px; background: #1c1e26; border: 1.5px solid #3d4252; color: #eee; border-radius: 6px; cursor: pointer; font-size: 0.85rem;" title="快捷鍵: 按鍵 R">
-              <span>🔄 重新發報 (R)</span>
+              <span><i class="mdi mdi-restore"></i> 重新發報 (R)</span>
             </button>
           </div>
 
@@ -1811,7 +1811,7 @@
         <!-- 3. Completion Scorecard (Hidden until complete) -->
         <div class="panel" id="text-scorecard" style="display: none; border-color: var(--gold); background: #161715;">
           <div class="panel-title" style="color: var(--gold-light);">
-            <span>🎉 文章練習完成！</span>
+            <span><i class="mdi mdi-party-popper"></i> 文章練習完成！</span>
             <span id="scorecard-speed-tag" style="color:#ffb703; font-size: 0.8rem;">15 WPM</span>
           </div>
           <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; margin: 10px 0; text-align: center;">
@@ -2396,15 +2396,15 @@
             </div>
           </div>
           <div style="font-size:0.68rem; color:#777; margin-top:6px; text-align:center;">
-            💡 點選按鍵後，按下鍵盤任意鍵即可更換
+            <i class="mdi mdi-lightbulb-outline"></i> 點選按鍵後，按下鍵盤任意鍵即可更換
           </div>
         </div>
 
         <!-- Factory Reset & Storage Status Footer -->
         <div style="display:flex; justify-content:space-between; align-items:center; margin-top:14px; padding-top:8px; border-top:1px solid #252834;">
-          <span style="font-size:0.7rem; color:#888;">💾 設定將自動保存</span>
+          <span style="font-size:0.7rem; color:#888;"><i class="mdi mdi-content-save-outline"></i> 設定將自動保存</span>
           <button id="btn-factory-reset" style="background:none; border:1px solid #444; color:#aaa; padding:4px 8px; border-radius:4px; font-size:0.72rem; cursor:pointer;">
-            🔄 重設為預設值
+            <i class="mdi mdi-restore"></i> 重設為預設值
           </button>
         </div>
       </div>
@@ -3487,7 +3487,7 @@
         const leftHint = document.getElementById('paddle-left-hint');
         const rightHint = document.getElementById('paddle-right-hint');
 
-        if (straightSpan) straightSpan.textContent = `⚡ 按住發報 (鍵盤「${this.formatKeys(b.straight)}」)`;
+        if (straightSpan) straightSpan.innerHTML = `<i class="mdi mdi-flash"></i> 按住發報 (鍵盤「${this.formatKeys(b.straight)}」)`;
         if (leftHint) leftHint.textContent = `鍵盤 ${this.formatKeys(b.dit)}`;
         if (rightHint) rightHint.textContent = `鍵盤 ${this.formatKeys(b.dah)}`;
       }
@@ -4753,7 +4753,7 @@
 
       if (isMatch) {
         setCharResult(idx, true, res.letter, res.sequence);
-        fbResult.textContent = '✅ 正確！';
+        fbResult.innerHTML = '<i class="mdi mdi-check-bold"></i> 正確！';
         fbResult.style.color = '#00e676';
         evalStatus.textContent = `字元 [${res.letter}] 正確！`;
         evalStatus.style.color = '#00e676';
@@ -4769,7 +4769,7 @@
       } else {
         // Wrong letter
         if (textState.strictMode) {
-          fbResult.textContent = `❌ 錯誤！目標為 ${target}，請重試`;
+          fbResult.innerHTML = `<i class="mdi mdi-close-thick"></i> 錯誤！目標為 ${target}，請重試`;
           fbResult.style.color = '#ff5252';
           evalStatus.textContent = `打錯了，目標是 ${target} (${engine.getSequenceForLetter(target) || ''})，請再試一次`;
           evalStatus.style.color = '#ff5252';
@@ -4794,7 +4794,7 @@
         } else {
           // Flow through: mark error and advance
           setCharResult(idx, false, res.letter || '?', res.sequence);
-          fbResult.textContent = `❌ 錯誤 (目標: ${target})`;
+          fbResult.innerHTML = `<i class="mdi mdi-close-thick"></i> 錯誤 (目標: ${target})`;
           fbResult.style.color = '#ff5252';
           evalStatus.textContent = `發報失誤：輸入 [${res.letter || '?'}]，目標為 [${target}]`;
           evalStatus.style.color = '#ff5252';
@@ -4872,7 +4872,7 @@
         btnPauseAuto.disabled = false;
         btnPauseAuto.style.cursor = 'pointer';
         btnPauseAuto.style.color = '#fff';
-        btnPauseAuto.innerHTML = '<span>⏸ 暫停</span>';
+        btnPauseAuto.innerHTML = '<span><i class="mdi mdi-pause"></i> 暫停</span>';
         textModeStatus.textContent = '自動示範發報中...';
         textModeStatus.style.color = 'var(--gold)';
         return;
@@ -4992,11 +4992,11 @@
       if (textState.autoPlayPaused) {
         synth.stop();
         simulateKeyVisualRelease();
-        btnPauseAuto.innerHTML = '<span>▶ 繼續</span>';
+        btnPauseAuto.innerHTML = '<span><i class="mdi mdi-play"></i> 繼續</span>';
         textModeStatus.textContent = '表演已暫停';
         textModeStatus.style.color = '#ff9100';
       } else {
-        btnPauseAuto.innerHTML = '<span>⏸ 暫停</span>';
+        btnPauseAuto.innerHTML = '<span><i class="mdi mdi-pause"></i> 暫停</span>';
         textModeStatus.textContent = '自動示範發報中...';
         textModeStatus.style.color = 'var(--gold)';
       }
@@ -5021,7 +5021,7 @@
       btnPauseAuto.disabled = true;
       btnPauseAuto.style.cursor = 'not-allowed';
       btnPauseAuto.style.color = '#666';
-      btnPauseAuto.innerHTML = '<span>⏸ 暫停</span>';
+      btnPauseAuto.innerHTML = '<span><i class="mdi mdi-pause"></i> 暫停</span>';
       btnStopAuto.disabled = true;
       btnStopAuto.style.cursor = 'not-allowed';
       btnStopAuto.style.color = '#666';
