@@ -306,6 +306,27 @@
       color: #fff;
     }
 
+    .wpm-badge {
+      background: #112233;
+      color: var(--neon-blue);
+      border: 1px solid #005b82;
+      padding: 2px 8px;
+      border-radius: 12px;
+      font-size: 0.74rem;
+      font-weight: bold;
+      font-family: monospace;
+      letter-spacing: 0.5px;
+      box-shadow: 0 0 6px rgba(0, 229, 255, 0.2);
+      white-space: nowrap;
+      transition: all 0.2s ease;
+    }
+
+    .wpm-badge.pulse {
+      box-shadow: 0 0 12px rgba(0, 229, 255, 0.6);
+      border-color: var(--neon-blue);
+      color: #fff;
+    }
+
     /* Dual Meter Side-by-Side Grid */
     .meter-dual-grid {
       display: grid;
@@ -1794,8 +1815,8 @@
               <div class="state-val" id="state-committed" style="color: var(--gold-light);">—</div>
             </div>
             <div class="state-item">
-              <div class="state-label">上次按壓耗時 (Duration)</div>
-              <div class="state-val" id="state-duration">— ms</div>
+              <div class="state-label">按鍵時長與即時速度 (Duration & WPM)</div>
+              <div class="state-val"><span id="state-duration">— ms</span> <span id="state-wpm" style="font-size:0.85rem; color:var(--neon-blue); font-weight:normal;">(15 WPM)</span></div>
             </div>
           </div>
         </div>
@@ -1822,7 +1843,10 @@
       <!-- Shared: Keying & Gap Meter Panel -->
       <div class="panel" id="meter-panel">
         <div class="panel-title">
-          <span>發報與間隔儀表 (Key & Gap Meter)</span>
+          <div style="display: flex; align-items: center; gap: 8px;">
+            <span>發報與間隔儀表 (Key & Gap Meter)</span>
+            <span id="meter-wpm-badge" class="wpm-badge">即時 15 WPM</span>
+          </div>
           <span id="meter-status" style="font-size:0.8rem; color:#aaa;">閒置</span>
         </div>
 
@@ -1840,7 +1864,7 @@
               <div id="meter-markers"></div>
             </div>
             <div class="meter-readout">
-              <div>時長: <strong id="readout-time">0 ms</strong></div>
+              <div>時長: <strong id="readout-time">0 ms</strong> <span id="readout-wpm" style="color:var(--neon-blue); font-size:0.75rem; font-weight:bold; margin-left:2px;">(15 WPM)</span></div>
               <div>門檻: <strong id="readout-threshold-tag">200 ms</strong></div>
               <div>上限: <strong id="readout-max">600 ms</strong></div>
             </div>
@@ -2207,6 +2231,56 @@
         this.pressStartTime = 0;
         this.isKeyDown = false;
         this.committedLetters = [];
+        this.recentStrokes = [];
+      }
+
+      getBaselineWpm() {
+        if (this.config.farnsworthEnabled) {
+          return this.config.charWpm || 18;
+        }
+        return Math.max(1, Math.round(1200 / (this.config.unitT || 80)));
+      }
+
+      calculateStrokeWpm(durationMs) {
+        if (!durationMs || durationMs <= 0) return this.getBaselineWpm();
+        const th = this.getEffectiveThreshold();
+        const wpm = durationMs < th ? (1200 / durationMs) : (3600 / durationMs);
+        return Math.max(1, Math.min(99, Math.round(wpm)));
+      }
+
+      recordStroke(durationMs, symbol) {
+        if (!this.recentStrokes) this.recentStrokes = [];
+        const now = typeof performance !== 'undefined' ? performance.now() : Date.now();
+        const units = symbol === '-' ? 3 : 1;
+        this.recentStrokes.push({ duration: durationMs, units, time: now });
+        this.recentStrokes = this.recentStrokes
+          .filter(s => (now - s.time) < 4000)
+          .slice(-10);
+      }
+
+      getRollingWpm() {
+        if (!this.recentStrokes || this.recentStrokes.length === 0) {
+          return this.getBaselineWpm();
+        }
+        const now = typeof performance !== 'undefined' ? performance.now() : Date.now();
+        const active = this.recentStrokes.filter(s => (now - s.time) < 4000);
+        if (active.length === 0) {
+          return this.getBaselineWpm();
+        }
+        let totalDur = 0;
+        let totalUnits = 0;
+        for (const s of active) {
+          totalDur += s.duration;
+          totalUnits += s.units;
+        }
+        if (totalUnits === 0) return this.getBaselineWpm();
+        const avgT = totalDur / totalUnits;
+        if (avgT <= 0) return this.getBaselineWpm();
+        return Math.max(1, Math.min(99, Math.round(1200 / avgT)));
+      }
+
+      resetStrokeHistory() {
+        this.recentStrokes = [];
       }
 
       updateConfig(newConfig) {
@@ -2244,6 +2318,7 @@
         const duration = Math.max(10, Math.round(timestamp - this.pressStartTime));
         this.lastPressDuration = duration;
         const symbol = this.classifyDuration(duration);
+        this.recordStroke(duration, symbol);
         const nextSequence = this.currentSequence + symbol;
 
         const node = this.tree[nextSequence];
@@ -2262,6 +2337,9 @@
 
       appendSymbol(symbol, duration) {
         this.lastPressDuration = duration;
+        if (duration) {
+          this.recordStroke(duration, symbol);
+        }
         const nextSequence = this.currentSequence + symbol;
         const node = this.tree[nextSequence];
         const isValid = !!node;
@@ -3280,7 +3358,9 @@
     const meterGhost = document.getElementById('meter-ghost');
     const meterMarkers = document.getElementById('meter-markers');
     const meterStatus = document.getElementById('meter-status');
+    const meterWpmBadge = document.getElementById('meter-wpm-badge');
     const readoutTime = document.getElementById('readout-time');
+    const readoutWpm = document.getElementById('readout-wpm');
     const readoutSymbol = document.getElementById('readout-symbol');
     const readoutMax = document.getElementById('readout-max');
     const readoutThresholdTag = document.getElementById('readout-threshold-tag');
@@ -3298,6 +3378,7 @@
     const stateLetter = document.getElementById('state-letter');
     const stateCommitted = document.getElementById('state-committed');
     const stateDuration = document.getElementById('state-duration');
+    const stateWpm = document.getElementById('state-wpm');
     const evalStatus = document.getElementById('eval-status');
 
     // Settings elements
@@ -3791,6 +3872,12 @@
           <div class="marker-label" style="left: ${wordPct}%; color: #00e5ff;">單字空格 7T (${wordGap}ms)</div>
         `;
       }
+
+      // Update Baseline WPM readouts
+      const baselineWpm = typeof engine.getBaselineWpm === 'function' ? engine.getBaselineWpm() : Math.round(1200 / unitT);
+      if (meterWpmBadge) meterWpmBadge.textContent = `即時 ${baselineWpm} WPM`;
+      if (readoutWpm) readoutWpm.textContent = `(${baselineWpm} WPM)`;
+      if (stateWpm) stateWpm.textContent = `(${baselineWpm} WPM)`;
     }
 
     // Animate meter during press
@@ -3806,6 +3893,13 @@
 
         meterBar.style.width = pct + '%';
         readoutTime.textContent = `${elapsed} ms`;
+
+        if (typeof engine.calculateStrokeWpm === 'function') {
+          const liveWpm = engine.calculateStrokeWpm(elapsed);
+          if (readoutWpm) readoutWpm.textContent = `(${liveWpm} WPM)`;
+          if (meterWpmBadge) meterWpmBadge.textContent = `即時 ${liveWpm} WPM`;
+          if (stateWpm) stateWpm.textContent = `(${liveWpm} WPM)`;
+        }
 
         if (elapsed < th) {
           meterBar.classList.remove('dah-active');
@@ -3827,6 +3921,18 @@
       const pct = Math.min(100, (finalDuration / maxMeterScale) * 100);
       meterBar.style.width = pct + '%';
       readoutTime.textContent = `${finalDuration} ms`;
+
+      if (typeof engine.calculateStrokeWpm === 'function') {
+        const strokeWpm = engine.calculateStrokeWpm(finalDuration);
+        const rollingWpm = typeof engine.getRollingWpm === 'function' ? engine.getRollingWpm() : strokeWpm;
+        if (readoutWpm) readoutWpm.textContent = `(${strokeWpm} WPM)`;
+        if (stateWpm) stateWpm.textContent = `(${strokeWpm} WPM)`;
+        if (meterWpmBadge) {
+          meterWpmBadge.textContent = `即時 ${rollingWpm} WPM`;
+          meterWpmBadge.classList.add('pulse');
+          setTimeout(() => meterWpmBadge.classList.remove('pulse'), 300);
+        }
+      }
 
       // Ghost marker
       meterGhost.style.left = pct + '%';

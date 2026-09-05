@@ -70,6 +70,27 @@
   color: #fff;
 }
 
+.wpm-badge {
+  background: #112233;
+  color: var(--neon-blue);
+  border: 1px solid #005b82;
+  padding: 2px 8px;
+  border-radius: 12px;
+  font-size: 0.74rem;
+  font-weight: bold;
+  font-family: monospace;
+  letter-spacing: 0.5px;
+  box-shadow: 0 0 6px rgba(0, 229, 255, 0.2);
+  white-space: nowrap;
+  transition: all 0.2s ease;
+}
+
+.wpm-badge.pulse {
+  box-shadow: 0 0 12px rgba(0, 229, 255, 0.6);
+  border-color: var(--neon-blue);
+  color: #fff;
+}
+
 /* Dual Meter Side-by-Side Grid */
 .meter-dual-grid {
   display: grid;

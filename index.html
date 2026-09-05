@@ -527,8 +527,8 @@
               <div class="state-val" id="state-committed" style="color: var(--gold-light);">—</div>
             </div>
             <div class="state-item">
-              <div class="state-label">按鍵維持時間 (Duration)</div>
-              <div class="state-val" id="state-duration">— ms</div>
+              <div class="state-label">按鍵時長與即時速度 (Duration & WPM)</div>
+              <div class="state-val"><span id="state-duration">— ms</span> <span id="state-wpm" style="font-size:0.85rem; color:var(--neon-blue); font-weight:normal;">(15 WPM)</span></div>
             </div>
           </div>
         </div>
@@ -555,7 +555,10 @@
       <!-- Shared: Keying & Gap Meter Panel -->
       <div class="panel" id="meter-panel">
         <div class="panel-title">
-          <span>發報與間隔儀表 (Key & Gap Meter)</span>
+          <div style="display: flex; align-items: center; gap: 8px;">
+            <span>發報與間隔儀表 (Key & Gap Meter)</span>
+            <span id="meter-wpm-badge" class="wpm-badge">即時 15 WPM</span>
+          </div>
           <span id="meter-status" style="font-size:0.8rem; color:#aaa;">閒置</span>
         </div>
 
@@ -573,7 +576,7 @@
               <div id="meter-markers"></div>
             </div>
             <div class="meter-readout">
-              <div>時長: <strong id="readout-time">0 ms</strong></div>
+              <div>時長: <strong id="readout-time">0 ms</strong> <span id="readout-wpm" style="color:var(--neon-blue); font-size:0.75rem; font-weight:bold; margin-left:2px;">(15 WPM)</span></div>
               <div>門檻: <strong id="readout-threshold-tag">200 ms</strong></div>
               <div>上限: <strong id="readout-max">600 ms</strong></div>
             </div>

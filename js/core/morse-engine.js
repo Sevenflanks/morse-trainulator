@@ -95,6 +95,7 @@ class MorseEngine {
     this.pressStartTime = 0;
     this.isKeyDown = false;
     this.committedLetters = [];
+    this.recentStrokes = [];
   }
 
   updateConfig(newConfig) {
@@ -115,6 +116,55 @@ class MorseEngine {
     return this.config.threshold;
   }
 
+  getBaselineWpm() {
+    if (this.config.farnsworthEnabled) {
+      return this.config.charWpm || 18;
+    }
+    return Math.max(1, Math.round(1200 / (this.config.unitT || 80)));
+  }
+
+  calculateStrokeWpm(durationMs) {
+    if (!durationMs || durationMs <= 0) return this.getBaselineWpm();
+    const th = this.getEffectiveThreshold();
+    const wpm = durationMs < th ? (1200 / durationMs) : (3600 / durationMs);
+    return Math.max(1, Math.min(99, Math.round(wpm)));
+  }
+
+  recordStroke(durationMs, symbol) {
+    if (!this.recentStrokes) this.recentStrokes = [];
+    const now = typeof performance !== 'undefined' ? performance.now() : Date.now();
+    const units = symbol === '-' ? 3 : 1;
+    this.recentStrokes.push({ duration: durationMs, units, time: now });
+    this.recentStrokes = this.recentStrokes
+      .filter(s => (now - s.time) < 4000)
+      .slice(-10);
+  }
+
+  getRollingWpm() {
+    if (!this.recentStrokes || this.recentStrokes.length === 0) {
+      return this.getBaselineWpm();
+    }
+    const now = typeof performance !== 'undefined' ? performance.now() : Date.now();
+    const active = this.recentStrokes.filter(s => (now - s.time) < 4000);
+    if (active.length === 0) {
+      return this.getBaselineWpm();
+    }
+    let totalDur = 0;
+    let totalUnits = 0;
+    for (const s of active) {
+      totalDur += s.duration;
+      totalUnits += s.units;
+    }
+    if (totalUnits === 0) return this.getBaselineWpm();
+    const avgT = totalDur / totalUnits;
+    if (avgT <= 0) return this.getBaselineWpm();
+    return Math.max(1, Math.min(99, Math.round(1200 / avgT)));
+  }
+
+  resetStrokeHistory() {
+    this.recentStrokes = [];
+  }
+
   classifyDuration(durationMs) {
     return durationMs < this.getEffectiveThreshold() ? '.' : '-';
   }
@@ -132,6 +182,7 @@ class MorseEngine {
     const duration = Math.max(10, Math.round(timestamp - this.pressStartTime));
     this.lastPressDuration = duration;
     const symbol = this.classifyDuration(duration);
+    this.recordStroke(duration, symbol);
     const nextSequence = this.currentSequence + symbol;
 
     const node = this.tree[nextSequence];
@@ -150,6 +201,9 @@ class MorseEngine {
 
   appendSymbol(symbol, duration) {
     this.lastPressDuration = duration;
+    if (duration) {
+      this.recordStroke(duration, symbol);
+    }
     const nextSequence = this.currentSequence + symbol;
     const node = this.tree[nextSequence];
     const isValid = !!node;

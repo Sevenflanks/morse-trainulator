@@ -59,6 +59,8 @@ assert.strictEqual(engine.getEffectiveUnitT(), 60);
 assert.strictEqual(engine.getEffectiveThreshold(), 120);
 assert.strictEqual(engine.classifyDuration(50), '.');
 assert.strictEqual(engine.classifyDuration(130), '-');
+assert.strictEqual(engine.getBaselineWpm(), 20);
+assert.strictEqual(engine.calculateStrokeWpm(60), 20);
 console.log('   -> morse-engine.js passed all tests!');
 
 // 3. Test koch-manager.js

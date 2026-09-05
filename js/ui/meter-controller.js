@@ -64,6 +64,15 @@ function updateMeterMarkers() {
       <div class="marker-label" style="left: ${wordPct}%; color: #00e5ff;">單字空格 7T (${wordGap}ms)</div>
     `;
   }
+
+  // Update Baseline WPM readouts
+  const meterWpmBadge = document.getElementById('meter-wpm-badge');
+  const readoutWpm = document.getElementById('readout-wpm');
+  const stateWpm = document.getElementById('state-wpm');
+  const baselineWpm = typeof engine.getBaselineWpm === 'function' ? engine.getBaselineWpm() : Math.round(1200 / unitT);
+  if (meterWpmBadge) meterWpmBadge.textContent = `即時 ${baselineWpm} WPM`;
+  if (readoutWpm) readoutWpm.textContent = `(${baselineWpm} WPM)`;
+  if (stateWpm) stateWpm.textContent = `(${baselineWpm} WPM)`;
 }
 
 function startMeterAnimation() {
@@ -74,6 +83,9 @@ function startMeterAnimation() {
   const meterBar = document.getElementById('meter-bar');
   const readoutTime = document.getElementById('readout-time');
   const readoutSymbol = document.getElementById('readout-symbol');
+  const readoutWpm = document.getElementById('readout-wpm');
+  const meterWpmBadge = document.getElementById('meter-wpm-badge');
+  const stateWpm = document.getElementById('state-wpm');
 
   function frame() {
     if (!engine.isKeyDown) return;
@@ -83,6 +95,13 @@ function startMeterAnimation() {
 
     if (meterBar) meterBar.style.width = pct + '%';
     if (readoutTime) readoutTime.textContent = `${elapsed} ms`;
+
+    if (typeof engine.calculateStrokeWpm === 'function') {
+      const liveWpm = engine.calculateStrokeWpm(elapsed);
+      if (readoutWpm) readoutWpm.textContent = `(${liveWpm} WPM)`;
+      if (meterWpmBadge) meterWpmBadge.textContent = `即時 ${liveWpm} WPM`;
+      if (stateWpm) stateWpm.textContent = `(${liveWpm} WPM)`;
+    }
 
     if (elapsed < th) {
       if (meterBar) meterBar.classList.remove('dah-active');
@@ -108,10 +127,26 @@ function stopMeterAnimation(finalDuration) {
   const meterBar = document.getElementById('meter-bar');
   const readoutTime = document.getElementById('readout-time');
   const meterGhost = document.getElementById('meter-ghost');
+  const readoutWpm = document.getElementById('readout-wpm');
+  const meterWpmBadge = document.getElementById('meter-wpm-badge');
+  const stateWpm = document.getElementById('state-wpm');
+  const engine = window.engine;
 
   const pct = Math.min(100, (finalDuration / maxMeterScale) * 100);
   if (meterBar) meterBar.style.width = pct + '%';
   if (readoutTime) readoutTime.textContent = `${finalDuration} ms`;
+
+  if (engine && typeof engine.calculateStrokeWpm === 'function') {
+    const strokeWpm = engine.calculateStrokeWpm(finalDuration);
+    const rollingWpm = typeof engine.getRollingWpm === 'function' ? engine.getRollingWpm() : strokeWpm;
+    if (readoutWpm) readoutWpm.textContent = `(${strokeWpm} WPM)`;
+    if (stateWpm) stateWpm.textContent = `(${strokeWpm} WPM)`;
+    if (meterWpmBadge) {
+      meterWpmBadge.textContent = `即時 ${rollingWpm} WPM`;
+      meterWpmBadge.classList.add('pulse');
+      setTimeout(() => meterWpmBadge.classList.remove('pulse'), 300);
+    }
+  }
 
   // Ghost marker
   if (meterGhost) {

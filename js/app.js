@@ -47,6 +47,7 @@ function initDomReferences() {
     stateSeq: document.getElementById('state-seq'),
     stateLetter: document.getElementById('state-letter'),
     stateDuration: document.getElementById('state-duration'),
+    stateWpm: document.getElementById('state-wpm'),
     stateCommitted: document.getElementById('state-committed'),
     evalStatus: document.getElementById('eval-status'),
 
@@ -54,8 +55,10 @@ function initDomReferences() {
     meterBar: document.getElementById('meter-bar'),
     meterGhost: document.getElementById('meter-ghost'),
     meterStatus: document.getElementById('meter-status'),
+    meterWpmBadge: document.getElementById('meter-wpm-badge'),
     meterMarkers: document.getElementById('meter-markers'),
     readoutTime: document.getElementById('readout-time'),
+    readoutWpm: document.getElementById('readout-wpm'),
     readoutSymbol: document.getElementById('readout-symbol'),
     readoutMax: document.getElementById('readout-max'),
     readoutThresholdTag: document.getElementById('readout-threshold-tag'),
