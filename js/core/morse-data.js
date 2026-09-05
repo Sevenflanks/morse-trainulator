@@ -120,36 +120,36 @@ const KOCH_SEQUENCE = [
 
 const KEY_PROFILES = {
   standard: {
-    name: '標準電鍵',
-    desc: '直鍵: K · 撥片: [ , / ] .',
+    name: '標準鍵位',
+    desc: '直鍵: K · 雙撥片: [ (點) / ] (劃) 或 , / .',
     straight: ['KeyK'],
     dit: ['BracketLeft', 'Comma'],
     dah: ['BracketRight', 'Period']
   },
   homerow: {
-    name: '基準盲打 (F/J)',
-    desc: '直鍵: K · 撥片: F (左) / J (右)',
+    name: '雙手基準 (F/J)',
+    desc: '直鍵: K · 雙撥片: F (點) / J (劃)',
     straight: ['KeyK'],
     dit: ['KeyF'],
     dah: ['KeyJ']
   },
   left_hand: {
     name: '單手左手 (Z/X)',
-    desc: '直鍵: C · 撥片: Z (左) / X (右)',
+    desc: '直鍵: C · 雙撥片: Z (點) / X (劃)',
     straight: ['KeyC'],
     dit: ['KeyZ'],
     dah: ['KeyX']
   },
   arrows: {
-    name: '方向鍵操作',
-    desc: '直鍵: ↓ · 撥片: ← (左) / → (右)',
+    name: '方向鍵模式',
+    desc: '直鍵: ↓ · 雙撥片: ← (點) / → (劃)',
     straight: ['ArrowDown'],
     dit: ['ArrowLeft'],
     dah: ['ArrowRight']
   },
   custom: {
     name: '自訂鍵位',
-    desc: '自選按鍵映射',
+    desc: '自選按鍵對應',
     straight: ['KeyK'],
     dit: ['KeyF'],
     dah: ['KeyJ']
@@ -191,7 +191,7 @@ const speedPresets = {
     letterGap: 720,
     wordGap: 1680,
     freq: 600,
-    desc: '入門 (5 WPM)：短音 240ms · 長音 720ms · 字母間隔 720ms · 單字間隔 1680ms'
+    desc: '入門 (5 WPM)：點 240ms · 劃 720ms · 字元間隔 720ms · 單字間隔 1680ms'
   },
   beginner: {
     name: '基礎',
@@ -201,7 +201,7 @@ const speedPresets = {
     letterGap: 360,
     wordGap: 840,
     freq: 640,
-    desc: '基礎 (10 WPM)：短音 120ms · 長音 360ms · 字母間隔 360ms · 單字間隔 840ms'
+    desc: '基礎 (10 WPM)：點 120ms · 劃 360ms · 字元間隔 360ms · 單字間隔 840ms'
   },
   intermediate: {
     name: '熟練',
@@ -211,7 +211,7 @@ const speedPresets = {
     letterGap: 240,
     wordGap: 560,
     freq: 680,
-    desc: '熟練 (15 WPM)：短音 80ms · 長音 240ms · 字母間隔 240ms · 單字間隔 560ms'
+    desc: '熟練 (15 WPM)：點 80ms · 劃 240ms · 字元間隔 240ms · 單字間隔 560ms'
   },
   proficient: {
     name: '精通',
@@ -221,7 +221,7 @@ const speedPresets = {
     letterGap: 180,
     wordGap: 420,
     freq: 720,
-    desc: '精通 (20 WPM)：短音 60ms · 長音 180ms · 字母間隔 180ms · 單字間隔 420ms'
+    desc: '精通 (20 WPM)：點 60ms · 劃 180ms · 字元間隔 180ms · 單字間隔 420ms'
   },
   advanced: {
     name: '神速',
@@ -231,7 +231,7 @@ const speedPresets = {
     letterGap: 105,
     wordGap: 245,
     freq: 760,
-    desc: '神速 (35 WPM)：短音 35ms · 長音 105ms · 字母間隔 105ms · 單字間隔 245ms'
+    desc: '神速 (35 WPM)：點 35ms · 劃 105ms · 字元間隔 105ms · 單字間隔 245ms'
   },
   competition: {
     name: '極限',
@@ -241,7 +241,7 @@ const speedPresets = {
     letterGap: 72,
     wordGap: 168,
     freq: 800,
-    desc: '極限 (50+ WPM)：短音 24ms · 長音 72ms · 字母間隔 72ms · 單字間隔 168ms'
+    desc: '極限 (50+ WPM)：點 24ms · 劃 72ms · 字元間隔 72ms · 單字間隔 168ms'
   }
 };
 

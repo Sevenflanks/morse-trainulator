@@ -215,8 +215,8 @@ function simulateApplyLoadedSettings(settings, dom) {
     keyer.setReversed(s.paddleReverse);
     // updatePaddleLabels logic
     const isRev = keyer.reversed;
-    dom['paddle-left-name'].innerHTML = isRev ? '— 長音 Dah' : '· 短音 Dit';
-    dom['paddle-right-name'].innerHTML = isRev ? '· 短音 Dit' : '— 長音 Dah';
+    dom['paddle-left-name'].innerHTML = isRev ? '— 劃 Dah (長音)' : '· 點 Dit (短音)';
+    dom['paddle-right-name'].innerHTML = isRev ? '· 點 Dit (短音)' : '— 劃 Dah (長音)';
   }
   if (s.iambicMode) {
     keyer.setMode(s.iambicMode);
@@ -255,8 +255,8 @@ console.log('  -> Keyer Device mode (Bug Key) restored successfully!');
 // B. Dual Paddle Options (Reverse + Mode A)
 assert.strictEqual(domElements['chk-paddle-reverse'].checked, true, 'paddle reverse checkbox should be checked');
 assert.strictEqual(keyer.reversed, true, 'keyer reversed should be true');
-assert.strictEqual(domElements['paddle-left-name'].innerHTML, '— 長音 Dah', 'left paddle should show Dah when reversed');
-assert.strictEqual(domElements['paddle-right-name'].innerHTML, '· 短音 Dit', 'right paddle should show Dit when reversed');
+assert.strictEqual(domElements['paddle-left-name'].innerHTML, '— 劃 Dah (長音)', 'left paddle should show Dah when reversed');
+assert.strictEqual(domElements['paddle-right-name'].innerHTML, '· 點 Dit (短音)', 'right paddle should show Dit when reversed');
 assert.strictEqual(domElements['radio-mode-a'].checked, true, 'radio Mode A should be checked');
 assert.strictEqual(domElements['radio-mode-b'].checked, false, 'radio Mode B should be false');
 assert.strictEqual(keyer.mode, 'A', 'keyer mode should be A');

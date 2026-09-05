@@ -139,7 +139,7 @@ function updateKochUI() {
     for (let i = 1; i <= maxLvl; i++) {
       const opt = document.createElement('option');
       opt.value = i;
-      opt.textContent = (i === 1) ? `第 1 關 (入門雙星 K, M)` : `第 ${i} 關 (新字 ${seqList[i] || i})`;
+      opt.textContent = (i === 1) ? `第 1 關 (入門雙星 K, M)` : `第 ${i} 關 (新字元 ${seqList[i] || i})`;
       if (i === curLvl) opt.selected = true;
       kochStageSelect.appendChild(opt);
     }
@@ -165,13 +165,13 @@ function setKochAssessmentMode(mode) {
 
   if (descEl) {
     if (mode === 'quick') {
-      descEl.textContent = '🟢 簡化模式：無超時限制，適合熟悉新字母與手感。';
+      descEl.textContent = '🟢 基礎練習：無超時限制，適合熟悉新字元音形與電鍵手感。';
       descEl.style.color = '#889';
     } else if (mode === 'standard') {
-      descEl.textContent = '🏆 正規模式：計時連續考核，啟用 2.0s 反射倒數，時限結束正確率 ≥90% 通關。可隨時主動結束。';
+      descEl.textContent = '🏆 正規考核：計時連續考核，啟用 2.0s 反射倒數，時限結束正確率 ≥90% 通關。可隨時手動結束結算。';
       descEl.style.color = '#00e5ff';
     } else if (mode === 'challenge') {
-      descEl.textContent = '🔥 挑戰模式：極限反射連續考核，啟用 2.0s 反射倒數，失誤直接重置計時！可隨時主動結束結算。';
+      descEl.textContent = '🔥 極限挑戰：極限直覺連續考核，啟用 2.0s 反射倒數，失誤直接重置計時！可隨時手動結束結算。';
       descEl.style.color = '#ff9100';
     }
   }
@@ -522,13 +522,13 @@ function updateKochProgressBadge() {
 
   if (hudModeTag) {
     if (kochState.mode === 'quick') {
-      hudModeTag.textContent = '🟢 簡化模式';
+      hudModeTag.textContent = '🟢 基礎練習模式';
       hudModeTag.style.color = '#00e676';
     } else if (kochState.mode === 'standard') {
-      hudModeTag.textContent = '🏆 正規模式';
+      hudModeTag.textContent = '🏆 正規考核模式';
       hudModeTag.style.color = 'var(--neon-blue)';
     } else if (kochState.mode === 'challenge') {
-      hudModeTag.textContent = '🔥 挑戰模式';
+      hudModeTag.textContent = '🔥 極限挑戰模式';
       hudModeTag.style.color = '#ff9100';
     }
   }
@@ -910,12 +910,12 @@ function finishKochDrillSession(isManualStop = false) {
         kochScTitle.style.color = 'var(--gold)';
       }
       if (kochScModeTag) {
-        kochScModeTag.textContent = '🔥 挑戰模式';
+        kochScModeTag.textContent = '🔥 極限挑戰';
         kochScModeTag.style.background = '#3b1114';
         kochScModeTag.style.color = '#ffd700';
       }
       if (kochScThresholdTag) {
-        kochScThresholdTag.textContent = '防線門檻: 守住 90% 防線';
+        kochScThresholdTag.textContent = '防線門檻: 守住 90% 直覺反射防線';
         kochScThresholdTag.style.color = '#ffd700';
       }
     } else if (kochState.mode === 'standard') {
@@ -924,7 +924,7 @@ function finishKochDrillSession(isManualStop = false) {
         kochScTitle.style.color = '#00e676';
       }
       if (kochScModeTag) {
-        kochScModeTag.textContent = '🏆 正規模式';
+        kochScModeTag.textContent = '🏆 正規考核';
         kochScModeTag.style.background = '#00364d';
         kochScModeTag.style.color = '#00e5ff';
       }
@@ -938,7 +938,7 @@ function finishKochDrillSession(isManualStop = false) {
         kochScTitle.style.color = '#00e676';
       }
       if (kochScModeTag) {
-        kochScModeTag.textContent = '🟢 簡化模式';
+        kochScModeTag.textContent = '🟢 基礎練習';
         kochScModeTag.style.background = '#102218';
         kochScModeTag.style.color = '#00e676';
       }
@@ -1014,7 +1014,7 @@ function finishKochDrillSession(isManualStop = false) {
         kochScDesc.innerHTML = `有效題目數過少（僅完成 ${total} 題），請重新發起考核並持續發報。${resetNotice}`;
       } else {
         const reason = isManualStop ? '手動結束考核。' : '';
-        kochScDesc.innerHTML = `${reason}本次正確率為 <strong>${accuracy}%</strong>，未達科赫法 <strong>90%</strong> 條件反射標準。${resetNotice}<br>
+        kochScDesc.innerHTML = `${reason}本次正確率為 <strong>${accuracy}%</strong>，未達科赫法 <strong>90%</strong> 直覺反射標準。${resetNotice}<br>
           請放鬆心情再試一次，讓耳朵與手指自然形成直覺反射！`;
       }
     }

@@ -77,7 +77,7 @@ function initTextModePassage(text) {
   if (fbTarget) fbTarget.textContent = '—';
   if (fbInput) fbInput.textContent = '—';
   if (fbResult) {
-    fbResult.textContent = '等待發報 (鍵盤 K 或雙撥片)';
+    fbResult.textContent = '等待發報 (直鍵或雙撥片)';
     fbResult.style.color = '#00e676';
   }
 
@@ -168,7 +168,7 @@ function finalizeLetterTextMode(res) {
       fbResult.style.color = '#00e676';
     }
     if (evalStatus) {
-      evalStatus.textContent = `字母 [${res.letter}] 正確！`;
+      evalStatus.textContent = `字元 [${res.letter}] 正確！`;
       evalStatus.style.color = '#00e676';
     }
     if (typeof highlightPath === 'function') highlightPath(res.sequence, true, engine);
@@ -189,7 +189,7 @@ function finalizeLetterTextMode(res) {
       }
       if (evalStatus) {
         const tSeq = engine ? (engine.getSequenceForLetter(target) || '') : '';
-        evalStatus.textContent = `打錯了，目標是 ${target} (${tSeq})，請再試一次`;
+        evalStatus.textContent = `發報未吻合，目標為 ${target} (${tSeq})，請重試`;
         evalStatus.style.color = '#ff5252';
       }
 
@@ -274,11 +274,11 @@ function finishTextModePassage() {
   }
 
   if (evalStatus) {
-    evalStatus.textContent = `🎉 測驗完成！正確率 ${accuracy}%`;
+    evalStatus.textContent = `🎉 報文挑戰完成！正確率 ${accuracy}%`;
     evalStatus.style.color = accuracy >= 80 ? '#00e676' : '#ffb703';
   }
   if (textModeStatus) {
-    textModeStatus.textContent = '測驗完成';
+    textModeStatus.textContent = '挑戰完成';
     textModeStatus.style.color = '#00e676';
   }
 }
@@ -306,7 +306,7 @@ async function startAutoPlay() {
       btnPauseAuto.innerHTML = '<span>⏸ 暫停</span>';
     }
     if (textModeStatus) {
-      textModeStatus.textContent = '自動表演中...';
+      textModeStatus.textContent = '自動示範中...';
       textModeStatus.style.color = 'var(--gold)';
     }
     return;
@@ -332,7 +332,7 @@ async function startAutoPlay() {
     btnStopAuto.style.color = '#fff';
   }
   if (textModeStatus) {
-    textModeStatus.textContent = '自動表演中...';
+    textModeStatus.textContent = '自動示範中...';
     textModeStatus.style.color = 'var(--gold)';
   }
 
@@ -355,7 +355,7 @@ async function startAutoPlay() {
     if (char === ' ') {
       if (chip) chip.classList.add('state-playing');
       if (evalStatus) {
-        evalStatus.textContent = `自動表演：單字間隔 (${engine.config.wordGap}ms)`;
+        evalStatus.textContent = `自動示範：單字間隔 (${engine.config.wordGap}ms)`;
         evalStatus.style.color = 'var(--gold)';
       }
       await new Promise(r => setTimeout(r, engine.config.wordGap));
@@ -374,7 +374,7 @@ async function startAutoPlay() {
 
     if (chip) chip.classList.add('state-playing');
     if (evalStatus) {
-      evalStatus.textContent = `自動表演：[${char}] (${seq})`;
+      evalStatus.textContent = `自動示範：[${char}] (${seq})`;
       evalStatus.style.color = '#ffd700';
     }
 
@@ -395,7 +395,7 @@ async function startAutoPlay() {
         meterBar.style.width = (sym === '.') ? '25%' : '75%';
         meterBar.className = (sym === '.') ? 'meter-bar' : 'meter-bar dah-active';
       }
-      if (readoutSymbol) readoutSymbol.textContent = (sym === '.') ? '短音 Dit (·)' : '長音 Dah (—)';
+      if (readoutSymbol) readoutSymbol.textContent = (sym === '.') ? '點 Dit (·)' : '劃 Dah (—)';
 
       synth.start();
       ribbon.startPulse(performance.now(), sym);
@@ -423,11 +423,11 @@ async function startAutoPlay() {
   if (typeof simulateKeyVisualRelease === 'function') simulateKeyVisualRelease();
   resetAutoPlayButtons();
   if (evalStatus) {
-    evalStatus.textContent = textState.autoPlayAbort ? '自動表演已停止' : '自動表演完成！';
+    evalStatus.textContent = textState.autoPlayAbort ? '自動示範已停止' : '自動示範發報完成！';
     evalStatus.style.color = textState.autoPlayAbort ? '#aaa' : '#00e676';
   }
   if (textModeStatus) {
-    textModeStatus.textContent = textState.autoPlayAbort ? '已停止' : '表演完畢';
+    textModeStatus.textContent = textState.autoPlayAbort ? '已停止' : '示範完畢';
     textModeStatus.style.color = textState.autoPlayAbort ? '#aaa' : '#00e676';
   }
   if (meterBar) meterBar.style.width = '0%';
@@ -447,13 +447,13 @@ function pauseAutoPlay() {
     if (typeof simulateKeyVisualRelease === 'function') simulateKeyVisualRelease();
     if (btnPauseAuto) btnPauseAuto.innerHTML = '<span>▶ 繼續</span>';
     if (textModeStatus) {
-      textModeStatus.textContent = '表演已暫停';
+      textModeStatus.textContent = '示範已暫停';
       textModeStatus.style.color = '#ff9100';
     }
   } else {
     if (btnPauseAuto) btnPauseAuto.innerHTML = '<span>⏸ 暫停</span>';
     if (textModeStatus) {
-      textModeStatus.textContent = '自動表演中...';
+      textModeStatus.textContent = '自動示範中...';
       textModeStatus.style.color = 'var(--gold)';
     }
   }

@@ -1347,7 +1347,7 @@
 
   <header>
     <h1>📻 摩斯訓練儀 (Morse Trainulator)</h1>
-    <div class="subtitle">專業級互動式電報模擬與報務員訓練體系 (Simulator & Trainer) · 支援直鍵/雙撥片/震報鍵 · PCB 二元樹尋路 · 實時節奏儀表</div>
+    <div class="subtitle">專業級互動式電報模擬與報務員訓練體系 (Simulator & Trainer) · 支援直鍵 / 雙撥片 / 機械震報鍵 · PCB 二元樹尋路 · 即時節奏儀表</div>
     <div class="layout-switch-container">
       <button type="button" class="layout-switch-btn active" id="btn-layout-2col" title="切換為雙欄沉浸專注佈局">
         <span>🎛️ 雙欄專注</span>
@@ -1381,8 +1381,8 @@
 
           <!-- Numbers Bus Bar Layer (Option A: 0-9 DIP Array) -->
           <g id="numbers-bus-layer">
-            <text x="105" y="499" fill="#00e5ff" font-size="7.2" font-family="monospace" letter-spacing="1" text-anchor="middle">· DIT BANK (1–5)</text>
-            <text x="295" y="499" fill="#ffb703" font-size="7.2" font-family="monospace" letter-spacing="1" text-anchor="middle">— DAH BANK (6–0)</text>
+            <text x="105" y="499" fill="#00e5ff" font-size="7.2" font-family="monospace" letter-spacing="1" text-anchor="middle">· 點 DIT 區 (1–5)</text>
+            <text x="295" y="499" fill="#ffb703" font-size="7.2" font-family="monospace" letter-spacing="1" text-anchor="middle">— 劃 DAH 區 (6–0)</text>
             <line x1="200" y1="504" x2="200" y2="542" stroke="#444b58" stroke-width="1.2" stroke-dasharray="2,2" />
             <g id="number-chips-group"></g>
           </g>
@@ -1401,13 +1401,13 @@
       <!-- Keyer Device Switcher Tabs (放在 PCB 下面) -->
       <div class="keyer-device-tabs" style="margin-top: 10px; width: 100%;">
         <button id="dev-straight" class="keyer-tab" type="button">
-          <span>🔘 直鍵<br><span style="white-space: nowrap;">(Straight)</span></span>
+          <span>🔘 直鍵<br><span style="white-space: nowrap;">(Straight Key)</span></span>
         </button>
         <button id="dev-paddle" class="keyer-tab active" type="button">
-          <span>🎛️ 雙撥片<br><span style="white-space: nowrap;">(Iambic)</span></span>
+          <span>🎛️ 雙撥片<br><span style="white-space: nowrap;">(Iambic Paddle)</span></span>
         </button>
         <button id="dev-bug" class="keyer-tab" type="button">
-          <span>📻 震報鍵<br><span style="white-space: nowrap;">(Bug Key)</span></span>
+          <span>📻 半自動震報鍵<br><span style="white-space: nowrap;">(Bug Key)</span></span>
         </button>
       </div>
 
@@ -1423,7 +1423,7 @@
           <div class="paddle-lever" id="paddle-left">
             <span class="paddle-led" id="led-dit-mem">MEM</span>
             <div class="paddle-name" id="paddle-left-name">
-              <span style="font-size:1.3rem;">·</span> 短音 Dit
+              <span style="font-size:1.3rem;">·</span> 點 Dit (短音)
             </div>
             <div class="paddle-key-hint" id="paddle-left-hint">鍵盤 [ 或 ,</div>
           </div>
@@ -1431,17 +1431,17 @@
           <div class="paddle-lever" id="paddle-right">
             <span class="paddle-led" id="led-dah-mem">MEM</span>
             <div class="paddle-name" id="paddle-right-name">
-              <span style="font-size:1.3rem;">—</span> 長音 Dah
+              <span style="font-size:1.3rem;">—</span> 劃 Dah (長音)
             </div>
             <div class="paddle-key-hint" id="paddle-right-hint">鍵盤 ] 或 .</div>
           </div>
         </div>
         <div class="squeeze-banner" id="squeeze-banner">
-          <span id="squeeze-status">雙撥片待命 · 單邊連發 · 夾片交替 (Squeeze Iambic)</span>
+          <span id="squeeze-status">雙撥片待命 · 單邊連發 · 夾發交替 (Squeeze Iambic)</span>
         </div>
       </div>
 
-      <div style="font-size: 0.78rem; color: var(--text-muted); text-align: center; margin-top: 4px;">💡 點擊卡片上任何字母，可聆聽示範發報音並查看點亮軌跡</div>
+      <div style="font-size: 0.78rem; color: var(--text-muted); text-align: center; margin-top: 4px;">💡 點擊板上任何字母或數字，可試聽示範發報音並查看點亮軌跡</div>
     </div>
 
     <!-- Training Core Column: Mode Tabs & Drill Exercises -->
@@ -1450,13 +1450,13 @@
       <!-- Mode Switcher Tabs -->
       <div style="display: flex; gap: 8px; width: 100%; margin-bottom: 4px;">
         <button class="mode-tab-btn active" id="tab-mode-free" style="flex: 1; padding: 10px; font-size: 0.88rem; font-weight: bold; border-radius: 8px; cursor: pointer; border: 1.5px solid var(--gold); background: #2a2512; color: var(--gold-light); display: flex; align-items: center; justify-content: center; gap: 4px;">
-          <span>⚡ 自由模式</span>
+          <span>⚡ 自由發報</span>
         </button>
         <button class="mode-tab-btn" id="tab-mode-text" style="flex: 1; padding: 10px; font-size: 0.88rem; font-weight: bold; border-radius: 8px; cursor: pointer; border: 1.5px solid #363a46; background: #15171d; color: #aaa; display: flex; align-items: center; justify-content: center; gap: 4px;">
-          <span>📖 文章挑戰</span>
+          <span>📖 報文挑戰</span>
         </button>
         <button class="mode-tab-btn" id="tab-mode-koch" style="flex: 1; padding: 10px; font-size: 0.88rem; font-weight: bold; border-radius: 8px; cursor: pointer; border: 1.5px solid #363a46; background: #15171d; color: #aaa; display: flex; align-items: center; justify-content: center; gap: 4px;">
-          <span>🎯 科赫闖關</span>
+          <span>🎯 國際科赫闖關</span>
         </button>
       </div>
 
@@ -1491,7 +1491,7 @@
           <!-- Playback Actions -->
           <div style="display: flex; gap: 8px; flex-wrap: wrap;">
             <button id="btn-play-auto" style="flex: 1.2; padding: 9px; background: linear-gradient(135deg, #ffd700, #ff9100); color: #000; font-weight: bold; border: none; border-radius: 6px; cursor: pointer; font-size: 0.85rem; display: flex; align-items: center; justify-content: center; gap: 5px; box-shadow: 0 0 10px rgba(255, 215, 0, 0.3);">
-              <span>▶ 自動表演</span>
+              <span>▶ 自動示範發報</span>
             </button>
             <button id="btn-pause-auto" disabled style="flex: 0.8; padding: 9px; background: #222530; border: 1.5px solid #3d4252; color: #666; border-radius: 6px; cursor: not-allowed; font-size: 0.85rem;">
               <span>⏸ 暫停</span>
@@ -1508,11 +1508,11 @@
           <div style="display: flex; gap: 16px; margin-top: 10px; font-size: 0.76rem; color: #ccc;">
             <label style="display: flex; align-items: center; gap: 5px; cursor: pointer;">
               <input type="checkbox" id="chk-show-hints" checked>
-              <span>顯示摩斯小抄</span>
+              <span>顯示點劃提示</span>
             </label>
             <label style="display: flex; align-items: center; gap: 5px; cursor: pointer;">
               <input type="checkbox" id="chk-strict-mode">
-              <span>打錯強制重試</span>
+              <span>嚴格模式 (錯誤強制重試)</span>
             </label>
           </div>
         </div>
@@ -1520,7 +1520,7 @@
         <!-- 2. Passage Display & Comparison -->
         <div class="panel">
           <div class="panel-title">
-            <span>文章即時比對</span>
+            <span>報文比對</span>
             <span id="text-progress-badge" style="font-size:0.75rem; color:var(--gold); font-weight: bold;">進度: 0/6 · 正確率: 100%</span>
           </div>
           
@@ -1532,23 +1532,23 @@
           <div style="display: flex; justify-content: space-between; font-size: 0.76rem; color: #aaa; margin-top: 8px; background: #121318; padding: 6px 10px; border-radius: 5px; border-left: 3px solid var(--neon-blue);">
             <div>目標: <strong id="fb-target" style="color:#00e5ff;">S (...)</strong></div>
             <div>實發: <strong id="fb-input" style="color:#ffd700;">—</strong></div>
-            <div>結果: <strong id="fb-result" style="color:#00e676;">等待發報 (鍵盤 / 或空白鍵)</strong></div>
+            <div>結果: <strong id="fb-result" style="color:#00e676;">等待發報 (直鍵或雙撥片)</strong></div>
           </div>
         </div>
 
         <!-- 3. Completion Scorecard (Hidden until complete) -->
         <div class="panel" id="text-scorecard" style="display: none; border-color: var(--gold); background: #161715;">
           <div class="panel-title" style="color: var(--gold-light);">
-            <span>🎉 文章發報挑戰完成！</span>
+            <span>🎉 報文發報挑戰完成！</span>
             <span id="scorecard-speed-tag" style="color:#ffb703; font-size: 0.8rem;">15 WPM</span>
           </div>
           <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; margin: 10px 0; text-align: center;">
             <div style="background: #1e2029; padding: 8px; border-radius: 6px;">
-              <div style="font-size: 0.7rem; color: #888;">總字數</div>
+              <div style="font-size: 0.7rem; color: #888;">總字元數</div>
               <div id="sc-total" style="font-size: 1.1rem; font-weight: bold; color: #fff;">0</div>
             </div>
             <div style="background: #0d2818; padding: 8px; border-radius: 6px; border: 1px solid #14592a;">
-              <div style="font-size: 0.7rem; color: #81b29a;">正確數</div>
+              <div style="font-size: 0.7rem; color: #81b29a;">正確字元</div>
               <div id="sc-correct" style="font-size: 1.1rem; font-weight: bold; color: #00e676;">0</div>
             </div>
             <div style="background: #2b1114; padding: 8px; border-radius: 6px; border: 1px solid #631b22;">
@@ -1732,17 +1732,17 @@
           <div class="panel-title" style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:6px;">
             <div style="display:flex; align-items:center; gap:6px;">
               <span id="koch-sc-title" style="color:#00e5ff; font-weight:bold;">🎉 關卡突破 (Stage Clear)!</span>
-              <span id="koch-sc-mode-tag" style="font-size:0.72rem; padding:1px 6px; border-radius:3px; background:#182230; color:#00e5ff;">簡化模式</span>
+              <span id="koch-sc-mode-tag" style="font-size:0.72rem; padding:1px 6px; border-radius:3px; background:#182230; color:#00e5ff;">基礎練習模式</span>
             </div>
             <span id="koch-sc-threshold-tag" style="color:#ffb703; font-size:0.78rem;">通關門檻: 90%</span>
           </div>
           <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; margin: 10px 0; text-align: center;">
             <div style="background: #151d28; padding: 8px; border-radius: 6px;">
-              <div style="font-size: 0.7rem; color: #888;">本輪題數</div>
+              <div style="font-size: 0.7rem; color: #888;">本輪字元數</div>
               <div id="koch-sc-total" style="font-size: 1.1rem; font-weight: bold; color: #fff;">10</div>
             </div>
             <div style="background: #0d2818; padding: 8px; border-radius: 6px; border: 1px solid #14592a;">
-              <div style="font-size: 0.7rem; color: #81b29a;">正確數</div>
+              <div style="font-size: 0.7rem; color: #81b29a;">正確字元</div>
               <div id="koch-sc-correct" style="font-size: 1.1rem; font-weight: bold; color: #00e676;">9</div>
             </div>
             <div style="background: #2b1114; padding: 8px; border-radius: 6px; border: 1px solid #631b22;">
@@ -1789,7 +1789,7 @@
             <div class="state-item">
               <div class="state-label" style="display: flex; justify-content: space-between; align-items: center;">
                 <span>已確認輸出 (Committed)</span>
-                <button id="btn-clear-committed" title="清空已確認輸出" style="display:none; background:transparent; border:1px solid #444; border-radius:3px; color:#888; font-size:0.68rem; padding:0 5px; cursor:pointer; line-height:1.2; transition: all 0.15s ease;" onmouseover="this.style.color='#fff'; this.style.borderColor='var(--gold)'" onmouseout="this.style.color='#888'; this.style.borderColor='#444'">清空</button>
+                <button id="btn-clear-committed" title="清除已送出字元" style="display:none; background:transparent; border:1px solid #444; border-radius:3px; color:#888; font-size:0.68rem; padding:0 5px; cursor:pointer; line-height:1.2; transition: all 0.15s ease;" onmouseover="this.style.color='#fff'; this.style.borderColor='var(--gold)'" onmouseout="this.style.color='#888'; this.style.borderColor='#444'">清除</button>
               </div>
               <div class="state-val" id="state-committed" style="color: var(--gold-light);">—</div>
             </div>
@@ -1803,16 +1803,16 @@
 
       <!-- Guided Walkthrough Scenarios (Free Mode only) -->
       <div class="panel" id="free-mode-scenarios">
-        <div class="panel-title">引導測試場景</div>
+        <div class="panel-title">新手引導情境 (Tutorial Scenarios)</div>
         <div class="tabs" id="scenario-tabs">
-          <button class="tab-btn active" data-tab="0">1. 單字 E (短音)</button>
-          <button class="tab-btn" data-tab="1">2. 單字 T (長音)</button>
-          <button class="tab-btn" data-tab="2">3. 輸入 SOS</button>
-          <button class="tab-btn" data-tab="3">4. 門檻邊界測試</button>
-          <button class="tab-btn" data-tab="4">5. 筆誤更正</button>
+          <button class="tab-btn active" data-tab="0">1. 單一字母 E (點 Dit)</button>
+          <button class="tab-btn" data-tab="1">2. 單一字母 T (劃 Dah)</button>
+          <button class="tab-btn" data-tab="2">3. 遇險信號 SOS</button>
+          <button class="tab-btn" data-tab="3">4. 判別門檻臨界測試</button>
+          <button class="tab-btn" data-tab="4">5. 筆誤更正訊號</button>
         </div>
         <div class="scenario-body" id="scenario-desc">
-          點擊下方模擬發報，測試單次短音 (Dit: ·) 尋路到 E 點位並結算。
+          點擊下方模擬發報，測試短按點 Dit (·) 尋路到 E 點位並結算。
         </div>
         <div class="scenario-steps" id="scenario-actions">
           <!-- Dynamic steps buttons -->
@@ -1822,7 +1822,7 @@
       <!-- Shared: Keying & Gap Meter Panel -->
       <div class="panel" id="meter-panel">
         <div class="panel-title">
-          <span>按鍵計量表</span>
+          <span>發報節奏與時序儀 (Keying & Gap Meter)</span>
           <span id="meter-status" style="font-size:0.8rem; color:#aaa;">閒置</span>
         </div>
 
@@ -1924,33 +1924,33 @@
             </button>
           </div>
           <div id="preset-desc-box" style="font-size: 0.73rem; color: var(--gold-light); margin-top: 6px; background: #121318; padding: 6px 10px; border-radius: 5px; border-left: 3px solid var(--gold); line-height: 1.4;">
-            熟練 (15 WPM)：短音 80ms · 長音 240ms · 字母間隔 240ms · 單字間隔 560ms
+            熟練 (15 WPM)：點 80ms · 劃 240ms · 字元間隔 240ms · 單字間隔 560ms
           </div>
         </div>
 
         <!-- Dual Paddle Settings -->
         <div id="paddle-settings-box" style="background: #121319; border: 1px solid #2e3342; border-radius: 6px; padding: 8px 10px; margin-bottom: 12px;">
           <div style="font-size:0.76rem; font-weight:bold; color:var(--gold); margin-bottom:8px; display:flex; justify-content:space-between; align-items:center;">
-            <span>雙撥片選項</span>
-            <span style="font-size:0.68rem; color:#888;">Curtis 8044 標準</span>
+            <span>雙撥片設定 (Iambic Paddle)</span>
+            <span style="font-size:0.68rem; color:#888;">Curtis 8044 標準狀態機</span>
           </div>
           <div style="display:flex; justify-content:space-between; align-items:center; font-size:0.8rem; margin-bottom:8px;">
             <label style="display:flex; align-items:center; gap:6px; cursor:pointer; color:#ccc;">
               <input type="checkbox" id="chk-paddle-reverse" style="accent-color:var(--gold);">
-              <span>左右撥片反轉 (左 Dah / 右 Dit)</span>
+              <span>左右撥片互換 (左劃 Dah / 右點 Dit)</span>
             </label>
-            <span style="font-size:0.7rem; color:#888;">適配左手或個人習慣</span>
+            <span style="font-size:0.7rem; color:#888;">適配左手或個人發報習慣</span>
           </div>
           <div style="display:flex; justify-content:space-between; align-items:center; font-size:0.8rem;">
             <label style="color:#ccc;">Iambic 夾發模式：</label>
             <div style="display:flex; gap:12px; font-size:0.78rem;">
               <label style="cursor:pointer; display:flex; align-items:center; gap:4px; color:#ffd700;">
                 <input type="radio" name="iambic-mode" id="radio-mode-b" value="B" checked style="accent-color:var(--gold);">
-                <span>Mode B (經典自動補發)</span>
+                <span>Mode B (夾發補發反向音)</span>
               </label>
               <label style="cursor:pointer; display:flex; align-items:center; gap:4px; color:#aaa;">
                 <input type="radio" name="iambic-mode" id="radio-mode-a" value="A" style="accent-color:var(--gold);">
-                <span>Mode A (即放即停)</span>
+                <span>Mode A (放開立即停止)</span>
               </label>
             </div>
           </div>
@@ -1959,20 +1959,20 @@
         <!-- Farnsworth Timing Option Box -->
         <div id="farnsworth-settings-box" style="background: #121319; border: 1px solid #2e3342; border-radius: 6px; padding: 8px 10px; margin-bottom: 12px;">
           <div style="font-size:0.76rem; font-weight:bold; color:var(--neon-blue); margin-bottom:8px; display:flex; justify-content:space-between; align-items:center;">
-            <span>法恩斯沃斯節奏</span>
-            <span style="font-size:0.68rem; color:#888;">國際標準音形訓練</span>
+            <span>法恩斯沃斯節奏 (Farnsworth Timing)</span>
+            <span style="font-size:0.68rem; color:#888;">國際標準音形訓練法</span>
           </div>
           <div style="display:flex; justify-content:space-between; align-items:center; font-size:0.8rem; margin-bottom:8px;">
             <label style="display:flex; align-items:center; gap:6px; cursor:pointer; color:#ccc;">
               <input type="checkbox" id="chk-farnsworth" style="accent-color:var(--neon-blue);">
-              <span>啟用法恩斯沃斯間隔 (音符高速 · 間隔放寬)</span>
+              <span>啟用法恩斯沃斯節奏 (字元音形高速 · 間距放寬)</span>
             </label>
             <span style="font-size:0.7rem; color:#888;" id="tag-farnsworth-status">已關閉</span>
           </div>
           <div id="farnsworth-controls" style="display:none; padding-top:6px; border-top:1px dashed #2a2e3a;">
             <div style="display:flex; justify-content:space-between; align-items:center; font-size:0.75rem; color:#aaa; margin-bottom:4px;">
-              <span>音符速度 (Character Speed): <strong id="tag-farnsworth-wpm" style="color:var(--neon-blue);">18 WPM (67ms)</strong></span>
-              <span style="font-size:0.68rem; color:#777;">音形俐落 · 間隙依上方套組</span>
+              <span>字元發報速度 (Character Speed): <strong id="tag-farnsworth-wpm" style="color:var(--neon-blue);">18 WPM (67ms)</strong></span>
+              <span style="font-size:0.68rem; color:#777;">音形俐落 · 間隔依上方套組</span>
             </div>
             <input type="range" id="param-farnsworth-wpm" min="15" max="40" step="1" value="18" style="width:100%; accent-color:var(--neon-blue);">
           </div>
@@ -1981,13 +1981,13 @@
         <!-- Atmospheric RF Noise (QRN) Box -->
         <div id="qrn-settings-box" style="background: #121319; border: 1px solid #2e3342; border-radius: 6px; padding: 8px 10px; margin-bottom: 12px;">
           <div style="font-size:0.76rem; font-weight:bold; color:#ffb703; margin-bottom:8px; display:flex; justify-content:space-between; align-items:center;">
-            <span>電台微底噪 (QRN)</span>
+            <span>天電背景底噪 (QRN)</span>
             <span style="font-size:0.68rem; color:#888;">短波帶通晶體濾波</span>
           </div>
           <div style="display:flex; justify-content:space-between; align-items:center; font-size:0.8rem; margin-bottom:6px;">
             <label style="display:flex; align-items:center; gap:6px; cursor:pointer; color:#ccc;">
               <input type="checkbox" id="chk-qrn" style="accent-color:#ffb703;">
-              <span>開啟電台背景雜音 (真空管氛圍)</span>
+              <span>開啟電台背景雜音 (短波接收機氛圍)</span>
             </label>
             <span style="font-size:0.7rem; color:#888;" id="tag-qrn-status">已靜音</span>
           </div>
@@ -2001,28 +2001,28 @@
         </div>
 
         <div class="settings-row">
-          <label>基礎時間單位 T (Dit 基準)
+          <label>基礎時間單位 T (Dit 基準長度)
             <span>1T 長度 (1200 / WPM)</span>
           </label>
           <input type="range" id="param-unit-t" min="15" max="300" step="5" value="80">
           <div class="val-tag" id="tag-unit-t">80ms</div>
         </div>
         <div class="settings-row">
-          <label>長短音門檻 (Threshold)
-            <span>低於為短音 Dit，高於為長音 Dah (2T)</span>
+          <label>長短音判別門檻 (Threshold)
+            <span>低於為點 Dit，高於為劃 Dah (2T)</span>
           </label>
           <input type="range" id="param-threshold" min="30" max="600" step="5" value="160">
           <div class="val-tag" id="tag-threshold">160ms</div>
         </div>
         <div class="settings-row">
-          <label>字母結算間隔 (Letter Gap)
-            <span>放開逾時自動結算字母 (3T)</span>
+          <label>字元結算間隔 (Letter Gap)
+            <span>放開逾時自動結算字元 (3T)</span>
           </label>
           <input type="range" id="param-gap" min="50" max="1000" step="10" value="240">
           <div class="val-tag" id="tag-gap">240ms</div>
         </div>
         <div class="settings-row">
-          <label>單字結束間隔 (Word Gap)
+          <label>單字空格間隔 (Word Gap)
             <span>靜音超過此時長插入單字空格 (7T)</span>
           </label>
           <input type="range" id="param-word-gap" min="100" max="2500" step="20" value="560">
@@ -2030,7 +2030,7 @@
         </div>
         <div class="settings-row">
           <label>側音頻率 (CW Sidetone)
-            <span>純正弦波電報蜂鳴頻率</span>
+            <span>純正弦波電報監聽音頻率</span>
           </label>
           <input type="range" id="param-freq" min="400" max="1000" step="20" value="680">
           <div class="val-tag" id="tag-freq">680Hz</div>
@@ -2039,18 +2039,18 @@
         <!-- Keyboard Keybindings Box -->
         <div id="keybindings-settings-box" style="background: #121319; border: 1px solid #2e3342; border-radius: 6px; padding: 8px 10px; margin-top: 14px; margin-bottom: 8px;">
           <div style="font-size:0.76rem; font-weight:bold; color:#00e5ff; margin-bottom:8px; display:flex; justify-content:space-between; align-items:center;">
-            <span>⌨️ 鍵盤鍵位自訂</span>
-            <span id="tag-current-profile" style="font-size:0.68rem; color:#888;">標準電鍵</span>
+            <span>⌨️ 鍵盤按鍵對應 (Keybindings)</span>
+            <span id="tag-current-profile" style="font-size:0.68rem; color:#888;">標準鍵位</span>
           </div>
 
           <!-- Preset Profile Buttons -->
           <div style="display:grid; grid-template-columns: repeat(4, 1fr); gap: 6px; margin-bottom: 10px;">
             <button class="key-profile-btn active-key-profile" data-profile="standard" style="background:#1a1c24; border:1px solid #363b4b; border-radius:5px; padding:6px 2px; color:#ddd; font-size:0.72rem; cursor:pointer; text-align:center;">
-              <div style="font-weight:bold;">標準電鍵</div>
+              <div style="font-weight:bold;">標準鍵位</div>
               <div style="font-size:0.63rem; color:#888;">K · [ ]</div>
             </button>
             <button class="key-profile-btn" data-profile="homerow" style="background:#1a1c24; border:1px solid #363b4b; border-radius:5px; padding:6px 2px; color:#ddd; font-size:0.72rem; cursor:pointer; text-align:center;">
-              <div style="font-weight:bold;">基準盲打</div>
+              <div style="font-weight:bold;">雙手基準</div>
               <div style="font-size:0.63rem; color:#00e5ff;">F · J</div>
             </button>
             <button class="key-profile-btn" data-profile="left_hand" style="background:#1a1c24; border:1px solid #363b4b; border-radius:5px; padding:6px 2px; color:#ddd; font-size:0.72rem; cursor:pointer; text-align:center;">
@@ -2072,20 +2072,20 @@
               </button>
             </div>
             <div style="display:flex; justify-content:space-between; align-items:center;">
-              <span style="color:#aaa;">短音撥片 (Dit / Bug 連發):</span>
+              <span style="color:#aaa;">點撥片 (Dit / 震報連發):</span>
               <button id="btn-bind-dit" class="bind-btn" style="background:#1f2330; border:1px solid #3d465c; color:#00e5ff; border-radius:4px; padding:2px 10px; font-family:monospace; font-size:0.75rem; cursor:pointer;">
                 [ / ,
               </button>
             </div>
             <div style="display:flex; justify-content:space-between; align-items:center;">
-              <span style="color:#aaa;">長音撥片 (Dah / Bug 手動):</span>
+              <span style="color:#aaa;">劃撥片 (Dah / 震報手動):</span>
               <button id="btn-bind-dah" class="bind-btn" style="background:#1f2330; border:1px solid #3d465c; color:#ffd700; border-radius:4px; padding:2px 10px; font-family:monospace; font-size:0.75rem; cursor:pointer;">
                 ] / .
               </button>
             </div>
           </div>
           <div style="font-size:0.68rem; color:#777; margin-top:6px; text-align:center;">
-            💡 點擊右側按鍵按鈕後，按下鍵盤任意鍵即可自訂錄製
+            💡 點擊右側按鍵按鈕後，按下鍵盤任意鍵即可重新設定
           </div>
         </div>
 
@@ -2093,7 +2093,7 @@
         <div style="display:flex; justify-content:space-between; align-items:center; margin-top:14px; padding-top:8px; border-top:1px solid #252834;">
           <span style="font-size:0.7rem; color:#888;">💾 所有設定全時自動記憶</span>
           <button id="btn-factory-reset" style="background:none; border:1px solid #444; color:#aaa; padding:4px 8px; border-radius:4px; font-size:0.72rem; cursor:pointer;">
-            🔄 恢復出廠預設值
+            🔄 回復原廠預設值
           </button>
         </div>
       </div>
@@ -3019,7 +3019,7 @@
     // ==========================================
     const KEY_PROFILES = {
       standard: {
-        name: '標準電鍵',
+        name: '標準鍵位',
         desc: '直鍵: K · 撥片: [ , / ] .',
         straight: ['KeyK'],
         dit: ['BracketLeft', 'Comma'],
@@ -3534,7 +3534,7 @@
         letterGap: 360,
         wordGap: 840,
         freq: 640,
-        desc: '基礎 (10 WPM)：短音 120ms · 長音 360ms · 字母間隔 360ms · 單字間隔 840ms'
+        desc: '基礎 (10 WPM)：點 120ms · 劃 360ms · 字元間隔 360ms · 單字間隔 840ms'
       },
       intermediate: {
         name: '熟練',
@@ -3544,7 +3544,7 @@
         letterGap: 240,
         wordGap: 560,
         freq: 680,
-        desc: '熟練 (15 WPM)：短音 80ms · 長音 240ms · 字母間隔 240ms · 單字間隔 560ms'
+        desc: '熟練 (15 WPM)：點 80ms · 劃 240ms · 字元間隔 240ms · 單字間隔 560ms'
       },
       proficient: {
         name: '精通',
@@ -3554,7 +3554,7 @@
         letterGap: 180,
         wordGap: 420,
         freq: 720,
-        desc: '精通 (20 WPM)：短音 60ms · 長音 180ms · 字母間隔 180ms · 單字間隔 420ms'
+        desc: '精通 (20 WPM)：點 60ms · 劃 180ms · 字元間隔 180ms · 單字間隔 420ms'
       },
       advanced: {
         name: '神速',
@@ -3785,7 +3785,7 @@
       if (gapMarkers) {
         gapMarkers.innerHTML = `
           <div class="marker" style="left: ${letterPct}%; background: #ffd700; width: 2.5px; box-shadow: 0 0 8px rgba(255, 215, 0, 0.8);"></div>
-          <div class="marker-label" style="left: ${letterPct}%; color: #ffd700;">字母結算 3T (${letterGap}ms)</div>
+          <div class="marker-label" style="left: ${letterPct}%; color: #ffd700;">字元結算 3T (${letterGap}ms)</div>
 
           <div class="marker" style="left: ${wordPct}%; background: #00e5ff; width: 2.5px; box-shadow: 0 0 8px rgba(0, 229, 255, 0.8);"></div>
           <div class="marker-label" style="left: ${wordPct}%; color: #00e5ff;">單字空格 7T (${wordGap}ms)</div>
@@ -3917,7 +3917,7 @@
         if (elapsed >= letterGap && elapsed < wordGap) {
           const remWord = Math.max(0, Math.round(wordGap - elapsed));
           gapBar.style.background = 'linear-gradient(90deg, #ffd700, #00e5ff)';
-          gapStatusBadge.textContent = `字母已結算 · 距空格 ${remWord}ms`;
+          gapStatusBadge.textContent = `字元已結算 · 距空格 ${remWord}ms`;
           gapStatusBadge.style.color = '#00e5ff';
           gapCountdownReadout.textContent = `距單字: ${remWord} ms`;
           gapCountdownReadout.style.color = '#00e5ff';
@@ -4237,7 +4237,7 @@
       textModeStatus.style.color = '#00e5ff';
       fbTarget.textContent = '—';
       fbInput.textContent = '—';
-      fbResult.textContent = '等待發報 (鍵盤 / 或空白鍵)';
+      fbResult.textContent = '等待發報 (直鍵或雙撥片)';
       fbResult.style.color = '#00e676';
 
       updateCharCursor();
@@ -4310,7 +4310,7 @@
         setCharResult(idx, true, res.letter, res.sequence);
         fbResult.textContent = '✅ 正確！';
         fbResult.style.color = '#00e676';
-        evalStatus.textContent = `字母 [${res.letter}] 正確！`;
+        evalStatus.textContent = `字元 [${res.letter}] 正確！`;
         evalStatus.style.color = '#00e676';
         highlightPath(res.sequence, true);
 
@@ -4428,7 +4428,7 @@
         btnPauseAuto.style.cursor = 'pointer';
         btnPauseAuto.style.color = '#fff';
         btnPauseAuto.innerHTML = '<span>⏸ 暫停</span>';
-        textModeStatus.textContent = '自動表演中...';
+        textModeStatus.textContent = '自動示範發報中...';
         textModeStatus.style.color = 'var(--gold)';
         return;
       }
@@ -4449,7 +4449,7 @@
       btnStopAuto.disabled = false;
       btnStopAuto.style.cursor = 'pointer';
       btnStopAuto.style.color = '#fff';
-      textModeStatus.textContent = '自動表演中...';
+      textModeStatus.textContent = '自動示範發報中...';
       textModeStatus.style.color = 'var(--gold)';
 
       const target = textState.targetChars;
@@ -4470,7 +4470,7 @@
 
         if (char === ' ') {
           if (chip) chip.classList.add('state-playing');
-          evalStatus.textContent = `自動表演：單字間隔 (${engine.config.wordGap}ms)`;
+          evalStatus.textContent = `自動示範：單字間隔 (${engine.config.wordGap}ms)`;
           evalStatus.style.color = 'var(--gold)';
           await new Promise(r => setTimeout(r, engine.config.wordGap));
           if (chip) {
@@ -4487,7 +4487,7 @@
         }
 
         if (chip) chip.classList.add('state-playing');
-        evalStatus.textContent = `自動表演：[${char}] (${seq})`;
+        evalStatus.textContent = `自動示範：[${char}] (${seq})`;
         evalStatus.style.color = '#ffd700';
 
         // Play each dit/dah element
@@ -4532,7 +4532,7 @@
 
       simulateKeyVisualRelease();
       resetAutoPlayButtons();
-      evalStatus.textContent = textState.autoPlayAbort ? '自動表演已停止' : '自動表演完成！';
+      evalStatus.textContent = textState.autoPlayAbort ? '自動示範已停止' : '自動示範完成！';
       evalStatus.style.color = textState.autoPlayAbort ? '#aaa' : '#00e676';
       textModeStatus.textContent = textState.autoPlayAbort ? '已停止' : '表演完畢';
       textModeStatus.style.color = textState.autoPlayAbort ? '#aaa' : '#00e676';
@@ -4552,7 +4552,7 @@
         textModeStatus.style.color = '#ff9100';
       } else {
         btnPauseAuto.innerHTML = '<span>⏸ 暫停</span>';
-        textModeStatus.textContent = '自動表演中...';
+        textModeStatus.textContent = '自動示範發報中...';
         textModeStatus.style.color = 'var(--gold)';
       }
     }
@@ -4712,10 +4712,10 @@
           descEl.textContent = '🟢 簡化模式：無超時限制，適合熟悉新字母與手感。';
           descEl.style.color = '#889';
         } else if (mode === 'standard') {
-          descEl.textContent = '🏆 正規模式：計時連續考核，啟用 2.0s 反射倒數，時限結束正確率 ≥90% 通關。可隨時主動結束。';
+          descEl.textContent = '🏆 正規考核：計時連續考核，啟用 2.0s 反射倒數，時限結束正確率 ≥90% 通關。可隨時手動結束結算。';
           descEl.style.color = '#00e5ff';
         } else if (mode === 'challenge') {
-          descEl.textContent = '🔥 挑戰模式：極限反射連續考核，啟用 2.0s 反射倒數，失誤直接重置計時！可隨時主動結束結算。';
+          descEl.textContent = '🔥 極限挑戰：極限直覺連續考核，啟用 2.0s 反射倒數，失誤直接重置計時！可隨時手動結束結算。';
           descEl.style.color = '#ff9100';
         }
       }
@@ -5052,13 +5052,13 @@
 
       if (hudModeTag) {
         if (kochState.mode === 'quick') {
-          hudModeTag.textContent = '🟢 簡化模式';
+          hudModeTag.textContent = '🟢 基礎練習模式';
           hudModeTag.style.color = '#00e676';
         } else if (kochState.mode === 'standard') {
-          hudModeTag.textContent = '🏆 正規模式';
+          hudModeTag.textContent = '🏆 正規考核模式';
           hudModeTag.style.color = 'var(--neon-blue)';
         } else if (kochState.mode === 'challenge') {
-          hudModeTag.textContent = '🔥 挑戰模式';
+          hudModeTag.textContent = '🔥 極限挑戰模式';
           hudModeTag.style.color = '#ff9100';
         }
       }
@@ -5275,7 +5275,7 @@
           kochFbResult.style.color = '#00e676';
         }
         if (evalStatus) {
-          evalStatus.textContent = `字母 [${res.letter}] 正確！`;
+          evalStatus.textContent = `字元 [${res.letter}] 正確！`;
           evalStatus.style.color = '#00e676';
         }
         highlightPath(res.sequence, true);
@@ -5625,7 +5625,7 @@
       } else if (ditMem || dahMem) {
         squeezeStatus.innerHTML = `預先排程記憶: ${ditMem ? '· Dit 鎖存' : ''} ${dahMem ? '— Dah 鎖存' : ''}`;
       } else {
-        squeezeStatus.textContent = '雙撥片待命 · 單邊連發 · 夾片交替 (Squeeze Iambic)';
+        squeezeStatus.textContent = '雙撥片待命 · 單邊連發 · 夾發交替 (Squeeze Iambic)';
       }
     };
 
@@ -5691,16 +5691,16 @@
 
     function updatePaddleLabels() {
       if (currentKeyerDevice === 'bug') {
-        paddleLeftName.innerHTML = '<span style="font-size:1.3rem;">·</span> 自動連發 Dit';
-        paddleRightName.innerHTML = '<span style="font-size:1.3rem;">—</span> 手動長音 Dah';
+        paddleLeftName.innerHTML = '<span style="font-size:1.3rem;">·</span> 點 Dit (自動連發)';
+        paddleRightName.innerHTML = '<span style="font-size:1.3rem;">—</span> 劃 Dah (手動長音)';
         squeezeBanner.classList.remove('squeezing');
-        squeezeStatus.innerHTML = '📻 <strong>半自動震報鍵 (Bug)</strong>：左撥片自動連發點 · 右撥片純手動長劃';
+        squeezeStatus.innerHTML = '📻 <strong>半自動機械震報鍵 (Bug Key)</strong>：左撥片自動連發點 · 右撥片純手動長劃';
         return;
       }
       const isRev = keyer.reversed;
-      paddleLeftName.innerHTML = isRev ? '<span style="font-size:1.3rem;">—</span> 長音 Dah' : '<span style="font-size:1.3rem;">·</span> 短音 Dit';
-      paddleRightName.innerHTML = isRev ? '<span style="font-size:1.3rem;">·</span> 短音 Dit' : '<span style="font-size:1.3rem;">—</span> 長音 Dah';
-      squeezeStatus.textContent = '雙撥片待命 · 單邊連發 · 夾片交替 (Squeeze Iambic)';
+      paddleLeftName.innerHTML = isRev ? '<span style="font-size:1.3rem;">—</span> 劃 Dah (長音)' : '<span style="font-size:1.3rem;">·</span> 點 Dit (短音)';
+      paddleRightName.innerHTML = isRev ? '<span style="font-size:1.3rem;">·</span> 點 Dit (短音)' : '<span style="font-size:1.3rem;">—</span> 劃 Dah (長音)';
+      squeezeStatus.textContent = '雙撥片待命 · 單邊連發 · 夾發交替 (Squeeze Iambic)';
     }
 
     function switchKeyerDevice(device, saveToSettings = true) {
@@ -5844,7 +5844,7 @@
         updateCommittedView();
         stateSeq.textContent = '—';
         stateLetter.textContent = '—';
-        evalStatus.textContent = '🔄 已重置清空輸出！';
+        evalStatus.textContent = '🔄 已重設並清除送出文字！';
         evalStatus.style.color = 'var(--gold)';
         highlightPath('', false);
         const clearBtn = document.getElementById('btn-clear-committed');
@@ -6078,7 +6078,7 @@
         e.stopPropagation();
         engine.committedLetters = [];
         updateCommittedView();
-        evalStatus.textContent = '🔄 已清空輸出文字！';
+        evalStatus.textContent = '🔄 已清除送出文字！';
         evalStatus.style.color = 'var(--gold)';
       });
     }
@@ -6086,21 +6086,21 @@
     // Scenario Walkthroughs setup
     const scenarios = [
       {
-        title: "1. 單字 E (短音 Dit)",
+        title: "1. 單一字母 E (點 Dit)",
         desc: "測試單次短按。持續時間低於門檻 (<200ms)，判定為短音 (·)，導線流向右側圓形節點 E 並成功結算。",
         actions: [
           { label: "模擬按壓 100ms (Dit)", dur: 100 }
         ]
       },
       {
-        title: "2. 單字 T (長音 Dah)",
+        title: "2. 單一字母 T (劃 Dah)",
         desc: "測試長按。持續時間大於門檻 (>200ms)，判定為長音 (—)，導線流向左側方形節點 T 並成功結算。",
         actions: [
           { label: "模擬按壓 300ms (Dah)", dur: 300 }
         ]
       },
       {
-        title: "3. 輸入 SOS (· · · — — — · · ·)",
+        title: "3. 遇險信號 SOS (· · · — — — · · ·)",
         desc: "國際求救信號。依序輸入 3 個短音 (S)、等待結算，再輸入 3 個長音 (O)，最後輸入 3 個短音 (S)。",
         actions: [
           { label: "發報 'S' (...)", pattern: '...' },
@@ -6109,15 +6109,15 @@
         ]
       },
       {
-        title: "4. 門檻邊界測試 (Boundary)",
+        title: "4. 判別門檻臨界測試 (Boundary)",
         desc: "測試臨界點手感：190ms (判定為 Dit) vs 210ms (判定為 Dah)。可在設定中調整門檻以驗證靈敏度。",
         actions: [
-          { label: "測試 190ms (近門檻短音)", dur: 190 },
-          { label: "測試 210ms (剛過門檻長音)", dur: 210 }
+          { label: "測試 190ms (近門檻點音)", dur: 190 },
+          { label: "測試 210ms (剛過門檻劃音)", dur: 210 }
         ]
       },
       {
-        title: "5. 筆誤更正 (<HH> / 8短音)",
+        title: "5. 筆誤更正訊號 (<HH> / 8短音)",
         desc: "國際電報更正訊號 (Error / Correction Prosign: <HH>)。連發 8 個短音 (........) 即可作廢並刪除已確認的最後一個單字。",
         actions: [
           { label: "先發報單字 SOS", pattern: '... --- ...' },

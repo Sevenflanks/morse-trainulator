@@ -58,7 +58,7 @@ function updateMeterMarkers() {
   if (gapMarkers) {
     gapMarkers.innerHTML = `
       <div class="marker" style="left: ${letterPct}%; background: #ffd700; width: 2.5px; box-shadow: 0 0 8px rgba(255, 215, 0, 0.8);"></div>
-      <div class="marker-label" style="left: ${letterPct}%; color: #ffd700;">字母結算 3T (${letterGap}ms)</div>
+      <div class="marker-label" style="left: ${letterPct}%; color: #ffd700;">字元結算 3T (${letterGap}ms)</div>
 
       <div class="marker" style="left: ${wordPct}%; background: #00e5ff; width: 2.5px; box-shadow: 0 0 8px rgba(0, 229, 255, 0.8);"></div>
       <div class="marker-label" style="left: ${wordPct}%; color: #00e5ff;">單字空格 7T (${wordGap}ms)</div>
@@ -87,13 +87,13 @@ function startMeterAnimation() {
     if (elapsed < th) {
       if (meterBar) meterBar.classList.remove('dah-active');
       if (readoutSymbol) {
-        readoutSymbol.textContent = '短音 Dit (·)';
+        readoutSymbol.textContent = '點 Dit (·)';
         readoutSymbol.style.color = '#00e5ff';
       }
     } else {
       if (meterBar) meterBar.classList.add('dah-active');
       if (readoutSymbol) {
-        readoutSymbol.textContent = '長音 Dah (—)';
+        readoutSymbol.textContent = '劃 Dah (—)';
         readoutSymbol.style.color = '#ffb703';
       }
     }
@@ -150,11 +150,11 @@ function startGapCountdown() {
 
   if (gapBar) gapBar.style.background = 'linear-gradient(90deg, #ffb703, #ffd700)';
   if (gapStatusBadge) {
-    gapStatusBadge.textContent = `同字接續中 · 剩 ${letterGap}ms`;
+    gapStatusBadge.textContent = `點劃接續中 · 剩 ${letterGap}ms`;
     gapStatusBadge.style.color = '#ffd700';
   }
   if (gapCountdownReadout) {
-    gapCountdownReadout.textContent = `距字母: ${letterGap} ms`;
+    gapCountdownReadout.textContent = `距字元: ${letterGap} ms`;
     gapCountdownReadout.style.color = '#ffd700';
   }
 
@@ -177,11 +177,11 @@ function startGapCountdown() {
       const remLetter = Math.max(0, Math.round(letterGap - elapsed));
       if (gapBar) gapBar.style.background = 'linear-gradient(90deg, #ffb703, #ffd700)';
       if (gapStatusBadge) {
-        gapStatusBadge.textContent = `同字接續中 · 剩 ${remLetter}ms`;
+        gapStatusBadge.textContent = `點劃接續中 · 剩 ${remLetter}ms`;
         gapStatusBadge.style.color = '#ffd700';
       }
       if (gapCountdownReadout) {
-        gapCountdownReadout.textContent = `距字母: ${remLetter} ms`;
+        gapCountdownReadout.textContent = `距字元: ${remLetter} ms`;
         gapCountdownReadout.style.color = '#ffd700';
       }
     }
@@ -198,7 +198,7 @@ function startGapCountdown() {
       const remWord = Math.max(0, Math.round(wordGap - elapsed));
       if (gapBar) gapBar.style.background = 'linear-gradient(90deg, #ffd700, #00e5ff)';
       if (gapStatusBadge) {
-        gapStatusBadge.textContent = `字母已結算 · 距空格 ${remWord}ms`;
+        gapStatusBadge.textContent = `字元已結算 · 距空格 ${remWord}ms`;
         gapStatusBadge.style.color = '#00e5ff';
       }
       if (gapCountdownReadout) {
@@ -212,7 +212,7 @@ function startGapCountdown() {
       commitWordSpace();
       if (gapBar) gapBar.style.background = 'linear-gradient(90deg, #00e5ff, #00e676)';
       if (gapStatusBadge) {
-        gapStatusBadge.textContent = '單字已結算 (已插空格)';
+        gapStatusBadge.textContent = '單字結算 (已插入空格)';
         gapStatusBadge.style.color = '#00e676';
       }
       if (gapCountdownReadout) {

@@ -391,16 +391,16 @@ function handleBugManualDah(isDown) {
 
 function updatePaddleLabels() {
   if (currentKeyerDevice === 'bug') {
-    if (dom.paddleLeftName) dom.paddleLeftName.innerHTML = '<span style="font-size:1.3rem;">·</span> 自動連發 Dit';
-    if (dom.paddleRightName) dom.paddleRightName.innerHTML = '<span style="font-size:1.3rem;">—</span> 手動長音 Dah';
+    if (dom.paddleLeftName) dom.paddleLeftName.innerHTML = '<span style="font-size:1.3rem;">·</span> 點 Dit (自動連發)';
+    if (dom.paddleRightName) dom.paddleRightName.innerHTML = '<span style="font-size:1.3rem;">—</span> 劃 Dah (手動長音)';
     if (dom.squeezeBanner) dom.squeezeBanner.classList.remove('squeezing');
-    if (dom.squeezeStatus) dom.squeezeStatus.innerHTML = '📻 <strong>半自動震報鍵 (Bug)</strong>：左撥片自動連發點 · 右撥片純手動長劃';
+    if (dom.squeezeStatus) dom.squeezeStatus.innerHTML = '📻 <strong>半自動機械震報鍵 (Bug Key)</strong>：左撥片自動連發點 · 右撥片純手動長劃';
     return;
   }
   const isRev = keyer.reversed;
-  if (dom.paddleLeftName) dom.paddleLeftName.innerHTML = isRev ? '<span style="font-size:1.3rem;">—</span> 長音 Dah' : '<span style="font-size:1.3rem;">·</span> 短音 Dit';
-  if (dom.paddleRightName) dom.paddleRightName.innerHTML = isRev ? '<span style="font-size:1.3rem;">·</span> 短音 Dit' : '<span style="font-size:1.3rem;">—</span> 長音 Dah';
-  if (dom.squeezeStatus) dom.squeezeStatus.textContent = '雙撥片待命 · 單邊連發 · 夾片交替 (Squeeze Iambic)';
+  if (dom.paddleLeftName) dom.paddleLeftName.innerHTML = isRev ? '<span style="font-size:1.3rem;">—</span> 劃 Dah (長音)' : '<span style="font-size:1.3rem;">·</span> 點 Dit (短音)';
+  if (dom.paddleRightName) dom.paddleRightName.innerHTML = isRev ? '<span style="font-size:1.3rem;">·</span> 點 Dit (短音)' : '<span style="font-size:1.3rem;">—</span> 劃 Dah (長音)';
+  if (dom.squeezeStatus) dom.squeezeStatus.textContent = '雙撥片待命 · 單邊連發 · 夾發交替 (Squeeze Iambic)';
 }
 
 function switchKeyerDevice(device, saveToSettings = true) {
@@ -662,7 +662,7 @@ function restartKeying() {
     if (dom.stateSeq) dom.stateSeq.textContent = '—';
     if (dom.stateLetter) dom.stateLetter.textContent = '—';
     if (dom.evalStatus) {
-      dom.evalStatus.textContent = '🔄 已重置清空輸出！';
+      dom.evalStatus.textContent = '🔄 已重設並清除送出文字！';
       dom.evalStatus.style.color = 'var(--gold)';
     }
     highlightPath('', false, engine, dom.antennaShape);

@@ -98,7 +98,7 @@ clearHandler({ stopPropagation() {} });
 assert.deepStrictEqual(global.engine.committedLetters, []);
 assert.strictEqual(mockCommittedEl.textContent, '—');
 assert.strictEqual(mockClearBtn.style.display, 'none', 'Clear button must be hidden when cleared');
-assert.strictEqual(mockEvalStatus.textContent, '🔄 已清空輸出文字！');
+assert.strictEqual(mockEvalStatus.textContent, '🔄 已清除送出文字！');
 console.log('   -> free-mode.js logic passed all checks!');
 
 console.log('========================================');
