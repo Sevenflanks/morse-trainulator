@@ -1,4 +1,4 @@
-# 摩斯密碼互動訓練卡 (Morse Code Training Card)
+# 📻 摩斯訓練儀 (Morse Trainulator)
 
 [![License: CC BY-NC-SA 4.0](https://img.shields.io/badge/License-CC%20BY--NC--SA%204.0-lightgrey.svg)](https://creativecommons.org/licenses/by-nc-sa/4.0/)
 [![Platform](https://img.shields.io/badge/Platform-Web%20(Pure%20Vanilla%20JS)-gold.svg)]()
@@ -6,15 +6,16 @@
 [![Tests](https://img.shields.io/badge/Tests-23%20Passing%20(100%25)-brightgreen.svg)]()
 [![Offline](https://img.shields.io/badge/Offline-100%25%20file%3A%2F%2F%2F%20Ready-green.svg)]()
 
-> **純前端、零依賴、兼具硬體儀表美學與專業級無線電報務訓練的互動式摩斯密碼教學卡。**  
-> 重現經典二元決策樹 PCB 向量電路板佈局，內建 Iambic 雙撥片、機械震報鍵、國際科赫闖關法與真實電台微底噪。
+> **Morse Trainulator（Trainer 訓練器 ＋ Simulator 模擬器）**  
+> 純前端、零依賴、兼具硬體儀表美學與專業級無線電報務模擬的互動式訓練體系。  
+> 協助練習者從零基礎出發，逐步掌握實體直鍵、雙撥片夾發 (Iambic Mode A/B)、半自動震報鍵 (Bug Key)，邁向具備反射神經的合格報務員！
 
 ---
 
 ## 🌐 線上直接體驗 (Live Demo)
 
-本專案為純靜態架構，可直接於 GitHub Pages 線上免安裝遊玩：
-👉 **[線上體驗 Demo 連結](https://your-username.github.io/morse-code-card/)**  
+本專案為純靜態架構，可直接於 GitHub Pages 線上免安裝遊玩：  
+👉 **[線上體驗 Demo 連結](https://your-username.github.io/morse-trainulator/)**  
 *(將 `your-username` 替換為您的 GitHub 帳號名稱即可)*
 
 或者下載原始碼後，直接在瀏覽器雙擊點開 `index.html` 即可 100% 離線運行！
@@ -108,7 +109,7 @@ node test/run-all.js
 
 ## 🌐 如何啟用 GitHub Pages 免費線上展示
 
-1. 將本專案推送到您的 GitHub 倉庫（例如 `morse-code-card`）。
+1. 將本專案推送到您的 GitHub 倉庫（例如 `morse-trainulator`）。
 2. 在 GitHub 倉庫頁面，點選上方 **Settings**（設定）。
 3. 在左側選單點擊 **Pages**。
 4. 在 **Build and deployment** 下方的 **Branch**：
@@ -116,14 +117,14 @@ node test/run-all.js
    - 資料夾選擇 `/(root)`。
    - 點擊 **Save**（儲存）。
 5. 等待 1~2 分鐘，重新整理頁面，頂部即會顯示您的專屬網址：  
-   `https://<your-username>.github.io/morse-code-card/`
+   `https://<your-username>.github.io/morse-trainulator/`
 
 ---
 
 ## 📁 專案目錄結構
 
 ```text
-morse-code-card/
+morse-trainulator/
 ├── index.html               # 現代模組化主入口（支援 GitHub Pages）
 ├── prototype_morse_card.html # 獨立單檔案發布版（100% 離線攜帶）
 ├── css/                     # 分層樣式表

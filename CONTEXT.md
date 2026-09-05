@@ -1,6 +1,6 @@
-# Morse Code Training Card
+# Morse Trainulator
 
-A pure web interactive Morse code training card reproducing the binary tree PCB card layout, providing tactile keying practice and audio-visual feedback.
+A pure web interactive Morse code simulator & operator training system reproducing the binary tree PCB card layout, providing tactile keying practice, Iambic keyer, Koch drills, and audio-visual feedback.
 
 ## Language
 

@@ -1,7 +1,7 @@
 {
-  "name": "morse-code-card",
+  "name": "morse-trainulator",
   "version": "1.0.0",
-  "description": "Pure web interactive Morse code training card reproducing binary decision tree PCB card layout, providing tactile keying practice, Iambic paddle keyer, Koch method drills, and Web Audio CW synthesis.",
+  "description": "Morse Trainulator: Pure web interactive Morse code simulator & trainer reproducing tactile keying, binary tree PCB card, Koch method drills, and Web Audio CW synthesis.",
   "main": "index.html",
   "scripts": {
     "test": "node test/run-all.js"

@@ -3,15 +3,15 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>摩斯密碼訓練卡 (Morse Code Training Card)</title>
-  <meta name="description" content="純前端、零依賴的專業級互動式摩斯密碼發報訓練卡。以二元樹 PCB 向量電路板為視覺核心，支援直鍵、雙撥片 (Iambic Mode A/B) 與半自動震報鍵 (Bug Key)，內建國際科赫闖關 (Koch Method) 與法恩斯沃斯節奏 (Farnsworth Timing)，具備純正弦波 CW 音訊與真實電台微底噪。">
-  <meta name="keywords" content="morse code, 摩斯密碼, cw, iambic keyer, koch method, farnsworth timing, pcb, amateur radio, 業餘無線電, 報務員">
+  <title>摩斯訓練儀 (Morse Trainulator) - 互動式電報模擬與報務員訓練器</title>
+  <meta name="description" content="Morse Trainulator（摩斯訓練儀）：純前端、零依賴的專業級互動式電報模擬器與報務訓練體系 (Simulator & Trainer)。以二元樹 PCB 向量電路板為核心，支援直鍵、雙撥片 (Iambic Mode A/B) 與半自動震報鍵 (Bug Key)，內建國際科赫闖關 (Koch Method) 與法恩斯沃斯節奏 (Farnsworth Timing)，具備純正弦波 CW 音訊與真實電台微底噪。">
+  <meta name="keywords" content="morse trainulator, morse code, 摩斯密碼, 摩斯訓練儀, cw, iambic keyer, koch method, farnsworth timing, pcb, amateur radio, 業餘無線電, 報務員">
   <meta name="theme-color" content="#0d0e12">
 
   <!-- Open Graph / Social Sharing -->
   <meta property="og:type" content="website">
-  <meta property="og:title" content="摩斯密碼訓練卡 (Morse Code Training Card)">
-  <meta property="og:description" content="純前端、零依賴的專業級互動式摩斯密碼發報訓練卡。支援實體鍵盤、雙撥片夾發、震報鍵、科赫闖關與真實電台底噪。">
+  <meta property="og:title" content="摩斯訓練儀 (Morse Trainulator) - 互動式電報模擬與訓練器">
+  <meta property="og:description" content="純前端、零依賴的專業級互動式電報模擬器與報務訓練器 (Simulator & Trainer)。支援實體鍵盤、雙撥片夾發、震報鍵、科赫闖關與真實電台底噪。">
 
   <!-- Zero-Dependency Inline SVG Favicon -->
   <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='6' fill='%23121319'/%3E%3Ccircle cx='16' cy='16' r='6' fill='%23d4af37'/%3E%3Cpath d='M7 16 A 9 9 0 0 0 7 16' stroke='%2300e5ff' stroke-width='2' stroke-linecap='round'/%3E%3Cpath d='M5 11 A 12 12 0 0 0 5 21' fill='none' stroke='%2300e5ff' stroke-width='2' stroke-linecap='round'/%3E%3Cpath d='M27 11 A 12 12 0 0 1 27 21' fill='none' stroke='%2300e5ff' stroke-width='2' stroke-linecap='round'/%3E%3C/svg%3E">
@@ -25,8 +25,8 @@
 <body>
 
   <header>
-    <h1>摩斯密碼訓練卡原型 (Morse Code Card Prototype)</h1>
-    <div class="subtitle">依據標準摩斯原則 (Dit: 1T, Dah: 3T) · 支援實體鍵盤「K」或雙撥片 · PCB 二元樹尋路 · 實時動態計量表</div>
+    <h1>📻 摩斯訓練儀 (Morse Trainulator)</h1>
+    <div class="subtitle">專業級互動式電報模擬與報務員訓練體系 (Simulator & Trainer) · 支援直鍵/雙撥片/震報鍵 · PCB 二元樹尋路 · 實時節奏儀表</div>
     <div class="layout-switch-container">
       <button type="button" class="layout-switch-btn active" id="btn-layout-2col" title="切換為雙欄沉浸專注佈局">
         <span>🎛️ 雙欄專注</span>
