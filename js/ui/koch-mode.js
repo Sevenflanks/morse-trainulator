@@ -94,18 +94,18 @@ function renderPoolChips(container, pool, engine) {
 
 function getClearBadgeHtml(clearInfo) {
   if (!clearInfo || !clearInfo.highest) {
-    return '<span class="badge-tier tier-none">⚪ 尚未通關</span>';
+    return '<span class="badge-tier tier-none"><i class="mdi mdi-circle-outline"></i> 尚未通關</span>';
   }
   if (clearInfo.highest === 'challenge') {
-    return '<span class="badge-tier tier-challenge">👑 極限征服</span>';
+    return '<span class="badge-tier tier-challenge"><i class="mdi mdi-crown"></i> 極限征服</span>';
   }
   if (clearInfo.highest === 'standard') {
-    return '<span class="badge-tier tier-standard">🏆 正規合格</span>';
+    return '<span class="badge-tier tier-standard"><i class="mdi mdi-trophy"></i> 正規合格</span>';
   }
   if (clearInfo.highest === 'quick') {
-    return '<span class="badge-tier tier-quick">🟢 基礎通過</span>';
+    return '<span class="badge-tier tier-quick"><i class="mdi mdi-check-circle"></i> 基礎通過</span>';
   }
-  return '<span class="badge-tier tier-none">⚪ 尚未通關</span>';
+  return '<span class="badge-tier tier-none"><i class="mdi mdi-circle-outline"></i> 尚未通關</span>';
 }
 
 function selectKochStage(lvl) {
@@ -147,7 +147,7 @@ function renderStageMatrix() {
       btn.classList.add('cell-locked');
       btn.disabled = true;
       btn.title = `第 ${i} 關 (${charLabel}) - 尚未解鎖`;
-      medalIcon = '🔒';
+      medalIcon = '<i class="mdi mdi-lock"></i>';
     } else {
       if (i === curLvl) {
         btn.classList.add('active-stage');
@@ -155,16 +155,16 @@ function renderStageMatrix() {
       if (clearInfo && clearInfo.highest) {
         if (clearInfo.highest === 'challenge') {
           btn.classList.add('cell-cleared-challenge');
-          btn.title = `第 ${i} 關 (${charLabel}) · 👑 極限挑戰征服 (最高含金量)`;
-          medalIcon = '👑';
+          btn.title = `第 ${i} 關 (${charLabel}) · 極限挑戰征服 (最高含金量)`;
+          medalIcon = '<i class="mdi mdi-crown"></i>';
         } else if (clearInfo.highest === 'standard') {
           btn.classList.add('cell-cleared-standard');
-          btn.title = `第 ${i} 關 (${charLabel}) · 🏆 正規考核合格`;
-          medalIcon = '🏆';
+          btn.title = `第 ${i} 關 (${charLabel}) · 正規考核合格`;
+          medalIcon = '<i class="mdi mdi-trophy"></i>';
         } else if (clearInfo.highest === 'quick') {
           btn.classList.add('cell-cleared-quick');
-          btn.title = `第 ${i} 關 (${charLabel}) · 🟢 基礎練習通過`;
-          medalIcon = '🟢';
+          btn.title = `第 ${i} 關 (${charLabel}) · 基礎練習通過`;
+          medalIcon = '<i class="mdi mdi-check-circle"></i>';
         }
       } else {
         btn.classList.add('cell-unlocked');
@@ -263,9 +263,9 @@ function updateKochUI() {
       const clearInfo = typeof kochManager.getStageClear === 'function' ? kochManager.getStageClear(i) : null;
       let prefix = '';
       if (clearInfo && clearInfo.highest) {
-        if (clearInfo.highest === 'challenge') prefix = '👑 [極限] ';
-        else if (clearInfo.highest === 'standard') prefix = '🏆 [正規] ';
-        else if (clearInfo.highest === 'quick') prefix = '🟢 [基礎] ';
+        if (clearInfo.highest === 'challenge') prefix = '[極限] ';
+        else if (clearInfo.highest === 'standard') prefix = '[正規] ';
+        else if (clearInfo.highest === 'quick') prefix = '[基礎] ';
       }
       opt.textContent = (i === 1) ? `${prefix}第 1 關 (入門雙星 K, M)` : `${prefix}第 ${i} 關 (新字元 ${seqList[i] || i})`;
       if (i === curLvl) opt.selected = true;
@@ -293,13 +293,13 @@ function setKochAssessmentMode(mode) {
 
   if (descEl) {
     if (mode === 'quick') {
-      descEl.textContent = '🟢 基礎練習：無超時限制，適合熟悉新字元音形與手感。';
+      descEl.innerHTML = '<i class="mdi mdi-check-circle"></i> 基礎練習：無超時限制，適合熟悉新字元音形與手感。';
       descEl.style.color = '#889';
     } else if (mode === 'standard') {
-      descEl.textContent = '🏆 正規考核：計時連續考核，啟用 2.0s 反射倒數，正確率 ≥90% 通關。';
+      descEl.innerHTML = '<i class="mdi mdi-trophy"></i> 正規考核：計時連續考核，啟用 2.0s 反射倒數，正確率 ≥90% 通關。';
       descEl.style.color = '#00e5ff';
     } else if (mode === 'challenge') {
-      descEl.textContent = '🔥 極限挑戰：限時連續考核，啟用 2.0s 反射倒數，正確率跌破 90% 重置計時。';
+      descEl.innerHTML = '<i class="mdi mdi-fire"></i> 極限挑戰：限時連續考核，啟用 2.0s 反射倒數，正確率跌破 90% 重置計時。';
       descEl.style.color = '#ff9100';
     }
   }
@@ -430,10 +430,10 @@ function startKochSessionTiming() {
     const evalStatus = document.getElementById('eval-status');
     if (evalStatus) {
       if (kochState.mode === 'challenge') {
-        evalStatus.textContent = '🔥 極限挑戰進行中...失誤直接重置計時！可按 Esc 隨時結束。';
+        evalStatus.innerHTML = '<i class="mdi mdi-fire"></i> 極限挑戰進行中...失誤直接重置計時！可按 Esc 隨時結束。';
         evalStatus.style.color = '#ff9100';
       } else if (kochState.mode === 'standard') {
-        evalStatus.textContent = '🏆 正規考核進行中...請在 2.0s 內反射發報！可按 Esc 結束。';
+        evalStatus.innerHTML = '<i class="mdi mdi-trophy"></i> 正規考核進行中...請在 2.0s 內反射發報！可按 Esc 結束。';
         evalStatus.style.color = '#00e5ff';
       }
     }
@@ -552,7 +552,7 @@ function handleReflexTimeout() {
   const kochFbResult = document.getElementById('koch-fb-result');
   const evalStatus = document.getElementById('eval-status');
 
-  if (kochFbInput) kochFbInput.textContent = '⏱️ 超時';
+  if (kochFbInput) kochFbInput.textContent = '超時';
   const chip = document.getElementById('koch-char-chip-' + idx);
   if (chip) {
     chip.classList.remove('state-current');
@@ -563,13 +563,13 @@ function handleReflexTimeout() {
     char: target,
     isCorrect: false,
     isTimeout: true,
-    input: '⏱️',
+    input: '超時',
     seq: ''
   };
   kochState.timeoutCount++;
 
   if (kochFbResult) {
-    kochFbResult.textContent = `⏱️ 反射超時 (目標: ${target})`;
+    kochFbResult.innerHTML = `<i class="mdi mdi-timer-sand"></i> 反射超時 (目標: ${target})`;
     kochFbResult.style.color = '#ff9100';
   }
 
@@ -587,18 +587,18 @@ function handleReflexTimeout() {
       kochState.runStartIndex = idx + 1; // 從下一點開始重新計算正確率！
       flashTimerReset();
       if (evalStatus) {
-        evalStatus.textContent = `⏱️ 反射超時！正確率跌破防線（${runAcc}% < 90%），挑戰計時重置為 ${formatTime(kochState.duration)}，由下一題重新起算！`;
+        evalStatus.innerHTML = `<i class="mdi mdi-timer-sand"></i> 反射超時！正確率跌破防線（${runAcc}% < 90%），挑戰計時重置為 ${formatTime(kochState.duration)}，由下一題重新起算！`;
         evalStatus.style.color = '#ff9100';
       }
     } else {
       if (evalStatus) {
-        evalStatus.textContent = `⏱️ 反射超時！當前正確率 ${runAcc}% 仍守住 90% 防線，請繼續發報！`;
+        evalStatus.innerHTML = `<i class="mdi mdi-timer-sand"></i> 反射超時！當前正確率 ${runAcc}% 仍守住 90% 防線，請繼續發報！`;
         evalStatus.style.color = '#ffb703';
       }
     }
   } else {
     if (evalStatus) {
-      evalStatus.textContent = `⏱️ 反射超時！未在 2.0s 內發報 (目標: ${target})`;
+      evalStatus.innerHTML = `<i class="mdi mdi-timer-sand"></i> 反射超時！未在 2.0s 內發報 (目標: ${target})`;
       evalStatus.style.color = '#ff9100';
     }
   }
@@ -645,18 +645,18 @@ function updateKochProgressBadge() {
     const curLvl = window.kochManager.currentLevel;
     const seqList = (typeof KOCH_SEQUENCE !== 'undefined') ? KOCH_SEQUENCE : [];
     const charName = (curLvl === 1) ? 'K, M' : (seqList[curLvl] || curLvl);
-    hudStageTag.textContent = `🎯 第 ${curLvl} 關 (${charName})`;
+    hudStageTag.innerHTML = `<i class="mdi mdi-bullseye-arrow"></i> 第 ${curLvl} 關 (${charName})`;
   }
 
   if (hudModeTag) {
     if (kochState.mode === 'quick') {
-      hudModeTag.textContent = '🟢 基礎練習模式';
+      hudModeTag.innerHTML = '<i class="mdi mdi-check-circle"></i> 基礎練習模式';
       hudModeTag.style.color = '#00e676';
     } else if (kochState.mode === 'standard') {
-      hudModeTag.textContent = '🏆 正規考核模式';
+      hudModeTag.innerHTML = '<i class="mdi mdi-trophy"></i> 正規考核模式';
       hudModeTag.style.color = 'var(--neon-blue)';
     } else if (kochState.mode === 'challenge') {
-      hudModeTag.textContent = '🔥 極限挑戰模式';
+      hudModeTag.innerHTML = '<i class="mdi mdi-fire"></i> 極限挑戰模式';
       hudModeTag.style.color = '#ff9100';
     }
   }
@@ -673,14 +673,14 @@ function updateKochProgressBadge() {
     const ss = (kochState.timeRemaining % 60).toString().padStart(2, '0');
     if (kochState.mode === 'challenge') {
       const resetInfo = kochState.challengeResetCount ? ` · 重置: ${kochState.challengeResetCount}次` : '';
-      const txt = `⏱️ 剩餘: ${mm}:${ss} · 題數: ${done} · 正確率: ${acc}%${resetInfo}`;
+      const txt = `剩餘: ${mm}:${ss} · 題數: ${done} · 正確率: ${acc}%${resetInfo}`;
       if (kochProgressBadge) {
         kochProgressBadge.textContent = txt;
         kochProgressBadge.style.color = '#ffb703';
       }
       if (hudStats) hudStats.textContent = txt;
     } else {
-      const txt = `⏱️ 剩餘: ${mm}:${ss} · 題數: ${done} · 正確率: ${acc}%`;
+      const txt = `剩餘: ${mm}:${ss} · 題數: ${done} · 正確率: ${acc}%`;
       if (kochProgressBadge) {
         kochProgressBadge.textContent = txt;
         kochProgressBadge.style.color = 'var(--neon-blue)';
@@ -726,10 +726,10 @@ function startKochDrill() {
   kochState.hasStarted = false;
 
   if (btnStart) {
-    btnStart.innerHTML = '<span>🔄 重新開始 <span style="font-size:0.75rem; background:#00364d; color:#fff; padding:1px 5px; border-radius:3px; margin-left:4px;">R</span></span>';
+    btnStart.innerHTML = '<span><i class="mdi mdi-restore"></i> 重新開始 <span style="font-size:0.75rem; background:#00364d; color:#fff; padding:1px 5px; border-radius:3px; margin-left:4px;">R</span></span>';
   }
   if (btnStop) {
-    btnStop.innerHTML = '<span>⏹ 結束 <span style="font-size:0.75rem; background:#4a1518; color:#fff; padding:1px 5px; border-radius:3px; margin-left:4px;">Esc</span></span>';
+    btnStop.innerHTML = '<span><i class="mdi mdi-stop"></i> 結束 <span style="font-size:0.75rem; background:#4a1518; color:#fff; padding:1px 5px; border-radius:3px; margin-left:4px;">Esc</span></span>';
     btnStop.style.display = 'inline-flex';
   }
   if (btnStopPanel) btnStopPanel.style.display = 'inline-flex';
@@ -804,13 +804,13 @@ function startKochDrill() {
 
   if (evalStatus) {
     if (kochState.mode === 'challenge') {
-      evalStatus.textContent = '🔥 準備就緒！發報第 1 個字母開始計時 · 失誤重置 · 按 Esc 結束';
+      evalStatus.innerHTML = '<i class="mdi mdi-fire"></i> 準備就緒！發報第 1 個字母開始計時 · 失誤重置 · 按 Esc 結束';
       evalStatus.style.color = '#ff9100';
     } else if (kochState.mode === 'standard') {
-      evalStatus.textContent = '🏆 準備就緒！發報第 1 個字母開始計時 · 反射限時 2.0s · 按 Esc 結束';
+      evalStatus.innerHTML = '<i class="mdi mdi-trophy"></i> 準備就緒！發報第 1 個字母開始計時 · 反射限時 2.0s · 按 Esc 結束';
       evalStatus.style.color = '#00e5ff';
     } else {
-      evalStatus.textContent = '🟢 科赫闖關進行中...請依序發報！';
+      evalStatus.innerHTML = '<i class="mdi mdi-check-circle"></i> 科赫闖關進行中...請依序發報！';
       evalStatus.style.color = '#00e676';
     }
   }
@@ -891,7 +891,7 @@ function finalizeLetterKochMode(res) {
 
   if (isMatch) {
     if (kochFbResult) {
-      kochFbResult.textContent = '✅ 正確！';
+      kochFbResult.innerHTML = '<i class="mdi mdi-check-bold"></i> 正確！';
       kochFbResult.style.color = '#00e676';
     }
     if (evalStatus) {
@@ -901,7 +901,7 @@ function finalizeLetterKochMode(res) {
     if (typeof highlightPath === 'function') highlightPath(res.sequence, true, engine);
   } else {
     if (kochFbResult) {
-      kochFbResult.textContent = `❌ 失誤 (目標: ${target})`;
+      kochFbResult.innerHTML = `<i class="mdi mdi-close-thick"></i> 失誤 (目標: ${target})`;
       kochFbResult.style.color = '#ff5252';
     }
     const tSeq = engine ? (engine.getSequenceForLetter(target) || '') : '';
@@ -912,12 +912,12 @@ function finalizeLetterKochMode(res) {
         kochState.runStartIndex = idx + 1; // 從下一點開始重新計算正確率！
         flashTimerReset();
         if (evalStatus) {
-          evalStatus.textContent = `❌ 正確率跌破防線（${runAcc}% < 90%）！挑戰計時重置為 ${formatTime(kochState.duration)}，由下一題重新起算！`;
+          evalStatus.innerHTML = `<i class="mdi mdi-close-thick"></i> 正確率跌破防線（${runAcc}% < 90%）！挑戰計時重置為 ${formatTime(kochState.duration)}，由下一題重新起算！`;
           evalStatus.style.color = '#ff5252';
         }
       } else {
         if (evalStatus) {
-          evalStatus.textContent = `⚠️ 失誤（目標是 ${target} ${tSeq}）：當前正確率 ${runAcc}% 仍守住 90% 防線，請繼續！`;
+          evalStatus.innerHTML = `<i class="mdi mdi-alert"></i> 失誤（目標是 ${target} ${tSeq}）：當前正確率 ${runAcc}% 仍守住 90% 防線，請繼續！`;
           evalStatus.style.color = '#ffb703';
         }
       }
@@ -966,7 +966,7 @@ function finishKochDrillSession(isManualStop = false) {
   if (kochHudHeader) kochHudHeader.style.display = 'none';
 
   if (btnStart) {
-    btnStart.innerHTML = '<span>▶ 開始闖關 <span style="font-size:0.75rem; background:#00364d; color:#fff; padding:1px 5px; border-radius:3px; margin-left:4px;">R</span></span>';
+    btnStart.innerHTML = '<span><i class="mdi mdi-play"></i> 開始闖關 <span style="font-size:0.75rem; background:#00364d; color:#fff; padding:1px 5px; border-radius:3px; margin-left:4px;">R</span></span>';
   }
   if (btnStop) btnStop.style.display = 'none';
   if (btnStopPanel) btnStopPanel.style.display = 'none';
@@ -1034,11 +1034,11 @@ function finishKochDrillSession(isManualStop = false) {
 
     if (kochState.mode === 'challenge') {
       if (kochScTitle) {
-        kochScTitle.textContent = !isManualStop ? '👑 極限挑戰征服 (Challenge Conquered)!' : '🎉 挑戰考核合格 (Challenge Passed)!';
+        kochScTitle.innerHTML = !isManualStop ? '<i class="mdi mdi-crown"></i> 極限挑戰征服 (Challenge Conquered)!' : '<i class="mdi mdi-party-popper"></i> 挑戰考核合格 (Challenge Passed)!';
         kochScTitle.style.color = 'var(--gold)';
       }
       if (kochScModeTag) {
-        kochScModeTag.textContent = '🔥 極限挑戰';
+        kochScModeTag.innerHTML = '<i class="mdi mdi-fire"></i> 極限挑戰';
         kochScModeTag.style.background = '#3b1114';
         kochScModeTag.style.color = '#ffd700';
       }
@@ -1048,11 +1048,11 @@ function finishKochDrillSession(isManualStop = false) {
       }
     } else if (kochState.mode === 'standard') {
       if (kochScTitle) {
-        kochScTitle.textContent = '🏆 正規考核合格 (Standard Passed)!';
+        kochScTitle.innerHTML = '<i class="mdi mdi-trophy"></i> 正規考核合格 (Standard Passed)!';
         kochScTitle.style.color = '#00e676';
       }
       if (kochScModeTag) {
-        kochScModeTag.textContent = '🏆 正規考核';
+        kochScModeTag.innerHTML = '<i class="mdi mdi-trophy"></i> 正規考核';
         kochScModeTag.style.background = '#00364d';
         kochScModeTag.style.color = '#00e5ff';
       }
@@ -1062,11 +1062,11 @@ function finishKochDrillSession(isManualStop = false) {
       }
     } else {
       if (kochScTitle) {
-        kochScTitle.textContent = '🎉 關卡突破 (Stage Clear)!';
+        kochScTitle.innerHTML = '<i class="mdi mdi-party-popper"></i> 關卡突破 (Stage Clear)!';
         kochScTitle.style.color = '#00e676';
       }
       if (kochScModeTag) {
-        kochScModeTag.textContent = '🟢 基礎練習';
+        kochScModeTag.innerHTML = '<i class="mdi mdi-check-circle"></i> 基礎練習';
         kochScModeTag.style.background = '#102218';
         kochScModeTag.style.color = '#00e676';
       }
@@ -1077,13 +1077,13 @@ function finishKochDrillSession(isManualStop = false) {
     }
 
     const resetNotice = (kochState.mode === 'challenge' && kochState.challengeResetCount > 0)
-      ? `<br><span style="color:#ffb703;">⚠️ 考核期間重置計時：<strong>${kochState.challengeResetCount}</strong> 次（累計發報 ${allTotal} 題）</span>`
+      ? `<br><span style="color:#ffb703;"><i class="mdi mdi-alert"></i> 考核期間重置計時：<strong>${kochState.challengeResetCount}</strong> 次（累計發報 ${allTotal} 題）</span>`
       : '';
 
     const MODE_NAMES = {
-      'quick': '🟢 基礎練習',
-      'standard': '🏆 正規考核',
-      'challenge': '👑 極限挑戰'
+      'quick': '基礎練習',
+      'standard': '正規考核',
+      'challenge': '極限挑戰'
     };
     const prevClear = typeof kochManager.getStageClear === 'function' ? kochManager.getStageClear(currentLvl) : null;
     const prevHighest = prevClear ? prevClear.highest : null;
@@ -1096,11 +1096,11 @@ function finishKochDrillSession(isManualStop = false) {
 
     let honorNotice = '';
     if (!prevHighest) {
-      honorNotice = `<br><span style="color:#ffd700;">🎖️ 通關榮譽：獲得<strong>【${MODE_NAMES[kochState.mode]}】</strong>認證！</span>`;
+      honorNotice = `<br><span style="color:#ffd700;"><i class="mdi mdi-medal"></i> 通關榮譽：獲得<strong>【${MODE_NAMES[kochState.mode]}】</strong>認證！</span>`;
     } else if (newRank > prevRank) {
-      honorNotice = `<br><span style="color:#ffd700;">🎉 榮譽晉升！本關由【${MODE_NAMES[prevHighest]}】升級為<strong>【${MODE_NAMES[kochState.mode]}】</strong>最高榮譽！</span>`;
+      honorNotice = `<br><span style="color:#ffd700;"><i class="mdi mdi-party-popper"></i> 榮譽晉升！本關由【${MODE_NAMES[prevHighest]}】升級為<strong>【${MODE_NAMES[kochState.mode]}】</strong>最高榮譽！</span>`;
     } else if (kochState.mode === prevHighest) {
-      honorNotice = `<br><span style="color:#00e5ff;">🎖️ 保持<strong>【${MODE_NAMES[prevHighest]}】</strong>榮譽紀錄！</span>`;
+      honorNotice = `<br><span style="color:#00e5ff;"><i class="mdi mdi-medal"></i> 保持<strong>【${MODE_NAMES[prevHighest]}】</strong>榮譽紀錄！</span>`;
     } else {
       honorNotice = `<br><span style="color:#889;">本關曾以含金量更高的<strong>【${MODE_NAMES[prevHighest]}】</strong>通關，紀錄予以保留。</span>`;
     }
@@ -1140,7 +1140,7 @@ function finishKochDrillSession(isManualStop = false) {
       }
     } else {
       if (kochScDesc) {
-        kochScDesc.innerHTML = `🏆 傳奇誕生！您已全通 36 關！整張 PCB 電路板與數字匯流排已全面通電！${resetNotice}${honorNotice}`;
+        kochScDesc.innerHTML = `<i class="mdi mdi-trophy"></i> 傳奇誕生！您已全通 36 關！整張 PCB 電路板與數字匯流排已全面通電！${resetNotice}${honorNotice}`;
       }
       if (btnKochNextStage) {
         btnKochNextStage.style.display = 'none';
@@ -1150,18 +1150,18 @@ function finishKochDrillSession(isManualStop = false) {
     updateKochUI();
 
     if (evalStatus) {
-      evalStatus.textContent = `🎉 關卡突破！正確率 ${accuracy}%`;
+      evalStatus.innerHTML = `<i class="mdi mdi-party-popper"></i> 關卡突破！正確率 ${accuracy}%`;
       evalStatus.style.color = '#00e676';
     }
   } else {
     if (kochScTitle) {
-      kochScTitle.textContent = isManualStop ? '📋 考核手動結算 (Drill Settled)' : '⚠️ 未達通關門檻';
+      kochScTitle.innerHTML = isManualStop ? '<i class="mdi mdi-clipboard-text"></i> 考核手動結算 (Drill Settled)' : '<i class="mdi mdi-alert"></i> 未達通關門檻';
       kochScTitle.style.color = '#ffb703';
     }
     if (kochScorecard) kochScorecard.style.borderColor = '#ffb703';
 
     const resetNotice = (kochState.mode === 'challenge' && kochState.challengeResetCount > 0)
-      ? `<br><span style="color:#ffb703;">⚠️ 考核期間重置計時：<strong>${kochState.challengeResetCount}</strong> 次（累計發報 ${allTotal} 題）</span>`
+      ? `<br><span style="color:#ffb703;"><i class="mdi mdi-alert"></i> 考核期間重置計時：<strong>${kochState.challengeResetCount}</strong> 次（累計發報 ${allTotal} 題）</span>`
       : '';
 
     if (kochScDesc) {

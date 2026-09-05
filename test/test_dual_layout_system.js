@@ -86,6 +86,8 @@ console.log('--- 3. Testing Koch Focus HUD lifecycle ---');
 const elements = {};
 function makeEl(initialId) {
   let _id = initialId;
+  let _innerHTML = '';
+  let _textContent = '';
   const el = {
     get id() { return _id; },
     set id(v) { _id = v; if (v) elements[v] = this; },
@@ -97,7 +99,10 @@ function makeEl(initialId) {
       contains(c) { return this.classes.has(c); },
       toggle(c, force) { if (force) this.classes.add(c); else this.classes.delete(c); }
     },
-    textContent: '',
+    get innerHTML() { return _innerHTML || _textContent; },
+    set innerHTML(v) { _innerHTML = v; _textContent = String(v).replace(/<[^>]+>/g, ''); },
+    get textContent() { return _textContent; },
+    set textContent(v) { _textContent = String(v); },
     children: [],
     appendChild(c) { this.children.push(c); },
     addEventListener() {},
