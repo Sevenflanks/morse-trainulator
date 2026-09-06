@@ -28,10 +28,36 @@ class MorseAudio {
       }
     }
     if (this.ctx && this.ctx.state === 'suspended') {
-      this.ctx.resume();
+      this.ctx.resume().catch(() => {});
     }
     if (this.noiseEnabled && !this.noiseNode) {
       this.startNoise();
+    }
+  }
+
+  unlock() {
+    this.init();
+    if (!this.ctx) return;
+    if (this.ctx.state === 'suspended') {
+      this.ctx.resume().catch(() => {});
+    }
+    // 1. Play 1-sample silent Web Audio buffer to kickstart WebKit audio graph
+    try {
+      const buffer = this.ctx.createBuffer(1, 1, 22050);
+      const source = this.ctx.createBufferSource();
+      source.buffer = buffer;
+      source.connect(this.ctx.destination);
+      source.start(0);
+    } catch (e) {}
+
+    // 2. HTML5 silent audio element to wake up iOS hardware audio session (Ambient -> Playback)
+    if (typeof Audio !== 'undefined') {
+      try {
+        if (!this._unlockAudioEl) {
+          this._unlockAudioEl = new Audio('data:audio/wav;base64,UklGRigAAABXQVZFZm10IBIAAAABAAEARKwAAIhYAQACABAAAABkYXRhAgAAAAEA');
+        }
+        this._unlockAudioEl.play().catch(() => {});
+      } catch (e) {}
     }
   }
 

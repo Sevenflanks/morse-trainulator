@@ -20,6 +20,31 @@ window.settingsManager = settingsManager;
 window.keybindingManager = keybindingManager;
 window.kochManager = kochManager;
 
+// Mobile / iOS Web Audio Unlocker & Gesture Safety
+const audioUnlockEvents = ['touchstart', 'touchend', 'click', 'keydown', 'pointerdown'];
+function triggerGlobalAudioUnlock() {
+  if (synth && typeof synth.unlock === 'function') {
+    synth.unlock();
+  }
+  audioUnlockEvents.forEach(evt => {
+    window.removeEventListener(evt, triggerGlobalAudioUnlock, true);
+  });
+}
+if (typeof window !== 'undefined' && typeof window.addEventListener === 'function') {
+  audioUnlockEvents.forEach(evt => {
+    window.addEventListener(evt, triggerGlobalAudioUnlock, { capture: true, passive: true });
+  });
+}
+
+if (typeof document !== 'undefined' && typeof document.addEventListener === 'function') {
+  // Global double-tap zoom suppression on interactive controls
+  document.addEventListener('dblclick', (e) => {
+    if (e.target && typeof e.target.closest === 'function' && (e.target.closest('#k5-dock') || e.target.closest('.va-topbar') || e.target.closest('button'))) {
+      e.preventDefault();
+    }
+  }, { passive: false });
+}
+
 // App State Variables
 let currentKeyerDevice = 'straight'; // 'straight' | 'paddle' | 'bug'
 let currentMode = 'free'; // 'free' | 'text' | 'koch'
@@ -1083,10 +1108,15 @@ function setupEventListeners() {
 
   // Pointer Events on Virtual Straight Key
   if (dom.keyTrigger) {
-    dom.keyTrigger.addEventListener('pointerdown', (e) => {
-      e.preventDefault();
+    const onKeyTriggerDown = (e) => {
+      if (e && e.cancelable) e.preventDefault();
+      if (synth && typeof synth.unlock === 'function') {
+        synth.unlock();
+      }
       handleKeyDown();
-    });
+    };
+    dom.keyTrigger.addEventListener('pointerdown', onKeyTriggerDown);
+    dom.keyTrigger.addEventListener('touchstart', onKeyTriggerDown, { passive: false });
   }
   window.addEventListener('pointerup', () => {
     if (currentKeyerDevice === 'straight') {
@@ -1601,7 +1631,10 @@ function setupK5Dock() {
     let isPressed = false;
 
     function onDown(e) {
-      e.preventDefault();
+      if (e && e.cancelable) e.preventDefault();
+      if (synth && typeof synth.unlock === 'function') {
+        synth.unlock();
+      }
       if (isPressed) return;
       isPressed = true;
       wingEl.classList.add('active');
@@ -1614,6 +1647,7 @@ function setupK5Dock() {
     }
 
     function onUp(e) {
+      if (e && e.cancelable) e.preventDefault();
       if (!isPressed) return;
       isPressed = false;
       wingEl.classList.remove('active');
@@ -1629,6 +1663,11 @@ function setupK5Dock() {
     wingEl.addEventListener('pointerup', onUp);
     wingEl.addEventListener('pointerleave', onUp);
     wingEl.addEventListener('pointercancel', onUp);
+
+    // Explicit touch event listeners to guarantee iOS audio unlock and disable double-tap gesture
+    wingEl.addEventListener('touchstart', onDown, { passive: false });
+    wingEl.addEventListener('touchend', onUp, { passive: false });
+    wingEl.addEventListener('touchcancel', onUp, { passive: false });
   }
 
   bindWing(wingLeft, 'left');

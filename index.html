@@ -2,7 +2,7 @@
 <html lang="zh-TW">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
   <title>摩斯訓練儀 (Morse Trainulator) - 互動式電報模擬與報務員訓練器</title>
   <meta name="description" content="Morse Trainulator（摩斯訓練儀）：純前端、零依賴的專業級互動式電報模擬器與報務訓練體系 (Simulator & Trainer)。以二元樹 PCB 向量電路板為核心，支援直鍵、雙撥片 (Iambic Mode A/B) 與半自動震報鍵 (Bug Key)，內建國際科赫闖關 (Koch Method) 與法恩斯沃斯節奏 (Farnsworth Timing)，具備純正弦波 CW 音訊與真實電台微底噪。">
   <meta name="keywords" content="morse trainulator, morse code, 摩斯密碼, 摩斯訓練儀, cw, iambic keyer, koch method, farnsworth timing, pcb, amateur radio, 業餘無線電, 報務員">
@@ -14,16 +14,16 @@
   <meta property="og:type" content="website">
 
   <!-- Zero-Dependency Inline SVG Favicon -->
-  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='6' fill='%23121319'/%3E%3Ccircle cx='16' cy='16' r='6' fill='%23d4af37'/%3E%3Cpath d='M7 16 A 9 9 0 0 0 7 16' stroke='%2300e5ff' stroke-width='2' stroke-linecap='round'/%3E%3Cpath d='M5 11 A 12 12 0 0 0 5 21' fill='none' stroke='%2300e5ff' stroke-width='2' stroke-linecap='round'/%3E%3Cpath d='M27 11 A 12 12 0 0 1 27 21' fill='none' stroke='%2300e5ff' stroke-width='2' stroke-linecap='round'/%3E%3C/svg%3E">
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='6' fill='%23121319'/%3E%3Ccircle cx='16' cy='16' r='6' fill='%23d4af37'/%3E%3Cpath d='M7 16 A 9 9 0 0 0 7 16' stroke='%2300e5ff' stroke-width='2' stroke-linecap='round'/%3E%3Cpath d='M5 11 A 12 12 0 0 0 5 21' fill='none' stroke='%2300e5ff' stroke-width='2' stroke-linecap='round'/%3E%3Cpath d='M27 11 A 12 12 0 0 1 27 21' fill='none' stroke='%2300e5ff' stroke-width='2' stroke-linecap='round'/%3E%3Cpath d='M27 11 A 12 12 0 0 1 27 21' fill='none' stroke='%2300e5ff' stroke-width='2' stroke-linecap='round'/%3E%3C/svg%3E">
   
   <!-- Material Design Icons (MDI) -->
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@mdi/font@7.4.47/css/materialdesignicons.min.css">
   
   <!-- CSS Stylesheets -->
-  <link rel="stylesheet" href="css/base.css">
-  <link rel="stylesheet" href="css/pcb-card.css">
-  <link rel="stylesheet" href="css/controls.css">
-  <link rel="stylesheet" href="css/modes.css">
+  <link rel="stylesheet" href="css/base.css?v=1.1">
+  <link rel="stylesheet" href="css/pcb-card.css?v=1.1">
+  <link rel="stylesheet" href="css/controls.css?v=1.1">
+  <link rel="stylesheet" href="css/modes.css?v=1.1">
 </head>
 <body>
 
@@ -38,14 +38,14 @@
       <span class="va-title"><i class="mdi mdi-radio-handheld"></i> 摩斯訓練儀 <span class="va-title-en">Morse Trainulator</span></span>
     </div>
     <div class="va-workspace-nav">
-      <button type="button" id="ws-tab-tx" class="va-ws-btn active" title="發報工作台 (Transmit)">
-        <i class="mdi mdi-flash"></i> <span>Tx (發報)</span>
+      <button type="button" id="ws-tab-tx" class="va-ws-btn active" title="發報工作台: Tx (發報)">
+        <i class="mdi mdi-flash"></i> <span>Tx<span class="ws-btn-sub"> (發報)</span></span>
       </button>
-      <button type="button" id="ws-tab-rx" class="va-ws-btn" title="抄收工作台 (Receive)">
-        <i class="mdi mdi-headphones"></i> <span>Rx (抄收)</span>
+      <button type="button" id="ws-tab-rx" class="va-ws-btn" title="抄收工作台: Rx (抄收)">
+        <i class="mdi mdi-headphones"></i> <span>Rx<span class="ws-btn-sub"> (抄收)</span></span>
       </button>
-      <button type="button" id="ws-tab-qso" class="va-ws-btn" title="通聯工作台 (QSO Contact)">
-        <i class="mdi mdi-radio-tower"></i> <span>QSO (通聯)</span>
+      <button type="button" id="ws-tab-qso" class="va-ws-btn" title="通聯工作台: QSO (通聯)">
+        <i class="mdi mdi-radio-tower"></i> <span>QSO<span class="ws-btn-sub"> (通聯)</span></span>
       </button>
     </div>
     <div class="va-topbar-right">
@@ -232,8 +232,7 @@
 
           <!-- Input row -->
           <div style="display: flex; gap: 8px; margin-bottom: 8px;">
-            <input type="text" id="text-input" value="SOS CQ" placeholder="輸入大寫英文字母、數字 0–9 或空白..." maxlength="80"
-              style="flex: 1; background: #0b0c10; border: 1.5px solid #363a46; border-radius: 6px; color: #fff; padding: 8px 12px; font-family: monospace; font-size: 0.95rem; text-transform: uppercase; letter-spacing: 1px;">
+            <input type="text" id="text-input" class="terminal-input" value="SOS CQ" placeholder="輸入大寫英文字母、數字 0–9 或空白..." maxlength="80">
             <button id="btn-apply-text" style="background: #252834; border: 1.5px solid #454a5a; color: #fff; border-radius: 6px; padding: 0 14px; font-size: 0.8rem; font-weight: bold; cursor: pointer;">載入文章</button>
           </div>
 
@@ -266,12 +265,12 @@
 
           <!-- Options Toggles -->
           <div style="display: flex; gap: 16px; margin-top: 10px; font-size: 0.76rem; color: #ccc;">
-            <label style="display: flex; align-items: center; gap: 5px; cursor: pointer;">
-              <input type="checkbox" id="chk-show-hints" checked>
+            <label style="display: flex; align-items: center; gap: 7px; cursor: pointer;" title="在題目字母下方顯示摩斯點劃提示">
+              <input type="checkbox" id="chk-show-hints" class="terminal-checkbox" checked>
               <span>顯示點劃提示</span>
             </label>
-            <label style="display: flex; align-items: center; gap: 5px; cursor: pointer;">
-              <input type="checkbox" id="chk-strict-mode">
+            <label style="display: flex; align-items: center; gap: 7px; cursor: pointer;" title="若敲擊錯誤必須重新輸入正確字元方可前進">
+              <input type="checkbox" id="chk-strict-mode" class="terminal-checkbox">
               <span>嚴格模式 (打錯重試)</span>
             </label>
           </div>
@@ -338,7 +337,7 @@
               <span id="koch-stage-badge" style="background:#00364d; color:var(--neon-blue); padding:2px 8px; border-radius:12px; font-size:0.75rem; border:1px solid #005b82; white-space: nowrap; flex-shrink: 0;">第 1 關 / 共 35 關</span>
             </div>
             <div style="display:flex; gap:6px; align-items:center; flex-shrink: 0;">
-              <select id="koch-stage-select" style="background:#151b24; color:#fff; border:1px solid #334254; border-radius:4px; font-size:0.72rem; padding:3px 6px; cursor:pointer;">
+              <select id="koch-stage-select" class="terminal-select" title="快速跳轉已解鎖關卡">
                 <!-- Dynamically populated with unlocked stages -->
               </select>
               <button id="btn-reset-koch" style="background:none; border:1px solid #444; color:#888; border-radius:3px; padding:2px 6px; font-size:0.68rem; cursor:pointer;" title="將進度重設至第 1 關">重設</button>
@@ -487,38 +486,44 @@
             <!-- Config 1: Quick (Fixed count) -->
             <div id="koch-cfg-quick" style="display:flex; align-items:center; gap:8px; font-size:0.78rem; color:#ccc; flex-wrap:wrap;">
               <span>每輪題數:</span>
-              <label style="cursor:pointer; display:flex; align-items:center; gap:3px; white-space:nowrap;">
-                <input type="radio" name="koch-len" value="12" style="accent-color:var(--neon-blue);"> 12 字 (1排)
-              </label>
-              <label style="cursor:pointer; display:flex; align-items:center; gap:3px; white-space:nowrap;">
-                <input type="radio" name="koch-len" value="24" checked style="accent-color:var(--neon-blue);"> 24 字 (2排)
-              </label>
+              <div class="radio-pill-group">
+                <label class="radio-pill">
+                  <input type="radio" name="koch-len" value="12"> 12 字 (1排)
+                </label>
+                <label class="radio-pill">
+                  <input type="radio" name="koch-len" value="24" checked> 24 字 (2排)
+                </label>
+              </div>
             </div>
 
             <!-- Config 2: Standard (Timed 1m/3m/5m) -->
             <div id="koch-cfg-standard" style="display:none; align-items:center; gap:8px; font-size:0.78rem; color:#ccc; flex-wrap:wrap;">
               <span>考核時長:</span>
-              <label style="cursor:pointer; display:flex; align-items:center; gap:3px; white-space:nowrap;">
-                <input type="radio" name="koch-duration" value="60" style="accent-color:var(--neon-blue);"> 1 分鐘
-              </label>
-              <label style="cursor:pointer; display:flex; align-items:center; gap:3px; white-space:nowrap;">
-                <input type="radio" name="koch-duration" value="180" checked style="accent-color:var(--neon-blue);"> 3 分鐘
-              </label>
-              <label style="cursor:pointer; display:flex; align-items:center; gap:3px; white-space:nowrap;">
-                <input type="radio" name="koch-duration" value="300" style="accent-color:var(--neon-blue);"> 5 分鐘
-              </label>
+              <div class="radio-pill-group">
+                <label class="radio-pill">
+                  <input type="radio" name="koch-duration" value="60"> 1 分鐘
+                </label>
+                <label class="radio-pill">
+                  <input type="radio" name="koch-duration" value="180" checked> 3 分鐘
+                </label>
+                <label class="radio-pill">
+                  <input type="radio" name="koch-duration" value="300"> 5 分鐘
+                </label>
+              </div>
               <span style="color:#889; font-size:0.72rem; margin-left:2px; white-space:nowrap;"><i class="mdi mdi-timer-sand"></i> 反射限時 2.0s</span>
             </div>
 
             <!-- Config 3: Challenge (Timed 3m/5m, zero tolerance) -->
             <div id="koch-cfg-challenge" style="display:none; align-items:center; gap:8px; font-size:0.78rem; color:#ccc; flex-wrap:wrap;">
               <span>考核時長:</span>
-              <label style="cursor:pointer; display:flex; align-items:center; gap:3px; white-space:nowrap;">
-                <input type="radio" name="koch-duration-ch" value="180" checked style="accent-color:#ff5252;"> 3 分鐘
-              </label>
-              <label style="cursor:pointer; display:flex; align-items:center; gap:3px; white-space:nowrap;">
-                <input type="radio" name="koch-duration-ch" value="300" style="accent-color:#ff5252;"> 5 分鐘
-              </label>
+              <div class="radio-pill-group">
+                <label class="radio-pill radio-pill-danger">
+                  <input type="radio" name="koch-duration-ch" value="180" checked> 3 分鐘
+                </label>
+                <label class="radio-pill radio-pill-danger">
+                  <input type="radio" name="koch-duration-ch" value="300"> 5 分鐘
+                </label>
+              </div>
               <span style="color:#ffb703; font-size:0.72rem; margin-left:2px; white-space:nowrap;"><i class="mdi mdi-timer-sand"></i> 反射限時 2.0s</span>
             </div>
 
@@ -541,8 +546,8 @@
           <div class="koch-hud-left">
             <span class="koch-hud-badge" id="koch-hud-stage-tag"><i class="mdi mdi-bullseye-arrow"></i> 第 1 關</span>
             <span id="koch-hud-mode-tag" style="font-size:0.75rem; padding:2px 8px; border-radius:4px; background:#182230; color:var(--neon-blue); font-weight:bold;"><i class="mdi mdi-check-circle"></i> 基礎練習模式</span>
-            <label style="font-size:0.75rem; color:#889; cursor:pointer; display:flex; align-items:center; gap:4px; margin-left:6px;" title="在題目字母下方顯示摩斯點劃提示">
-              <input type="checkbox" id="chk-koch-hints" style="accent-color:var(--neon-blue);"> 點劃提示
+            <label style="font-size:0.75rem; color:#889; cursor:pointer; display:flex; align-items:center; gap:6px; margin-left:6px;" title="在題目字母下方顯示摩斯點劃提示">
+              <input type="checkbox" id="chk-koch-hints" class="terminal-checkbox"> <span>點劃提示</span>
             </label>
           </div>
           <div class="koch-hud-right">
@@ -949,22 +954,20 @@
           <span style="font-size:0.7rem; color:#888;">Curtis 8044</span>
         </div>
         <div style="display:flex; justify-content:space-between; align-items:center; font-size:0.8rem; margin-bottom:10px;">
-          <label style="display:flex; align-items:center; gap:6px; cursor:pointer; color:#ccc;">
-            <input type="checkbox" id="chk-paddle-reverse" style="accent-color:var(--gold);">
+          <label style="display:flex; align-items:center; gap:8px; cursor:pointer; color:#ccc;">
+            <input type="checkbox" id="chk-paddle-reverse" class="switch-input switch-gold">
             <span>左右撥片互換 (左劃 Dah / 右點 Dit)</span>
           </label>
           <span style="font-size:0.7rem; color:#888; white-space:nowrap;">適配左手或接線</span>
         </div>
         <div style="display:flex; justify-content:space-between; align-items:center; font-size:0.8rem;">
           <label style="color:#ccc;">Iambic 夾發模式：</label>
-          <div style="display:flex; gap:12px; font-size:0.78rem;">
-            <label style="cursor:pointer; display:flex; align-items:center; gap:4px; color:#ffd700; white-space:nowrap;">
-              <input type="radio" name="iambic-mode" id="radio-mode-b" value="B" checked style="accent-color:var(--gold);">
-              <span>Mode B (自動補音)</span>
+          <div class="radio-pill-group">
+            <label class="radio-pill radio-pill-gold">
+              <input type="radio" name="iambic-mode" id="radio-mode-b" value="B" checked> Mode B (自動補音)
             </label>
-            <label style="cursor:pointer; display:flex; align-items:center; gap:4px; color:#aaa; white-space:nowrap;">
-              <input type="radio" name="iambic-mode" id="radio-mode-a" value="A" style="accent-color:var(--gold);">
-              <span>Mode A (放開即停)</span>
+            <label class="radio-pill radio-pill-gold">
+              <input type="radio" name="iambic-mode" id="radio-mode-a" value="A"> Mode A (放開即停)
             </label>
           </div>
         </div>
@@ -977,8 +980,8 @@
           <span style="font-size:0.7rem; color:#888;">音形訓練法</span>
         </div>
         <div style="display:flex; justify-content:space-between; align-items:center; font-size:0.8rem; margin-bottom:8px;">
-          <label style="display:flex; align-items:center; gap:6px; cursor:pointer; color:#ccc;">
-            <input type="checkbox" id="chk-farnsworth" style="accent-color:var(--neon-blue);">
+          <label style="display:flex; align-items:center; gap:8px; cursor:pointer; color:#ccc;">
+            <input type="checkbox" id="chk-farnsworth" class="switch-input switch-neon">
             <span>啟用法恩斯沃斯 (音形高速 · 間距放寬)</span>
           </label>
           <span style="font-size:0.7rem; color:#888;" id="tag-farnsworth-status">已關閉</span>
@@ -988,7 +991,7 @@
             <span>字元速度 (Character Speed): <strong id="tag-farnsworth-wpm" style="color:var(--neon-blue);">18 WPM (67ms)</strong></span>
             <span style="font-size:0.68rem; color:#777; white-space:nowrap;">間隔依主設定</span>
           </div>
-          <input type="range" id="param-farnsworth-wpm" min="15" max="40" step="1" value="18" style="width:100%; accent-color:var(--neon-blue);">
+          <input type="range" id="param-farnsworth-wpm" class="console-slider slider-neon-blue" min="15" max="40" step="1" value="18" style="width:100%;">
         </div>
       </div>
 
@@ -999,8 +1002,8 @@
           <span style="font-size:0.7rem; color:#888;">短波濾波</span>
         </div>
         <div style="display:flex; justify-content:space-between; align-items:center; font-size:0.8rem; margin-bottom:6px;">
-          <label style="display:flex; align-items:center; gap:6px; cursor:pointer; color:#ccc;">
-            <input type="checkbox" id="chk-qrn" style="accent-color:#ffb703;">
+          <label style="display:flex; align-items:center; gap:8px; cursor:pointer; color:#ccc;">
+            <input type="checkbox" id="chk-qrn" class="switch-input switch-amber">
             <span>開啟背景雜音 (短波情境)</span>
           </label>
           <span style="font-size:0.7rem; color:#888;" id="tag-qrn-status">已靜音</span>
@@ -1010,7 +1013,7 @@
             <span>雜音強度 (Volume): <strong id="tag-qrn-vol" style="color:#ffb703;">20%</strong></span>
             <span style="font-size:0.68rem; color:#777;">環境底噪</span>
           </div>
-          <input type="range" id="param-qrn-vol" min="0.01" max="0.10" step="0.01" value="0.04" style="width:100%; accent-color:#ffb703;">
+          <input type="range" id="param-qrn-vol" class="console-slider slider-amber" min="0.01" max="0.10" step="0.01" value="0.04" style="width:100%;">
         </div>
       </div>
 
@@ -1080,22 +1083,22 @@
   <!-- /settings-drawer -->
 
   <!-- Modular Scripts Loaded Sequentially for 100% file:/// and Web Compatibility -->
-  <script src="js/core/morse-data.js"></script>
-  <script src="js/core/morse-engine.js"></script>
-  <script src="js/core/morse-audio.js"></script>
-  <script src="js/core/iambic-keyer.js"></script>
-  <script src="js/core/cw-ribbon.js"></script>
-  <script src="js/core/koch-manager.js"></script>
-  <script src="js/core/keybinding-manager.js"></script>
-  <script src="js/core/settings-manager.js"></script>
+  <script src="js/core/morse-data.js?v=1.1"></script>
+  <script src="js/core/morse-engine.js?v=1.1"></script>
+  <script src="js/core/morse-audio.js?v=1.1"></script>
+  <script src="js/core/iambic-keyer.js?v=1.1"></script>
+  <script src="js/core/cw-ribbon.js?v=1.1"></script>
+  <script src="js/core/koch-manager.js?v=1.1"></script>
+  <script src="js/core/keybinding-manager.js?v=1.1"></script>
+  <script src="js/core/settings-manager.js?v=1.1"></script>
 
-  <script src="js/ui/pcb-renderer.js"></script>
-  <script src="js/ui/meter-controller.js"></script>
-  <script src="js/ui/free-mode.js"></script>
-  <script src="js/ui/text-mode.js"></script>
-  <script src="js/ui/koch-mode.js"></script>
+  <script src="js/ui/pcb-renderer.js?v=1.1"></script>
+  <script src="js/ui/meter-controller.js?v=1.1"></script>
+  <script src="js/ui/free-mode.js?v=1.1"></script>
+  <script src="js/ui/text-mode.js?v=1.1"></script>
+  <script src="js/ui/koch-mode.js?v=1.1"></script>
 
   <!-- Application Bootstrap -->
-  <script src="js/app.js"></script>
+  <script src="js/app.js?v=1.1"></script>
 </body>
 </html>

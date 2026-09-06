@@ -47,6 +47,8 @@ body {
   overflow: hidden;
   display: flex;
   flex-direction: column;
+  touch-action: manipulation;
+  -webkit-text-size-adjust: 100%;
 }
 
 header {
@@ -270,6 +272,8 @@ h1 {
   align-items: center;
   gap: 10px;
   font-weight: 700;
+  flex-shrink: 0;
+  white-space: nowrap;
 }
 .brand-mark {
   width: 28px;
@@ -282,11 +286,13 @@ h1 {
   display: flex;
   align-items: center;
   gap: 6px;
+  white-space: nowrap;
 }
 .va-title-en {
   font-size: 0.78rem;
   color: var(--text-muted);
   font-weight: 400;
+  white-space: nowrap;
 }
 .va-workspace-nav {
   display: flex;
@@ -295,6 +301,7 @@ h1 {
   padding: 3px;
   border-radius: 8px;
   border: 1px solid #232936;
+  flex-shrink: 0;
 }
 .va-ws-btn {
   padding: 6px 12px;
@@ -309,6 +316,9 @@ h1 {
   align-items: center;
   gap: 5px;
   transition: all 0.15s ease;
+  white-space: nowrap;
+  user-select: none;
+  -webkit-user-select: none;
 }
 .va-ws-btn:hover {
   color: #fff;
@@ -323,6 +333,8 @@ h1 {
   display: flex;
   align-items: center;
   gap: 10px;
+  flex-shrink: 0;
+  white-space: nowrap;
 }
 .topbar-wpm-pill {
   font-family: monospace;
@@ -580,6 +592,10 @@ h1 {
   flex-shrink: 0;
   box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.5);
   z-index: 10;
+  touch-action: none;
+  user-select: none;
+  -webkit-user-select: none;
+  -webkit-touch-callout: none;
 }
 .k5-dock-container {
   display: flex;
@@ -587,6 +603,10 @@ h1 {
   gap: 12px;
   height: 96px;
   box-sizing: border-box;
+  touch-action: none;
+  user-select: none;
+  -webkit-user-select: none;
+  -webkit-touch-callout: none;
 }
 .k2-thumb-wing {
   flex: 1.1;
@@ -929,19 +949,55 @@ h1 {
 /* Mobile & Portrait Adaptation (375px - 768px) */
 @media (max-width: 768px) {
   .va-topbar {
-    padding: 0 10px;
+    padding: 0 8px;
     height: 48px;
+    gap: 4px;
+  }
+  .va-brand {
+    gap: 6px;
+    flex-shrink: 0;
+  }
+  .brand-mark {
+    width: 22px;
+    height: 22px;
+    flex-shrink: 0;
+  }
+  .va-title {
+    font-size: 0.86rem;
+    gap: 4px;
+    white-space: nowrap;
   }
   .va-title-en {
     display: none;
   }
+  .va-workspace-nav {
+    gap: 2px;
+    padding: 2px;
+    flex-shrink: 0;
+  }
   .va-ws-btn {
-    padding: 5px 8px;
-    font-size: 0.75rem;
+    padding: 4px 6px;
+    font-size: 0.72rem;
+    gap: 3px;
+    white-space: nowrap;
+  }
+  .ws-btn-sub {
+    display: none;
+  }
+  .va-topbar-right {
+    gap: 6px;
+    flex-shrink: 0;
   }
   .topbar-wpm-pill {
-    font-size: 0.75rem;
-    padding: 3px 8px;
+    font-size: 0.72rem;
+    padding: 2px 6px;
+    white-space: nowrap;
+  }
+  .btn-icon {
+    width: 28px;
+    height: 28px;
+    font-size: 0.82rem;
+    flex-shrink: 0;
   }
   .k5-dock-container {
     gap: 6px;
@@ -950,6 +1006,7 @@ h1 {
   .k2-thumb-wing {
     min-width: 80px;
     padding: 6px 4px;
+    touch-action: none;
   }
   .k2-wing-symbol {
     font-size: 1.5rem;
@@ -963,10 +1020,29 @@ h1 {
   #k5-center-island,
   .k5-center-smart-island {
     padding: 4px 6px;
+    touch-action: none;
   }
   .settings-drawer {
     max-width: 100%;
     border-left: none;
     border-right: none;
+  }
+}
+
+@media (max-width: 380px) {
+  .va-topbar {
+    padding: 0 4px;
+    gap: 2px;
+  }
+  .va-title {
+    font-size: 0.8rem;
+  }
+  .va-ws-btn {
+    padding: 3px 4px;
+    font-size: 0.68rem;
+  }
+  .topbar-wpm-pill {
+    padding: 2px 4px;
+    font-size: 0.68rem;
   }
 }
