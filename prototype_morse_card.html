@@ -5048,6 +5048,18 @@
         const pct = Math.min(100, (elapsed / maxMeterScale) * 100);
 
         meterBar.style.width = pct + '%';
+        const haloPressArc = document.getElementById('halo-press-arc');
+        const hudTimingStatus = document.getElementById('hud-timing-status');
+        if (haloPressArc) {
+          const pressPct = Math.min(100, (elapsed / maxMeterScale) * 100);
+          const pressOffset = 440 - (440 * (pressPct / 100));
+          haloPressArc.style.strokeDashoffset = pressOffset;
+          haloPressArc.style.stroke = (elapsed < th) ? 'var(--neon-blue)' : 'var(--gold)';
+        }
+        if (hudTimingStatus) {
+          const isDah = elapsed >= th;
+          hudTimingStatus.innerHTML = `發報中: <strong style="color:${isDah ? 'var(--gold)' : 'var(--neon-blue)'};">${isDah ? '— 劃 Dah' : '· 點 Dit'}</strong> (${elapsed}ms)`;
+        }
         readoutTime.textContent = `${elapsed} ms`;
 
         if (typeof engine.calculateStrokeWpm === 'function') {
@@ -5074,6 +5086,8 @@
 
     function stopMeterAnimation(finalDuration) {
       if (animFrame) cancelAnimationFrame(animFrame);
+      const haloPressArc = document.getElementById('halo-press-arc');
+      if (haloPressArc) haloPressArc.style.strokeDashoffset = '440';
       const pct = Math.min(100, (finalDuration / maxMeterScale) * 100);
       meterBar.style.width = pct + '%';
       readoutTime.textContent = `${finalDuration} ms`;
@@ -5140,6 +5154,8 @@
     // Real-time Settlement Gap Timeline Animation
     function startGapCountdown() {
       if (gapAnimFrame) cancelAnimationFrame(gapAnimFrame);
+      const haloGapArc = document.getElementById('halo-gap-arc');
+      if (haloGapArc) haloGapArc.style.strokeDashoffset = '534';
       letterSettled = false;
       wordSettled = false;
 
@@ -5158,6 +5174,22 @@
         const pct = Math.min(100, (elapsed / maxGapScale) * 100);
 
         gapBar.style.width = pct + '%';
+        const haloGapArc = document.getElementById('halo-gap-arc');
+        const hudTimingStatus = document.getElementById('hud-timing-status');
+        if (haloGapArc) {
+          const gapOffset = 534 - (534 * (pct / 100));
+          haloGapArc.style.strokeDashoffset = gapOffset;
+          if (elapsed < letterGap) {
+            haloGapArc.style.stroke = '#2c394c';
+            if (hudTimingStatus) hudTimingStatus.textContent = `間隔計時: ${Math.round(elapsed)}ms`;
+          } else if (elapsed < wordGap) {
+            haloGapArc.style.stroke = 'var(--gold)';
+            if (hudTimingStatus) hudTimingStatus.innerHTML = `<span style="color:var(--gold); font-weight:bold;">字元結算 (3T: ${Math.round(elapsed)}ms)</span>`;
+          } else {
+            haloGapArc.style.stroke = 'var(--neon-blue)';
+            if (hudTimingStatus) hudTimingStatus.innerHTML = `<span style="color:var(--neon-blue); font-weight:bold;">單字空格 (7T: ${Math.round(elapsed)}ms)</span>`;
+          }
+        }
         if (gapTimeReadout) gapTimeReadout.textContent = `${Math.round(elapsed)} ms`;
 
         // Stage 1: Before letter settlement (0 ~ 3T)
@@ -5299,6 +5331,10 @@
 
       stateSeq.textContent = res.sequence;
       stateLetter.textContent = res.letter || (res.isValid ? '定位中...' : '(非英文字母)');
+      const hudChar = document.getElementById('hud-char-target');
+      const hudSeq = document.getElementById('hud-seq-target');
+      if (hudChar) hudChar.textContent = res.letter || '—';
+      if (hudSeq) hudSeq.textContent = res.sequence || '';
       stateDuration.textContent = `${res.duration} ms`;
 
       if (res.letter === '<HH>') {
@@ -5329,6 +5365,12 @@
       stateCommitted.textContent = text;
       stateCommitted.title = (text !== '—') ? text : '';
       stateCommitted.scrollLeft = stateCommitted.scrollWidth;
+      const hudStream = document.getElementById('hud-committed-stream');
+      if (hudStream) {
+        hudStream.textContent = text;
+        hudStream.title = (text !== '—') ? text : '';
+        hudStream.scrollLeft = hudStream.scrollWidth;
+      }
       const clearBtn = document.getElementById('btn-clear-committed');
       if (clearBtn) {
         const hasText = engine && engine.committedLetters && engine.committedLetters.length > 0;
@@ -5378,6 +5420,10 @@
         evalStatus.style.color = '#888';
         stateSeq.textContent = '—';
         stateLetter.textContent = '—';
+        const hudCharReset = document.getElementById('hud-char-target');
+        const hudSeqReset = document.getElementById('hud-seq-target');
+        if (hudCharReset) hudCharReset.textContent = '—';
+        if (hudSeqReset) hudSeqReset.textContent = '';
         meterBar.style.width = '0%';
         readoutTime.textContent = '0 ms';
         readoutSymbol.textContent = '無';
@@ -7192,6 +7238,10 @@
       if (saveToSettings && typeof settingsManager !== 'undefined') {
         settingsManager.settings.keyerDevice = device;
         settingsManager.save();
+      }
+
+      if (typeof updateK5MorphingUI === 'function') {
+        updateK5MorphingUI();
       }
     }
 

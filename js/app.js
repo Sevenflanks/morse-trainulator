@@ -273,6 +273,10 @@ function setupKeyerCallbacks() {
 
     if (dom.stateSeq) dom.stateSeq.textContent = res.sequence;
     if (dom.stateLetter) dom.stateLetter.textContent = res.letter || (res.isValid ? '定位中...' : '(非英文字母)');
+    const hudChar = document.getElementById('hud-char-target');
+    const hudSeq = document.getElementById('hud-seq-target');
+    if (hudChar) hudChar.textContent = res.letter || '—';
+    if (hudSeq) hudSeq.textContent = res.sequence || '';
     if (dom.stateDuration) dom.stateDuration.textContent = `${duration} ms`;
 
     if (res.letter === '<HH>') {
@@ -454,6 +458,10 @@ function switchKeyerDevice(device, saveToSettings = true) {
     settingsManager.settings.keyerDevice = device;
     settingsManager.save();
   }
+
+  if (typeof updateK5MorphingUI === 'function') {
+    updateK5MorphingUI();
+  }
 }
 
 // ----------------------------------------------------
@@ -541,6 +549,10 @@ function handleKeyUp() {
 
   if (dom.stateSeq) dom.stateSeq.textContent = res.sequence;
   if (dom.stateLetter) dom.stateLetter.textContent = res.letter || (res.isValid ? '定位中...' : '(非英文字母)');
+  const hudCharKey = document.getElementById('hud-char-target');
+  const hudSeqKey = document.getElementById('hud-seq-target');
+  if (hudCharKey) hudCharKey.textContent = res.letter || '—';
+  if (hudSeqKey) hudSeqKey.textContent = res.sequence || '';
   if (dom.stateDuration) dom.stateDuration.textContent = `${res.duration} ms`;
 
   if (res.letter === '<HH>') {
@@ -632,6 +644,10 @@ function finalizeLetter() {
     }
     if (dom.stateSeq) dom.stateSeq.textContent = '—';
     if (dom.stateLetter) dom.stateLetter.textContent = '—';
+    const hudCharReset = document.getElementById('hud-char-target');
+    const hudSeqReset = document.getElementById('hud-seq-target');
+    if (hudCharReset) hudCharReset.textContent = '—';
+    if (hudSeqReset) hudSeqReset.textContent = '';
     if (dom.meterBar) dom.meterBar.style.width = '0%';
     if (dom.readoutTime) dom.readoutTime.textContent = '0 ms';
     if (dom.readoutSymbol) dom.readoutSymbol.textContent = '無';

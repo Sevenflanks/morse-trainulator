@@ -13,11 +13,17 @@ function renderCommittedText() {
 function updateCommittedView() {
   const el = document.getElementById('state-committed');
   const clearBtn = document.getElementById('btn-clear-committed');
+  const hudStream = document.getElementById('hud-committed-stream');
   const text = renderCommittedText();
   if (el) {
     el.textContent = text;
     el.title = (text !== '—') ? text : '';
     el.scrollLeft = el.scrollWidth;
+  }
+  if (hudStream) {
+    hudStream.textContent = text;
+    hudStream.title = (text !== '—') ? text : '';
+    hudStream.scrollLeft = hudStream.scrollWidth;
   }
   if (clearBtn) {
     const hasText = window.engine && window.engine.committedLetters && window.engine.committedLetters.length > 0;
