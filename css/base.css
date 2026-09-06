@@ -205,3 +205,196 @@ h1 {
 .mdi.mdi-lg {
   font-size: 1.3em;
 }
+
+
+/* ==========================================================================
+   Three-Zone Shell: Top Bar, Workspaces, and Navigation
+   ========================================================================== */
+.va-topbar {
+  width: 100%;
+  max-width: 1280px;
+  height: 52px;
+  background: #13151c;
+  border: 1px solid #282f3d;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 16px;
+  margin-bottom: 12px;
+  flex-shrink: 0;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.4);
+}
+.va-brand {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-weight: 700;
+}
+.brand-mark {
+  width: 28px;
+  height: 28px;
+  flex-shrink: 0;
+}
+.va-title {
+  font-size: 1rem;
+  color: var(--gold-light);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.va-title-en {
+  font-size: 0.78rem;
+  color: var(--text-muted);
+  font-weight: 400;
+}
+.va-workspace-nav {
+  display: flex;
+  gap: 4px;
+  background: #0b0c10;
+  padding: 3px;
+  border-radius: 8px;
+  border: 1px solid #232936;
+}
+.va-ws-btn {
+  padding: 6px 12px;
+  border: none;
+  background: transparent;
+  color: var(--text-muted);
+  font-size: 0.8rem;
+  font-weight: 600;
+  border-radius: 6px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  transition: all 0.15s ease;
+}
+.va-ws-btn:hover {
+  color: #fff;
+  background: rgba(255, 255, 255, 0.05);
+}
+.va-ws-btn.active {
+  background: #1e2430;
+  color: var(--neon-blue);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+}
+.va-topbar-right {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.topbar-wpm-pill {
+  font-family: monospace;
+  font-size: 0.82rem;
+  font-weight: 700;
+  color: var(--gold);
+  background: #0b0c10;
+  border: 1px solid rgba(212, 175, 55, 0.3);
+  padding: 4px 10px;
+  border-radius: 12px;
+}
+.btn-icon {
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
+  background: #1b1e26;
+  border: 1px solid #2e3444;
+  color: #cfd6e6;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+.btn-icon:hover {
+  border-color: var(--neon-blue);
+  color: var(--neon-blue);
+}
+.header-subbar {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-bottom: 12px;
+}
+.workspace-view {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+.placeholder-workspace {
+  padding: 60px 20px;
+  text-align: center;
+  background: #141720;
+  border: 1px solid #283142;
+  border-radius: 12px;
+  max-width: 600px;
+  margin: 40px auto;
+  width: 100%;
+}
+.placeholder-icon {
+  font-size: 3.5rem;
+  color: var(--neon-blue);
+  margin-bottom: 16px;
+}
+.placeholder-badge {
+  display: inline-block;
+  margin-top: 16px;
+  font-size: 0.75rem;
+  font-family: monospace;
+  background: rgba(0, 229, 255, 0.1);
+  color: var(--neon-blue);
+  border: 1px solid rgba(0, 229, 255, 0.3);
+  padding: 4px 12px;
+  border-radius: 20px;
+}
+
+/* Slide-up Settings Drawer */
+.drawer-backdrop {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.6);
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
+  z-index: 999;
+}
+.settings-drawer {
+  position: fixed;
+  bottom: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 100%;
+  max-width: 720px;
+  max-height: 80vh;
+  background: #141720;
+  border: 1px solid #2b3548;
+  border-bottom: none;
+  border-radius: 16px 16px 0 0;
+  z-index: 1000;
+  display: flex;
+  flex-direction: column;
+  box-shadow: 0 -8px 32px rgba(0, 0, 0, 0.6);
+}
+.drawer-header {
+  padding: 14px 18px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-bottom: 1px solid #242e40;
+}
+.drawer-title {
+  font-weight: 700;
+  font-size: 1rem;
+  color: var(--gold);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.drawer-body {
+  padding: 16px 18px;
+  overflow-y: auto;
+}

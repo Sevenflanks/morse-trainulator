@@ -1613,22 +1613,246 @@
     .mdi.mdi-lg {
       font-size: 1.3em;
     }
+
+    /* ==========================================================================
+       Three-Zone Shell: Top Bar, Workspaces, and Navigation
+       ========================================================================== */
+    .va-topbar {
+      width: 100%;
+      max-width: 1280px;
+      height: 52px;
+      background: #13151c;
+      border: 1px solid #282f3d;
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 16px;
+      margin-bottom: 12px;
+      flex-shrink: 0;
+      box-shadow: 0 4px 16px rgba(0, 0, 0, 0.4);
+    }
+    .va-brand {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-weight: 700;
+    }
+    .brand-mark {
+      width: 28px;
+      height: 28px;
+      flex-shrink: 0;
+    }
+    .va-title {
+      font-size: 1rem;
+      color: var(--gold-light);
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .va-title-en {
+      font-size: 0.78rem;
+      color: var(--text-muted);
+      font-weight: 400;
+    }
+    .va-workspace-nav {
+      display: flex;
+      gap: 4px;
+      background: #0b0c10;
+      padding: 3px;
+      border-radius: 8px;
+      border: 1px solid #232936;
+    }
+    .va-ws-btn {
+      padding: 6px 12px;
+      border: none;
+      background: transparent;
+      color: var(--text-muted);
+      font-size: 0.8rem;
+      font-weight: 600;
+      border-radius: 6px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      transition: all 0.15s ease;
+    }
+    .va-ws-btn:hover {
+      color: #fff;
+      background: rgba(255, 255, 255, 0.05);
+    }
+    .va-ws-btn.active {
+      background: #1e2430;
+      color: var(--neon-blue);
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+    }
+    .va-topbar-right {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .topbar-wpm-pill {
+      font-family: monospace;
+      font-size: 0.82rem;
+      font-weight: 700;
+      color: var(--gold);
+      background: #0b0c10;
+      border: 1px solid rgba(212, 175, 55, 0.3);
+      padding: 4px 10px;
+      border-radius: 12px;
+    }
+    .btn-icon {
+      width: 32px;
+      height: 32px;
+      border-radius: 8px;
+      background: #1b1e26;
+      border: 1px solid #2e3444;
+      color: #cfd6e6;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: all 0.15s;
+    }
+    .btn-icon:hover {
+      border-color: var(--neon-blue);
+      color: var(--neon-blue);
+    }
+    .header-subbar {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      margin-bottom: 12px;
+    }
+    .workspace-view {
+      width: 100%;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+    .placeholder-workspace {
+      padding: 60px 20px;
+      text-align: center;
+      background: #141720;
+      border: 1px solid #283142;
+      border-radius: 12px;
+      max-width: 600px;
+      margin: 40px auto;
+      width: 100%;
+    }
+    .placeholder-icon {
+      font-size: 3.5rem;
+      color: var(--neon-blue);
+      margin-bottom: 16px;
+    }
+    .placeholder-badge {
+      display: inline-block;
+      margin-top: 16px;
+      font-size: 0.75rem;
+      font-family: monospace;
+      background: rgba(0, 229, 255, 0.1);
+      color: var(--neon-blue);
+      border: 1px solid rgba(0, 229, 255, 0.3);
+      padding: 4px 12px;
+      border-radius: 20px;
+    }
+
+    /* Slide-up Settings Drawer */
+    .drawer-backdrop {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(0, 0, 0, 0.6);
+      backdrop-filter: blur(4px);
+      -webkit-backdrop-filter: blur(4px);
+      z-index: 999;
+    }
+    .settings-drawer {
+      position: fixed;
+      bottom: 0;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 100%;
+      max-width: 720px;
+      max-height: 80vh;
+      background: #141720;
+      border: 1px solid #2b3548;
+      border-bottom: none;
+      border-radius: 16px 16px 0 0;
+      z-index: 1000;
+      display: flex;
+      flex-direction: column;
+      box-shadow: 0 -8px 32px rgba(0, 0, 0, 0.6);
+    }
+    .drawer-header {
+      padding: 14px 18px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border-bottom: 1px solid #242e40;
+    }
+    .drawer-title {
+      font-weight: 700;
+      font-size: 1rem;
+      color: var(--gold);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .drawer-body {
+      padding: 16px 18px;
+      overflow-y: auto;
+    }
   </style>
 </head>
 <body>
 
-  <header>
-    <h1><i class="mdi mdi-radio-handheld"></i> 摩斯訓練儀 (Morse Trainulator)</h1>
-    <div class="subtitle">電報模擬與練習工具 · 支援直鍵 / 雙撥片 / 機械震報鍵 · PCB 二元樹尋路 · 節奏儀表</div>
-    <div class="layout-switch-container">
-      <button type="button" class="layout-switch-btn active" id="btn-layout-2col" title="切換為雙欄專注佈局">
-        <span><i class="mdi mdi-view-column"></i> 雙欄專注</span>
+  <!-- Three-Zone Top Bar -->
+  <header class="va-topbar">
+    <div class="va-brand">
+      <svg class="brand-mark" viewBox="0 0 36 36" fill="none">
+        <polygon points="18,2 33,10.5 33,25.5 18,34 3,25.5 3,10.5" stroke="#00e5ff" stroke-width="1.8" fill="#101520"/>
+        <circle cx="12" cy="18" r="3.2" fill="#ffd700"/>
+        <rect x="19" y="15.8" width="8.5" height="4.4" rx="2.2" fill="#00e5ff"/>
+      </svg>
+      <span class="va-title"><i class="mdi mdi-radio-handheld"></i> 摩斯訓練儀 <span class="va-title-en">Morse Trainulator</span></span>
+    </div>
+    <div class="va-workspace-nav">
+      <button type="button" id="ws-tab-tx" class="va-ws-btn active" title="發報工作台 (Transmit)">
+        <i class="mdi mdi-flash"></i> <span>Tx (發報)</span>
       </button>
-      <button type="button" class="layout-switch-btn" id="btn-layout-3col" title="切換為三欄工作台">
-        <span><i class="mdi mdi-view-dashboard-variant"></i> 三欄工作台</span>
+      <button type="button" id="ws-tab-rx" class="va-ws-btn" title="抄收工作台 (Receive)">
+        <i class="mdi mdi-headphones"></i> <span>Rx (抄收)</span>
+      </button>
+      <button type="button" id="ws-tab-qso" class="va-ws-btn" title="通聯工作台 (QSO Contact)">
+        <i class="mdi mdi-radio-tower"></i> <span>QSO (通聯)</span>
+      </button>
+    </div>
+    <div class="va-topbar-right">
+      <div id="topbar-wpm-pill" class="topbar-wpm-pill" title="即時速度">
+        <span id="topbar-wpm-val">20</span> WPM
+      </div>
+      <button type="button" id="btn-open-settings" class="btn-icon" title="設定抽屜">
+        <i class="mdi mdi-cog"></i>
       </button>
     </div>
   </header>
+
+  <!-- Workspace 1: Tx (發報) -->
+  <div id="ws-container-tx" class="workspace-view active">
+    <div class="header-subbar">
+      <div class="subtitle">電報模擬與練習工具 · 支援直鍵 / 雙撥片 / 機械震報鍵 · PCB 二元樹尋路 · 節奏儀表</div>
+      <div class="layout-switch-container">
+        <button type="button" class="layout-switch-btn active" id="btn-layout-2col" title="切換為雙欄專注佈局">
+          <span><i class="mdi mdi-view-column"></i> 雙欄專注</span>
+        </button>
+        <button type="button" class="layout-switch-btn" id="btn-layout-3col" title="切換為三欄工作台">
+          <span><i class="mdi mdi-view-dashboard-variant"></i> 三欄工作台</span>
+        </button>
+      </div>
+    </div>
 
   <div class="main-container layout-2col" id="main-container">
     <!-- Left Column: PCB Card -->
@@ -2465,6 +2689,41 @@
 
     </div> <!-- /col-telemetry -->
   </div> <!-- /main-container -->
+  </div> <!-- /ws-container-tx -->
+
+  <!-- Workspace 2: Rx (抄收) -->
+  <div id="ws-container-rx" class="workspace-view" style="display:none;">
+    <div class="placeholder-workspace">
+      <i class="mdi mdi-headphones placeholder-icon"></i>
+      <h2 style="color:#fff; margin-bottom:8px;">Rx (抄收工作台)</h2>
+      <p style="color:var(--text-muted); font-size:0.9rem;">盲聽電報呼號、隨機字母與聽寫解碼訓練 (CW Copy / Receive Challenge)</p>
+      <div class="placeholder-badge">即將推出 · Coming Soon</div>
+    </div>
+  </div>
+
+  <!-- Workspace 3: QSO (通聯) -->
+  <div id="ws-container-qso" class="workspace-view" style="display:none;">
+    <div class="placeholder-workspace">
+      <i class="mdi mdi-radio-tower placeholder-icon"></i>
+      <h2 style="color:#fff; margin-bottom:8px;">QSO (通聯工作台)</h2>
+      <p style="color:var(--text-muted); font-size:0.9rem;">業餘無線電虛擬頻段、訊號雜音與通聯程序模擬 (Virtual CW QSO Simulation)</p>
+      <div class="placeholder-badge">即將推出 · Coming Soon</div>
+    </div>
+  </div>
+
+  <!-- Slide-up Settings Drawer Skeleton -->
+  <div id="settings-drawer-backdrop" class="drawer-backdrop" style="display:none;"></div>
+  <div id="settings-drawer" class="settings-drawer" style="display:none;">
+    <div class="drawer-header">
+      <div class="drawer-title"><i class="mdi mdi-cog"></i> 系統設定 (Settings)</div>
+      <button type="button" id="btn-close-settings" class="btn-icon" title="關閉"><i class="mdi mdi-close"></i></button>
+    </div>
+    <div class="drawer-body" id="drawer-settings-content">
+      <div style="font-size:0.85rem; color:#8e929b; text-align:center; padding:20px;">
+        滑出式設定抽屜（完整二級參數收納將於 Task 5 實裝）
+      </div>
+    </div>
+  </div>
 
   <script>
     /**
@@ -7150,6 +7409,65 @@
       }
     }
 
+
+    // ----------------------------------------------------
+    // Three-Zone Shell & Workspace Navigation (Tx / Rx / QSO)
+    // ----------------------------------------------------
+    function setupWorkspaceNavigation() {
+      const wsTabs = [
+        { btnId: 'ws-tab-tx', viewId: 'ws-container-tx' },
+        { btnId: 'ws-tab-rx', viewId: 'ws-container-rx' },
+        { btnId: 'ws-tab-qso', viewId: 'ws-container-qso' }
+      ];
+
+      wsTabs.forEach(item => {
+        const btn = document.getElementById(item.btnId);
+        if (!btn) return;
+        btn.addEventListener('click', () => {
+          wsTabs.forEach(t => {
+            const b = document.getElementById(t.btnId);
+            const v = document.getElementById(t.viewId);
+            if (b) b.classList.remove('active');
+            if (v) {
+              v.style.display = 'none';
+              v.classList.remove('active');
+            }
+          });
+          btn.classList.add('active');
+          const targetView = document.getElementById(item.viewId);
+          if (targetView) {
+            targetView.style.display = 'flex';
+            targetView.classList.add('active');
+          }
+        });
+      });
+
+      // Settings Drawer Toggle
+      const btnOpenSettings = document.getElementById('btn-open-settings');
+      const btnCloseSettings = document.getElementById('btn-close-settings');
+      const drawer = document.getElementById('settings-drawer');
+      const backdrop = document.getElementById('settings-drawer-backdrop');
+
+      function openDrawer() {
+        if (drawer) drawer.style.display = 'flex';
+        if (backdrop) backdrop.style.display = 'block';
+      }
+      function closeDrawer() {
+        if (drawer) drawer.style.display = 'none';
+        if (backdrop) backdrop.style.display = 'none';
+      }
+
+      if (btnOpenSettings) btnOpenSettings.addEventListener('click', openDrawer);
+      if (btnCloseSettings) btnCloseSettings.addEventListener('click', closeDrawer);
+      if (backdrop) backdrop.addEventListener('click', closeDrawer);
+
+      // Sync WPM in Top Bar
+      window.updateTopbarWpm = function(wpm) {
+        const valEl = document.getElementById('topbar-wpm-val');
+        if (valEl) valEl.textContent = wpm;
+      };
+    }
+
     function setLayoutMode(mode) {
       const mainContainer = document.getElementById('main-container');
       const btnLayout2col = document.getElementById('btn-layout-2col');
@@ -7183,6 +7501,7 @@
     }
 
     // Startup
+    setupWorkspaceNavigation();
     renderCardSvg();
     applyLoadedSettings();
     setupScenarios();

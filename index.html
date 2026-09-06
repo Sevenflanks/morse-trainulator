@@ -27,18 +27,50 @@
 </head>
 <body>
 
-  <header>
-    <h1><i class="mdi mdi-radio-handheld"></i> 摩斯訓練儀 (Morse Trainulator)</h1>
-    <div class="subtitle">電報模擬與練習工具 · 支援直鍵 / 雙撥片 / 機械震報鍵 · PCB 二元樹尋路 · 節奏儀表</div>
-    <div class="layout-switch-container">
-      <button type="button" class="layout-switch-btn active" id="btn-layout-2col" title="切換為雙欄專注佈局">
-        <span><i class="mdi mdi-view-column"></i> 雙欄專注</span>
+  <!-- Three-Zone Top Bar -->
+  <header class="va-topbar">
+    <div class="va-brand">
+      <svg class="brand-mark" viewBox="0 0 36 36" fill="none">
+        <polygon points="18,2 33,10.5 33,25.5 18,34 3,25.5 3,10.5" stroke="#00e5ff" stroke-width="1.8" fill="#101520"/>
+        <circle cx="12" cy="18" r="3.2" fill="#ffd700"/>
+        <rect x="19" y="15.8" width="8.5" height="4.4" rx="2.2" fill="#00e5ff"/>
+      </svg>
+      <span class="va-title"><i class="mdi mdi-radio-handheld"></i> 摩斯訓練儀 <span class="va-title-en">Morse Trainulator</span></span>
+    </div>
+    <div class="va-workspace-nav">
+      <button type="button" id="ws-tab-tx" class="va-ws-btn active" title="發報工作台 (Transmit)">
+        <i class="mdi mdi-flash"></i> <span>Tx (發報)</span>
       </button>
-      <button type="button" class="layout-switch-btn" id="btn-layout-3col" title="切換為三欄工作台">
-        <span><i class="mdi mdi-view-dashboard-variant"></i> 三欄工作台</span>
+      <button type="button" id="ws-tab-rx" class="va-ws-btn" title="抄收工作台 (Receive)">
+        <i class="mdi mdi-headphones"></i> <span>Rx (抄收)</span>
+      </button>
+      <button type="button" id="ws-tab-qso" class="va-ws-btn" title="通聯工作台 (QSO Contact)">
+        <i class="mdi mdi-radio-tower"></i> <span>QSO (通聯)</span>
+      </button>
+    </div>
+    <div class="va-topbar-right">
+      <div id="topbar-wpm-pill" class="topbar-wpm-pill" title="即時速度">
+        <span id="topbar-wpm-val">20</span> WPM
+      </div>
+      <button type="button" id="btn-open-settings" class="btn-icon" title="設定抽屜">
+        <i class="mdi mdi-cog"></i>
       </button>
     </div>
   </header>
+
+  <!-- Workspace 1: Tx (發報) -->
+  <div id="ws-container-tx" class="workspace-view active">
+    <div class="header-subbar">
+      <div class="subtitle">電報模擬與練習工具 · 支援直鍵 / 雙撥片 / 機械震報鍵 · PCB 二元樹尋路 · 節奏儀表</div>
+      <div class="layout-switch-container">
+        <button type="button" class="layout-switch-btn active" id="btn-layout-2col" title="切換為雙欄專注佈局">
+          <span><i class="mdi mdi-view-column"></i> 雙欄專注</span>
+        </button>
+        <button type="button" class="layout-switch-btn" id="btn-layout-3col" title="切換為三欄工作台">
+          <span><i class="mdi mdi-view-dashboard-variant"></i> 三欄工作台</span>
+        </button>
+      </div>
+    </div>
 
   <div class="main-container layout-2col" id="main-container">
     <!-- Left Column: PCB Card -->
@@ -875,6 +907,41 @@
 
     </div> <!-- /col-telemetry -->
   </div> <!-- /main-container -->
+  </div> <!-- /ws-container-tx -->
+
+  <!-- Workspace 2: Rx (抄收) -->
+  <div id="ws-container-rx" class="workspace-view" style="display:none;">
+    <div class="placeholder-workspace">
+      <i class="mdi mdi-headphones placeholder-icon"></i>
+      <h2 style="color:#fff; margin-bottom:8px;">Rx (抄收工作台)</h2>
+      <p style="color:var(--text-muted); font-size:0.9rem;">盲聽電報呼號、隨機字母與聽寫解碼訓練 (CW Copy / Receive Challenge)</p>
+      <div class="placeholder-badge">即將推出 · Coming Soon</div>
+    </div>
+  </div>
+
+  <!-- Workspace 3: QSO (通聯) -->
+  <div id="ws-container-qso" class="workspace-view" style="display:none;">
+    <div class="placeholder-workspace">
+      <i class="mdi mdi-radio-tower placeholder-icon"></i>
+      <h2 style="color:#fff; margin-bottom:8px;">QSO (通聯工作台)</h2>
+      <p style="color:var(--text-muted); font-size:0.9rem;">業餘無線電虛擬頻段、訊號雜音與通聯程序模擬 (Virtual CW QSO Simulation)</p>
+      <div class="placeholder-badge">即將推出 · Coming Soon</div>
+    </div>
+  </div>
+
+  <!-- Slide-up Settings Drawer Skeleton -->
+  <div id="settings-drawer-backdrop" class="drawer-backdrop" style="display:none;"></div>
+  <div id="settings-drawer" class="settings-drawer" style="display:none;">
+    <div class="drawer-header">
+      <div class="drawer-title"><i class="mdi mdi-cog"></i> 系統設定 (Settings)</div>
+      <button type="button" id="btn-close-settings" class="btn-icon" title="關閉"><i class="mdi mdi-close"></i></button>
+    </div>
+    <div class="drawer-body" id="drawer-settings-content">
+      <div style="font-size:0.85rem; color:#8e929b; text-align:center; padding:20px;">
+        滑出式設定抽屜（完整二級參數收納將於 Task 5 實裝）
+      </div>
+    </div>
+  </div>
 
   <!-- Modular Scripts Loaded Sequentially for 100% file:/// and Web Compatibility -->
   <script src="js/core/morse-data.js"></script>

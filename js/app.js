@@ -1461,6 +1461,7 @@ function setupEventListeners() {
 // ----------------------------------------------------
 function initApp() {
   initDomReferences();
+  setupWorkspaceNavigation();
   ribbon = new CWRibbon('cw-ribbon', engine);
   window.ribbon = ribbon;
 
@@ -1493,5 +1494,64 @@ if (typeof module !== 'undefined' && module.exports) {
     settingsManager,
     kochManager,
     initApp
+  };
+}
+
+
+// ----------------------------------------------------
+// Three-Zone Shell & Workspace Navigation (Tx / Rx / QSO)
+// ----------------------------------------------------
+function setupWorkspaceNavigation() {
+  const wsTabs = [
+    { btnId: 'ws-tab-tx', viewId: 'ws-container-tx' },
+    { btnId: 'ws-tab-rx', viewId: 'ws-container-rx' },
+    { btnId: 'ws-tab-qso', viewId: 'ws-container-qso' }
+  ];
+
+  wsTabs.forEach(item => {
+    const btn = document.getElementById(item.btnId);
+    if (!btn) return;
+    btn.addEventListener('click', () => {
+      wsTabs.forEach(t => {
+        const b = document.getElementById(t.btnId);
+        const v = document.getElementById(t.viewId);
+        if (b) b.classList.remove('active');
+        if (v) {
+          v.style.display = 'none';
+          v.classList.remove('active');
+        }
+      });
+      btn.classList.add('active');
+      const targetView = document.getElementById(item.viewId);
+      if (targetView) {
+        targetView.style.display = 'flex';
+        targetView.classList.add('active');
+      }
+    });
+  });
+
+  // Settings Drawer Toggle
+  const btnOpenSettings = document.getElementById('btn-open-settings');
+  const btnCloseSettings = document.getElementById('btn-close-settings');
+  const drawer = document.getElementById('settings-drawer');
+  const backdrop = document.getElementById('settings-drawer-backdrop');
+
+  function openDrawer() {
+    if (drawer) drawer.style.display = 'flex';
+    if (backdrop) backdrop.style.display = 'block';
+  }
+  function closeDrawer() {
+    if (drawer) drawer.style.display = 'none';
+    if (backdrop) backdrop.style.display = 'none';
+  }
+
+  if (btnOpenSettings) btnOpenSettings.addEventListener('click', openDrawer);
+  if (btnCloseSettings) btnCloseSettings.addEventListener('click', closeDrawer);
+  if (backdrop) backdrop.addEventListener('click', closeDrawer);
+
+  // Sync WPM in Top Bar
+  window.updateTopbarWpm = function(wpm) {
+    const valEl = document.getElementById('topbar-wpm-val');
+    if (valEl) valEl.textContent = wpm;
   };
 }
