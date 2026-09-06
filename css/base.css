@@ -1,33 +1,52 @@
 :root {
-  --bg-dark: #0f1015;
-  --card-bg: #18191e;
-  --gold: #d4af37;
-  --gold-glow: rgba(212, 175, 55, 0.7);
+  --bg-dark: #080a0f;
+  --bg-panel: #0f131c;
+  --bg-surface: #151a27;
+  --bg-card: #1a2130;
+  --card-bg: #0f131c;
+  --gold: #ffd700;
+  --gold-dim: #b89700;
+  --gold-glow: rgba(255, 215, 0, 0.25);
   --gold-light: #f7e49a;
+  --cyan: #00e5ff;
+  --cyan-dim: #009cb3;
+  --cyan-glow: rgba(0, 229, 255, 0.25);
   --neon-blue: #00e5ff;
   --neon-glow: rgba(0, 229, 255, 0.85);
+  --green: #00e676;
+  --red: #ff5252;
   --danger: #ff5252;
+  --text-main: #f0f4fc;
+  --text-dim: #8292a4;
+  --text-muted: #4e5d71;
+  --border-subtle: #1c2333;
+  --border-accent: rgba(0, 229, 255, 0.28);
+  --border-gold: rgba(255, 215, 0, 0.35);
   --border-brass: #9b8146;
   --wire-base: #4a4126;
-  --text-muted: #8e929b;
+  --font-mono: 'JetBrains Mono', 'Fira Code', 'Roboto Mono', monospace;
+  --font-ui: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
 }
 
 * {
   box-sizing: border-box;
+  margin: 0;
+  padding: 0;
   user-select: none;
   -webkit-user-select: none;
 }
 
 body {
   margin: 0;
-  padding: 16px;
+  padding: 0;
   background: var(--bg-dark);
-  color: #e0e0e0;
-  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "PingFang TC", "Microsoft JhengHei", sans-serif;
-  min-height: 100vh;
+  color: var(--text-main);
+  font-family: var(--font-ui);
+  height: 100vh;
+  height: 100dvh;
+  overflow: hidden;
   display: flex;
   flex-direction: column;
-  align-items: center;
 }
 
 header {
