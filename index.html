@@ -72,6 +72,27 @@
       </div>
     </div>
 
+
+    <!-- Zone 2: Focus HUD Stage (A3 Center Radar Halo) -->
+    <div id="focus-hud-stage" class="focus-hud-stage">
+      <div class="a3-halo-stage">
+        <svg class="a3-halo-svg" viewBox="0 0 200 200">
+          <circle class="halo-bg-ring" cx="100" cy="100" r="70" />
+          <circle class="halo-bg-ring" cx="100" cy="100" r="85" />
+          <circle class="halo-press-arc" id="halo-press-arc" cx="100" cy="100" r="70" />
+          <circle class="halo-gap-arc" id="halo-gap-arc" cx="100" cy="100" r="85" />
+          <circle class="halo-gate-dot gate-3t" cx="25.5" cy="140.9" r="3.5" title="3T 結算點" />
+          <circle class="halo-gate-dot gate-7t" cx="180.8" cy="73.7" r="3.5" title="7T 空格點" />
+        </svg>
+        <div class="a3-halo-inner">
+          <div class="hud-char-large" id="hud-char-target">—</div>
+          <div class="hud-seq-code" id="hud-seq-target"></div>
+        </div>
+      </div>
+      <div class="hud-status-line" id="hud-timing-status">準備就緒</div>
+      <div class="hud-committed-stream" id="hud-committed-stream">—</div>
+    </div>
+
   <div class="main-container layout-2col" id="main-container">
     <!-- Left Column: PCB Card -->
     <div class="card-column" id="col-hardware">

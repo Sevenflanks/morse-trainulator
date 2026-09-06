@@ -597,3 +597,128 @@ h1 {
   font-family: monospace;
   white-space: nowrap;
 }
+
+
+/* ==========================================================================
+   Zone 2: Focus HUD Stage & A3 Center Radar Halo
+   ========================================================================== */
+.focus-hud-stage {
+  width: 100%;
+  max-width: 1280px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 24px 16px;
+  box-sizing: border-box;
+  background: radial-gradient(circle at 50% 40%, #151a24 0%, #0d1017 100%);
+  border: 1px solid #232a38;
+  border-radius: 12px;
+  margin-bottom: 12px;
+  position: relative;
+  box-shadow: inset 0 2px 10px rgba(0, 0, 0, 0.6);
+}
+.a3-halo-stage {
+  position: relative;
+  width: 200px;
+  height: 200px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 14px;
+  flex-shrink: 0;
+}
+.a3-halo-svg {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  transform: rotate(-90deg);
+  transform-origin: 50% 50%;
+}
+.halo-bg-ring {
+  fill: none;
+  stroke: #18202d;
+  stroke-width: 6;
+}
+.halo-press-arc {
+  fill: none;
+  stroke: var(--neon-blue);
+  stroke-width: 6;
+  stroke-dasharray: 440;
+  stroke-dashoffset: 440;
+  stroke-linecap: round;
+  transition: stroke-dashoffset 0.04s linear;
+}
+.halo-gap-arc {
+  fill: none;
+  stroke: #2c394c;
+  stroke-width: 6;
+  stroke-dasharray: 534;
+  stroke-dashoffset: 534;
+  stroke-linecap: round;
+  transition: stroke-dashoffset 0.04s linear;
+}
+.halo-gate-dot {
+  fill: var(--gold);
+  transition: transform 0.1s;
+}
+.halo-gate-dot.gate-3t {
+  fill: #ffd700;
+}
+.halo-gate-dot.gate-7t {
+  fill: #00e5ff;
+}
+.a3-halo-inner {
+  text-align: center;
+  z-index: 2;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+.hud-char-large {
+  font-size: 4.6rem;
+  font-weight: 900;
+  color: var(--gold);
+  font-family: monospace;
+  line-height: 0.95;
+  text-shadow: 0 0 20px rgba(255, 215, 0, 0.4);
+}
+.hud-seq-code {
+  font-size: 1.3rem;
+  color: var(--neon-blue);
+  font-family: monospace;
+  letter-spacing: 4px;
+  margin-top: 4px;
+  min-height: 24px;
+}
+.hud-status-line {
+  font-size: 0.82rem;
+  font-family: monospace;
+  color: var(--text-muted);
+  margin-top: 6px;
+  min-height: 20px;
+  text-align: center;
+}
+.hud-committed-stream {
+  background: #090c12;
+  border: 1px solid #232a38;
+  border-radius: 8px;
+  padding: 8px 16px;
+  font-family: monospace;
+  font-size: 1rem;
+  letter-spacing: 2px;
+  min-height: 38px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #cfd6e6;
+  box-shadow: inset 0 2px 6px rgba(0, 0, 0, 0.6);
+  max-width: 540px;
+  width: 100%;
+  margin-top: 10px;
+  box-sizing: border-box;
+  word-break: break-all;
+}

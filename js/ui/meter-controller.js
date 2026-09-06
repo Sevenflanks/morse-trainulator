@@ -94,6 +94,18 @@ function startMeterAnimation() {
     const pct = Math.min(100, (elapsed / maxMeterScale) * 100);
 
     if (meterBar) meterBar.style.width = pct + '%';
+    const haloPressArc = document.getElementById('halo-press-arc');
+    const hudTimingStatus = document.getElementById('hud-timing-status');
+    if (haloPressArc) {
+      const pressPct = Math.min(100, (elapsed / maxMeterScale) * 100);
+      const pressOffset = 440 - (440 * (pressPct / 100));
+      haloPressArc.style.strokeDashoffset = pressOffset;
+      haloPressArc.style.stroke = (elapsed < th) ? 'var(--neon-blue)' : 'var(--gold)';
+    }
+    if (hudTimingStatus) {
+      const isDah = elapsed >= th;
+      hudTimingStatus.innerHTML = `發報中: <strong style="color:${isDah ? 'var(--gold)' : 'var(--neon-blue)'};">${isDah ? '— 劃 Dah' : '· 點 Dit'}</strong> (${elapsed}ms)`;
+    }
     if (readoutTime) readoutTime.textContent = `${elapsed} ms`;
 
     if (typeof engine.calculateStrokeWpm === 'function') {
@@ -134,6 +146,8 @@ function stopMeterAnimation(finalDuration) {
 
   const pct = Math.min(100, (finalDuration / maxMeterScale) * 100);
   if (meterBar) meterBar.style.width = pct + '%';
+  const haloPressArc = document.getElementById('halo-press-arc');
+  if (haloPressArc) haloPressArc.style.strokeDashoffset = '440';
   if (readoutTime) readoutTime.textContent = `${finalDuration} ms`;
 
   if (engine && typeof engine.calculateStrokeWpm === 'function') {
@@ -157,6 +171,8 @@ function stopMeterAnimation(finalDuration) {
 }
 
 function stopGapCountdown() {
+  const haloGapArc = document.getElementById('halo-gap-arc');
+  if (haloGapArc) haloGapArc.style.strokeDashoffset = '534';
   if (gapAnimFrame) {
     cancelAnimationFrame(gapAnimFrame);
     gapAnimFrame = null;
@@ -205,6 +221,22 @@ function startGapCountdown() {
     const pct = Math.min(100, (elapsed / maxGapScale) * 100);
 
     if (gapBar) gapBar.style.width = pct + '%';
+    const haloGapArc = document.getElementById('halo-gap-arc');
+    const hudTimingStatus = document.getElementById('hud-timing-status');
+    if (haloGapArc) {
+      const gapOffset = 534 - (534 * (pct / 100));
+      haloGapArc.style.strokeDashoffset = gapOffset;
+      if (elapsed < letterGap) {
+        haloGapArc.style.stroke = '#2c394c';
+        if (hudTimingStatus) hudTimingStatus.textContent = `間隔計時: ${elapsed}ms`;
+      } else if (elapsed < wordGap) {
+        haloGapArc.style.stroke = 'var(--gold)';
+        if (hudTimingStatus) hudTimingStatus.innerHTML = `<span style="color:var(--gold); font-weight:bold;">字元結算 (3T: ${elapsed}ms)</span>`;
+      } else {
+        haloGapArc.style.stroke = 'var(--neon-blue)';
+        if (hudTimingStatus) hudTimingStatus.innerHTML = `<span style="color:var(--neon-blue); font-weight:bold;">單字空格 (7T: ${elapsed}ms)</span>`;
+      }
+    }
     if (gapTimeReadout) gapTimeReadout.textContent = `${Math.round(elapsed)} ms`;
 
     // Stage 1: Before letter settlement (0 ~ 3T)

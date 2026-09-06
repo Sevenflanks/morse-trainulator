@@ -373,6 +373,10 @@ function handleBugManualDah(isDown) {
     const res = engine.appendSymbol('-', duration);
     if (dom.stateSeq) dom.stateSeq.textContent = res.sequence;
     if (dom.stateLetter) dom.stateLetter.textContent = res.letter || '(非英文字母)';
+    const hudChar = document.getElementById('hud-char-target');
+    const hudSeq = document.getElementById('hud-seq-target');
+    if (hudChar) hudChar.textContent = res.letter || '—';
+    if (hudSeq) hudSeq.textContent = res.sequence || '';
     if (dom.stateDuration) dom.stateDuration.textContent = `${duration} ms`;
 
     if (res.isValid) {
