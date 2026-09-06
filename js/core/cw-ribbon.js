@@ -88,6 +88,9 @@ class CWRibbon {
     const H = c.height;
     const now = performance.now();
 
+    this.baselineY = Math.round(H * 0.74);
+    this.highY = Math.round(H * 0.28);
+
     // 1. Background
     ctx.fillStyle = '#08090d';
     ctx.fillRect(0, 0, W, H);

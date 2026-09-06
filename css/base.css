@@ -336,11 +336,63 @@ h1 {
   align-items: center;
   margin-bottom: 12px;
 }
+.header-subbar.noise-hidden {
+  display: none !important;
+}
+
+/* ==========================================================================
+   Panoramic HUD Ribbon (Top 置頂示波光帶, 75px)
+   ========================================================================== */
+.p3b-top-ribbon {
+  width: 100%;
+  height: 75px;
+  min-height: 75px;
+  max-height: 75px;
+  background: #080b11;
+  border-bottom: 1px solid var(--border-subtle);
+  position: relative;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  flex-shrink: 0;
+  box-sizing: border-box;
+}
+.scope-canvas {
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+.scope-graticule {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background-image: 
+    linear-gradient(to right, rgba(0, 229, 255, 0.05) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(0, 229, 255, 0.05) 1px, transparent 1px);
+  background-size: 24px 24px;
+}
+.scope-bezel-text {
+  position: absolute;
+  top: 6px;
+  left: 12px;
+  font-size: 0.65rem;
+  font-family: var(--font-mono);
+  color: var(--cyan);
+  font-weight: 700;
+  letter-spacing: 0.5px;
+  z-index: 2;
+  pointer-events: none;
+  text-shadow: 0 0 6px var(--cyan-glow);
+}
+
 .workspace-view {
   width: 100%;
+  flex: 1;
+  min-height: 0;
   display: flex;
   flex-direction: column;
   align-items: center;
+  overflow: hidden;
 }
 .placeholder-workspace {
   padding: 60px 20px;

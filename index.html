@@ -60,6 +60,15 @@
 
   <!-- Workspace 1: Tx (發報) -->
   <div id="ws-container-tx" class="workspace-view active">
+    <!-- Panoramic Top HUD Ribbon (75px) -->
+    <div class="p3b-top-ribbon" id="cockpit-top-ribbon">
+      <div class="scope-bezel-text">
+        <i class="mdi mdi-sine-wave"></i> PANORAMIC SPECTRUM HUD · 100% HORIZONTAL CARRIER MONITOR
+      </div>
+      <canvas id="cw-ribbon" class="scope-canvas" height="75"></canvas>
+      <div class="scope-graticule"></div>
+    </div>
+
     <div class="header-subbar noise-hidden" style="display:none;">
       <div class="subtitle">電報模擬與練習工具 · 支援直鍵 / 雙撥片 / 機械震報鍵 · PCB 二元樹尋路 · 節奏儀表</div>
 
@@ -707,13 +716,10 @@
           </div>
         </div>
 
-        <!-- 3. Real-time CW Oscilloscope Ribbon -->
-        <div style="display:flex; justify-content:space-between; align-items:center; font-size:0.75rem; color:var(--text-muted); margin-bottom:4px; margin-top:6px;">
-          <span>③ 電報示波紙帶 (CW Ribbon)</span>
-          <span style="font-size:0.7rem; color:#888;">60 FPS 方波 · 時序視覺化</span>
-        </div>
-        <div style="background: #08090d; border: 1.5px solid #282c3a; border-radius: 6px; overflow: hidden; position: relative; height: 58px; box-shadow: inset 0 2px 8px rgba(0,0,0,0.9);">
-          <canvas id="cw-ribbon" width="500" height="58" style="width: 100%; height: 100%; display: block;"></canvas>
+        <!-- 3. Real-time CW Oscilloscope Notice -->
+        <div style="display:flex; justify-content:space-between; align-items:center; font-size:0.75rem; color:var(--text-muted); margin-top:8px; padding-top:6px; border-top:1px solid #1c2333;">
+          <span><i class="mdi mdi-sine-wave" style="color:var(--cyan);"></i> 示波光帶已升格至頂置平視艙 (Top HUD)</span>
+          <span style="font-size:0.7rem; color:var(--cyan);">60 FPS 全寬即時監聽</span>
         </div>
       </div>
 
