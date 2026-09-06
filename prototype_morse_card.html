@@ -2912,78 +2912,6 @@
           </div>
         </div>
 
-        <!-- Dual Paddle Settings -->
-        <div id="paddle-settings-box" style="background: #121319; border: 1px solid #2e3342; border-radius: 6px; padding: 8px 10px; margin-bottom: 12px;">
-          <div style="font-size:0.76rem; font-weight:bold; color:var(--gold); margin-bottom:8px; display:flex; justify-content:space-between; align-items:center;">
-            <span>雙撥片設定 (Iambic Paddle)</span>
-            <span style="font-size:0.68rem; color:#888;">Curtis 8044</span>
-          </div>
-          <div style="display:flex; justify-content:space-between; align-items:center; font-size:0.8rem; margin-bottom:8px;">
-            <label style="display:flex; align-items:center; gap:6px; cursor:pointer; color:#ccc;">
-              <input type="checkbox" id="chk-paddle-reverse" style="accent-color:var(--gold);">
-              <span>左右撥片互換 (左劃 Dah / 右點 Dit)</span>
-            </label>
-            <span style="font-size:0.7rem; color:#888;">適配左手或接線</span>
-          </div>
-          <div style="display:flex; justify-content:space-between; align-items:center; font-size:0.8rem;">
-            <label style="color:#ccc;">Iambic 夾發模式：</label>
-            <div style="display:flex; gap:12px; font-size:0.78rem;">
-              <label style="cursor:pointer; display:flex; align-items:center; gap:4px; color:#ffd700;">
-                <input type="radio" name="iambic-mode" id="radio-mode-b" value="B" checked style="accent-color:var(--gold);">
-                <span style="white-space:nowrap;">Mode B (自動補音)</span>
-              </label>
-              <label style="cursor:pointer; display:flex; align-items:center; gap:4px; color:#aaa;">
-                <input type="radio" name="iambic-mode" id="radio-mode-a" value="A" style="accent-color:var(--gold);">
-                <span style="white-space:nowrap;">Mode A (放開即停)</span>
-              </label>
-            </div>
-          </div>
-        </div>
-
-        <!-- Farnsworth Timing Option Box -->
-        <div id="farnsworth-settings-box" style="background: #121319; border: 1px solid #2e3342; border-radius: 6px; padding: 8px 10px; margin-bottom: 12px;">
-          <div style="font-size:0.76rem; font-weight:bold; color:var(--neon-blue); margin-bottom:8px; display:flex; justify-content:space-between; align-items:center;">
-            <span>法恩斯沃斯節奏 (Farnsworth Timing)</span>
-            <span style="font-size:0.68rem; color:#888;">音形訓練法</span>
-          </div>
-          <div style="display:flex; justify-content:space-between; align-items:center; font-size:0.8rem; margin-bottom:8px;">
-            <label style="display:flex; align-items:center; gap:6px; cursor:pointer; color:#ccc;">
-              <input type="checkbox" id="chk-farnsworth" style="accent-color:var(--neon-blue);">
-              <span>啟用法恩斯沃斯 (音形高速 · 間距放寬)</span>
-            </label>
-            <span style="font-size:0.7rem; color:#888;" id="tag-farnsworth-status">已關閉</span>
-          </div>
-          <div id="farnsworth-controls" style="display:none; padding-top:6px; border-top:1px dashed #2a2e3a;">
-            <div style="display:flex; justify-content:space-between; align-items:center; font-size:0.75rem; color:#aaa; margin-bottom:4px;">
-              <span>字元速度 (Character Speed): <strong id="tag-farnsworth-wpm" style="color:var(--neon-blue);">18 WPM (67ms)</strong></span>
-              <span style="font-size:0.68rem; color:#777; white-space:nowrap;">間隔依上方預設</span>
-            </div>
-            <input type="range" id="param-farnsworth-wpm" min="15" max="40" step="1" value="18" style="width:100%; accent-color:var(--neon-blue);">
-          </div>
-        </div>
-
-        <!-- Atmospheric RF Noise (QRN) Box -->
-        <div id="qrn-settings-box" style="background: #121319; border: 1px solid #2e3342; border-radius: 6px; padding: 8px 10px; margin-bottom: 12px;">
-          <div style="font-size:0.76rem; font-weight:bold; color:#ffb703; margin-bottom:8px; display:flex; justify-content:space-between; align-items:center;">
-            <span>電台背景雜音 (QRN)</span>
-            <span style="font-size:0.68rem; color:#888;">短波濾波</span>
-          </div>
-          <div style="display:flex; justify-content:space-between; align-items:center; font-size:0.8rem; margin-bottom:6px;">
-            <label style="display:flex; align-items:center; gap:6px; cursor:pointer; color:#ccc;">
-              <input type="checkbox" id="chk-qrn" style="accent-color:#ffb703;">
-              <span>開啟背景雜音 (短波情境)</span>
-            </label>
-            <span style="font-size:0.7rem; color:#888;" id="tag-qrn-status">已靜音</span>
-          </div>
-          <div id="qrn-controls" style="display:none; padding-top:6px; border-top:1px dashed #2a2e3a;">
-            <div style="display:flex; justify-content:space-between; align-items:center; font-size:0.75rem; color:#aaa; margin-bottom:4px;">
-              <span>雜音強度 (Volume): <strong id="tag-qrn-vol" style="color:#ffb703;">20%</strong></span>
-              <span style="font-size:0.68rem; color:#777;">環境底噪</span>
-            </div>
-            <input type="range" id="param-qrn-vol" min="0.01" max="0.10" step="0.01" value="0.04" style="width:100%; accent-color:#ffb703;">
-          </div>
-        </div>
-
         <div class="settings-row">
           <label>時間單位 T (Dit 基準)
             <span>1T 長度 (1200 / WPM)</span>
@@ -3012,77 +2940,15 @@
           <input type="range" id="param-word-gap" min="100" max="2500" step="20" value="560">
           <div class="val-tag" id="tag-word-gap">560ms</div>
         </div>
-        <div class="settings-row">
-          <label>側音頻率 (CW Sidetone)
-            <span>正弦波側音頻率</span>
-          </label>
-          <input type="range" id="param-freq" min="400" max="1000" step="20" value="680">
-          <div class="val-tag" id="tag-freq">680Hz</div>
-        </div>
 
-        <!-- Keyboard Keybindings Box -->
-        <div id="keybindings-settings-box" style="background: #121319; border: 1px solid #2e3342; border-radius: 6px; padding: 8px 10px; margin-top: 14px; margin-bottom: 8px;">
-          <div style="font-size:0.76rem; font-weight:bold; color:#00e5ff; margin-bottom:8px; display:flex; justify-content:space-between; align-items:center;">
-            <span>⌨️ 鍵盤按鍵對應</span>
-            <span id="tag-current-profile" style="font-size:0.68rem; color:#888;">標準鍵位</span>
-          </div>
-
-          <!-- Preset Profile Buttons -->
-          <div style="display:grid; grid-template-columns: repeat(4, 1fr); gap: 6px; margin-bottom: 10px;">
-            <button class="key-profile-btn active-key-profile" data-profile="standard" style="background:#1a1c24; border:1px solid #363b4b; border-radius:5px; padding:6px 2px; color:#ddd; font-size:0.72rem; cursor:pointer; text-align:center;">
-              <div style="font-weight:bold;">標準鍵位</div>
-              <div style="font-size:0.63rem; color:#888;">K · [ ]</div>
-            </button>
-            <button class="key-profile-btn" data-profile="homerow" style="background:#1a1c24; border:1px solid #363b4b; border-radius:5px; padding:6px 2px; color:#ddd; font-size:0.72rem; cursor:pointer; text-align:center;">
-              <div style="font-weight:bold;">雙手基準</div>
-              <div style="font-size:0.63rem; color:#00e5ff;">F · J</div>
-            </button>
-            <button class="key-profile-btn" data-profile="left_hand" style="background:#1a1c24; border:1px solid #363b4b; border-radius:5px; padding:6px 2px; color:#ddd; font-size:0.72rem; cursor:pointer; text-align:center;">
-              <div style="font-weight:bold;">單手左手</div>
-              <div style="font-size:0.63rem; color:#ffd700;">Z · X</div>
-            </button>
-            <button class="key-profile-btn" data-profile="arrows" style="background:#1a1c24; border:1px solid #363b4b; border-radius:5px; padding:6px 2px; color:#ddd; font-size:0.72rem; cursor:pointer; text-align:center;">
-              <div style="font-weight:bold;">方向鍵</div>
-              <div style="font-size:0.63rem; color:#81b29a;">← · →</div>
+          <!-- Quick link button to open settings drawer -->
+          <div style="margin-top:14px;">
+            <button type="button" id="btn-open-settings-telemetry" style="width:100%; background:#1a1c24; border:1px solid #363b4b; border-radius:6px; padding:8px 12px; color:#ddd; font-size:0.8rem; cursor:pointer; display:flex; align-items:center; justify-content:center; gap:8px;">
+              <i class="mdi mdi-cog-outline" style="color:var(--neon-blue);"></i> 系統進階設定 (音頻 · 撥片 · Farnsworth · 鍵位)
             </button>
           </div>
-
-          <!-- Interactive Key Binding Remap Buttons -->
-          <div style="display:flex; flex-direction:column; gap:6px; font-size:0.75rem; background:#0c0d12; padding:8px; border-radius:5px;">
-            <div style="display:flex; justify-content:space-between; align-items:center;">
-              <span style="color:#aaa;">直鍵 (Straight):</span>
-              <button id="btn-bind-straight" class="bind-btn" style="background:#1f2330; border:1px solid #3d465c; color:#fff; border-radius:4px; padding:2px 10px; font-family:monospace; font-size:0.75rem; cursor:pointer;">
-                K
-              </button>
-            </div>
-            <div style="display:flex; justify-content:space-between; align-items:center;">
-              <span style="color:#aaa;">點撥片 (Dit):</span>
-              <button id="btn-bind-dit" class="bind-btn" style="background:#1f2330; border:1px solid #3d465c; color:#00e5ff; border-radius:4px; padding:2px 10px; font-family:monospace; font-size:0.75rem; cursor:pointer;">
-                [ / ,
-              </button>
-            </div>
-            <div style="display:flex; justify-content:space-between; align-items:center;">
-              <span style="color:#aaa;">劃撥片 (Dah):</span>
-              <button id="btn-bind-dah" class="bind-btn" style="background:#1f2330; border:1px solid #3d465c; color:#ffd700; border-radius:4px; padding:2px 10px; font-family:monospace; font-size:0.75rem; cursor:pointer;">
-                ] / .
-              </button>
-            </div>
-          </div>
-          <div style="font-size:0.68rem; color:#777; margin-top:6px; text-align:center;">
-            <i class="mdi mdi-lightbulb-outline"></i> 點選按鍵後，按下鍵盤任意鍵即可更換
-          </div>
-        </div>
-
-        <!-- Factory Reset & Storage Status Footer -->
-        <div style="display:flex; justify-content:space-between; align-items:center; margin-top:14px; padding-top:8px; border-top:1px solid #252834;">
-          <span style="font-size:0.7rem; color:#888;"><i class="mdi mdi-content-save-outline"></i> 設定將自動保存</span>
-          <button id="btn-factory-reset" style="background:none; border:1px solid #444; color:#aaa; padding:4px 8px; border-radius:4px; font-size:0.72rem; cursor:pointer;">
-            <i class="mdi mdi-restore"></i> 重設為預設值
-          </button>
-        </div>
       </div>
-
-    </div> <!-- /col-telemetry -->
+</div> <!-- /col-telemetry -->
   </div> <!-- /main-container -->
 
     <!-- K5 Ergonomic Morphing Dock (Zone 3) -->
@@ -3160,15 +3026,162 @@
   <div id="settings-drawer-backdrop" class="drawer-backdrop" style="display:none;"></div>
   <div id="settings-drawer" class="settings-drawer" style="display:none;">
     <div class="drawer-header">
-      <div class="drawer-title"><i class="mdi mdi-cog"></i> 系統設定 (Settings)</div>
+      <div class="drawer-title"><i class="mdi mdi-cog"></i> 系統進階設定 (Settings)</div>
       <button type="button" id="btn-close-settings" class="btn-icon" title="關閉"><i class="mdi mdi-close"></i></button>
     </div>
     <div class="drawer-body" id="drawer-settings-content">
-      <div style="font-size:0.85rem; color:#8e929b; text-align:center; padding:20px;">
-        滑出式設定抽屜（完整二級參數收納將於 Task 5 實裝）
+
+      <!-- Sidetone Frequency -->
+      <div class="settings-card-section" style="background:#14161f; border:1px solid #282d3c; border-radius:8px; padding:12px;">
+        <div style="font-size:0.8rem; font-weight:bold; color:var(--neon-blue); margin-bottom:10px; display:flex; justify-content:space-between; align-items:center;">
+          <span><i class="mdi mdi-sine-wave"></i> 側音頻率 (CW Sidetone)</span>
+          <span style="font-size:0.7rem; color:#888;">音調調整 (400–1000 Hz)</span>
+        </div>
+        <div class="settings-row" style="margin-bottom:0;">
+          <label>側音頻率 (CW Sidetone)
+            <span>正弦波側音頻率</span>
+          </label>
+          <input type="range" id="param-freq" min="400" max="1000" step="20" value="680">
+          <div class="val-tag" id="tag-freq">680Hz</div>
+        </div>
       </div>
+
+      <!-- Dual Paddle Settings -->
+      <div id="paddle-settings-box" style="background: #14161f; border: 1px solid #282d3c; border-radius: 8px; padding: 12px;">
+        <div style="font-size:0.8rem; font-weight:bold; color:var(--gold); margin-bottom:10px; display:flex; justify-content:space-between; align-items:center;">
+          <span><i class="mdi mdi-electric-switch"></i> 雙撥片設定 (Iambic Paddle)</span>
+          <span style="font-size:0.7rem; color:#888;">Curtis 8044</span>
+        </div>
+        <div style="display:flex; justify-content:space-between; align-items:center; font-size:0.8rem; margin-bottom:10px;">
+          <label style="display:flex; align-items:center; gap:6px; cursor:pointer; color:#ccc;">
+            <input type="checkbox" id="chk-paddle-reverse" style="accent-color:var(--gold);">
+            <span>左右撥片互換 (左劃 Dah / 右點 Dit)</span>
+          </label>
+          <span style="font-size:0.7rem; color:#888; white-space:nowrap;">適配左手或接線</span>
+        </div>
+        <div style="display:flex; justify-content:space-between; align-items:center; font-size:0.8rem;">
+          <label style="color:#ccc;">Iambic 夾發模式：</label>
+          <div style="display:flex; gap:12px; font-size:0.78rem;">
+            <label style="cursor:pointer; display:flex; align-items:center; gap:4px; color:#ffd700; white-space:nowrap;">
+              <input type="radio" name="iambic-mode" id="radio-mode-b" value="B" checked style="accent-color:var(--gold);">
+              <span>Mode B (自動補音)</span>
+            </label>
+            <label style="cursor:pointer; display:flex; align-items:center; gap:4px; color:#aaa; white-space:nowrap;">
+              <input type="radio" name="iambic-mode" id="radio-mode-a" value="A" style="accent-color:var(--gold);">
+              <span>Mode A (放開即停)</span>
+            </label>
+          </div>
+        </div>
+      </div>
+
+      <!-- Farnsworth Timing Option Box -->
+      <div id="farnsworth-settings-box" style="background: #14161f; border: 1px solid #282d3c; border-radius: 8px; padding: 12px;">
+        <div style="font-size:0.8rem; font-weight:bold; color:var(--neon-blue); margin-bottom:10px; display:flex; justify-content:space-between; align-items:center;">
+          <span><i class="mdi mdi-metronome"></i> 法恩斯沃斯節奏 (Farnsworth Timing)</span>
+          <span style="font-size:0.7rem; color:#888;">音形訓練法</span>
+        </div>
+        <div style="display:flex; justify-content:space-between; align-items:center; font-size:0.8rem; margin-bottom:8px;">
+          <label style="display:flex; align-items:center; gap:6px; cursor:pointer; color:#ccc;">
+            <input type="checkbox" id="chk-farnsworth" style="accent-color:var(--neon-blue);">
+            <span>啟用法恩斯沃斯 (音形高速 · 間距放寬)</span>
+          </label>
+          <span style="font-size:0.7rem; color:#888;" id="tag-farnsworth-status">已關閉</span>
+        </div>
+        <div id="farnsworth-controls" style="display:none; padding-top:8px; border-top:1px dashed #2a2e3a;">
+          <div style="display:flex; justify-content:space-between; align-items:center; font-size:0.75rem; color:#aaa; margin-bottom:6px;">
+            <span>字元速度 (Character Speed): <strong id="tag-farnsworth-wpm" style="color:var(--neon-blue);">18 WPM (67ms)</strong></span>
+            <span style="font-size:0.68rem; color:#777; white-space:nowrap;">間隔依主設定</span>
+          </div>
+          <input type="range" id="param-farnsworth-wpm" min="15" max="40" step="1" value="18" style="width:100%; accent-color:var(--neon-blue);">
+        </div>
+      </div>
+
+      <!-- Atmospheric RF Noise (QRN) Box -->
+      <div id="qrn-settings-box" style="background: #14161f; border: 1px solid #282d3c; border-radius: 8px; padding: 12px;">
+        <div style="font-size:0.8rem; font-weight:bold; color:#ffb703; margin-bottom:10px; display:flex; justify-content:space-between; align-items:center;">
+          <span><i class="mdi mdi-radio-tower"></i> 電台背景雜音 (QRN)</span>
+          <span style="font-size:0.7rem; color:#888;">短波濾波</span>
+        </div>
+        <div style="display:flex; justify-content:space-between; align-items:center; font-size:0.8rem; margin-bottom:6px;">
+          <label style="display:flex; align-items:center; gap:6px; cursor:pointer; color:#ccc;">
+            <input type="checkbox" id="chk-qrn" style="accent-color:#ffb703;">
+            <span>開啟背景雜音 (短波情境)</span>
+          </label>
+          <span style="font-size:0.7rem; color:#888;" id="tag-qrn-status">已靜音</span>
+        </div>
+        <div id="qrn-controls" style="display:none; padding-top:8px; border-top:1px dashed #2a2e3a;">
+          <div style="display:flex; justify-content:space-between; align-items:center; font-size:0.75rem; color:#aaa; margin-bottom:6px;">
+            <span>雜音強度 (Volume): <strong id="tag-qrn-vol" style="color:#ffb703;">20%</strong></span>
+            <span style="font-size:0.68rem; color:#777;">環境底噪</span>
+          </div>
+          <input type="range" id="param-qrn-vol" min="0.01" max="0.10" step="0.01" value="0.04" style="width:100%; accent-color:#ffb703;">
+        </div>
+      </div>
+
+      <!-- Keyboard Keybindings Box -->
+      <div id="keybindings-settings-box" style="background: #14161f; border: 1px solid #282d3c; border-radius: 8px; padding: 12px;">
+        <div style="font-size:0.8rem; font-weight:bold; color:#00e5ff; margin-bottom:10px; display:flex; justify-content:space-between; align-items:center;">
+          <span><i class="mdi mdi-keyboard-outline"></i> 鍵盤按鍵對應</span>
+          <span id="tag-current-profile" style="font-size:0.7rem; color:#888;">標準鍵位</span>
+        </div>
+
+        <!-- Preset Profile Buttons -->
+        <div style="display:grid; grid-template-columns: repeat(4, 1fr); gap: 6px; margin-bottom: 10px;">
+          <button class="key-profile-btn active-key-profile" data-profile="standard" style="background:#1a1c24; border:1px solid #363b4b; border-radius:5px; padding:6px 2px; color:#ddd; font-size:0.72rem; cursor:pointer; text-align:center;">
+            <div style="font-weight:bold;">標準鍵位</div>
+            <div style="font-size:0.63rem; color:#888;">K · [ ]</div>
+          </button>
+          <button class="key-profile-btn" data-profile="homerow" style="background:#1a1c24; border:1px solid #363b4b; border-radius:5px; padding:6px 2px; color:#ddd; font-size:0.72rem; cursor:pointer; text-align:center;">
+            <div style="font-weight:bold;">雙手基準</div>
+            <div style="font-size:0.63rem; color:#00e5ff;">F · J</div>
+          </button>
+          <button class="key-profile-btn" data-profile="left_hand" style="background:#1a1c24; border:1px solid #363b4b; border-radius:5px; padding:6px 2px; color:#ddd; font-size:0.72rem; cursor:pointer; text-align:center;">
+            <div style="font-weight:bold;">單手左手</div>
+            <div style="font-size:0.63rem; color:#ffd700;">Z · X</div>
+          </button>
+          <button class="key-profile-btn" data-profile="arrows" style="background:#1a1c24; border:1px solid #363b4b; border-radius:5px; padding:6px 2px; color:#ddd; font-size:0.72rem; cursor:pointer; text-align:center;">
+            <div style="font-weight:bold;">方向鍵</div>
+            <div style="font-size:0.63rem; color:#81b29a;">← · →</div>
+          </button>
+        </div>
+
+        <!-- Interactive Key Binding Remap Buttons -->
+        <div style="display:flex; flex-direction:column; gap:6px; font-size:0.75rem; background:#0c0d12; padding:8px; border-radius:5px;">
+          <div style="display:flex; justify-content:space-between; align-items:center;">
+            <span style="color:#aaa;">直鍵 (Straight):</span>
+            <button id="btn-bind-straight" class="bind-btn" style="background:#1f2330; border:1px solid #3d465c; color:#fff; border-radius:4px; padding:2px 10px; font-family:monospace; font-size:0.75rem; cursor:pointer;">
+              K
+            </button>
+          </div>
+          <div style="display:flex; justify-content:space-between; align-items:center;">
+            <span style="color:#aaa;">點撥片 (Dit):</span>
+            <button id="btn-bind-dit" class="bind-btn" style="background:#1f2330; border:1px solid #3d465c; color:#00e5ff; border-radius:4px; padding:2px 10px; font-family:monospace; font-size:0.75rem; cursor:pointer;">
+              [ / ,
+            </button>
+          </div>
+          <div style="display:flex; justify-content:space-between; align-items:center;">
+            <span style="color:#aaa;">劃撥片 (Dah):</span>
+            <button id="btn-bind-dah" class="bind-btn" style="background:#1f2330; border:1px solid #3d465c; color:#ffd700; border-radius:4px; padding:2px 10px; font-family:monospace; font-size:0.75rem; cursor:pointer;">
+              ] / .
+            </button>
+          </div>
+        </div>
+        <div style="font-size:0.68rem; color:#777; margin-top:6px; text-align:center;">
+          <i class="mdi mdi-lightbulb-outline"></i> 點選按鍵後，按下鍵盤任意鍵即可更換
+        </div>
+      </div>
+
+      <!-- Factory Reset & Storage Status Footer -->
+      <div style="display:flex; justify-content:space-between; align-items:center; padding:10px 4px; border-top:1px solid #252834;">
+        <span style="font-size:0.72rem; color:#888;"><i class="mdi mdi-content-save-outline"></i> 設定將自動保存</span>
+        <button id="btn-factory-reset" style="background:none; border:1px solid #555; color:#aaa; padding:5px 10px; border-radius:4px; font-size:0.72rem; cursor:pointer; display:flex; align-items:center; gap:4px;">
+          <i class="mdi mdi-restore"></i> 重設為預設值
+        </button>
+      </div>
+
     </div>
   </div>
+  <!-- /settings-drawer -->
 
   <script>
     /**
@@ -8207,21 +8220,33 @@ function setStageView(view) {
       // Settings Drawer Toggle
       const btnOpenSettings = document.getElementById('btn-open-settings');
       const btnCloseSettings = document.getElementById('btn-close-settings');
+      const btnOpenSettingsTelemetry = document.getElementById('btn-open-settings-telemetry');
       const drawer = document.getElementById('settings-drawer');
       const backdrop = document.getElementById('settings-drawer-backdrop');
 
       function openDrawer() {
-        if (drawer) drawer.style.display = 'flex';
-        if (backdrop) backdrop.style.display = 'block';
+        if (backdrop) {
+          backdrop.style.display = 'block';
+          requestAnimationFrame(() => backdrop.classList.add('open'));
+        }
+        if (drawer) {
+          drawer.style.display = 'flex';
+          requestAnimationFrame(() => drawer.classList.add('open'));
+        }
       }
       function closeDrawer() {
-        if (drawer) drawer.style.display = 'none';
-        if (backdrop) backdrop.style.display = 'none';
+        if (backdrop) backdrop.classList.remove('open');
+        if (drawer) drawer.classList.remove('open');
+        setTimeout(() => {
+          if (backdrop && !backdrop.classList.contains('open')) backdrop.style.display = 'none';
+          if (drawer && !drawer.classList.contains('open')) drawer.style.display = 'none';
+        }, 250);
       }
 
       if (btnOpenSettings) btnOpenSettings.addEventListener('click', openDrawer);
       if (btnCloseSettings) btnCloseSettings.addEventListener('click', closeDrawer);
       if (backdrop) backdrop.addEventListener('click', closeDrawer);
+      if (btnOpenSettingsTelemetry) btnOpenSettingsTelemetry.addEventListener('click', openDrawer);
 
       // Sync WPM in Top Bar
       window.updateTopbarWpm = function(wpm) {

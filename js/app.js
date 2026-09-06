@@ -1852,21 +1852,33 @@ function setupWorkspaceNavigation() {
   // Settings Drawer Toggle
   const btnOpenSettings = document.getElementById('btn-open-settings');
   const btnCloseSettings = document.getElementById('btn-close-settings');
+  const btnOpenSettingsTelemetry = document.getElementById('btn-open-settings-telemetry');
   const drawer = document.getElementById('settings-drawer');
   const backdrop = document.getElementById('settings-drawer-backdrop');
 
   function openDrawer() {
-    if (drawer) drawer.style.display = 'flex';
-    if (backdrop) backdrop.style.display = 'block';
+    if (backdrop) {
+      backdrop.style.display = 'block';
+      requestAnimationFrame(() => backdrop.classList.add('open'));
+    }
+    if (drawer) {
+      drawer.style.display = 'flex';
+      requestAnimationFrame(() => drawer.classList.add('open'));
+    }
   }
   function closeDrawer() {
-    if (drawer) drawer.style.display = 'none';
-    if (backdrop) backdrop.style.display = 'none';
+    if (backdrop) backdrop.classList.remove('open');
+    if (drawer) drawer.classList.remove('open');
+    setTimeout(() => {
+      if (backdrop && !backdrop.classList.contains('open')) backdrop.style.display = 'none';
+      if (drawer && !drawer.classList.contains('open')) drawer.style.display = 'none';
+    }, 250);
   }
 
   if (btnOpenSettings) btnOpenSettings.addEventListener('click', openDrawer);
   if (btnCloseSettings) btnCloseSettings.addEventListener('click', closeDrawer);
   if (backdrop) backdrop.addEventListener('click', closeDrawer);
+  if (btnOpenSettingsTelemetry) btnOpenSettingsTelemetry.addEventListener('click', openDrawer);
 
   // Sync WPM in Top Bar
   window.updateTopbarWpm = function(wpm) {
