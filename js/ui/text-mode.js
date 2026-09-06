@@ -99,6 +99,16 @@ function updateCharCursor() {
     }
 
     const char = textState.targetChars[textState.currentIndex];
+    const hudChar = document.getElementById('hud-char-target');
+    const hudSeq = document.getElementById('hud-seq-target');
+    if (hudChar && char) {
+      hudChar.textContent = (char === ' ') ? '␣' : char;
+    }
+    if (hudSeq && char) {
+      const seq = (char === ' ') ? '7T' : (engine ? (engine.getSequenceForLetter(char) || '') : '');
+      hudSeq.textContent = seq;
+    }
+
     if (fbTarget) {
       if (char === ' ') {
         fbTarget.textContent = '單字空格 (Word Gap)';

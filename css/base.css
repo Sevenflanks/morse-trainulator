@@ -1,33 +1,52 @@
 :root {
-  --bg-dark: #0f1015;
-  --card-bg: #18191e;
-  --gold: #d4af37;
-  --gold-glow: rgba(212, 175, 55, 0.7);
+  --bg-dark: #080a0f;
+  --bg-panel: #0f131c;
+  --bg-surface: #151a27;
+  --bg-card: #1a2130;
+  --card-bg: #0f131c;
+  --gold: #ffd700;
+  --gold-dim: #b89700;
+  --gold-glow: rgba(255, 215, 0, 0.25);
   --gold-light: #f7e49a;
+  --cyan: #00e5ff;
+  --cyan-dim: #009cb3;
+  --cyan-glow: rgba(0, 229, 255, 0.25);
   --neon-blue: #00e5ff;
   --neon-glow: rgba(0, 229, 255, 0.85);
+  --green: #00e676;
+  --red: #ff5252;
   --danger: #ff5252;
+  --text-main: #f0f4fc;
+  --text-dim: #8292a4;
+  --text-muted: #4e5d71;
+  --border-subtle: #1c2333;
+  --border-accent: rgba(0, 229, 255, 0.28);
+  --border-gold: rgba(255, 215, 0, 0.35);
   --border-brass: #9b8146;
   --wire-base: #4a4126;
-  --text-muted: #8e929b;
+  --font-mono: 'JetBrains Mono', 'Fira Code', 'Roboto Mono', monospace;
+  --font-ui: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
 }
 
 * {
   box-sizing: border-box;
+  margin: 0;
+  padding: 0;
   user-select: none;
   -webkit-user-select: none;
 }
 
 body {
   margin: 0;
-  padding: 16px;
+  padding: 0;
   background: var(--bg-dark);
-  color: #e0e0e0;
-  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "PingFang TC", "Microsoft JhengHei", sans-serif;
-  min-height: 100vh;
+  color: var(--text-main);
+  font-family: var(--font-ui);
+  height: 100vh;
+  height: 100dvh;
+  overflow: hidden;
   display: flex;
   flex-direction: column;
-  align-items: center;
 }
 
 header {
@@ -317,11 +336,134 @@ h1 {
   align-items: center;
   margin-bottom: 12px;
 }
+.header-subbar.noise-hidden {
+  display: none !important;
+}
+
+/* ==========================================================================
+   Panoramic HUD Ribbon (Top 置頂示波光帶, 75px)
+   ========================================================================== */
+.p3b-top-ribbon {
+  width: 100%;
+  height: 75px;
+  min-height: 75px;
+  max-height: 75px;
+  background: #080b11;
+  border-bottom: 1px solid var(--border-subtle);
+  position: relative;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  flex-shrink: 0;
+  box-sizing: border-box;
+}
+.scope-canvas {
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+.scope-graticule {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background-image: 
+    linear-gradient(to right, rgba(0, 229, 255, 0.05) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(0, 229, 255, 0.05) 1px, transparent 1px);
+  background-size: 24px 24px;
+}
+.scope-bezel-text {
+  position: absolute;
+  top: 6px;
+  left: 12px;
+  font-size: 0.65rem;
+  font-family: var(--font-mono);
+  color: var(--cyan);
+  font-weight: 700;
+  letter-spacing: 0.5px;
+  z-index: 2;
+  pointer-events: none;
+  text-shadow: 0 0 6px var(--cyan-glow);
+}
+
+/* ==========================================================================
+   Timing Vector Telemetry (向量時差遙測儀)
+   ========================================================================== */
+.telemetry-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+}
+.telem-card {
+  background: #0a0e16;
+  border: 1px solid #1a2230;
+  border-radius: 6px;
+  padding: 6px 8px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+.telem-label {
+  font-size: 0.65rem;
+  color: var(--text-muted);
+  letter-spacing: 0.5px;
+}
+.telem-value {
+  font-family: var(--font-mono);
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: #fff;
+  display: flex;
+  align-items: baseline;
+  gap: 3px;
+}
+.telem-unit {
+  font-size: 0.65rem;
+  font-weight: normal;
+  color: var(--text-dim);
+}
+.ratio-bar-wrap {
+  grid-column: 1 / span 2;
+  background: #0a0e16;
+  border: 1px solid #1a2230;
+  border-radius: 6px;
+  padding: 6px 8px;
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+.ratio-meter-track {
+  width: 100%;
+  height: 8px;
+  background: #141b26;
+  border-radius: 4px;
+  position: relative;
+  overflow: hidden;
+}
+.ratio-meter-fill {
+  height: 100%;
+  width: 60%;
+  background: linear-gradient(90deg, var(--cyan), var(--gold));
+  border-radius: 4px;
+  transition: width 0.15s ease;
+}
+.ratio-target-mark {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 60%;
+  width: 2px;
+  background: #fff;
+  box-shadow: 0 0 4px #fff;
+}
+
 .workspace-view {
   width: 100%;
+  flex: 1;
+  min-height: 0;
   display: flex;
   flex-direction: column;
   align-items: center;
+  overflow: hidden;
 }
 .placeholder-workspace {
   padding: 60px 20px;

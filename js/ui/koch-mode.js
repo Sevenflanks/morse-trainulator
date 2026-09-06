@@ -836,6 +836,15 @@ function updateKochCursor() {
 
   if (idx < total) {
     const target = kochState.targetChars[idx];
+    const hudChar = document.getElementById('hud-char-target');
+    const hudSeq = document.getElementById('hud-seq-target');
+    if (hudChar && target) {
+      hudChar.textContent = target;
+    }
+    if (hudSeq && target) {
+      hudSeq.textContent = kochState.showHints ? (engine ? (engine.getSequenceForLetter(target) || '') : '') : '';
+    }
+
     if (kochFbTarget) {
       kochFbTarget.textContent = kochState.showHints
         ? `${target} (${engine ? (engine.getSequenceForLetter(target) || '') : ''})`
