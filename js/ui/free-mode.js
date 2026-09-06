@@ -97,6 +97,11 @@ async function replayLetter(letter, seq) {
   if (stateLetter) stateLetter.textContent = letter;
   if (stateSeq) stateSeq.textContent = seq;
 
+  const hudTarget = document.getElementById('hud-char-target');
+  const hudSeq = document.getElementById('hud-seq-target');
+  if (hudTarget) hudTarget.textContent = letter;
+  if (hudSeq) hudSeq.textContent = seq;
+
   let sub = '';
   for (const char of seq) {
     sub += char;
@@ -126,6 +131,8 @@ async function replayLetter(letter, seq) {
     if (evalStatus) evalStatus.textContent = '等待輸入';
     if (stateSeq) stateSeq.textContent = '—';
     if (stateLetter) stateLetter.textContent = '—';
+    if (hudTarget && (window.currentMode === 'free' || !window.currentMode)) hudTarget.textContent = '—';
+    if (hudSeq && (window.currentMode === 'free' || !window.currentMode)) hudSeq.textContent = '—';
   }, 1200);
 }
 
