@@ -205,7 +205,7 @@ function setupKeyerCallbacks() {
     if (currentMode === 'koch') {
       if (!kochState.running || kochState.isFinished) {
         if (dom.evalStatus) {
-          dom.evalStatus.textContent = '請先點擊「▶ 開始闖關」';
+          dom.evalStatus.textContent = '請先點擊「開始闖關」';
           dom.evalStatus.style.color = '#ffb703';
         }
         return;
@@ -273,6 +273,10 @@ function setupKeyerCallbacks() {
 
     if (dom.stateSeq) dom.stateSeq.textContent = res.sequence;
     if (dom.stateLetter) dom.stateLetter.textContent = res.letter || (res.isValid ? '定位中...' : '(非英文字母)');
+    const hudChar = document.getElementById('hud-char-target');
+    const hudSeq = document.getElementById('hud-seq-target');
+    if (hudChar) hudChar.textContent = res.letter || '—';
+    if (hudSeq) hudSeq.textContent = res.sequence || '';
     if (dom.stateDuration) dom.stateDuration.textContent = `${duration} ms`;
 
     if (res.letter === '<HH>') {
@@ -373,6 +377,10 @@ function handleBugManualDah(isDown) {
     const res = engine.appendSymbol('-', duration);
     if (dom.stateSeq) dom.stateSeq.textContent = res.sequence;
     if (dom.stateLetter) dom.stateLetter.textContent = res.letter || '(非英文字母)';
+    const hudChar = document.getElementById('hud-char-target');
+    const hudSeq = document.getElementById('hud-seq-target');
+    if (hudChar) hudChar.textContent = res.letter || '—';
+    if (hudSeq) hudSeq.textContent = res.sequence || '';
     if (dom.stateDuration) dom.stateDuration.textContent = `${duration} ms`;
 
     if (res.isValid) {
@@ -450,6 +458,10 @@ function switchKeyerDevice(device, saveToSettings = true) {
     settingsManager.settings.keyerDevice = device;
     settingsManager.save();
   }
+
+  if (typeof updateK5MorphingUI === 'function') {
+    updateK5MorphingUI();
+  }
 }
 
 // ----------------------------------------------------
@@ -495,7 +507,7 @@ function handleKeyDown() {
   if (currentMode === 'koch') {
     if (!kochState.running || kochState.isFinished) {
       if (dom.evalStatus) {
-        dom.evalStatus.textContent = '請先點擊「▶ 開始闖關」';
+        dom.evalStatus.textContent = '請先點擊「開始闖關」';
         dom.evalStatus.style.color = '#ffb703';
       }
       return;
@@ -537,6 +549,10 @@ function handleKeyUp() {
 
   if (dom.stateSeq) dom.stateSeq.textContent = res.sequence;
   if (dom.stateLetter) dom.stateLetter.textContent = res.letter || (res.isValid ? '定位中...' : '(非英文字母)');
+  const hudCharKey = document.getElementById('hud-char-target');
+  const hudSeqKey = document.getElementById('hud-seq-target');
+  if (hudCharKey) hudCharKey.textContent = res.letter || '—';
+  if (hudSeqKey) hudSeqKey.textContent = res.sequence || '';
   if (dom.stateDuration) dom.stateDuration.textContent = `${res.duration} ms`;
 
   if (res.letter === '<HH>') {
@@ -628,6 +644,10 @@ function finalizeLetter() {
     }
     if (dom.stateSeq) dom.stateSeq.textContent = '—';
     if (dom.stateLetter) dom.stateLetter.textContent = '—';
+    const hudCharReset = document.getElementById('hud-char-target');
+    const hudSeqReset = document.getElementById('hud-seq-target');
+    if (hudCharReset) hudCharReset.textContent = '—';
+    if (hudSeqReset) hudSeqReset.textContent = '';
     if (dom.meterBar) dom.meterBar.style.width = '0%';
     if (dom.readoutTime) dom.readoutTime.textContent = '0 ms';
     if (dom.readoutSymbol) dom.readoutSymbol.textContent = '無';
@@ -788,6 +808,9 @@ function applySpeedPreset(key, saveToSettings = true) {
 
   updateMeterMarkers();
 
+  const currentWpm = Math.round(1200 / p.unitT);
+  if (typeof updateTopbarWpm === 'function') updateTopbarWpm(currentWpm);
+
   if (saveToSettings) {
     settingsManager.settings.speedPreset = key;
     settingsManager.settings.unitT = p.unitT;
@@ -827,6 +850,8 @@ function applyLoadedSettings() {
       btn.classList.remove('active-preset');
     });
     updateMeterMarkers();
+    const currentWpm = Math.round(1200 / s.unitT);
+    if (typeof updateTopbarWpm === 'function') updateTopbarWpm(currentWpm);
   }
 
   // 2. CW Frequency
@@ -923,6 +948,10 @@ function applyLoadedSettings() {
   // 9. Layout Mode (2-Column Focus vs 3-Column Cockpit)
   if (s.layoutMode) {
     setLayoutMode(s.layoutMode);
+  }
+
+  if (typeof updateTopbarWpm === 'function' && engine && engine.config && engine.config.unitT) {
+    updateTopbarWpm(Math.round(1200 / engine.config.unitT));
   }
 }
 
@@ -1157,6 +1186,8 @@ function setupEventListeners() {
       engine.updateConfig({ unitT: val });
       if (dom.tagUnitT) dom.tagUnitT.textContent = `${val}ms`;
       updateMeterMarkers();
+      const currentWpm = Math.round(1200 / val);
+      if (typeof updateTopbarWpm === 'function') updateTopbarWpm(currentWpm);
       settingsManager.settings.unitT = val;
       settingsManager.settings.speedPreset = null;
       settingsManager.save();
@@ -1461,6 +1492,10 @@ function setupEventListeners() {
 // ----------------------------------------------------
 function initApp() {
   initDomReferences();
+  setupWorkspaceNavigation();
+  setupSettingsDrawer();
+  setupK5Dock();
+  setupStageViewSwitching();
   ribbon = new CWRibbon('cw-ribbon', engine);
   window.ribbon = ribbon;
 
@@ -1484,6 +1519,406 @@ if (typeof document !== 'undefined') {
   }
 }
 
+
+// ----------------------------------------------------
+// Three-Zone Shell & Workspace Navigation (Tx / Rx / QSO)
+// ----------------------------------------------------
+
+// ----------------------------------------------------
+// K5 Ergonomic Morphing Dock Controller
+// ----------------------------------------------------
+function setupK5Dock() {
+  const wingLeft = document.getElementById('k5-wing-left');
+  const wingRight = document.getElementById('k5-wing-right');
+  const pillPaddle = document.getElementById('k5-pill-paddle');
+  const pillStraight = document.getElementById('k5-pill-straight');
+  const pillBug = document.getElementById('k5-pill-bug');
+  const wpmMinus = document.getElementById('k5-wpm-minus');
+  const wpmPlus = document.getElementById('k5-wpm-plus');
+  const wpmVal = document.getElementById('k5-wpm-val');
+  const revToggle = document.getElementById('k5-reverse-toggle');
+
+  if (!wingLeft || !wingRight) return;
+
+  const pills = [
+    { el: pillPaddle, mode: 'paddle' },
+    { el: pillStraight, mode: 'straight' },
+    { el: pillBug, mode: 'bug' }
+  ];
+
+  pills.forEach(p => {
+    if (!p.el) return;
+    p.el.addEventListener('click', () => {
+      switchKeyerDevice(p.mode);
+    });
+  });
+
+  if (wpmMinus) {
+    wpmMinus.addEventListener('click', () => {
+      const current = (engine && typeof engine.getBaselineWpm === 'function') ? engine.getBaselineWpm() : 20;
+      setWpmFromStepper(current - 1);
+    });
+  }
+
+  if (wpmPlus) {
+    wpmPlus.addEventListener('click', () => {
+      const current = (engine && typeof engine.getBaselineWpm === 'function') ? engine.getBaselineWpm() : 20;
+      setWpmFromStepper(current + 1);
+    });
+  }
+
+  if (revToggle) {
+    revToggle.addEventListener('click', () => {
+      const nextRev = !keyer.reversed;
+      keyer.setReversed(nextRev);
+      revToggle.classList.toggle('active', nextRev);
+      const chkReverse = document.getElementById('chk-paddle-reverse');
+      if (chkReverse) chkReverse.checked = nextRev;
+      if (settingsManager && settingsManager.settings) {
+        settingsManager.settings.paddleReverse = nextRev;
+        settingsManager.save();
+      }
+      updatePaddleLabels();
+      updateK5MorphingUI();
+    });
+  }
+
+  function bindWing(wingEl, side) {
+    let isPressed = false;
+
+    function onDown(e) {
+      e.preventDefault();
+      if (isPressed) return;
+      isPressed = true;
+      wingEl.classList.add('active');
+
+      if (currentKeyerDevice === 'straight') {
+        handleKeyDown();
+      } else if (currentKeyerDevice === 'paddle' || currentKeyerDevice === 'bug') {
+        keyer.setPhysicalContact(side, true);
+      }
+    }
+
+    function onUp(e) {
+      if (!isPressed) return;
+      isPressed = false;
+      wingEl.classList.remove('active');
+
+      if (currentKeyerDevice === 'straight') {
+        handleKeyUp();
+      } else if (currentKeyerDevice === 'paddle' || currentKeyerDevice === 'bug') {
+        keyer.setPhysicalContact(side, false);
+      }
+    }
+
+    wingEl.addEventListener('pointerdown', onDown);
+    wingEl.addEventListener('pointerup', onUp);
+    wingEl.addEventListener('pointerleave', onUp);
+    wingEl.addEventListener('pointercancel', onUp);
+  }
+
+  bindWing(wingLeft, 'left');
+  bindWing(wingRight, 'right');
+
+  updateK5MorphingUI();
+}
+
+function setWpmFromStepper(wpm) {
+  const clamped = Math.max(10, Math.min(40, wpm));
+  const t = Math.round(1200 / clamped);
+  engine.updateConfig({
+    unitT: t,
+    threshold: Math.round(t * 2),
+    letterGap: Math.round(t * 3),
+    wordGap: Math.round(t * 7)
+  });
+  if (dom.paramUnitT) dom.paramUnitT.value = t;
+  if (dom.tagUnitT) dom.tagUnitT.textContent = `${t}ms`;
+  if (dom.paramThreshold) dom.paramThreshold.value = Math.round(t * 2);
+  if (dom.tagThreshold) dom.tagThreshold.textContent = `${Math.round(t * 2)}ms`;
+  if (dom.paramGap) dom.paramGap.value = Math.round(t * 3);
+  if (dom.tagGap) dom.tagGap.textContent = `${Math.round(t * 3)}ms`;
+  if (dom.paramWordGap) dom.paramWordGap.value = Math.round(t * 7);
+  if (dom.tagWordGap) dom.tagWordGap.textContent = `${Math.round(t * 7)}ms`;
+  if (typeof updateMeterMarkers === 'function') updateMeterMarkers();
+
+  const k5WpmVal = document.getElementById('k5-wpm-val');
+  if (k5WpmVal) k5WpmVal.textContent = `${clamped} WPM`;
+  const topbarWpmVal = document.getElementById('topbar-wpm-val');
+  if (topbarWpmVal) topbarWpmVal.textContent = clamped;
+  const stateWpm = document.getElementById('state-wpm');
+  if (stateWpm) stateWpm.textContent = `(${clamped} WPM)`;
+  const readoutWpm = document.getElementById('readout-wpm');
+  if (readoutWpm) readoutWpm.textContent = `(${clamped} WPM)`;
+  const meterBadge = document.getElementById('meter-wpm-badge');
+  if (meterBadge) meterBadge.textContent = `即時 ${clamped} WPM`;
+
+  if (settingsManager && settingsManager.settings) {
+    settingsManager.settings.unitT = t;
+    settingsManager.settings.threshold = Math.round(t * 2);
+    settingsManager.settings.letterGap = Math.round(t * 3);
+    settingsManager.settings.wordGap = Math.round(t * 7);
+    settingsManager.save();
+  }
+}
+
+function updateK5MorphingUI() {
+  const wingLeft = document.getElementById('k5-wing-left');
+  const wingRight = document.getElementById('k5-wing-right');
+  const leftSym = document.getElementById('k5-left-sym');
+  const leftTitle = document.getElementById('k5-left-title');
+  const leftHint = document.getElementById('k5-left-hint');
+  const rightSym = document.getElementById('k5-right-sym');
+  const rightTitle = document.getElementById('k5-right-title');
+  const rightHint = document.getElementById('k5-right-hint');
+  const modeBadge = document.getElementById('k5-mode-badge');
+  const revToggle = document.getElementById('k5-reverse-toggle');
+  const k5WpmVal = document.getElementById('k5-wpm-val');
+
+  const pillPaddle = document.getElementById('k5-pill-paddle');
+  const pillStraight = document.getElementById('k5-pill-straight');
+  const pillBug = document.getElementById('k5-pill-bug');
+
+  if (!wingLeft || !wingRight) return;
+
+  if (pillPaddle) pillPaddle.classList.toggle('active', currentKeyerDevice === 'paddle');
+  if (pillStraight) pillStraight.classList.toggle('active', currentKeyerDevice === 'straight');
+  if (pillBug) pillBug.classList.toggle('active', currentKeyerDevice === 'bug');
+
+  if (revToggle) {
+    revToggle.classList.toggle('active', !!keyer.reversed);
+  }
+
+  if (k5WpmVal && engine && typeof engine.getBaselineWpm === 'function') {
+    k5WpmVal.textContent = `${engine.getBaselineWpm()} WPM`;
+  }
+
+  if (currentKeyerDevice === 'straight') {
+    wingLeft.style.borderLeft = '3px solid var(--gold)';
+    wingLeft.style.borderBottom = '3px solid var(--gold)';
+    if (leftSym) {
+      leftSym.innerHTML = '<i class="mdi mdi-ray-vertex"></i>';
+      leftSym.style.color = 'var(--gold)';
+    }
+    if (leftTitle) leftTitle.textContent = '直鍵 (左手)';
+    if (leftHint) leftHint.textContent = '空白鍵 / 點擊長短音';
+
+    wingRight.style.borderRight = '3px solid var(--gold)';
+    wingRight.style.borderBottom = '3px solid var(--gold)';
+    if (rightSym) {
+      rightSym.innerHTML = '<i class="mdi mdi-ray-vertex"></i>';
+      rightSym.style.color = 'var(--gold)';
+    }
+    if (rightTitle) rightTitle.textContent = '直鍵 (右手)';
+    if (rightHint) rightHint.textContent = '空白鍵 / 點擊長短音';
+
+    if (modeBadge) modeBadge.textContent = '直鍵手電鍵';
+  } else if (currentKeyerDevice === 'bug') {
+    wingLeft.style.borderLeft = '3px solid var(--neon-blue)';
+    wingLeft.style.borderBottom = '3px solid var(--neon-blue)';
+    if (leftSym) {
+      leftSym.innerHTML = '<i class="mdi mdi-sine-wave"></i>';
+      leftSym.style.color = 'var(--neon-blue)';
+    }
+    if (leftTitle) leftTitle.textContent = '機械連點';
+    if (leftHint) leftHint.textContent = '彈簧震動 Dit (F)';
+
+    wingRight.style.borderRight = '3px solid var(--gold)';
+    wingRight.style.borderBottom = '3px solid var(--gold)';
+    if (rightSym) {
+      rightSym.innerHTML = '<i class="mdi mdi-hand-pointing-right"></i>';
+      rightSym.style.color = 'var(--gold)';
+    }
+    if (rightTitle) rightTitle.textContent = '手動長音';
+    if (rightHint) rightHint.textContent = '手動長劃 Dah (J)';
+
+    if (modeBadge) modeBadge.textContent = '震報鍵 Bug';
+  } else {
+    const isRev = !!keyer.reversed;
+    if (isRev) {
+      wingLeft.style.borderLeft = '3px solid var(--gold)';
+      wingLeft.style.borderBottom = '3px solid var(--gold)';
+      if (leftSym) {
+        leftSym.textContent = '—';
+        leftSym.style.color = 'var(--gold)';
+      }
+      if (leftTitle) leftTitle.textContent = '劃 Dah';
+      if (leftHint) leftHint.textContent = '鍵盤 J / 點擊';
+
+      wingRight.style.borderRight = '3px solid var(--neon-blue)';
+      wingRight.style.borderBottom = '3px solid var(--neon-blue)';
+      if (rightSym) {
+        rightSym.textContent = '·';
+        rightSym.style.color = 'var(--neon-blue)';
+      }
+      if (rightTitle) rightTitle.textContent = '點 Dit';
+      if (rightHint) rightHint.textContent = '鍵盤 F / 點擊';
+    } else {
+      wingLeft.style.borderLeft = '3px solid var(--neon-blue)';
+      wingLeft.style.borderBottom = '3px solid var(--neon-blue)';
+      if (leftSym) {
+        leftSym.textContent = '·';
+        leftSym.style.color = 'var(--neon-blue)';
+      }
+      if (leftTitle) leftTitle.textContent = '點 Dit';
+      if (leftHint) leftHint.textContent = '鍵盤 F / 點擊';
+
+      wingRight.style.borderRight = '3px solid var(--gold)';
+      wingRight.style.borderBottom = '3px solid var(--gold)';
+      if (rightSym) {
+        rightSym.textContent = '—';
+        rightSym.style.color = 'var(--gold)';
+      }
+      if (rightTitle) rightTitle.textContent = '劃 Dah';
+      if (rightHint) rightHint.textContent = '鍵盤 J / 點擊';
+    }
+    if (modeBadge) modeBadge.textContent = '雙撥片 Mode ' + (keyer.mode || 'B');
+  }
+}
+
+
+// ----------------------------------------------------
+// Stage View Switcher Controller (Tree / Focus / Telemetry)
+// ----------------------------------------------------
+function setupStageViewSwitching() {
+  const tabs = [
+    { id: 'view-tab-tree', view: 'tree' },
+    { id: 'view-tab-focus', view: 'focus' },
+    { id: 'view-tab-telemetry', view: 'telemetry' }
+  ];
+
+  tabs.forEach(t => {
+    const btn = document.getElementById(t.id);
+    if (!btn) return;
+    btn.addEventListener('click', () => setStageView(t.view));
+  });
+
+  if (typeof settingsManager !== 'undefined' && settingsManager.settings && settingsManager.settings.stageView) {
+    setStageView(settingsManager.settings.stageView);
+  }
+}
+
+function setStageView(view) {
+  const btnTree = document.getElementById('view-tab-tree');
+  const btnFocus = document.getElementById('view-tab-focus');
+  const btnTelemetry = document.getElementById('view-tab-telemetry');
+  const focusStage = document.getElementById('focus-hud-stage');
+  const colHardware = document.getElementById('col-hardware');
+  const meterPanel = document.getElementById('meter-panel');
+
+  if (btnTree) btnTree.classList.toggle('active', view === 'tree');
+  if (btnFocus) btnFocus.classList.toggle('active', view === 'focus');
+  if (btnTelemetry) btnTelemetry.classList.toggle('active', view === 'telemetry');
+
+  if (view === 'focus') {
+    if (focusStage) focusStage.style.display = 'flex';
+    if (colHardware) colHardware.style.display = 'none';
+  } else if (view === 'telemetry') {
+    if (focusStage) focusStage.style.display = 'none';
+    if (colHardware) colHardware.style.display = 'none';
+    if (meterPanel) meterPanel.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+  } else {
+    // Default 'tree'
+    if (focusStage) focusStage.style.display = 'none';
+    if (colHardware) colHardware.style.display = 'flex';
+  }
+
+  setTimeout(() => {
+    const ribbonCanvas = document.getElementById('cw-ribbon');
+    if (ribbonCanvas && ribbonCanvas.parentElement) {
+      ribbonCanvas.width = ribbonCanvas.parentElement.clientWidth || 500;
+    }
+  }, 50);
+
+  if (typeof settingsManager !== 'undefined' && settingsManager.settings) {
+    settingsManager.settings.stageView = view;
+    settingsManager.save();
+  }
+}
+
+function setupWorkspaceNavigation() {
+  const wsTabs = [
+    { btnId: 'ws-tab-tx', viewId: 'ws-container-tx' },
+    { btnId: 'ws-tab-rx', viewId: 'ws-container-rx' },
+    { btnId: 'ws-tab-qso', viewId: 'ws-container-qso' }
+  ];
+
+  wsTabs.forEach(item => {
+    const btn = document.getElementById(item.btnId);
+    if (!btn) return;
+    btn.addEventListener('click', () => {
+      wsTabs.forEach(t => {
+        const b = document.getElementById(t.btnId);
+        const v = document.getElementById(t.viewId);
+        if (b) b.classList.remove('active');
+        if (v) {
+          v.style.display = 'none';
+          v.classList.remove('active');
+        }
+      });
+      btn.classList.add('active');
+      const targetView = document.getElementById(item.viewId);
+      if (targetView) {
+        targetView.style.display = 'flex';
+        targetView.classList.add('active');
+      }
+    });
+  });
+}
+
+// ----------------------------------------------------
+// Settings Slide-up Drawer Controller
+// ----------------------------------------------------
+function setupSettingsDrawer() {
+  const btnOpenSettings = document.getElementById('btn-open-settings');
+  const btnCloseSettings = document.getElementById('btn-close-settings');
+  const btnOpenSettingsTelemetry = document.getElementById('btn-open-settings-telemetry');
+  const drawer = document.getElementById('settings-drawer');
+  const backdrop = document.getElementById('settings-drawer-backdrop');
+
+  function openDrawer() {
+    if (backdrop) {
+      backdrop.style.display = 'block';
+      requestAnimationFrame(() => backdrop.classList.add('open'));
+    }
+    if (drawer) {
+      drawer.style.display = 'flex';
+      requestAnimationFrame(() => drawer.classList.add('open'));
+    }
+  }
+  function closeDrawer() {
+    if (backdrop) backdrop.classList.remove('open');
+    if (drawer) drawer.classList.remove('open');
+    setTimeout(() => {
+      if (backdrop && !backdrop.classList.contains('open')) backdrop.style.display = 'none';
+      if (drawer && !drawer.classList.contains('open')) drawer.style.display = 'none';
+    }, 250);
+  }
+
+  if (btnOpenSettings) btnOpenSettings.addEventListener('click', openDrawer);
+  if (btnCloseSettings) btnCloseSettings.addEventListener('click', closeDrawer);
+  if (backdrop) backdrop.addEventListener('click', closeDrawer);
+  if (btnOpenSettingsTelemetry) btnOpenSettingsTelemetry.addEventListener('click', openDrawer);
+
+  // Sync WPM in Top Bar
+  if (typeof window !== 'undefined') {
+    window.updateTopbarWpm = updateTopbarWpm;
+  }
+}
+
+// ----------------------------------------------------
+// Top Bar & K5 Dock WPM Display Synchronization
+// ----------------------------------------------------
+function updateTopbarWpm(wpm) {
+  const valEl = document.getElementById('topbar-wpm-val');
+  if (valEl) valEl.textContent = wpm;
+  const k5WpmVal = document.getElementById('k5-wpm-val');
+  if (k5WpmVal) k5WpmVal.textContent = `${wpm} WPM`;
+}
+if (typeof window !== 'undefined') {
+  window.updateTopbarWpm = updateTopbarWpm;
+}
+
 if (typeof module !== 'undefined' && module.exports) {
   module.exports = {
     engine,
@@ -1492,6 +1927,14 @@ if (typeof module !== 'undefined' && module.exports) {
     keybindingManager,
     settingsManager,
     kochManager,
-    initApp
+    initApp,
+    setupK5Dock,
+    setWpmFromStepper,
+    updateK5MorphingUI,
+    setupStageViewSwitching,
+    setStageView,
+    setupWorkspaceNavigation,
+    setupSettingsDrawer,
+    updateTopbarWpm
   };
 }

@@ -916,11 +916,12 @@
     }
 
     .char-chip.state-timeout::after {
-      content: '⏱️';
+      content: "\F051B";
+      font-family: "Material Design Icons";
       position: absolute;
       top: -5px;
       right: -5px;
-      font-size: 0.6rem;
+      font-size: 0.65rem;
       line-height: 1;
     }
 
@@ -1613,22 +1614,687 @@
     .mdi.mdi-lg {
       font-size: 1.3em;
     }
+
+    /* ==========================================================================
+       Three-Zone Shell: Top Bar, Workspaces, and Navigation
+       ========================================================================== */
+    .va-topbar {
+      width: 100%;
+      max-width: 1280px;
+      height: 52px;
+      background: #13151c;
+      border: 1px solid #282f3d;
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 16px;
+      margin-bottom: 12px;
+      flex-shrink: 0;
+      box-shadow: 0 4px 16px rgba(0, 0, 0, 0.4);
+    }
+    .va-brand {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-weight: 700;
+    }
+    .brand-mark {
+      width: 28px;
+      height: 28px;
+      flex-shrink: 0;
+    }
+    .va-title {
+      font-size: 1rem;
+      color: var(--gold-light);
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .va-title-en {
+      font-size: 0.78rem;
+      color: var(--text-muted);
+      font-weight: 400;
+    }
+    .va-workspace-nav {
+      display: flex;
+      gap: 4px;
+      background: #0b0c10;
+      padding: 3px;
+      border-radius: 8px;
+      border: 1px solid #232936;
+    }
+    .va-ws-btn {
+      padding: 6px 12px;
+      border: none;
+      background: transparent;
+      color: var(--text-muted);
+      font-size: 0.8rem;
+      font-weight: 600;
+      border-radius: 6px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      transition: all 0.15s ease;
+    }
+    .va-ws-btn:hover {
+      color: #fff;
+      background: rgba(255, 255, 255, 0.05);
+    }
+    .va-ws-btn.active {
+      background: #1e2430;
+      color: var(--neon-blue);
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+    }
+    .va-topbar-right {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .topbar-wpm-pill {
+      font-family: monospace;
+      font-size: 0.82rem;
+      font-weight: 700;
+      color: var(--gold);
+      background: #0b0c10;
+      border: 1px solid rgba(212, 175, 55, 0.3);
+      padding: 4px 10px;
+      border-radius: 12px;
+    }
+    .btn-icon {
+      width: 32px;
+      height: 32px;
+      border-radius: 8px;
+      background: #1b1e26;
+      border: 1px solid #2e3444;
+      color: #cfd6e6;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: all 0.15s;
+    }
+    .btn-icon:hover {
+      border-color: var(--neon-blue);
+      color: var(--neon-blue);
+    }
+    .header-subbar {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      margin-bottom: 12px;
+    }
+    .workspace-view {
+      width: 100%;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+    .placeholder-workspace {
+      padding: 60px 20px;
+      text-align: center;
+      background: #141720;
+      border: 1px solid #283142;
+      border-radius: 12px;
+      max-width: 600px;
+      margin: 40px auto;
+      width: 100%;
+    }
+    .placeholder-icon {
+      font-size: 3.5rem;
+      color: var(--neon-blue);
+      margin-bottom: 16px;
+    }
+    .placeholder-badge {
+      display: inline-block;
+      margin-top: 16px;
+      font-size: 0.75rem;
+      font-family: monospace;
+      background: rgba(0, 229, 255, 0.1);
+      color: var(--neon-blue);
+      border: 1px solid rgba(0, 229, 255, 0.3);
+      padding: 4px 12px;
+      border-radius: 20px;
+    }
+
+    /* Slide-up Settings Drawer */
+    .drawer-backdrop {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(0, 0, 0, 0.6);
+      backdrop-filter: blur(4px);
+      -webkit-backdrop-filter: blur(4px);
+      z-index: 999;
+    }
+    .settings-drawer {
+      position: fixed;
+      bottom: 0;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 100%;
+      max-width: 720px;
+      max-height: 80vh;
+      background: #141720;
+      border: 1px solid #2b3548;
+      border-bottom: none;
+      border-radius: 16px 16px 0 0;
+      z-index: 1000;
+      display: flex;
+      flex-direction: column;
+      box-shadow: 0 -8px 32px rgba(0, 0, 0, 0.6);
+    }
+    .drawer-header {
+      padding: 14px 18px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border-bottom: 1px solid #242e40;
+    }
+    .drawer-title {
+      font-weight: 700;
+      font-size: 1rem;
+      color: var(--gold);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .drawer-body {
+      padding: 16px 18px;
+      overflow-y: auto;
+    }
+
+/* ==========================================================================
+   Zone 3: K5 Ergonomic Morphing Dock (雙翼變形工學座)
+   ========================================================================== */
+.va-keyer-dock {
+  width: 100%;
+  max-width: 1280px;
+  background: #141720;
+  border-top: 1px solid #232936;
+  border-radius: 0 0 12px 12px;
+  padding: 10px 16px;
+  box-sizing: border-box;
+  margin-top: 12px;
+  flex-shrink: 0;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
+  z-index: 10;
+}
+.k5-dock-container {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  height: 96px;
+  box-sizing: border-box;
+}
+.k2-thumb-wing {
+  flex: 1.1;
+  height: 96px;
+  background: linear-gradient(145deg, #1e2635 0%, #11151f 100%);
+  border: 1.5px solid #2f3c52;
+  border-radius: 20px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  position: relative;
+  touch-action: none;
+  user-select: none;
+  -webkit-user-select: none;
+  transition: all 0.08s ease;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.4);
+  box-sizing: border-box;
+}
+.k2-thumb-wing.left {
+  border-bottom-left-radius: 28px;
+  border-left: 3px solid var(--neon-blue);
+  border-bottom: 3px solid var(--neon-blue);
+}
+.k2-thumb-wing.right {
+  border-bottom-right-radius: 28px;
+  border-right: 3px solid var(--gold);
+  border-bottom: 3px solid var(--gold);
+}
+.k2-thumb-wing.active {
+  transform: scale(0.97) translateY(2px);
+  background: linear-gradient(145deg, #10141c 0%, #07090e 100%);
+}
+.k2-thumb-wing.left.active {
+  box-shadow: 0 0 20px rgba(0, 229, 255, 0.45);
+}
+.k2-thumb-wing.right.active {
+  box-shadow: 0 0 20px rgba(255, 215, 0, 0.45);
+}
+.k2-wing-symbol {
+  font-size: 2.2rem;
+  font-family: monospace;
+  font-weight: 900;
+  line-height: 1;
+}
+.k2-wing-title {
+  font-size: 0.82rem;
+  font-weight: 700;
+  margin-top: 2px;
+  color: #fff;
+}
+.k2-wing-hint {
+  font-size: 0.68rem;
+  color: var(--text-muted);
+  margin-top: 2px;
+  font-family: monospace;
+}
+.k5-center-smart-island {
+  width: 124px;
+  height: 96px;
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  box-sizing: border-box;
+}
+.k5-device-capsule {
+  display: flex;
+  gap: 2px;
+  background: #090c12;
+  border: 1px solid #283344;
+  border-radius: 12px;
+  padding: 2px;
+  width: 100%;
+  box-sizing: border-box;
+}
+.k5-dev-pill {
+  flex: 1;
+  height: 24px;
+  border: none;
+  background: transparent;
+  color: var(--text-muted);
+  border-radius: 9px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.95rem;
+  transition: all 0.12s;
+  padding: 0;
+}
+.k5-dev-pill:hover {
+  color: #fff;
+}
+.k5-dev-pill.active {
+  background: #1e2430;
+  color: var(--gold);
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.5);
+}
+.k5-island-controls {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  width: 100%;
+  box-sizing: border-box;
+}
+.k2-island-pill {
+  background: #090c12;
+  border: 1px solid #283344;
+  border-radius: 14px;
+  padding: 2px 6px;
+  flex: 1;
+  text-align: center;
+  font-size: 0.72rem;
+  color: var(--text-muted);
+  font-family: monospace;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  box-sizing: border-box;
+}
+.k2-island-btn {
+  background: #1a1e28;
+  border: 1px solid #2e3648;
+  color: #cfd6e6;
+  width: 18px;
+  height: 18px;
+  border-radius: 4px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.8rem;
+  line-height: 1;
+  padding: 0;
+}
+.k2-island-btn:hover {
+  border-color: var(--neon-blue);
+  color: #fff;
+}
+.k5-rev-btn {
+  width: 24px;
+  height: 24px;
+  border-radius: 6px;
+  background: #090c12;
+  border: 1px solid #283344;
+  color: var(--text-muted);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.88rem;
+  transition: all 0.12s;
+  padding: 0;
+  flex-shrink: 0;
+}
+.k5-rev-btn:hover {
+  color: var(--gold);
+  border-color: var(--gold);
+}
+.k5-rev-btn.active {
+  background: #252010;
+  color: var(--gold);
+  border-color: var(--gold);
+  box-shadow: 0 0 6px rgba(255, 215, 0, 0.3);
+}
+.k5-mode-badge {
+  font-size: 0.65rem;
+  color: var(--text-muted);
+  font-family: monospace;
+  white-space: nowrap;
+}
+
+
+/* ==========================================================================
+   Zone 2: Focus HUD Stage & A3 Center Radar Halo
+   ========================================================================== */
+.focus-hud-stage {
+  width: 100%;
+  max-width: 1280px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 24px 16px;
+  box-sizing: border-box;
+  background: radial-gradient(circle at 50% 40%, #151a24 0%, #0d1017 100%);
+  border: 1px solid #232a38;
+  border-radius: 12px;
+  margin-bottom: 12px;
+  position: relative;
+  box-shadow: inset 0 2px 10px rgba(0, 0, 0, 0.6);
+}
+.a3-halo-stage {
+  position: relative;
+  width: 200px;
+  height: 200px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 14px;
+  flex-shrink: 0;
+}
+.a3-halo-svg {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  transform: rotate(-90deg);
+  transform-origin: 50% 50%;
+}
+.halo-bg-ring {
+  fill: none;
+  stroke: #18202d;
+  stroke-width: 6;
+}
+.halo-press-arc {
+  fill: none;
+  stroke: var(--neon-blue);
+  stroke-width: 6;
+  stroke-dasharray: 440;
+  stroke-dashoffset: 440;
+  stroke-linecap: round;
+  transition: stroke-dashoffset 0.04s linear;
+}
+.halo-gap-arc {
+  fill: none;
+  stroke: #2c394c;
+  stroke-width: 6;
+  stroke-dasharray: 534;
+  stroke-dashoffset: 534;
+  stroke-linecap: round;
+  transition: stroke-dashoffset 0.04s linear;
+}
+.halo-gate-dot {
+  fill: var(--gold);
+  transition: transform 0.1s;
+}
+.halo-gate-dot.gate-3t {
+  fill: #ffd700;
+}
+.halo-gate-dot.gate-7t {
+  fill: #00e5ff;
+}
+.a3-halo-inner {
+  text-align: center;
+  z-index: 2;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+.hud-char-large {
+  font-size: 4.6rem;
+  font-weight: 900;
+  color: var(--gold);
+  font-family: monospace;
+  line-height: 0.95;
+  text-shadow: 0 0 20px rgba(255, 215, 0, 0.4);
+}
+.hud-seq-code {
+  font-size: 1.3rem;
+  color: var(--neon-blue);
+  font-family: monospace;
+  letter-spacing: 4px;
+  margin-top: 4px;
+  min-height: 24px;
+}
+.hud-status-line {
+  font-size: 0.82rem;
+  font-family: monospace;
+  color: var(--text-muted);
+  margin-top: 6px;
+  min-height: 20px;
+  text-align: center;
+}
+.hud-committed-stream {
+  background: #090c12;
+  border: 1px solid #232a38;
+  border-radius: 8px;
+  padding: 8px 16px;
+  font-family: monospace;
+  font-size: 1rem;
+  letter-spacing: 2px;
+  min-height: 38px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #cfd6e6;
+  box-shadow: inset 0 2px 6px rgba(0, 0, 0, 0.6);
+  max-width: 540px;
+  width: 100%;
+  margin-top: 10px;
+  box-sizing: border-box;
+  word-break: break-all;
+}
+
+
+/* ==========================================================================
+   Stage View Switcher (Tree View / Focus HUD / Telemetry View)
+   ========================================================================== */
+.stage-view-switcher {
+  display: flex;
+  gap: 6px;
+  background: #0b0c10;
+  padding: 3px;
+  border-radius: 8px;
+  border: 1px solid #232936;
+  margin-top: 10px;
+}
+.stage-view-btn {
+  padding: 6px 14px;
+  border: none;
+  background: transparent;
+  color: var(--text-muted);
+  font-size: 0.82rem;
+  font-weight: 600;
+  border-radius: 6px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  transition: all 0.15s ease;
+}
+.stage-view-btn:hover {
+  color: #fff;
+  background: rgba(255, 255, 255, 0.05);
+}
+.stage-view-btn.active {
+  background: #1e2430;
+  color: var(--neon-blue);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+}
+
+  
+/* Mobile & Portrait Adaptation (375px - 768px) */
+@media (max-width: 768px) {
+  .va-topbar {
+    padding: 0 10px;
+    height: 48px;
+  }
+  .va-title-en {
+    display: none;
+  }
+  .va-ws-btn {
+    padding: 5px 8px;
+    font-size: 0.75rem;
+  }
+  .topbar-wpm-pill {
+    font-size: 0.75rem;
+    padding: 3px 8px;
+  }
+  .k5-dock-container {
+    gap: 6px;
+    padding: 0 6px;
+  }
+  .k2-thumb-wing {
+    min-width: 80px;
+    padding: 6px 4px;
+  }
+  .k2-wing-symbol {
+    font-size: 1.5rem;
+  }
+  .k2-wing-title {
+    font-size: 0.75rem;
+  }
+  .k2-wing-hint {
+    display: none;
+  }
+  #k5-center-island,
+  .k5-center-smart-island {
+    padding: 4px 6px;
+  }
+  .settings-drawer {
+    max-width: 100%;
+    border-left: none;
+    border-right: none;
+  }
+}
+
   </style>
 </head>
 <body>
 
-  <header>
-    <h1><i class="mdi mdi-radio-handheld"></i> 摩斯訓練儀 (Morse Trainulator)</h1>
-    <div class="subtitle">電報模擬與練習工具 · 支援直鍵 / 雙撥片 / 機械震報鍵 · PCB 二元樹尋路 · 節奏儀表</div>
-    <div class="layout-switch-container">
-      <button type="button" class="layout-switch-btn active" id="btn-layout-2col" title="切換為雙欄專注佈局">
-        <span><i class="mdi mdi-view-column"></i> 雙欄專注</span>
+  <!-- Three-Zone Top Bar -->
+  <header class="va-topbar">
+    <div class="va-brand">
+      <svg class="brand-mark" viewBox="0 0 36 36" fill="none">
+        <polygon points="18,2 33,10.5 33,25.5 18,34 3,25.5 3,10.5" stroke="#00e5ff" stroke-width="1.8" fill="#101520"/>
+        <circle cx="12" cy="18" r="3.2" fill="#ffd700"/>
+        <rect x="19" y="15.8" width="8.5" height="4.4" rx="2.2" fill="#00e5ff"/>
+      </svg>
+      <span class="va-title"><i class="mdi mdi-radio-handheld"></i> 摩斯訓練儀 <span class="va-title-en">Morse Trainulator</span></span>
+    </div>
+    <div class="va-workspace-nav">
+      <button type="button" id="ws-tab-tx" class="va-ws-btn active" title="發報工作台 (Transmit)">
+        <i class="mdi mdi-flash"></i> <span>Tx (發報)</span>
       </button>
-      <button type="button" class="layout-switch-btn" id="btn-layout-3col" title="切換為三欄工作台">
-        <span><i class="mdi mdi-view-dashboard-variant"></i> 三欄工作台</span>
+      <button type="button" id="ws-tab-rx" class="va-ws-btn" title="抄收工作台 (Receive)">
+        <i class="mdi mdi-headphones"></i> <span>Rx (抄收)</span>
+      </button>
+      <button type="button" id="ws-tab-qso" class="va-ws-btn" title="通聯工作台 (QSO Contact)">
+        <i class="mdi mdi-radio-tower"></i> <span>QSO (通聯)</span>
+      </button>
+    </div>
+    <div class="va-topbar-right">
+      <div id="topbar-wpm-pill" class="topbar-wpm-pill" title="即時速度">
+        <span id="topbar-wpm-val">20</span> WPM
+      </div>
+      <button type="button" id="btn-open-settings" class="btn-icon" title="設定抽屜">
+        <i class="mdi mdi-cog"></i>
       </button>
     </div>
   </header>
+
+  <!-- Workspace 1: Tx (發報) -->
+  <div id="ws-container-tx" class="workspace-view active">
+    <div class="header-subbar">
+      <div class="subtitle">電報模擬與練習工具 · 支援直鍵 / 雙撥片 / 機械震報鍵 · PCB 二元樹尋路 · 節奏儀表</div>
+
+      <!-- Stage View Switcher (Tree / Focus HUD / Telemetry) -->
+      <div class="stage-view-switcher" id="stage-view-switcher">
+        <button type="button" class="stage-view-btn active" id="view-tab-tree" data-view="tree" title="PCB 二元樹尋路視圖">
+          <i class="mdi mdi-sitemap"></i> <span>二元樹 (Tree)</span>
+        </button>
+        <button type="button" class="stage-view-btn" id="view-tab-focus" data-view="focus" title="A3 雷達光環專注視圖">
+          <i class="mdi mdi-target"></i> <span>專注 (Focus HUD)</span>
+        </button>
+        <button type="button" class="stage-view-btn" id="view-tab-telemetry" data-view="telemetry" title="電報示波儀表視圖">
+          <i class="mdi mdi-sine-wave"></i> <span>示波儀表 (Telemetry)</span>
+        </button>
+      </div>
+      <div class="layout-switch-container">
+        <button type="button" class="layout-switch-btn active" id="btn-layout-2col" title="切換為雙欄專注佈局">
+          <span><i class="mdi mdi-view-column"></i> 雙欄專注</span>
+        </button>
+        <button type="button" class="layout-switch-btn" id="btn-layout-3col" title="切換為三欄工作台">
+          <span><i class="mdi mdi-view-dashboard-variant"></i> 三欄工作台</span>
+        </button>
+      </div>
+    </div>
+
+
+    <!-- Zone 2: Focus HUD Stage (A3 Center Radar Halo) -->
+    <div id="focus-hud-stage" class="focus-hud-stage" style="display:none;">
+      <div class="a3-halo-stage">
+        <svg class="a3-halo-svg" viewBox="0 0 200 200">
+          <circle class="halo-bg-ring" cx="100" cy="100" r="70" />
+          <circle class="halo-bg-ring" cx="100" cy="100" r="85" />
+          <circle class="halo-press-arc" id="halo-press-arc" cx="100" cy="100" r="70" />
+          <circle class="halo-gap-arc" id="halo-gap-arc" cx="100" cy="100" r="85" />
+          <circle class="halo-gate-dot gate-3t" cx="25.5" cy="140.9" r="3.5" title="3T 結算點" />
+          <circle class="halo-gate-dot gate-7t" cx="180.8" cy="73.7" r="3.5" title="7T 空格點" />
+        </svg>
+        <div class="a3-halo-inner">
+          <div class="hud-char-large" id="hud-char-target">—</div>
+          <div class="hud-seq-code" id="hud-seq-target"></div>
+        </div>
+      </div>
+      <div class="hud-status-line" id="hud-timing-status">準備就緒</div>
+      <div class="hud-committed-stream" id="hud-committed-stream">—</div>
+    </div>
 
   <div class="main-container layout-2col" id="main-container">
     <!-- Left Column: PCB Card -->
@@ -2293,78 +2959,6 @@
           </div>
         </div>
 
-        <!-- Dual Paddle Settings -->
-        <div id="paddle-settings-box" style="background: #121319; border: 1px solid #2e3342; border-radius: 6px; padding: 8px 10px; margin-bottom: 12px;">
-          <div style="font-size:0.76rem; font-weight:bold; color:var(--gold); margin-bottom:8px; display:flex; justify-content:space-between; align-items:center;">
-            <span>雙撥片設定 (Iambic Paddle)</span>
-            <span style="font-size:0.68rem; color:#888;">Curtis 8044</span>
-          </div>
-          <div style="display:flex; justify-content:space-between; align-items:center; font-size:0.8rem; margin-bottom:8px;">
-            <label style="display:flex; align-items:center; gap:6px; cursor:pointer; color:#ccc;">
-              <input type="checkbox" id="chk-paddle-reverse" style="accent-color:var(--gold);">
-              <span>左右撥片互換 (左劃 Dah / 右點 Dit)</span>
-            </label>
-            <span style="font-size:0.7rem; color:#888;">適配左手或接線</span>
-          </div>
-          <div style="display:flex; justify-content:space-between; align-items:center; font-size:0.8rem;">
-            <label style="color:#ccc;">Iambic 夾發模式：</label>
-            <div style="display:flex; gap:12px; font-size:0.78rem;">
-              <label style="cursor:pointer; display:flex; align-items:center; gap:4px; color:#ffd700;">
-                <input type="radio" name="iambic-mode" id="radio-mode-b" value="B" checked style="accent-color:var(--gold);">
-                <span style="white-space:nowrap;">Mode B (自動補音)</span>
-              </label>
-              <label style="cursor:pointer; display:flex; align-items:center; gap:4px; color:#aaa;">
-                <input type="radio" name="iambic-mode" id="radio-mode-a" value="A" style="accent-color:var(--gold);">
-                <span style="white-space:nowrap;">Mode A (放開即停)</span>
-              </label>
-            </div>
-          </div>
-        </div>
-
-        <!-- Farnsworth Timing Option Box -->
-        <div id="farnsworth-settings-box" style="background: #121319; border: 1px solid #2e3342; border-radius: 6px; padding: 8px 10px; margin-bottom: 12px;">
-          <div style="font-size:0.76rem; font-weight:bold; color:var(--neon-blue); margin-bottom:8px; display:flex; justify-content:space-between; align-items:center;">
-            <span>法恩斯沃斯節奏 (Farnsworth Timing)</span>
-            <span style="font-size:0.68rem; color:#888;">音形訓練法</span>
-          </div>
-          <div style="display:flex; justify-content:space-between; align-items:center; font-size:0.8rem; margin-bottom:8px;">
-            <label style="display:flex; align-items:center; gap:6px; cursor:pointer; color:#ccc;">
-              <input type="checkbox" id="chk-farnsworth" style="accent-color:var(--neon-blue);">
-              <span>啟用法恩斯沃斯 (音形高速 · 間距放寬)</span>
-            </label>
-            <span style="font-size:0.7rem; color:#888;" id="tag-farnsworth-status">已關閉</span>
-          </div>
-          <div id="farnsworth-controls" style="display:none; padding-top:6px; border-top:1px dashed #2a2e3a;">
-            <div style="display:flex; justify-content:space-between; align-items:center; font-size:0.75rem; color:#aaa; margin-bottom:4px;">
-              <span>字元速度 (Character Speed): <strong id="tag-farnsworth-wpm" style="color:var(--neon-blue);">18 WPM (67ms)</strong></span>
-              <span style="font-size:0.68rem; color:#777; white-space:nowrap;">間隔依上方預設</span>
-            </div>
-            <input type="range" id="param-farnsworth-wpm" min="15" max="40" step="1" value="18" style="width:100%; accent-color:var(--neon-blue);">
-          </div>
-        </div>
-
-        <!-- Atmospheric RF Noise (QRN) Box -->
-        <div id="qrn-settings-box" style="background: #121319; border: 1px solid #2e3342; border-radius: 6px; padding: 8px 10px; margin-bottom: 12px;">
-          <div style="font-size:0.76rem; font-weight:bold; color:#ffb703; margin-bottom:8px; display:flex; justify-content:space-between; align-items:center;">
-            <span>電台背景雜音 (QRN)</span>
-            <span style="font-size:0.68rem; color:#888;">短波濾波</span>
-          </div>
-          <div style="display:flex; justify-content:space-between; align-items:center; font-size:0.8rem; margin-bottom:6px;">
-            <label style="display:flex; align-items:center; gap:6px; cursor:pointer; color:#ccc;">
-              <input type="checkbox" id="chk-qrn" style="accent-color:#ffb703;">
-              <span>開啟背景雜音 (短波情境)</span>
-            </label>
-            <span style="font-size:0.7rem; color:#888;" id="tag-qrn-status">已靜音</span>
-          </div>
-          <div id="qrn-controls" style="display:none; padding-top:6px; border-top:1px dashed #2a2e3a;">
-            <div style="display:flex; justify-content:space-between; align-items:center; font-size:0.75rem; color:#aaa; margin-bottom:4px;">
-              <span>雜音強度 (Volume): <strong id="tag-qrn-vol" style="color:#ffb703;">20%</strong></span>
-              <span style="font-size:0.68rem; color:#777;">環境底噪</span>
-            </div>
-            <input type="range" id="param-qrn-vol" min="0.01" max="0.10" step="0.01" value="0.04" style="width:100%; accent-color:#ffb703;">
-          </div>
-        </div>
-
         <div class="settings-row">
           <label>時間單位 T (Dit 基準)
             <span>1T 長度 (1200 / WPM)</span>
@@ -2393,78 +2987,248 @@
           <input type="range" id="param-word-gap" min="100" max="2500" step="20" value="560">
           <div class="val-tag" id="tag-word-gap">560ms</div>
         </div>
-        <div class="settings-row">
+
+          <!-- Quick link button to open settings drawer -->
+          <div style="margin-top:14px;">
+            <button type="button" id="btn-open-settings-telemetry" style="width:100%; background:#1a1c24; border:1px solid #363b4b; border-radius:6px; padding:8px 12px; color:#ddd; font-size:0.8rem; cursor:pointer; display:flex; align-items:center; justify-content:center; gap:8px;">
+              <i class="mdi mdi-cog-outline" style="color:var(--neon-blue);"></i> 系統進階設定 (音頻 · 撥片 · Farnsworth · 鍵位)
+            </button>
+          </div>
+      </div>
+</div> <!-- /col-telemetry -->
+  </div> <!-- /main-container -->
+
+    <!-- K5 Ergonomic Morphing Dock (Zone 3) -->
+    <footer class="va-keyer-dock" id="k5-dock">
+      <div class="k5-dock-container">
+        <!-- Left Ergonomic Wing (Adaptive) -->
+        <div class="k2-thumb-wing left" id="k5-wing-left" data-paddle="left">
+          <span class="k2-wing-symbol" id="k5-left-sym" style="color:var(--neon-blue);">·</span>
+          <span class="k2-wing-title" id="k5-left-title">點 Dit</span>
+          <span class="k2-wing-hint" id="k5-left-hint">鍵盤 F / 點擊</span>
+        </div>
+
+        <!-- Center Smart Island (Zero Extra Height!) -->
+        <div class="k5-center-smart-island" id="k5-center-island">
+          <!-- Tri-Mode Segmented Capsule -->
+          <div class="k5-device-capsule">
+            <button type="button" class="k5-dev-pill active" id="k5-pill-paddle" data-mode="paddle" title="雙撥片 (Iambic Paddle)">
+              <i class="mdi mdi-tune-vertical"></i>
+            </button>
+            <button type="button" class="k5-dev-pill" id="k5-pill-straight" data-mode="straight" title="直鍵 (Straight Key)">
+              <i class="mdi mdi-radiobox-marked"></i>
+            </button>
+            <button type="button" class="k5-dev-pill" id="k5-pill-bug" data-mode="bug" title="機械震報鍵 (Bug Key)">
+              <i class="mdi mdi-metronome"></i>
+            </button>
+          </div>
+
+          <!-- Island Controls: WPM Stepper & Reverse Toggle -->
+          <div class="k5-island-controls">
+            <div class="k2-island-pill">
+              <button type="button" class="k2-island-btn" id="k5-wpm-minus" title="降低速度">-</button>
+              <span id="k5-wpm-val" style="color:var(--gold); font-weight:700;">20 WPM</span>
+              <button type="button" class="k2-island-btn" id="k5-wpm-plus" title="提高速度">+</button>
+            </div>
+            <button type="button" class="k5-rev-btn" id="k5-reverse-toggle" title="左右撥片互換 (Reverse Dit/Dah)">
+              <i class="mdi mdi-swap-horizontal"></i>
+            </button>
+          </div>
+
+          <!-- Dynamic Mode Indicator Badge -->
+          <span class="k5-mode-badge" id="k5-mode-badge">雙撥片 Mode B</span>
+        </div>
+
+        <!-- Right Ergonomic Wing (Adaptive) -->
+        <div class="k2-thumb-wing right" id="k5-wing-right" data-paddle="right">
+          <span class="k2-wing-symbol" id="k5-right-sym" style="color:var(--gold);">—</span>
+          <span class="k2-wing-title" id="k5-right-title">劃 Dah</span>
+          <span class="k2-wing-hint" id="k5-right-hint">鍵盤 J / 點擊</span>
+        </div>
+      </div>
+    </footer>
+  </div> <!-- /ws-container-tx -->
+
+  <!-- Workspace 2: Rx (抄收) -->
+  <div id="ws-container-rx" class="workspace-view" style="display:none;">
+    <div class="placeholder-workspace">
+      <i class="mdi mdi-headphones placeholder-icon"></i>
+      <h2 style="color:#fff; margin-bottom:8px;">Rx (抄收工作台)</h2>
+      <p style="color:var(--text-muted); font-size:0.9rem;">盲聽電報呼號、隨機字母與聽寫解碼訓練 (CW Copy / Receive Challenge)</p>
+      <div class="placeholder-badge">即將推出 · Coming Soon</div>
+    </div>
+  </div>
+
+  <!-- Workspace 3: QSO (通聯) -->
+  <div id="ws-container-qso" class="workspace-view" style="display:none;">
+    <div class="placeholder-workspace">
+      <i class="mdi mdi-radio-tower placeholder-icon"></i>
+      <h2 style="color:#fff; margin-bottom:8px;">QSO (通聯工作台)</h2>
+      <p style="color:var(--text-muted); font-size:0.9rem;">業餘無線電虛擬頻段、訊號雜音與通聯程序模擬 (Virtual CW QSO Simulation)</p>
+      <div class="placeholder-badge">即將推出 · Coming Soon</div>
+    </div>
+  </div>
+
+  <!-- Slide-up Settings Drawer Skeleton -->
+  <div id="settings-drawer-backdrop" class="drawer-backdrop" style="display:none;"></div>
+  <div id="settings-drawer" class="settings-drawer" style="display:none;">
+    <div class="drawer-header">
+      <div class="drawer-title"><i class="mdi mdi-cog"></i> 系統進階設定 (Settings)</div>
+      <button type="button" id="btn-close-settings" class="btn-icon" title="關閉"><i class="mdi mdi-close"></i></button>
+    </div>
+    <div class="drawer-body" id="drawer-settings-content">
+
+      <!-- Sidetone Frequency -->
+      <div class="settings-card-section" style="background:#14161f; border:1px solid #282d3c; border-radius:8px; padding:12px;">
+        <div style="font-size:0.8rem; font-weight:bold; color:var(--neon-blue); margin-bottom:10px; display:flex; justify-content:space-between; align-items:center;">
+          <span><i class="mdi mdi-sine-wave"></i> 側音頻率 (CW Sidetone)</span>
+          <span style="font-size:0.7rem; color:#888;">音調調整 (400–1000 Hz)</span>
+        </div>
+        <div class="settings-row" style="margin-bottom:0;">
           <label>側音頻率 (CW Sidetone)
             <span>正弦波側音頻率</span>
           </label>
           <input type="range" id="param-freq" min="400" max="1000" step="20" value="680">
           <div class="val-tag" id="tag-freq">680Hz</div>
         </div>
+      </div>
 
-        <!-- Keyboard Keybindings Box -->
-        <div id="keybindings-settings-box" style="background: #121319; border: 1px solid #2e3342; border-radius: 6px; padding: 8px 10px; margin-top: 14px; margin-bottom: 8px;">
-          <div style="font-size:0.76rem; font-weight:bold; color:#00e5ff; margin-bottom:8px; display:flex; justify-content:space-between; align-items:center;">
-            <span>⌨️ 鍵盤按鍵對應</span>
-            <span id="tag-current-profile" style="font-size:0.68rem; color:#888;">標準鍵位</span>
-          </div>
-
-          <!-- Preset Profile Buttons -->
-          <div style="display:grid; grid-template-columns: repeat(4, 1fr); gap: 6px; margin-bottom: 10px;">
-            <button class="key-profile-btn active-key-profile" data-profile="standard" style="background:#1a1c24; border:1px solid #363b4b; border-radius:5px; padding:6px 2px; color:#ddd; font-size:0.72rem; cursor:pointer; text-align:center;">
-              <div style="font-weight:bold;">標準鍵位</div>
-              <div style="font-size:0.63rem; color:#888;">K · [ ]</div>
-            </button>
-            <button class="key-profile-btn" data-profile="homerow" style="background:#1a1c24; border:1px solid #363b4b; border-radius:5px; padding:6px 2px; color:#ddd; font-size:0.72rem; cursor:pointer; text-align:center;">
-              <div style="font-weight:bold;">雙手基準</div>
-              <div style="font-size:0.63rem; color:#00e5ff;">F · J</div>
-            </button>
-            <button class="key-profile-btn" data-profile="left_hand" style="background:#1a1c24; border:1px solid #363b4b; border-radius:5px; padding:6px 2px; color:#ddd; font-size:0.72rem; cursor:pointer; text-align:center;">
-              <div style="font-weight:bold;">單手左手</div>
-              <div style="font-size:0.63rem; color:#ffd700;">Z · X</div>
-            </button>
-            <button class="key-profile-btn" data-profile="arrows" style="background:#1a1c24; border:1px solid #363b4b; border-radius:5px; padding:6px 2px; color:#ddd; font-size:0.72rem; cursor:pointer; text-align:center;">
-              <div style="font-weight:bold;">方向鍵</div>
-              <div style="font-size:0.63rem; color:#81b29a;">← · →</div>
-            </button>
-          </div>
-
-          <!-- Interactive Key Binding Remap Buttons -->
-          <div style="display:flex; flex-direction:column; gap:6px; font-size:0.75rem; background:#0c0d12; padding:8px; border-radius:5px;">
-            <div style="display:flex; justify-content:space-between; align-items:center;">
-              <span style="color:#aaa;">直鍵 (Straight):</span>
-              <button id="btn-bind-straight" class="bind-btn" style="background:#1f2330; border:1px solid #3d465c; color:#fff; border-radius:4px; padding:2px 10px; font-family:monospace; font-size:0.75rem; cursor:pointer;">
-                K
-              </button>
-            </div>
-            <div style="display:flex; justify-content:space-between; align-items:center;">
-              <span style="color:#aaa;">點撥片 (Dit):</span>
-              <button id="btn-bind-dit" class="bind-btn" style="background:#1f2330; border:1px solid #3d465c; color:#00e5ff; border-radius:4px; padding:2px 10px; font-family:monospace; font-size:0.75rem; cursor:pointer;">
-                [ / ,
-              </button>
-            </div>
-            <div style="display:flex; justify-content:space-between; align-items:center;">
-              <span style="color:#aaa;">劃撥片 (Dah):</span>
-              <button id="btn-bind-dah" class="bind-btn" style="background:#1f2330; border:1px solid #3d465c; color:#ffd700; border-radius:4px; padding:2px 10px; font-family:monospace; font-size:0.75rem; cursor:pointer;">
-                ] / .
-              </button>
-            </div>
-          </div>
-          <div style="font-size:0.68rem; color:#777; margin-top:6px; text-align:center;">
-            <i class="mdi mdi-lightbulb-outline"></i> 點選按鍵後，按下鍵盤任意鍵即可更換
-          </div>
+      <!-- Dual Paddle Settings -->
+      <div id="paddle-settings-box" style="background: #14161f; border: 1px solid #282d3c; border-radius: 8px; padding: 12px;">
+        <div style="font-size:0.8rem; font-weight:bold; color:var(--gold); margin-bottom:10px; display:flex; justify-content:space-between; align-items:center;">
+          <span><i class="mdi mdi-electric-switch"></i> 雙撥片設定 (Iambic Paddle)</span>
+          <span style="font-size:0.7rem; color:#888;">Curtis 8044</span>
         </div>
-
-        <!-- Factory Reset & Storage Status Footer -->
-        <div style="display:flex; justify-content:space-between; align-items:center; margin-top:14px; padding-top:8px; border-top:1px solid #252834;">
-          <span style="font-size:0.7rem; color:#888;"><i class="mdi mdi-content-save-outline"></i> 設定將自動保存</span>
-          <button id="btn-factory-reset" style="background:none; border:1px solid #444; color:#aaa; padding:4px 8px; border-radius:4px; font-size:0.72rem; cursor:pointer;">
-            <i class="mdi mdi-restore"></i> 重設為預設值
-          </button>
+        <div style="display:flex; justify-content:space-between; align-items:center; font-size:0.8rem; margin-bottom:10px;">
+          <label style="display:flex; align-items:center; gap:6px; cursor:pointer; color:#ccc;">
+            <input type="checkbox" id="chk-paddle-reverse" style="accent-color:var(--gold);">
+            <span>左右撥片互換 (左劃 Dah / 右點 Dit)</span>
+          </label>
+          <span style="font-size:0.7rem; color:#888; white-space:nowrap;">適配左手或接線</span>
+        </div>
+        <div style="display:flex; justify-content:space-between; align-items:center; font-size:0.8rem;">
+          <label style="color:#ccc;">Iambic 夾發模式：</label>
+          <div style="display:flex; gap:12px; font-size:0.78rem;">
+            <label style="cursor:pointer; display:flex; align-items:center; gap:4px; color:#ffd700; white-space:nowrap;">
+              <input type="radio" name="iambic-mode" id="radio-mode-b" value="B" checked style="accent-color:var(--gold);">
+              <span>Mode B (自動補音)</span>
+            </label>
+            <label style="cursor:pointer; display:flex; align-items:center; gap:4px; color:#aaa; white-space:nowrap;">
+              <input type="radio" name="iambic-mode" id="radio-mode-a" value="A" style="accent-color:var(--gold);">
+              <span>Mode A (放開即停)</span>
+            </label>
+          </div>
         </div>
       </div>
 
-    </div> <!-- /col-telemetry -->
-  </div> <!-- /main-container -->
+      <!-- Farnsworth Timing Option Box -->
+      <div id="farnsworth-settings-box" style="background: #14161f; border: 1px solid #282d3c; border-radius: 8px; padding: 12px;">
+        <div style="font-size:0.8rem; font-weight:bold; color:var(--neon-blue); margin-bottom:10px; display:flex; justify-content:space-between; align-items:center;">
+          <span><i class="mdi mdi-metronome"></i> 法恩斯沃斯節奏 (Farnsworth Timing)</span>
+          <span style="font-size:0.7rem; color:#888;">音形訓練法</span>
+        </div>
+        <div style="display:flex; justify-content:space-between; align-items:center; font-size:0.8rem; margin-bottom:8px;">
+          <label style="display:flex; align-items:center; gap:6px; cursor:pointer; color:#ccc;">
+            <input type="checkbox" id="chk-farnsworth" style="accent-color:var(--neon-blue);">
+            <span>啟用法恩斯沃斯 (音形高速 · 間距放寬)</span>
+          </label>
+          <span style="font-size:0.7rem; color:#888;" id="tag-farnsworth-status">已關閉</span>
+        </div>
+        <div id="farnsworth-controls" style="display:none; padding-top:8px; border-top:1px dashed #2a2e3a;">
+          <div style="display:flex; justify-content:space-between; align-items:center; font-size:0.75rem; color:#aaa; margin-bottom:6px;">
+            <span>字元速度 (Character Speed): <strong id="tag-farnsworth-wpm" style="color:var(--neon-blue);">18 WPM (67ms)</strong></span>
+            <span style="font-size:0.68rem; color:#777; white-space:nowrap;">間隔依主設定</span>
+          </div>
+          <input type="range" id="param-farnsworth-wpm" min="15" max="40" step="1" value="18" style="width:100%; accent-color:var(--neon-blue);">
+        </div>
+      </div>
+
+      <!-- Atmospheric RF Noise (QRN) Box -->
+      <div id="qrn-settings-box" style="background: #14161f; border: 1px solid #282d3c; border-radius: 8px; padding: 12px;">
+        <div style="font-size:0.8rem; font-weight:bold; color:#ffb703; margin-bottom:10px; display:flex; justify-content:space-between; align-items:center;">
+          <span><i class="mdi mdi-radio-tower"></i> 電台背景雜音 (QRN)</span>
+          <span style="font-size:0.7rem; color:#888;">短波濾波</span>
+        </div>
+        <div style="display:flex; justify-content:space-between; align-items:center; font-size:0.8rem; margin-bottom:6px;">
+          <label style="display:flex; align-items:center; gap:6px; cursor:pointer; color:#ccc;">
+            <input type="checkbox" id="chk-qrn" style="accent-color:#ffb703;">
+            <span>開啟背景雜音 (短波情境)</span>
+          </label>
+          <span style="font-size:0.7rem; color:#888;" id="tag-qrn-status">已靜音</span>
+        </div>
+        <div id="qrn-controls" style="display:none; padding-top:8px; border-top:1px dashed #2a2e3a;">
+          <div style="display:flex; justify-content:space-between; align-items:center; font-size:0.75rem; color:#aaa; margin-bottom:6px;">
+            <span>雜音強度 (Volume): <strong id="tag-qrn-vol" style="color:#ffb703;">20%</strong></span>
+            <span style="font-size:0.68rem; color:#777;">環境底噪</span>
+          </div>
+          <input type="range" id="param-qrn-vol" min="0.01" max="0.10" step="0.01" value="0.04" style="width:100%; accent-color:#ffb703;">
+        </div>
+      </div>
+
+      <!-- Keyboard Keybindings Box -->
+      <div id="keybindings-settings-box" style="background: #14161f; border: 1px solid #282d3c; border-radius: 8px; padding: 12px;">
+        <div style="font-size:0.8rem; font-weight:bold; color:#00e5ff; margin-bottom:10px; display:flex; justify-content:space-between; align-items:center;">
+          <span><i class="mdi mdi-keyboard-outline"></i> 鍵盤按鍵對應</span>
+          <span id="tag-current-profile" style="font-size:0.7rem; color:#888;">標準鍵位</span>
+        </div>
+
+        <!-- Preset Profile Buttons -->
+        <div style="display:grid; grid-template-columns: repeat(4, 1fr); gap: 6px; margin-bottom: 10px;">
+          <button class="key-profile-btn active-key-profile" data-profile="standard" style="background:#1a1c24; border:1px solid #363b4b; border-radius:5px; padding:6px 2px; color:#ddd; font-size:0.72rem; cursor:pointer; text-align:center;">
+            <div style="font-weight:bold;">標準鍵位</div>
+            <div style="font-size:0.63rem; color:#888;">K · [ ]</div>
+          </button>
+          <button class="key-profile-btn" data-profile="homerow" style="background:#1a1c24; border:1px solid #363b4b; border-radius:5px; padding:6px 2px; color:#ddd; font-size:0.72rem; cursor:pointer; text-align:center;">
+            <div style="font-weight:bold;">雙手基準</div>
+            <div style="font-size:0.63rem; color:#00e5ff;">F · J</div>
+          </button>
+          <button class="key-profile-btn" data-profile="left_hand" style="background:#1a1c24; border:1px solid #363b4b; border-radius:5px; padding:6px 2px; color:#ddd; font-size:0.72rem; cursor:pointer; text-align:center;">
+            <div style="font-weight:bold;">單手左手</div>
+            <div style="font-size:0.63rem; color:#ffd700;">Z · X</div>
+          </button>
+          <button class="key-profile-btn" data-profile="arrows" style="background:#1a1c24; border:1px solid #363b4b; border-radius:5px; padding:6px 2px; color:#ddd; font-size:0.72rem; cursor:pointer; text-align:center;">
+            <div style="font-weight:bold;">方向鍵</div>
+            <div style="font-size:0.63rem; color:#81b29a;">← · →</div>
+          </button>
+        </div>
+
+        <!-- Interactive Key Binding Remap Buttons -->
+        <div style="display:flex; flex-direction:column; gap:6px; font-size:0.75rem; background:#0c0d12; padding:8px; border-radius:5px;">
+          <div style="display:flex; justify-content:space-between; align-items:center;">
+            <span style="color:#aaa;">直鍵 (Straight):</span>
+            <button id="btn-bind-straight" class="bind-btn" style="background:#1f2330; border:1px solid #3d465c; color:#fff; border-radius:4px; padding:2px 10px; font-family:monospace; font-size:0.75rem; cursor:pointer;">
+              K
+            </button>
+          </div>
+          <div style="display:flex; justify-content:space-between; align-items:center;">
+            <span style="color:#aaa;">點撥片 (Dit):</span>
+            <button id="btn-bind-dit" class="bind-btn" style="background:#1f2330; border:1px solid #3d465c; color:#00e5ff; border-radius:4px; padding:2px 10px; font-family:monospace; font-size:0.75rem; cursor:pointer;">
+              [ / ,
+            </button>
+          </div>
+          <div style="display:flex; justify-content:space-between; align-items:center;">
+            <span style="color:#aaa;">劃撥片 (Dah):</span>
+            <button id="btn-bind-dah" class="bind-btn" style="background:#1f2330; border:1px solid #3d465c; color:#ffd700; border-radius:4px; padding:2px 10px; font-family:monospace; font-size:0.75rem; cursor:pointer;">
+              ] / .
+            </button>
+          </div>
+        </div>
+        <div style="font-size:0.68rem; color:#777; margin-top:6px; text-align:center;">
+          <i class="mdi mdi-lightbulb-outline"></i> 點選按鍵後，按下鍵盤任意鍵即可更換
+        </div>
+      </div>
+
+      <!-- Factory Reset & Storage Status Footer -->
+      <div style="display:flex; justify-content:space-between; align-items:center; padding:10px 4px; border-top:1px solid #252834;">
+        <span style="font-size:0.72rem; color:#888;"><i class="mdi mdi-content-save-outline"></i> 設定將自動保存</span>
+        <button id="btn-factory-reset" style="background:none; border:1px solid #555; color:#aaa; padding:5px 10px; border-radius:4px; font-size:0.72rem; cursor:pointer; display:flex; align-items:center; gap:4px;">
+          <i class="mdi mdi-restore"></i> 重設為預設值
+        </button>
+      </div>
+
+    </div>
+  </div>
+  <!-- /settings-drawer -->
 
   <script>
     /**
@@ -3749,6 +4513,15 @@
     const paramQrnVol = document.getElementById('param-qrn-vol');
     const tagQrnVol = document.getElementById('tag-qrn-vol');
 
+    // Top Bar & K5 Dock WPM Display Synchronization
+    function updateTopbarWpm(wpm) {
+      const valEl = document.getElementById('topbar-wpm-val');
+      if (valEl) valEl.textContent = wpm;
+      const k5WpmVal = document.getElementById('k5-wpm-val');
+      if (k5WpmVal) k5WpmVal.textContent = `${wpm} WPM`;
+    }
+    window.updateTopbarWpm = updateTopbarWpm;
+
     // Mode Switching Elements
     let currentMode = 'free'; // 'free' | 'text' | 'koch'
     const tabModeFree = document.getElementById('tab-mode-free');
@@ -4089,6 +4862,9 @@
 
       updateMeterMarkers();
 
+      const currentWpm = Math.round(1200 / p.unitT);
+      if (typeof updateTopbarWpm === 'function') updateTopbarWpm(currentWpm);
+
       if (saveToSettings && typeof settingsManager !== 'undefined') {
         settingsManager.settings.speedPreset = key;
         settingsManager.settings.unitT = p.unitT;
@@ -4277,6 +5053,8 @@
     function startMeterAnimation() {
       const startTime = engine.pressStartTime;
       const th = engine.getEffectiveThreshold();
+      const haloPressArc = document.getElementById('halo-press-arc');
+      const hudTimingStatus = document.getElementById('hud-timing-status');
 
       function frame() {
         if (!engine.isKeyDown) return;
@@ -4285,6 +5063,16 @@
         const pct = Math.min(100, (elapsed / maxMeterScale) * 100);
 
         meterBar.style.width = pct + '%';
+        if (haloPressArc) {
+          const pressPct = Math.min(100, (elapsed / maxMeterScale) * 100);
+          const pressOffset = 440 - (440 * (pressPct / 100));
+          haloPressArc.style.strokeDashoffset = pressOffset;
+          haloPressArc.style.stroke = (elapsed < th) ? 'var(--neon-blue)' : 'var(--gold)';
+        }
+        if (hudTimingStatus) {
+          const isDah = elapsed >= th;
+          hudTimingStatus.innerHTML = `發報中: <strong style="color:${isDah ? 'var(--gold)' : 'var(--neon-blue)'};">${isDah ? '— 劃 Dah' : '· 點 Dit'}</strong> (${elapsed}ms)`;
+        }
         readoutTime.textContent = `${elapsed} ms`;
 
         if (typeof engine.calculateStrokeWpm === 'function') {
@@ -4311,6 +5099,8 @@
 
     function stopMeterAnimation(finalDuration) {
       if (animFrame) cancelAnimationFrame(animFrame);
+      const haloPressArc = document.getElementById('halo-press-arc');
+      if (haloPressArc) haloPressArc.style.strokeDashoffset = '440';
       const pct = Math.min(100, (finalDuration / maxMeterScale) * 100);
       meterBar.style.width = pct + '%';
       readoutTime.textContent = `${finalDuration} ms`;
@@ -4377,6 +5167,9 @@
     // Real-time Settlement Gap Timeline Animation
     function startGapCountdown() {
       if (gapAnimFrame) cancelAnimationFrame(gapAnimFrame);
+      const haloGapArc = document.getElementById('halo-gap-arc');
+      const hudTimingStatus = document.getElementById('hud-timing-status');
+      if (haloGapArc) haloGapArc.style.strokeDashoffset = '534';
       letterSettled = false;
       wordSettled = false;
 
@@ -4395,6 +5188,28 @@
         const pct = Math.min(100, (elapsed / maxGapScale) * 100);
 
         gapBar.style.width = pct + '%';
+        if (haloGapArc) {
+          let haloGapPct = 0;
+          if (elapsed <= letterGap) {
+            haloGapPct = (elapsed / letterGap) * 42;
+          } else if (elapsed <= wordGap) {
+            haloGapPct = 42 + ((elapsed - letterGap) / (wordGap - letterGap)) * 53;
+          } else {
+            haloGapPct = Math.min(100, 95 + ((elapsed - wordGap) / (wordGap * 0.18)) * 5);
+          }
+          const gapOffset = 534 - (534 * (haloGapPct / 100));
+          haloGapArc.style.strokeDashoffset = gapOffset;
+          if (elapsed < letterGap) {
+            haloGapArc.style.stroke = '#2c394c';
+            if (hudTimingStatus) hudTimingStatus.textContent = `間隔計時: ${Math.round(elapsed)}ms`;
+          } else if (elapsed < wordGap) {
+            haloGapArc.style.stroke = 'var(--gold)';
+            if (hudTimingStatus) hudTimingStatus.innerHTML = `<span style="color:var(--gold); font-weight:bold;">字元結算 (3T: ${Math.round(elapsed)}ms)</span>`;
+          } else {
+            haloGapArc.style.stroke = 'var(--neon-blue)';
+            if (hudTimingStatus) hudTimingStatus.innerHTML = `<span style="color:var(--neon-blue); font-weight:bold;">單字空格 (7T: ${Math.round(elapsed)}ms)</span>`;
+          }
+        }
         if (gapTimeReadout) gapTimeReadout.textContent = `${Math.round(elapsed)} ms`;
 
         // Stage 1: Before letter settlement (0 ~ 3T)
@@ -4501,7 +5316,7 @@
       // Koch Mode special intercept
       if (currentMode === 'koch') {
         if (!kochState.running || kochState.isFinished) {
-          evalStatus.textContent = '請先點擊「▶ 開始闖關」';
+          evalStatus.textContent = '請先點擊「開始闖關」';
           evalStatus.style.color = '#ffb703';
           return;
         }
@@ -4536,6 +5351,10 @@
 
       stateSeq.textContent = res.sequence;
       stateLetter.textContent = res.letter || (res.isValid ? '定位中...' : '(非英文字母)');
+      const hudChar = document.getElementById('hud-char-target');
+      const hudSeq = document.getElementById('hud-seq-target');
+      if (hudChar) hudChar.textContent = res.letter || '—';
+      if (hudSeq) hudSeq.textContent = res.sequence || '';
       stateDuration.textContent = `${res.duration} ms`;
 
       if (res.letter === '<HH>') {
@@ -4566,6 +5385,12 @@
       stateCommitted.textContent = text;
       stateCommitted.title = (text !== '—') ? text : '';
       stateCommitted.scrollLeft = stateCommitted.scrollWidth;
+      const hudStream = document.getElementById('hud-committed-stream');
+      if (hudStream) {
+        hudStream.textContent = text;
+        hudStream.title = (text !== '—') ? text : '';
+        hudStream.scrollLeft = hudStream.scrollWidth;
+      }
       const clearBtn = document.getElementById('btn-clear-committed');
       if (clearBtn) {
         const hasText = engine && engine.committedLetters && engine.committedLetters.length > 0;
@@ -4615,6 +5440,10 @@
         evalStatus.style.color = '#888';
         stateSeq.textContent = '—';
         stateLetter.textContent = '—';
+        const hudCharReset = document.getElementById('hud-char-target');
+        const hudSeqReset = document.getElementById('hud-seq-target');
+        if (hudCharReset) hudCharReset.textContent = '—';
+        if (hudSeqReset) hudSeqReset.textContent = '';
         meterBar.style.width = '0%';
         readoutTime.textContent = '0 ms';
         readoutSymbol.textContent = '無';
@@ -6222,7 +7051,7 @@
       // Koch Mode intercept
       if (currentMode === 'koch') {
         if (!kochState.running || kochState.isFinished) {
-          evalStatus.textContent = '請先點擊「▶ 開始闖關」';
+          evalStatus.textContent = '請先點擊「開始闖關」';
           evalStatus.style.color = '#ffb703';
           return;
         }
@@ -6279,6 +7108,10 @@
       // Card readout states
       stateSeq.textContent = res.sequence;
       stateLetter.textContent = res.letter || '(非英文字母)';
+      const hudChar = document.getElementById('hud-char-target');
+      const hudSeq = document.getElementById('hud-seq-target');
+      if (hudChar) hudChar.textContent = res.letter || '—';
+      if (hudSeq) hudSeq.textContent = res.sequence || '';
       stateDuration.textContent = `${duration} ms`;
 
       // Highlight SVG wire
@@ -6425,6 +7258,10 @@
       if (saveToSettings && typeof settingsManager !== 'undefined') {
         settingsManager.settings.keyerDevice = device;
         settingsManager.save();
+      }
+
+      if (typeof updateK5MorphingUI === 'function') {
+        updateK5MorphingUI();
       }
     }
 
@@ -6643,6 +7480,8 @@
       engine.updateConfig({ unitT: val });
       tagUnitT.textContent = `${val}ms`;
       updateMeterMarkers();
+      const currentWpm = Math.round(1200 / val);
+      if (typeof updateTopbarWpm === 'function') updateTopbarWpm(currentWpm);
       if (typeof settingsManager !== 'undefined') {
         settingsManager.settings.unitT = val;
         settingsManager.settings.speedPreset = null;
@@ -7051,6 +7890,8 @@
           btn.classList.remove('active-preset');
         });
         updateMeterMarkers();
+        const currentWpm = Math.round(1200 / s.unitT);
+        if (typeof updateTopbarWpm === 'function') updateTopbarWpm(currentWpm);
       }
 
       // 2. CW Sidetone Frequency
@@ -7148,6 +7989,395 @@
       if (s.layoutMode) {
         setLayoutMode(s.layoutMode);
       }
+
+      if (typeof updateTopbarWpm === 'function' && engine && engine.config && engine.config.unitT) {
+        updateTopbarWpm(Math.round(1200 / engine.config.unitT));
+      }
+    }
+
+
+    // ----------------------------------------------------
+    // Three-Zone Shell & Workspace Navigation (Tx / Rx / QSO)
+    // ----------------------------------------------------
+    
+// ----------------------------------------------------
+// K5 Ergonomic Morphing Dock Controller
+// ----------------------------------------------------
+function setupK5Dock() {
+  const wingLeft = document.getElementById('k5-wing-left');
+  const wingRight = document.getElementById('k5-wing-right');
+  const pillPaddle = document.getElementById('k5-pill-paddle');
+  const pillStraight = document.getElementById('k5-pill-straight');
+  const pillBug = document.getElementById('k5-pill-bug');
+  const wpmMinus = document.getElementById('k5-wpm-minus');
+  const wpmPlus = document.getElementById('k5-wpm-plus');
+  const wpmVal = document.getElementById('k5-wpm-val');
+  const revToggle = document.getElementById('k5-reverse-toggle');
+
+  if (!wingLeft || !wingRight) return;
+
+  const pills = [
+    { el: pillPaddle, mode: 'paddle' },
+    { el: pillStraight, mode: 'straight' },
+    { el: pillBug, mode: 'bug' }
+  ];
+
+  pills.forEach(p => {
+    if (!p.el) return;
+    p.el.addEventListener('click', () => {
+      switchKeyerDevice(p.mode);
+    });
+  });
+
+  if (wpmMinus) {
+    wpmMinus.addEventListener('click', () => {
+      const current = (engine && typeof engine.getBaselineWpm === 'function') ? engine.getBaselineWpm() : 20;
+      setWpmFromStepper(current - 1);
+    });
+  }
+
+  if (wpmPlus) {
+    wpmPlus.addEventListener('click', () => {
+      const current = (engine && typeof engine.getBaselineWpm === 'function') ? engine.getBaselineWpm() : 20;
+      setWpmFromStepper(current + 1);
+    });
+  }
+
+  if (revToggle) {
+    revToggle.addEventListener('click', () => {
+      const nextRev = !keyer.reversed;
+      keyer.setReversed(nextRev);
+      revToggle.classList.toggle('active', nextRev);
+      const chkReverse = document.getElementById('chk-paddle-reverse');
+      if (chkReverse) chkReverse.checked = nextRev;
+      if (settingsManager && settingsManager.settings) {
+        settingsManager.settings.paddleReverse = nextRev;
+        settingsManager.save();
+      }
+      updatePaddleLabels();
+      updateK5MorphingUI();
+    });
+  }
+
+  function bindWing(wingEl, side) {
+    let isPressed = false;
+
+    function onDown(e) {
+      e.preventDefault();
+      if (isPressed) return;
+      isPressed = true;
+      wingEl.classList.add('active');
+
+      if (currentKeyerDevice === 'straight') {
+        handleKeyDown();
+      } else if (currentKeyerDevice === 'paddle' || currentKeyerDevice === 'bug') {
+        keyer.setPhysicalContact(side, true);
+      }
+    }
+
+    function onUp(e) {
+      if (!isPressed) return;
+      isPressed = false;
+      wingEl.classList.remove('active');
+
+      if (currentKeyerDevice === 'straight') {
+        handleKeyUp();
+      } else if (currentKeyerDevice === 'paddle' || currentKeyerDevice === 'bug') {
+        keyer.setPhysicalContact(side, false);
+      }
+    }
+
+    wingEl.addEventListener('pointerdown', onDown);
+    wingEl.addEventListener('pointerup', onUp);
+    wingEl.addEventListener('pointerleave', onUp);
+    wingEl.addEventListener('pointercancel', onUp);
+  }
+
+  bindWing(wingLeft, 'left');
+  bindWing(wingRight, 'right');
+
+  updateK5MorphingUI();
+}
+
+function setWpmFromStepper(wpm) {
+  const clamped = Math.max(10, Math.min(40, wpm));
+  const t = Math.round(1200 / clamped);
+  engine.updateConfig({
+    unitT: t,
+    threshold: Math.round(t * 2),
+    letterGap: Math.round(t * 3),
+    wordGap: Math.round(t * 7)
+  });
+  if (dom.paramUnitT) dom.paramUnitT.value = t;
+  if (dom.tagUnitT) dom.tagUnitT.textContent = `${t}ms`;
+  if (dom.paramThreshold) dom.paramThreshold.value = Math.round(t * 2);
+  if (dom.tagThreshold) dom.tagThreshold.textContent = `${Math.round(t * 2)}ms`;
+  if (dom.paramGap) dom.paramGap.value = Math.round(t * 3);
+  if (dom.tagGap) dom.tagGap.textContent = `${Math.round(t * 3)}ms`;
+  if (dom.paramWordGap) dom.paramWordGap.value = Math.round(t * 7);
+  if (dom.tagWordGap) dom.tagWordGap.textContent = `${Math.round(t * 7)}ms`;
+  if (typeof updateMeterMarkers === 'function') updateMeterMarkers();
+
+  const k5WpmVal = document.getElementById('k5-wpm-val');
+  if (k5WpmVal) k5WpmVal.textContent = `${clamped} WPM`;
+  const topbarWpmVal = document.getElementById('topbar-wpm-val');
+  if (topbarWpmVal) topbarWpmVal.textContent = clamped;
+  const stateWpm = document.getElementById('state-wpm');
+  if (stateWpm) stateWpm.textContent = `(${clamped} WPM)`;
+  const readoutWpm = document.getElementById('readout-wpm');
+  if (readoutWpm) readoutWpm.textContent = `(${clamped} WPM)`;
+  const meterBadge = document.getElementById('meter-wpm-badge');
+  if (meterBadge) meterBadge.textContent = `即時 ${clamped} WPM`;
+
+  if (settingsManager && settingsManager.settings) {
+    settingsManager.settings.unitT = t;
+    settingsManager.settings.threshold = Math.round(t * 2);
+    settingsManager.settings.letterGap = Math.round(t * 3);
+    settingsManager.settings.wordGap = Math.round(t * 7);
+    settingsManager.save();
+  }
+}
+
+function updateK5MorphingUI() {
+  const wingLeft = document.getElementById('k5-wing-left');
+  const wingRight = document.getElementById('k5-wing-right');
+  const leftSym = document.getElementById('k5-left-sym');
+  const leftTitle = document.getElementById('k5-left-title');
+  const leftHint = document.getElementById('k5-left-hint');
+  const rightSym = document.getElementById('k5-right-sym');
+  const rightTitle = document.getElementById('k5-right-title');
+  const rightHint = document.getElementById('k5-right-hint');
+  const modeBadge = document.getElementById('k5-mode-badge');
+  const revToggle = document.getElementById('k5-reverse-toggle');
+  const k5WpmVal = document.getElementById('k5-wpm-val');
+
+  const pillPaddle = document.getElementById('k5-pill-paddle');
+  const pillStraight = document.getElementById('k5-pill-straight');
+  const pillBug = document.getElementById('k5-pill-bug');
+
+  if (!wingLeft || !wingRight) return;
+
+  if (pillPaddle) pillPaddle.classList.toggle('active', currentKeyerDevice === 'paddle');
+  if (pillStraight) pillStraight.classList.toggle('active', currentKeyerDevice === 'straight');
+  if (pillBug) pillBug.classList.toggle('active', currentKeyerDevice === 'bug');
+
+  if (revToggle) {
+    revToggle.classList.toggle('active', !!keyer.reversed);
+  }
+
+  if (k5WpmVal && engine && typeof engine.getBaselineWpm === 'function') {
+    k5WpmVal.textContent = `${engine.getBaselineWpm()} WPM`;
+  }
+
+  if (currentKeyerDevice === 'straight') {
+    wingLeft.style.borderLeft = '3px solid var(--gold)';
+    wingLeft.style.borderBottom = '3px solid var(--gold)';
+    if (leftSym) {
+      leftSym.innerHTML = '<i class="mdi mdi-ray-vertex"></i>';
+      leftSym.style.color = 'var(--gold)';
+    }
+    if (leftTitle) leftTitle.textContent = '直鍵 (左手)';
+    if (leftHint) leftHint.textContent = '空白鍵 / 點擊長短音';
+
+    wingRight.style.borderRight = '3px solid var(--gold)';
+    wingRight.style.borderBottom = '3px solid var(--gold)';
+    if (rightSym) {
+      rightSym.innerHTML = '<i class="mdi mdi-ray-vertex"></i>';
+      rightSym.style.color = 'var(--gold)';
+    }
+    if (rightTitle) rightTitle.textContent = '直鍵 (右手)';
+    if (rightHint) rightHint.textContent = '空白鍵 / 點擊長短音';
+
+    if (modeBadge) modeBadge.textContent = '直鍵手電鍵';
+  } else if (currentKeyerDevice === 'bug') {
+    wingLeft.style.borderLeft = '3px solid var(--neon-blue)';
+    wingLeft.style.borderBottom = '3px solid var(--neon-blue)';
+    if (leftSym) {
+      leftSym.innerHTML = '<i class="mdi mdi-sine-wave"></i>';
+      leftSym.style.color = 'var(--neon-blue)';
+    }
+    if (leftTitle) leftTitle.textContent = '機械連點';
+    if (leftHint) leftHint.textContent = '彈簧震動 Dit (F)';
+
+    wingRight.style.borderRight = '3px solid var(--gold)';
+    wingRight.style.borderBottom = '3px solid var(--gold)';
+    if (rightSym) {
+      rightSym.innerHTML = '<i class="mdi mdi-hand-pointing-right"></i>';
+      rightSym.style.color = 'var(--gold)';
+    }
+    if (rightTitle) rightTitle.textContent = '手動長音';
+    if (rightHint) rightHint.textContent = '手動長劃 Dah (J)';
+
+    if (modeBadge) modeBadge.textContent = '震報鍵 Bug';
+  } else {
+    const isRev = !!keyer.reversed;
+    if (isRev) {
+      wingLeft.style.borderLeft = '3px solid var(--gold)';
+      wingLeft.style.borderBottom = '3px solid var(--gold)';
+      if (leftSym) {
+        leftSym.textContent = '—';
+        leftSym.style.color = 'var(--gold)';
+      }
+      if (leftTitle) leftTitle.textContent = '劃 Dah';
+      if (leftHint) leftHint.textContent = '鍵盤 J / 點擊';
+
+      wingRight.style.borderRight = '3px solid var(--neon-blue)';
+      wingRight.style.borderBottom = '3px solid var(--neon-blue)';
+      if (rightSym) {
+        rightSym.textContent = '·';
+        rightSym.style.color = 'var(--neon-blue)';
+      }
+      if (rightTitle) rightTitle.textContent = '點 Dit';
+      if (rightHint) rightHint.textContent = '鍵盤 F / 點擊';
+    } else {
+      wingLeft.style.borderLeft = '3px solid var(--neon-blue)';
+      wingLeft.style.borderBottom = '3px solid var(--neon-blue)';
+      if (leftSym) {
+        leftSym.textContent = '·';
+        leftSym.style.color = 'var(--neon-blue)';
+      }
+      if (leftTitle) leftTitle.textContent = '點 Dit';
+      if (leftHint) leftHint.textContent = '鍵盤 F / 點擊';
+
+      wingRight.style.borderRight = '3px solid var(--gold)';
+      wingRight.style.borderBottom = '3px solid var(--gold)';
+      if (rightSym) {
+        rightSym.textContent = '—';
+        rightSym.style.color = 'var(--gold)';
+      }
+      if (rightTitle) rightTitle.textContent = '劃 Dah';
+      if (rightHint) rightHint.textContent = '鍵盤 J / 點擊';
+    }
+    if (modeBadge) modeBadge.textContent = '雙撥片 Mode ' + (keyer.mode || 'B');
+  }
+}
+
+    
+// ----------------------------------------------------
+// Stage View Switcher Controller (Tree / Focus / Telemetry)
+// ----------------------------------------------------
+function setupStageViewSwitching() {
+  const tabs = [
+    { id: 'view-tab-tree', view: 'tree' },
+    { id: 'view-tab-focus', view: 'focus' },
+    { id: 'view-tab-telemetry', view: 'telemetry' }
+  ];
+
+  tabs.forEach(t => {
+    const btn = document.getElementById(t.id);
+    if (!btn) return;
+    btn.addEventListener('click', () => setStageView(t.view));
+  });
+
+  if (typeof settingsManager !== 'undefined' && settingsManager.settings && settingsManager.settings.stageView) {
+    setStageView(settingsManager.settings.stageView);
+  }
+}
+
+function setStageView(view) {
+  const btnTree = document.getElementById('view-tab-tree');
+  const btnFocus = document.getElementById('view-tab-focus');
+  const btnTelemetry = document.getElementById('view-tab-telemetry');
+  const focusStage = document.getElementById('focus-hud-stage');
+  const colHardware = document.getElementById('col-hardware');
+  const meterPanel = document.getElementById('meter-panel');
+
+  if (btnTree) btnTree.classList.toggle('active', view === 'tree');
+  if (btnFocus) btnFocus.classList.toggle('active', view === 'focus');
+  if (btnTelemetry) btnTelemetry.classList.toggle('active', view === 'telemetry');
+
+  if (view === 'focus') {
+    if (focusStage) focusStage.style.display = 'flex';
+    if (colHardware) colHardware.style.display = 'none';
+  } else if (view === 'telemetry') {
+    if (focusStage) focusStage.style.display = 'none';
+    if (colHardware) colHardware.style.display = 'none';
+    if (meterPanel) meterPanel.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+  } else {
+    // Default 'tree'
+    if (focusStage) focusStage.style.display = 'none';
+    if (colHardware) colHardware.style.display = 'flex';
+  }
+
+  setTimeout(() => {
+    const ribbonCanvas = document.getElementById('cw-ribbon');
+    if (ribbonCanvas && ribbonCanvas.parentElement) {
+      ribbonCanvas.width = ribbonCanvas.parentElement.clientWidth || 500;
+    }
+  }, 50);
+
+  if (typeof settingsManager !== 'undefined' && settingsManager.settings) {
+    settingsManager.settings.stageView = view;
+    settingsManager.save();
+  }
+}
+
+    function setupWorkspaceNavigation() {
+      const wsTabs = [
+        { btnId: 'ws-tab-tx', viewId: 'ws-container-tx' },
+        { btnId: 'ws-tab-rx', viewId: 'ws-container-rx' },
+        { btnId: 'ws-tab-qso', viewId: 'ws-container-qso' }
+      ];
+
+      wsTabs.forEach(item => {
+        const btn = document.getElementById(item.btnId);
+        if (!btn) return;
+        btn.addEventListener('click', () => {
+          wsTabs.forEach(t => {
+            const b = document.getElementById(t.btnId);
+            const v = document.getElementById(t.viewId);
+            if (b) b.classList.remove('active');
+            if (v) {
+              v.style.display = 'none';
+              v.classList.remove('active');
+            }
+          });
+          btn.classList.add('active');
+          const targetView = document.getElementById(item.viewId);
+          if (targetView) {
+            targetView.style.display = 'flex';
+            targetView.classList.add('active');
+          }
+        });
+      });
+    }
+
+    // ----------------------------------------------------
+    // Settings Slide-up Drawer Controller
+    // ----------------------------------------------------
+    function setupSettingsDrawer() {
+      const btnOpenSettings = document.getElementById('btn-open-settings');
+      const btnCloseSettings = document.getElementById('btn-close-settings');
+      const btnOpenSettingsTelemetry = document.getElementById('btn-open-settings-telemetry');
+      const drawer = document.getElementById('settings-drawer');
+      const backdrop = document.getElementById('settings-drawer-backdrop');
+
+      function openDrawer() {
+        if (backdrop) {
+          backdrop.style.display = 'block';
+          requestAnimationFrame(() => backdrop.classList.add('open'));
+        }
+        if (drawer) {
+          drawer.style.display = 'flex';
+          requestAnimationFrame(() => drawer.classList.add('open'));
+        }
+      }
+      function closeDrawer() {
+        if (backdrop) backdrop.classList.remove('open');
+        if (drawer) drawer.classList.remove('open');
+        setTimeout(() => {
+          if (backdrop && !backdrop.classList.contains('open')) backdrop.style.display = 'none';
+          if (drawer && !drawer.classList.contains('open')) drawer.style.display = 'none';
+        }, 250);
+      }
+
+      if (btnOpenSettings) btnOpenSettings.addEventListener('click', openDrawer);
+      if (btnCloseSettings) btnCloseSettings.addEventListener('click', closeDrawer);
+      if (backdrop) backdrop.addEventListener('click', closeDrawer);
+      if (btnOpenSettingsTelemetry) btnOpenSettingsTelemetry.addEventListener('click', openDrawer);
+
+      // Sync WPM in Top Bar
+      window.updateTopbarWpm = updateTopbarWpm;
     }
 
     function setLayoutMode(mode) {
@@ -7183,12 +8413,15 @@
     }
 
     // Startup
+    setupWorkspaceNavigation();
+    setupSettingsDrawer();
+    setupK5Dock();
+    setupStageViewSwitching();
     renderCardSvg();
     applyLoadedSettings();
     setupScenarios();
     initTextModePassage(textInput.value || 'SOS CQ');
     updateKochUI();
-    applyLoadedSettings();
   </script>
 </body>
 </html>

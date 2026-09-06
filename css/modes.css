@@ -278,11 +278,12 @@
 }
 
 .char-chip.state-timeout::after {
-  content: '⏱️';
+  content: "\F051B";
+  font-family: "Material Design Icons";
   position: absolute;
   top: -5px;
   right: -5px;
-  font-size: 0.6rem;
+  font-size: 0.65rem;
   line-height: 1;
 }
 

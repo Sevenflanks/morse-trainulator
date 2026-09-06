@@ -205,3 +205,603 @@ h1 {
 .mdi.mdi-lg {
   font-size: 1.3em;
 }
+
+
+/* ==========================================================================
+   Three-Zone Shell: Top Bar, Workspaces, and Navigation
+   ========================================================================== */
+.va-topbar {
+  width: 100%;
+  max-width: 1280px;
+  height: 52px;
+  background: #13151c;
+  border: 1px solid #282f3d;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 16px;
+  margin-bottom: 12px;
+  flex-shrink: 0;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.4);
+}
+.va-brand {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-weight: 700;
+}
+.brand-mark {
+  width: 28px;
+  height: 28px;
+  flex-shrink: 0;
+}
+.va-title {
+  font-size: 1rem;
+  color: var(--gold-light);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.va-title-en {
+  font-size: 0.78rem;
+  color: var(--text-muted);
+  font-weight: 400;
+}
+.va-workspace-nav {
+  display: flex;
+  gap: 4px;
+  background: #0b0c10;
+  padding: 3px;
+  border-radius: 8px;
+  border: 1px solid #232936;
+}
+.va-ws-btn {
+  padding: 6px 12px;
+  border: none;
+  background: transparent;
+  color: var(--text-muted);
+  font-size: 0.8rem;
+  font-weight: 600;
+  border-radius: 6px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  transition: all 0.15s ease;
+}
+.va-ws-btn:hover {
+  color: #fff;
+  background: rgba(255, 255, 255, 0.05);
+}
+.va-ws-btn.active {
+  background: #1e2430;
+  color: var(--neon-blue);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+}
+.va-topbar-right {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.topbar-wpm-pill {
+  font-family: monospace;
+  font-size: 0.82rem;
+  font-weight: 700;
+  color: var(--gold);
+  background: #0b0c10;
+  border: 1px solid rgba(212, 175, 55, 0.3);
+  padding: 4px 10px;
+  border-radius: 12px;
+}
+.btn-icon {
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
+  background: #1b1e26;
+  border: 1px solid #2e3444;
+  color: #cfd6e6;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+.btn-icon:hover {
+  border-color: var(--neon-blue);
+  color: var(--neon-blue);
+}
+.header-subbar {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-bottom: 12px;
+}
+.workspace-view {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+.placeholder-workspace {
+  padding: 60px 20px;
+  text-align: center;
+  background: #141720;
+  border: 1px solid #283142;
+  border-radius: 12px;
+  max-width: 600px;
+  margin: 40px auto;
+  width: 100%;
+}
+.placeholder-icon {
+  font-size: 3.5rem;
+  color: var(--neon-blue);
+  margin-bottom: 16px;
+}
+.placeholder-badge {
+  display: inline-block;
+  margin-top: 16px;
+  font-size: 0.75rem;
+  font-family: monospace;
+  background: rgba(0, 229, 255, 0.1);
+  color: var(--neon-blue);
+  border: 1px solid rgba(0, 229, 255, 0.3);
+  padding: 4px 12px;
+  border-radius: 20px;
+}
+
+/* Slide-up Settings Drawer */
+.drawer-backdrop {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.6);
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
+  z-index: 999;
+}
+.settings-drawer {
+  position: fixed;
+  bottom: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 100%;
+  max-width: 720px;
+  max-height: 80vh;
+  background: #141720;
+  border: 1px solid #2b3548;
+  border-bottom: none;
+  border-radius: 16px 16px 0 0;
+  z-index: 1000;
+  display: flex;
+  flex-direction: column;
+  box-shadow: 0 -8px 32px rgba(0, 0, 0, 0.6);
+}
+.drawer-header {
+  padding: 14px 18px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-bottom: 1px solid #242e40;
+}
+.drawer-title {
+  font-weight: 700;
+  font-size: 1rem;
+  color: var(--gold);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.drawer-body {
+  padding: 16px 18px;
+  overflow-y: auto;
+}
+
+
+/* ==========================================================================
+   Zone 3: K5 Ergonomic Morphing Dock (雙翼變形工學座)
+   ========================================================================== */
+.va-keyer-dock {
+  width: 100%;
+  max-width: 1280px;
+  background: #141720;
+  border-top: 1px solid #232936;
+  border-radius: 0 0 12px 12px;
+  padding: 10px 16px;
+  box-sizing: border-box;
+  margin-top: 12px;
+  flex-shrink: 0;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
+  z-index: 10;
+}
+.k5-dock-container {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  height: 96px;
+  box-sizing: border-box;
+}
+.k2-thumb-wing {
+  flex: 1.1;
+  height: 96px;
+  background: linear-gradient(145deg, #1e2635 0%, #11151f 100%);
+  border: 1.5px solid #2f3c52;
+  border-radius: 20px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  position: relative;
+  touch-action: none;
+  user-select: none;
+  -webkit-user-select: none;
+  transition: all 0.08s ease;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.4);
+  box-sizing: border-box;
+}
+.k2-thumb-wing.left {
+  border-bottom-left-radius: 28px;
+  border-left: 3px solid var(--neon-blue);
+  border-bottom: 3px solid var(--neon-blue);
+}
+.k2-thumb-wing.right {
+  border-bottom-right-radius: 28px;
+  border-right: 3px solid var(--gold);
+  border-bottom: 3px solid var(--gold);
+}
+.k2-thumb-wing.active {
+  transform: scale(0.97) translateY(2px);
+  background: linear-gradient(145deg, #10141c 0%, #07090e 100%);
+}
+.k2-thumb-wing.left.active {
+  box-shadow: 0 0 20px rgba(0, 229, 255, 0.45);
+}
+.k2-thumb-wing.right.active {
+  box-shadow: 0 0 20px rgba(255, 215, 0, 0.45);
+}
+.k2-wing-symbol {
+  font-size: 2.2rem;
+  font-family: monospace;
+  font-weight: 900;
+  line-height: 1;
+}
+.k2-wing-title {
+  font-size: 0.82rem;
+  font-weight: 700;
+  margin-top: 2px;
+  color: #fff;
+}
+.k2-wing-hint {
+  font-size: 0.68rem;
+  color: var(--text-muted);
+  margin-top: 2px;
+  font-family: monospace;
+}
+.k5-center-smart-island {
+  width: 124px;
+  height: 96px;
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  box-sizing: border-box;
+}
+.k5-device-capsule {
+  display: flex;
+  gap: 2px;
+  background: #090c12;
+  border: 1px solid #283344;
+  border-radius: 12px;
+  padding: 2px;
+  width: 100%;
+  box-sizing: border-box;
+}
+.k5-dev-pill {
+  flex: 1;
+  height: 24px;
+  border: none;
+  background: transparent;
+  color: var(--text-muted);
+  border-radius: 9px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.95rem;
+  transition: all 0.12s;
+  padding: 0;
+}
+.k5-dev-pill:hover {
+  color: #fff;
+}
+.k5-dev-pill.active {
+  background: #1e2430;
+  color: var(--gold);
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.5);
+}
+.k5-island-controls {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  width: 100%;
+  box-sizing: border-box;
+}
+.k2-island-pill {
+  background: #090c12;
+  border: 1px solid #283344;
+  border-radius: 14px;
+  padding: 2px 6px;
+  flex: 1;
+  text-align: center;
+  font-size: 0.72rem;
+  color: var(--text-muted);
+  font-family: monospace;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  box-sizing: border-box;
+}
+.k2-island-btn {
+  background: #1a1e28;
+  border: 1px solid #2e3648;
+  color: #cfd6e6;
+  width: 18px;
+  height: 18px;
+  border-radius: 4px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.8rem;
+  line-height: 1;
+  padding: 0;
+}
+.k2-island-btn:hover {
+  border-color: var(--neon-blue);
+  color: #fff;
+}
+.k5-rev-btn {
+  width: 24px;
+  height: 24px;
+  border-radius: 6px;
+  background: #090c12;
+  border: 1px solid #283344;
+  color: var(--text-muted);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.88rem;
+  transition: all 0.12s;
+  padding: 0;
+  flex-shrink: 0;
+}
+.k5-rev-btn:hover {
+  color: var(--gold);
+  border-color: var(--gold);
+}
+.k5-rev-btn.active {
+  background: #252010;
+  color: var(--gold);
+  border-color: var(--gold);
+  box-shadow: 0 0 6px rgba(255, 215, 0, 0.3);
+}
+.k5-mode-badge {
+  font-size: 0.65rem;
+  color: var(--text-muted);
+  font-family: monospace;
+  white-space: nowrap;
+}
+
+
+/* ==========================================================================
+   Zone 2: Focus HUD Stage & A3 Center Radar Halo
+   ========================================================================== */
+.focus-hud-stage {
+  width: 100%;
+  max-width: 1280px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 24px 16px;
+  box-sizing: border-box;
+  background: radial-gradient(circle at 50% 40%, #151a24 0%, #0d1017 100%);
+  border: 1px solid #232a38;
+  border-radius: 12px;
+  margin-bottom: 12px;
+  position: relative;
+  box-shadow: inset 0 2px 10px rgba(0, 0, 0, 0.6);
+}
+.a3-halo-stage {
+  position: relative;
+  width: 200px;
+  height: 200px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 14px;
+  flex-shrink: 0;
+}
+.a3-halo-svg {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  transform: rotate(-90deg);
+  transform-origin: 50% 50%;
+}
+.halo-bg-ring {
+  fill: none;
+  stroke: #18202d;
+  stroke-width: 6;
+}
+.halo-press-arc {
+  fill: none;
+  stroke: var(--neon-blue);
+  stroke-width: 6;
+  stroke-dasharray: 440;
+  stroke-dashoffset: 440;
+  stroke-linecap: round;
+  transition: stroke-dashoffset 0.04s linear;
+}
+.halo-gap-arc {
+  fill: none;
+  stroke: #2c394c;
+  stroke-width: 6;
+  stroke-dasharray: 534;
+  stroke-dashoffset: 534;
+  stroke-linecap: round;
+  transition: stroke-dashoffset 0.04s linear;
+}
+.halo-gate-dot {
+  fill: var(--gold);
+  transition: transform 0.1s;
+}
+.halo-gate-dot.gate-3t {
+  fill: #ffd700;
+}
+.halo-gate-dot.gate-7t {
+  fill: #00e5ff;
+}
+.a3-halo-inner {
+  text-align: center;
+  z-index: 2;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+.hud-char-large {
+  font-size: 4.6rem;
+  font-weight: 900;
+  color: var(--gold);
+  font-family: monospace;
+  line-height: 0.95;
+  text-shadow: 0 0 20px rgba(255, 215, 0, 0.4);
+}
+.hud-seq-code {
+  font-size: 1.3rem;
+  color: var(--neon-blue);
+  font-family: monospace;
+  letter-spacing: 4px;
+  margin-top: 4px;
+  min-height: 24px;
+}
+.hud-status-line {
+  font-size: 0.82rem;
+  font-family: monospace;
+  color: var(--text-muted);
+  margin-top: 6px;
+  min-height: 20px;
+  text-align: center;
+}
+.hud-committed-stream {
+  background: #090c12;
+  border: 1px solid #232a38;
+  border-radius: 8px;
+  padding: 8px 16px;
+  font-family: monospace;
+  font-size: 1rem;
+  letter-spacing: 2px;
+  min-height: 38px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #cfd6e6;
+  box-shadow: inset 0 2px 6px rgba(0, 0, 0, 0.6);
+  max-width: 540px;
+  width: 100%;
+  margin-top: 10px;
+  box-sizing: border-box;
+  word-break: break-all;
+}
+
+
+/* ==========================================================================
+   Stage View Switcher (Tree View / Focus HUD / Telemetry View)
+   ========================================================================== */
+.stage-view-switcher {
+  display: flex;
+  gap: 6px;
+  background: #0b0c10;
+  padding: 3px;
+  border-radius: 8px;
+  border: 1px solid #232936;
+  margin-top: 10px;
+}
+.stage-view-btn {
+  padding: 6px 14px;
+  border: none;
+  background: transparent;
+  color: var(--text-muted);
+  font-size: 0.82rem;
+  font-weight: 600;
+  border-radius: 6px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  transition: all 0.15s ease;
+}
+.stage-view-btn:hover {
+  color: #fff;
+  background: rgba(255, 255, 255, 0.05);
+}
+.stage-view-btn.active {
+  background: #1e2430;
+  color: var(--neon-blue);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+}
+
+
+/* Mobile & Portrait Adaptation (375px - 768px) */
+@media (max-width: 768px) {
+  .va-topbar {
+    padding: 0 10px;
+    height: 48px;
+  }
+  .va-title-en {
+    display: none;
+  }
+  .va-ws-btn {
+    padding: 5px 8px;
+    font-size: 0.75rem;
+  }
+  .topbar-wpm-pill {
+    font-size: 0.75rem;
+    padding: 3px 8px;
+  }
+  .k5-dock-container {
+    gap: 6px;
+    padding: 0 6px;
+  }
+  .k2-thumb-wing {
+    min-width: 80px;
+    padding: 6px 4px;
+  }
+  .k2-wing-symbol {
+    font-size: 1.5rem;
+  }
+  .k2-wing-title {
+    font-size: 0.75rem;
+  }
+  .k2-wing-hint {
+    display: none;
+  }
+  #k5-center-island,
+  .k5-center-smart-island {
+    padding: 4px 6px;
+  }
+  .settings-drawer {
+    max-width: 100%;
+    border-left: none;
+    border-right: none;
+  }
+}

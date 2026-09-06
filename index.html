@@ -27,18 +27,84 @@
 </head>
 <body>
 
-  <header>
-    <h1><i class="mdi mdi-radio-handheld"></i> 摩斯訓練儀 (Morse Trainulator)</h1>
-    <div class="subtitle">電報模擬與練習工具 · 支援直鍵 / 雙撥片 / 機械震報鍵 · PCB 二元樹尋路 · 節奏儀表</div>
-    <div class="layout-switch-container">
-      <button type="button" class="layout-switch-btn active" id="btn-layout-2col" title="切換為雙欄專注佈局">
-        <span><i class="mdi mdi-view-column"></i> 雙欄專注</span>
+  <!-- Three-Zone Top Bar -->
+  <header class="va-topbar">
+    <div class="va-brand">
+      <svg class="brand-mark" viewBox="0 0 36 36" fill="none">
+        <polygon points="18,2 33,10.5 33,25.5 18,34 3,25.5 3,10.5" stroke="#00e5ff" stroke-width="1.8" fill="#101520"/>
+        <circle cx="12" cy="18" r="3.2" fill="#ffd700"/>
+        <rect x="19" y="15.8" width="8.5" height="4.4" rx="2.2" fill="#00e5ff"/>
+      </svg>
+      <span class="va-title"><i class="mdi mdi-radio-handheld"></i> 摩斯訓練儀 <span class="va-title-en">Morse Trainulator</span></span>
+    </div>
+    <div class="va-workspace-nav">
+      <button type="button" id="ws-tab-tx" class="va-ws-btn active" title="發報工作台 (Transmit)">
+        <i class="mdi mdi-flash"></i> <span>Tx (發報)</span>
       </button>
-      <button type="button" class="layout-switch-btn" id="btn-layout-3col" title="切換為三欄工作台">
-        <span><i class="mdi mdi-view-dashboard-variant"></i> 三欄工作台</span>
+      <button type="button" id="ws-tab-rx" class="va-ws-btn" title="抄收工作台 (Receive)">
+        <i class="mdi mdi-headphones"></i> <span>Rx (抄收)</span>
+      </button>
+      <button type="button" id="ws-tab-qso" class="va-ws-btn" title="通聯工作台 (QSO Contact)">
+        <i class="mdi mdi-radio-tower"></i> <span>QSO (通聯)</span>
+      </button>
+    </div>
+    <div class="va-topbar-right">
+      <div id="topbar-wpm-pill" class="topbar-wpm-pill" title="即時速度">
+        <span id="topbar-wpm-val">20</span> WPM
+      </div>
+      <button type="button" id="btn-open-settings" class="btn-icon" title="設定抽屜">
+        <i class="mdi mdi-cog"></i>
       </button>
     </div>
   </header>
+
+  <!-- Workspace 1: Tx (發報) -->
+  <div id="ws-container-tx" class="workspace-view active">
+    <div class="header-subbar">
+      <div class="subtitle">電報模擬與練習工具 · 支援直鍵 / 雙撥片 / 機械震報鍵 · PCB 二元樹尋路 · 節奏儀表</div>
+
+      <!-- Stage View Switcher (Tree / Focus HUD / Telemetry) -->
+      <div class="stage-view-switcher" id="stage-view-switcher">
+        <button type="button" class="stage-view-btn active" id="view-tab-tree" data-view="tree" title="PCB 二元樹尋路視圖">
+          <i class="mdi mdi-sitemap"></i> <span>二元樹 (Tree)</span>
+        </button>
+        <button type="button" class="stage-view-btn" id="view-tab-focus" data-view="focus" title="A3 雷達光環專注視圖">
+          <i class="mdi mdi-target"></i> <span>專注 (Focus HUD)</span>
+        </button>
+        <button type="button" class="stage-view-btn" id="view-tab-telemetry" data-view="telemetry" title="電報示波儀表視圖">
+          <i class="mdi mdi-sine-wave"></i> <span>示波儀表 (Telemetry)</span>
+        </button>
+      </div>
+      <div class="layout-switch-container">
+        <button type="button" class="layout-switch-btn active" id="btn-layout-2col" title="切換為雙欄專注佈局">
+          <span><i class="mdi mdi-view-column"></i> 雙欄專注</span>
+        </button>
+        <button type="button" class="layout-switch-btn" id="btn-layout-3col" title="切換為三欄工作台">
+          <span><i class="mdi mdi-view-dashboard-variant"></i> 三欄工作台</span>
+        </button>
+      </div>
+    </div>
+
+
+    <!-- Zone 2: Focus HUD Stage (A3 Center Radar Halo) -->
+    <div id="focus-hud-stage" class="focus-hud-stage" style="display:none;">
+      <div class="a3-halo-stage">
+        <svg class="a3-halo-svg" viewBox="0 0 200 200">
+          <circle class="halo-bg-ring" cx="100" cy="100" r="70" />
+          <circle class="halo-bg-ring" cx="100" cy="100" r="85" />
+          <circle class="halo-press-arc" id="halo-press-arc" cx="100" cy="100" r="70" />
+          <circle class="halo-gap-arc" id="halo-gap-arc" cx="100" cy="100" r="85" />
+          <circle class="halo-gate-dot gate-3t" cx="25.5" cy="140.9" r="3.5" title="3T 結算點" />
+          <circle class="halo-gate-dot gate-7t" cx="180.8" cy="73.7" r="3.5" title="7T 空格點" />
+        </svg>
+        <div class="a3-halo-inner">
+          <div class="hud-char-large" id="hud-char-target">—</div>
+          <div class="hud-seq-code" id="hud-seq-target"></div>
+        </div>
+      </div>
+      <div class="hud-status-line" id="hud-timing-status">準備就緒</div>
+      <div class="hud-committed-stream" id="hud-committed-stream">—</div>
+    </div>
 
   <div class="main-container layout-2col" id="main-container">
     <!-- Left Column: PCB Card -->
@@ -703,78 +769,6 @@
           </div>
         </div>
 
-        <!-- Dual Paddle Settings -->
-        <div id="paddle-settings-box" style="background: #121319; border: 1px solid #2e3342; border-radius: 6px; padding: 8px 10px; margin-bottom: 12px;">
-          <div style="font-size:0.76rem; font-weight:bold; color:var(--gold); margin-bottom:8px; display:flex; justify-content:space-between; align-items:center;">
-            <span>雙撥片設定 (Iambic Paddle)</span>
-            <span style="font-size:0.68rem; color:#888;">Curtis 8044</span>
-          </div>
-          <div style="display:flex; justify-content:space-between; align-items:center; font-size:0.8rem; margin-bottom:8px;">
-            <label style="display:flex; align-items:center; gap:6px; cursor:pointer; color:#ccc;">
-              <input type="checkbox" id="chk-paddle-reverse" style="accent-color:var(--gold);">
-              <span>左右撥片互換 (左劃 Dah / 右點 Dit)</span>
-            </label>
-            <span style="font-size:0.7rem; color:#888; white-space:nowrap;">適配左手或接線</span>
-          </div>
-          <div style="display:flex; justify-content:space-between; align-items:center; font-size:0.8rem;">
-            <label style="color:#ccc;">Iambic 夾發模式：</label>
-            <div style="display:flex; gap:10px; font-size:0.78rem;">
-              <label style="cursor:pointer; display:flex; align-items:center; gap:4px; color:#ffd700; white-space:nowrap;">
-                <input type="radio" name="iambic-mode" id="radio-mode-b" value="B" checked style="accent-color:var(--gold);">
-                <span>Mode B (自動補音)</span>
-              </label>
-              <label style="cursor:pointer; display:flex; align-items:center; gap:4px; color:#aaa; white-space:nowrap;">
-                <input type="radio" name="iambic-mode" id="radio-mode-a" value="A" style="accent-color:var(--gold);">
-                <span>Mode A (放開即停)</span>
-              </label>
-            </div>
-          </div>
-        </div>
-
-        <!-- Farnsworth Timing Option Box -->
-        <div id="farnsworth-settings-box" style="background: #121319; border: 1px solid #2e3342; border-radius: 6px; padding: 8px 10px; margin-bottom: 12px;">
-          <div style="font-size:0.76rem; font-weight:bold; color:var(--neon-blue); margin-bottom:8px; display:flex; justify-content:space-between; align-items:center;">
-            <span>法恩斯沃斯節奏 (Farnsworth Timing)</span>
-            <span style="font-size:0.68rem; color:#888;">音形訓練法</span>
-          </div>
-          <div style="display:flex; justify-content:space-between; align-items:center; font-size:0.8rem; margin-bottom:8px;">
-            <label style="display:flex; align-items:center; gap:6px; cursor:pointer; color:#ccc;">
-              <input type="checkbox" id="chk-farnsworth" style="accent-color:var(--neon-blue);">
-              <span>啟用法恩斯沃斯 (音形高速 · 間距放寬)</span>
-            </label>
-            <span style="font-size:0.7rem; color:#888;" id="tag-farnsworth-status">已關閉</span>
-          </div>
-          <div id="farnsworth-controls" style="display:none; padding-top:6px; border-top:1px dashed #2a2e3a;">
-            <div style="display:flex; justify-content:space-between; align-items:center; font-size:0.75rem; color:#aaa; margin-bottom:4px;">
-              <span>字元速度 (Character Speed): <strong id="tag-farnsworth-wpm" style="color:var(--neon-blue);">18 WPM (67ms)</strong></span>
-              <span style="font-size:0.68rem; color:#777; white-space:nowrap;">間隔依上方預設</span>
-            </div>
-            <input type="range" id="param-farnsworth-wpm" min="15" max="40" step="1" value="18" style="width:100%; accent-color:var(--neon-blue);">
-          </div>
-        </div>
-
-        <!-- Atmospheric RF Noise (QRN) Box -->
-        <div id="qrn-settings-box" style="background: #121319; border: 1px solid #2e3342; border-radius: 6px; padding: 8px 10px; margin-bottom: 12px;">
-          <div style="font-size:0.76rem; font-weight:bold; color:#ffb703; margin-bottom:8px; display:flex; justify-content:space-between; align-items:center;">
-            <span>電台背景雜音 (QRN)</span>
-            <span style="font-size:0.68rem; color:#888;">短波濾波</span>
-          </div>
-          <div style="display:flex; justify-content:space-between; align-items:center; font-size:0.8rem; margin-bottom:6px;">
-            <label style="display:flex; align-items:center; gap:6px; cursor:pointer; color:#ccc;">
-              <input type="checkbox" id="chk-qrn" style="accent-color:#ffb703;">
-              <span>開啟背景雜音 (短波情境)</span>
-            </label>
-            <span style="font-size:0.7rem; color:#888;" id="tag-qrn-status">已靜音</span>
-          </div>
-          <div id="qrn-controls" style="display:none; padding-top:6px; border-top:1px dashed #2a2e3a;">
-            <div style="display:flex; justify-content:space-between; align-items:center; font-size:0.75rem; color:#aaa; margin-bottom:4px;">
-              <span>雜音強度 (Volume): <strong id="tag-qrn-vol" style="color:#ffb703;">20%</strong></span>
-              <span style="font-size:0.68rem; color:#777;">環境底噪</span>
-            </div>
-            <input type="range" id="param-qrn-vol" min="0.01" max="0.10" step="0.01" value="0.04" style="width:100%; accent-color:#ffb703;">
-          </div>
-        </div>
-
         <div class="settings-row">
           <label>時間單位 T (Dit 基準)
             <span>1T 長度 (1200 / WPM)</span>
@@ -803,78 +797,248 @@
           <input type="range" id="param-word-gap" min="100" max="2500" step="20" value="560">
           <div class="val-tag" id="tag-word-gap">560ms</div>
         </div>
-        <div class="settings-row">
+
+          <!-- Quick link button to open settings drawer -->
+          <div style="margin-top:14px;">
+            <button type="button" id="btn-open-settings-telemetry" style="width:100%; background:#1a1c24; border:1px solid #363b4b; border-radius:6px; padding:8px 12px; color:#ddd; font-size:0.8rem; cursor:pointer; display:flex; align-items:center; justify-content:center; gap:8px;">
+              <i class="mdi mdi-cog-outline" style="color:var(--neon-blue);"></i> 系統進階設定 (音頻 · 撥片 · Farnsworth · 鍵位)
+            </button>
+          </div>
+      </div>
+</div> <!-- /col-telemetry -->
+  </div> <!-- /main-container -->
+
+    <!-- K5 Ergonomic Morphing Dock (Zone 3) -->
+    <footer class="va-keyer-dock" id="k5-dock">
+      <div class="k5-dock-container">
+        <!-- Left Ergonomic Wing (Adaptive) -->
+        <div class="k2-thumb-wing left" id="k5-wing-left" data-paddle="left">
+          <span class="k2-wing-symbol" id="k5-left-sym" style="color:var(--neon-blue);">·</span>
+          <span class="k2-wing-title" id="k5-left-title">點 Dit</span>
+          <span class="k2-wing-hint" id="k5-left-hint">鍵盤 F / 點擊</span>
+        </div>
+
+        <!-- Center Smart Island (Zero Extra Height!) -->
+        <div class="k5-center-smart-island" id="k5-center-island">
+          <!-- Tri-Mode Segmented Capsule -->
+          <div class="k5-device-capsule">
+            <button type="button" class="k5-dev-pill active" id="k5-pill-paddle" data-mode="paddle" title="雙撥片 (Iambic Paddle)">
+              <i class="mdi mdi-tune-vertical"></i>
+            </button>
+            <button type="button" class="k5-dev-pill" id="k5-pill-straight" data-mode="straight" title="直鍵 (Straight Key)">
+              <i class="mdi mdi-radiobox-marked"></i>
+            </button>
+            <button type="button" class="k5-dev-pill" id="k5-pill-bug" data-mode="bug" title="機械震報鍵 (Bug Key)">
+              <i class="mdi mdi-metronome"></i>
+            </button>
+          </div>
+
+          <!-- Island Controls: WPM Stepper & Reverse Toggle -->
+          <div class="k5-island-controls">
+            <div class="k2-island-pill">
+              <button type="button" class="k2-island-btn" id="k5-wpm-minus" title="降低速度">-</button>
+              <span id="k5-wpm-val" style="color:var(--gold); font-weight:700;">20 WPM</span>
+              <button type="button" class="k2-island-btn" id="k5-wpm-plus" title="提高速度">+</button>
+            </div>
+            <button type="button" class="k5-rev-btn" id="k5-reverse-toggle" title="左右撥片互換 (Reverse Dit/Dah)">
+              <i class="mdi mdi-swap-horizontal"></i>
+            </button>
+          </div>
+
+          <!-- Dynamic Mode Indicator Badge -->
+          <span class="k5-mode-badge" id="k5-mode-badge">雙撥片 Mode B</span>
+        </div>
+
+        <!-- Right Ergonomic Wing (Adaptive) -->
+        <div class="k2-thumb-wing right" id="k5-wing-right" data-paddle="right">
+          <span class="k2-wing-symbol" id="k5-right-sym" style="color:var(--gold);">—</span>
+          <span class="k2-wing-title" id="k5-right-title">劃 Dah</span>
+          <span class="k2-wing-hint" id="k5-right-hint">鍵盤 J / 點擊</span>
+        </div>
+      </div>
+    </footer>
+  </div> <!-- /ws-container-tx -->
+
+  <!-- Workspace 2: Rx (抄收) -->
+  <div id="ws-container-rx" class="workspace-view" style="display:none;">
+    <div class="placeholder-workspace">
+      <i class="mdi mdi-headphones placeholder-icon"></i>
+      <h2 style="color:#fff; margin-bottom:8px;">Rx (抄收工作台)</h2>
+      <p style="color:var(--text-muted); font-size:0.9rem;">盲聽電報呼號、隨機字母與聽寫解碼訓練 (CW Copy / Receive Challenge)</p>
+      <div class="placeholder-badge">即將推出 · Coming Soon</div>
+    </div>
+  </div>
+
+  <!-- Workspace 3: QSO (通聯) -->
+  <div id="ws-container-qso" class="workspace-view" style="display:none;">
+    <div class="placeholder-workspace">
+      <i class="mdi mdi-radio-tower placeholder-icon"></i>
+      <h2 style="color:#fff; margin-bottom:8px;">QSO (通聯工作台)</h2>
+      <p style="color:var(--text-muted); font-size:0.9rem;">業餘無線電虛擬頻段、訊號雜音與通聯程序模擬 (Virtual CW QSO Simulation)</p>
+      <div class="placeholder-badge">即將推出 · Coming Soon</div>
+    </div>
+  </div>
+
+  <!-- Slide-up Settings Drawer Skeleton -->
+  <div id="settings-drawer-backdrop" class="drawer-backdrop" style="display:none;"></div>
+  <div id="settings-drawer" class="settings-drawer" style="display:none;">
+    <div class="drawer-header">
+      <div class="drawer-title"><i class="mdi mdi-cog"></i> 系統進階設定 (Settings)</div>
+      <button type="button" id="btn-close-settings" class="btn-icon" title="關閉"><i class="mdi mdi-close"></i></button>
+    </div>
+    <div class="drawer-body" id="drawer-settings-content">
+
+      <!-- Sidetone Frequency -->
+      <div class="settings-card-section" style="background:#14161f; border:1px solid #282d3c; border-radius:8px; padding:12px;">
+        <div style="font-size:0.8rem; font-weight:bold; color:var(--neon-blue); margin-bottom:10px; display:flex; justify-content:space-between; align-items:center;">
+          <span><i class="mdi mdi-sine-wave"></i> 側音頻率 (CW Sidetone)</span>
+          <span style="font-size:0.7rem; color:#888;">音調調整 (400–1000 Hz)</span>
+        </div>
+        <div class="settings-row" style="margin-bottom:0;">
           <label>側音頻率 (CW Sidetone)
             <span>正弦波側音頻率</span>
           </label>
           <input type="range" id="param-freq" min="400" max="1000" step="20" value="680">
           <div class="val-tag" id="tag-freq">680Hz</div>
         </div>
+      </div>
 
-        <!-- Keyboard Keybindings Box -->
-        <div id="keybindings-settings-box" style="background: #121319; border: 1px solid #2e3342; border-radius: 6px; padding: 8px 10px; margin-top: 14px; margin-bottom: 8px;">
-          <div style="font-size:0.76rem; font-weight:bold; color:#00e5ff; margin-bottom:8px; display:flex; justify-content:space-between; align-items:center;">
-            <span>⌨️ 鍵盤按鍵對應</span>
-            <span id="tag-current-profile" style="font-size:0.68rem; color:#888;">標準鍵位</span>
-          </div>
-
-          <!-- Preset Profile Buttons -->
-          <div style="display:grid; grid-template-columns: repeat(4, 1fr); gap: 6px; margin-bottom: 10px;">
-            <button class="key-profile-btn active-key-profile" data-profile="standard" style="background:#1a1c24; border:1px solid #363b4b; border-radius:5px; padding:6px 2px; color:#ddd; font-size:0.72rem; cursor:pointer; text-align:center;">
-              <div style="font-weight:bold;">標準鍵位</div>
-              <div style="font-size:0.63rem; color:#888;">K · [ ]</div>
-            </button>
-            <button class="key-profile-btn" data-profile="homerow" style="background:#1a1c24; border:1px solid #363b4b; border-radius:5px; padding:6px 2px; color:#ddd; font-size:0.72rem; cursor:pointer; text-align:center;">
-              <div style="font-weight:bold;">雙手基準</div>
-              <div style="font-size:0.63rem; color:#00e5ff;">F · J</div>
-            </button>
-            <button class="key-profile-btn" data-profile="left_hand" style="background:#1a1c24; border:1px solid #363b4b; border-radius:5px; padding:6px 2px; color:#ddd; font-size:0.72rem; cursor:pointer; text-align:center;">
-              <div style="font-weight:bold;">單手左手</div>
-              <div style="font-size:0.63rem; color:#ffd700;">Z · X</div>
-            </button>
-            <button class="key-profile-btn" data-profile="arrows" style="background:#1a1c24; border:1px solid #363b4b; border-radius:5px; padding:6px 2px; color:#ddd; font-size:0.72rem; cursor:pointer; text-align:center;">
-              <div style="font-weight:bold;">方向鍵</div>
-              <div style="font-size:0.63rem; color:#81b29a;">← · →</div>
-            </button>
-          </div>
-
-          <!-- Interactive Key Binding Remap Buttons -->
-          <div style="display:flex; flex-direction:column; gap:6px; font-size:0.75rem; background:#0c0d12; padding:8px; border-radius:5px;">
-            <div style="display:flex; justify-content:space-between; align-items:center;">
-              <span style="color:#aaa;">直鍵 (Straight):</span>
-              <button id="btn-bind-straight" class="bind-btn" style="background:#1f2330; border:1px solid #3d465c; color:#fff; border-radius:4px; padding:2px 10px; font-family:monospace; font-size:0.75rem; cursor:pointer;">
-                K
-              </button>
-            </div>
-            <div style="display:flex; justify-content:space-between; align-items:center;">
-              <span style="color:#aaa;">點撥片 (Dit):</span>
-              <button id="btn-bind-dit" class="bind-btn" style="background:#1f2330; border:1px solid #3d465c; color:#00e5ff; border-radius:4px; padding:2px 10px; font-family:monospace; font-size:0.75rem; cursor:pointer;">
-                [ / ,
-              </button>
-            </div>
-            <div style="display:flex; justify-content:space-between; align-items:center;">
-              <span style="color:#aaa;">劃撥片 (Dah):</span>
-              <button id="btn-bind-dah" class="bind-btn" style="background:#1f2330; border:1px solid #3d465c; color:#ffd700; border-radius:4px; padding:2px 10px; font-family:monospace; font-size:0.75rem; cursor:pointer;">
-                ] / .
-              </button>
-            </div>
-          </div>
-          <div style="font-size:0.68rem; color:#777; margin-top:6px; text-align:center;">
-            <i class="mdi mdi-lightbulb-outline"></i> 點選按鍵後，按下鍵盤任意鍵即可更換
-          </div>
+      <!-- Dual Paddle Settings -->
+      <div id="paddle-settings-box" style="background: #14161f; border: 1px solid #282d3c; border-radius: 8px; padding: 12px;">
+        <div style="font-size:0.8rem; font-weight:bold; color:var(--gold); margin-bottom:10px; display:flex; justify-content:space-between; align-items:center;">
+          <span><i class="mdi mdi-electric-switch"></i> 雙撥片設定 (Iambic Paddle)</span>
+          <span style="font-size:0.7rem; color:#888;">Curtis 8044</span>
         </div>
-
-        <!-- Factory Reset & Storage Status Footer -->
-        <div style="display:flex; justify-content:space-between; align-items:center; margin-top:14px; padding-top:8px; border-top:1px solid #252834;">
-          <span style="font-size:0.7rem; color:#888;"><i class="mdi mdi-content-save-outline"></i> 設定將自動保存</span>
-          <button id="btn-factory-reset" style="background:none; border:1px solid #444; color:#aaa; padding:4px 8px; border-radius:4px; font-size:0.72rem; cursor:pointer;">
-            <i class="mdi mdi-restore"></i> 重設為預設值
-          </button>
+        <div style="display:flex; justify-content:space-between; align-items:center; font-size:0.8rem; margin-bottom:10px;">
+          <label style="display:flex; align-items:center; gap:6px; cursor:pointer; color:#ccc;">
+            <input type="checkbox" id="chk-paddle-reverse" style="accent-color:var(--gold);">
+            <span>左右撥片互換 (左劃 Dah / 右點 Dit)</span>
+          </label>
+          <span style="font-size:0.7rem; color:#888; white-space:nowrap;">適配左手或接線</span>
+        </div>
+        <div style="display:flex; justify-content:space-between; align-items:center; font-size:0.8rem;">
+          <label style="color:#ccc;">Iambic 夾發模式：</label>
+          <div style="display:flex; gap:12px; font-size:0.78rem;">
+            <label style="cursor:pointer; display:flex; align-items:center; gap:4px; color:#ffd700; white-space:nowrap;">
+              <input type="radio" name="iambic-mode" id="radio-mode-b" value="B" checked style="accent-color:var(--gold);">
+              <span>Mode B (自動補音)</span>
+            </label>
+            <label style="cursor:pointer; display:flex; align-items:center; gap:4px; color:#aaa; white-space:nowrap;">
+              <input type="radio" name="iambic-mode" id="radio-mode-a" value="A" style="accent-color:var(--gold);">
+              <span>Mode A (放開即停)</span>
+            </label>
+          </div>
         </div>
       </div>
 
-    </div> <!-- /col-telemetry -->
-  </div> <!-- /main-container -->
+      <!-- Farnsworth Timing Option Box -->
+      <div id="farnsworth-settings-box" style="background: #14161f; border: 1px solid #282d3c; border-radius: 8px; padding: 12px;">
+        <div style="font-size:0.8rem; font-weight:bold; color:var(--neon-blue); margin-bottom:10px; display:flex; justify-content:space-between; align-items:center;">
+          <span><i class="mdi mdi-metronome"></i> 法恩斯沃斯節奏 (Farnsworth Timing)</span>
+          <span style="font-size:0.7rem; color:#888;">音形訓練法</span>
+        </div>
+        <div style="display:flex; justify-content:space-between; align-items:center; font-size:0.8rem; margin-bottom:8px;">
+          <label style="display:flex; align-items:center; gap:6px; cursor:pointer; color:#ccc;">
+            <input type="checkbox" id="chk-farnsworth" style="accent-color:var(--neon-blue);">
+            <span>啟用法恩斯沃斯 (音形高速 · 間距放寬)</span>
+          </label>
+          <span style="font-size:0.7rem; color:#888;" id="tag-farnsworth-status">已關閉</span>
+        </div>
+        <div id="farnsworth-controls" style="display:none; padding-top:8px; border-top:1px dashed #2a2e3a;">
+          <div style="display:flex; justify-content:space-between; align-items:center; font-size:0.75rem; color:#aaa; margin-bottom:6px;">
+            <span>字元速度 (Character Speed): <strong id="tag-farnsworth-wpm" style="color:var(--neon-blue);">18 WPM (67ms)</strong></span>
+            <span style="font-size:0.68rem; color:#777; white-space:nowrap;">間隔依主設定</span>
+          </div>
+          <input type="range" id="param-farnsworth-wpm" min="15" max="40" step="1" value="18" style="width:100%; accent-color:var(--neon-blue);">
+        </div>
+      </div>
+
+      <!-- Atmospheric RF Noise (QRN) Box -->
+      <div id="qrn-settings-box" style="background: #14161f; border: 1px solid #282d3c; border-radius: 8px; padding: 12px;">
+        <div style="font-size:0.8rem; font-weight:bold; color:#ffb703; margin-bottom:10px; display:flex; justify-content:space-between; align-items:center;">
+          <span><i class="mdi mdi-radio-tower"></i> 電台背景雜音 (QRN)</span>
+          <span style="font-size:0.7rem; color:#888;">短波濾波</span>
+        </div>
+        <div style="display:flex; justify-content:space-between; align-items:center; font-size:0.8rem; margin-bottom:6px;">
+          <label style="display:flex; align-items:center; gap:6px; cursor:pointer; color:#ccc;">
+            <input type="checkbox" id="chk-qrn" style="accent-color:#ffb703;">
+            <span>開啟背景雜音 (短波情境)</span>
+          </label>
+          <span style="font-size:0.7rem; color:#888;" id="tag-qrn-status">已靜音</span>
+        </div>
+        <div id="qrn-controls" style="display:none; padding-top:8px; border-top:1px dashed #2a2e3a;">
+          <div style="display:flex; justify-content:space-between; align-items:center; font-size:0.75rem; color:#aaa; margin-bottom:6px;">
+            <span>雜音強度 (Volume): <strong id="tag-qrn-vol" style="color:#ffb703;">20%</strong></span>
+            <span style="font-size:0.68rem; color:#777;">環境底噪</span>
+          </div>
+          <input type="range" id="param-qrn-vol" min="0.01" max="0.10" step="0.01" value="0.04" style="width:100%; accent-color:#ffb703;">
+        </div>
+      </div>
+
+      <!-- Keyboard Keybindings Box -->
+      <div id="keybindings-settings-box" style="background: #14161f; border: 1px solid #282d3c; border-radius: 8px; padding: 12px;">
+        <div style="font-size:0.8rem; font-weight:bold; color:#00e5ff; margin-bottom:10px; display:flex; justify-content:space-between; align-items:center;">
+          <span><i class="mdi mdi-keyboard-outline"></i> 鍵盤按鍵對應</span>
+          <span id="tag-current-profile" style="font-size:0.7rem; color:#888;">標準鍵位</span>
+        </div>
+
+        <!-- Preset Profile Buttons -->
+        <div style="display:grid; grid-template-columns: repeat(4, 1fr); gap: 6px; margin-bottom: 10px;">
+          <button class="key-profile-btn active-key-profile" data-profile="standard" style="background:#1a1c24; border:1px solid #363b4b; border-radius:5px; padding:6px 2px; color:#ddd; font-size:0.72rem; cursor:pointer; text-align:center;">
+            <div style="font-weight:bold;">標準鍵位</div>
+            <div style="font-size:0.63rem; color:#888;">K · [ ]</div>
+          </button>
+          <button class="key-profile-btn" data-profile="homerow" style="background:#1a1c24; border:1px solid #363b4b; border-radius:5px; padding:6px 2px; color:#ddd; font-size:0.72rem; cursor:pointer; text-align:center;">
+            <div style="font-weight:bold;">雙手基準</div>
+            <div style="font-size:0.63rem; color:#00e5ff;">F · J</div>
+          </button>
+          <button class="key-profile-btn" data-profile="left_hand" style="background:#1a1c24; border:1px solid #363b4b; border-radius:5px; padding:6px 2px; color:#ddd; font-size:0.72rem; cursor:pointer; text-align:center;">
+            <div style="font-weight:bold;">單手左手</div>
+            <div style="font-size:0.63rem; color:#ffd700;">Z · X</div>
+          </button>
+          <button class="key-profile-btn" data-profile="arrows" style="background:#1a1c24; border:1px solid #363b4b; border-radius:5px; padding:6px 2px; color:#ddd; font-size:0.72rem; cursor:pointer; text-align:center;">
+            <div style="font-weight:bold;">方向鍵</div>
+            <div style="font-size:0.63rem; color:#81b29a;">← · →</div>
+          </button>
+        </div>
+
+        <!-- Interactive Key Binding Remap Buttons -->
+        <div style="display:flex; flex-direction:column; gap:6px; font-size:0.75rem; background:#0c0d12; padding:8px; border-radius:5px;">
+          <div style="display:flex; justify-content:space-between; align-items:center;">
+            <span style="color:#aaa;">直鍵 (Straight):</span>
+            <button id="btn-bind-straight" class="bind-btn" style="background:#1f2330; border:1px solid #3d465c; color:#fff; border-radius:4px; padding:2px 10px; font-family:monospace; font-size:0.75rem; cursor:pointer;">
+              K
+            </button>
+          </div>
+          <div style="display:flex; justify-content:space-between; align-items:center;">
+            <span style="color:#aaa;">點撥片 (Dit):</span>
+            <button id="btn-bind-dit" class="bind-btn" style="background:#1f2330; border:1px solid #3d465c; color:#00e5ff; border-radius:4px; padding:2px 10px; font-family:monospace; font-size:0.75rem; cursor:pointer;">
+              [ / ,
+            </button>
+          </div>
+          <div style="display:flex; justify-content:space-between; align-items:center;">
+            <span style="color:#aaa;">劃撥片 (Dah):</span>
+            <button id="btn-bind-dah" class="bind-btn" style="background:#1f2330; border:1px solid #3d465c; color:#ffd700; border-radius:4px; padding:2px 10px; font-family:monospace; font-size:0.75rem; cursor:pointer;">
+              ] / .
+            </button>
+          </div>
+        </div>
+        <div style="font-size:0.68rem; color:#777; margin-top:6px; text-align:center;">
+          <i class="mdi mdi-lightbulb-outline"></i> 點選按鍵後，按下鍵盤任意鍵即可更換
+        </div>
+      </div>
+
+      <!-- Factory Reset & Storage Status Footer -->
+      <div style="display:flex; justify-content:space-between; align-items:center; padding:10px 4px; border-top:1px solid #252834;">
+        <span style="font-size:0.72rem; color:#888;"><i class="mdi mdi-content-save-outline"></i> 設定將自動保存</span>
+        <button id="btn-factory-reset" style="background:none; border:1px solid #555; color:#aaa; padding:5px 10px; border-radius:4px; font-size:0.72rem; cursor:pointer; display:flex; align-items:center; gap:4px;">
+          <i class="mdi mdi-restore"></i> 重設為預設值
+        </button>
+      </div>
+
+    </div>
+  </div>
+  <!-- /settings-drawer -->
 
   <!-- Modular Scripts Loaded Sequentially for 100% file:/// and Web Compatibility -->
   <script src="js/core/morse-data.js"></script>
