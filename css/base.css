@@ -759,3 +759,48 @@ h1 {
   color: var(--neon-blue);
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
 }
+
+
+/* Mobile & Portrait Adaptation (375px - 768px) */
+@media (max-width: 768px) {
+  .va-topbar {
+    padding: 0 10px;
+    height: 48px;
+  }
+  .va-title-en {
+    display: none;
+  }
+  .va-ws-btn {
+    padding: 5px 8px;
+    font-size: 0.75rem;
+  }
+  .topbar-wpm-pill {
+    font-size: 0.75rem;
+    padding: 3px 8px;
+  }
+  .k5-dock-container {
+    gap: 6px;
+    padding: 0 6px;
+  }
+  .k2-thumb-wing {
+    min-width: 80px;
+    padding: 6px 4px;
+  }
+  .k2-wing-symbol {
+    font-size: 1.5rem;
+  }
+  .k2-wing-name {
+    font-size: 0.75rem;
+  }
+  .k2-wing-hint {
+    display: none;
+  }
+  .k5-center-island {
+    padding: 4px 6px;
+  }
+  .settings-drawer {
+    max-width: 100%;
+    border-left: none;
+    border-right: none;
+  }
+}

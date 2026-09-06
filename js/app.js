@@ -205,7 +205,7 @@ function setupKeyerCallbacks() {
     if (currentMode === 'koch') {
       if (!kochState.running || kochState.isFinished) {
         if (dom.evalStatus) {
-          dom.evalStatus.textContent = '請先點擊「▶ 開始闖關」';
+          dom.evalStatus.textContent = '請先點擊「開始闖關」';
           dom.evalStatus.style.color = '#ffb703';
         }
         return;
@@ -499,7 +499,7 @@ function handleKeyDown() {
   if (currentMode === 'koch') {
     if (!kochState.running || kochState.isFinished) {
       if (dom.evalStatus) {
-        dom.evalStatus.textContent = '請先點擊「▶ 開始闖關」';
+        dom.evalStatus.textContent = '請先點擊「開始闖關」';
         dom.evalStatus.style.color = '#ffb703';
       }
       return;
