@@ -336,7 +336,9 @@ h1 {
   align-items: center;
   margin-bottom: 12px;
 }
-.header-subbar.noise-hidden {
+.header-subbar.noise-hidden,
+.hardware-keyer-deck.noise-hidden,
+#hardware-keyer-deck {
   display: none !important;
 }
 

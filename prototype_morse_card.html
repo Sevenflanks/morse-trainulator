@@ -1779,7 +1779,9 @@
       align-items: center;
       margin-bottom: 12px;
     }
-    .header-subbar.noise-hidden {
+    .header-subbar.noise-hidden,
+    .hardware-keyer-deck.noise-hidden,
+    #hardware-keyer-deck {
       display: none !important;
     }
 
@@ -2535,33 +2537,36 @@
         </button>
       </div>
 
-      <!-- Device 1: Straight Key Trigger -->
-      <button class="key-button" id="key-trigger" style="display:none; width: 100%;">
-        <span><i class="mdi mdi-flash"></i> 按住發報 (鍵盤「K」)</span>
-      </button>
+      <!-- Redundant Legacy Keyer Deck (Replaced by K5 Bottom Dock) -->
+      <div id="hardware-keyer-deck" class="hardware-keyer-deck noise-hidden" style="display: none !important;">
+        <!-- Device 1: Straight Key Trigger -->
+        <button class="key-button" id="key-trigger" style="display:none; width: 100%;">
+          <span><i class="mdi mdi-flash"></i> 按住發報 (鍵盤「K」)</span>
+        </button>
 
-      <!-- Device 2: Dual-Paddle Deck -->
-      <div id="paddle-container" class="paddle-deck" style="display:flex; width: 100%;">
-        <div class="paddle-row">
-          <!-- Left Paddle -->
-          <div class="paddle-lever" id="paddle-left">
-            <span class="paddle-led" id="led-dit-mem">MEM</span>
-            <div class="paddle-name" id="paddle-left-name">
-              <span style="font-size:1.3rem;">·</span> 點 Dit (短音)
+        <!-- Device 2: Dual-Paddle Deck -->
+        <div id="paddle-container" class="paddle-deck" style="display:none; width: 100%;">
+          <div class="paddle-row">
+            <!-- Left Paddle -->
+            <div class="paddle-lever" id="paddle-left">
+              <span class="paddle-led" id="led-dit-mem">MEM</span>
+              <div class="paddle-name" id="paddle-left-name">
+                <span style="font-size:1.3rem;">·</span> 點 Dit (短音)
+              </div>
+              <div class="paddle-key-hint" id="paddle-left-hint">鍵盤 [ 或 ,</div>
             </div>
-            <div class="paddle-key-hint" id="paddle-left-hint">鍵盤 [ 或 ,</div>
-          </div>
-          <!-- Right Paddle -->
-          <div class="paddle-lever" id="paddle-right">
-            <span class="paddle-led" id="led-dah-mem">MEM</span>
-            <div class="paddle-name" id="paddle-right-name">
-              <span style="font-size:1.3rem;">—</span> 劃 Dah (長音)
+            <!-- Right Paddle -->
+            <div class="paddle-lever" id="paddle-right">
+              <span class="paddle-led" id="led-dah-mem">MEM</span>
+              <div class="paddle-name" id="paddle-right-name">
+                <span style="font-size:1.3rem;">—</span> 劃 Dah (長音)
+              </div>
+              <div class="paddle-key-hint" id="paddle-right-hint">鍵盤 ] 或 .</div>
             </div>
-            <div class="paddle-key-hint" id="paddle-right-hint">鍵盤 ] 或 .</div>
           </div>
-        </div>
-        <div class="squeeze-banner" id="squeeze-banner">
-          <span id="squeeze-status">雙撥片待命 · 單邊連發 · 夾發交替 (Squeeze Iambic)</span>
+          <div class="squeeze-banner" id="squeeze-banner">
+            <span id="squeeze-status">雙撥片待命 · 單邊連發 · 夾發交替 (Squeeze Iambic)</span>
+          </div>
         </div>
       </div>
 
