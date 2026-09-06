@@ -168,6 +168,57 @@ function stopMeterAnimation(finalDuration) {
     meterGhost.style.opacity = '1';
     setTimeout(() => { meterGhost.style.opacity = '0'; }, 1200);
   }
+
+  // Telemetry Vector Update
+  updateTelemetryGauges(engine);
+}
+
+function updateTelemetryGauges(engine) {
+  if (!engine && typeof window !== 'undefined') {
+    engine = window.engine;
+  }
+  if (!engine) return;
+
+  const unitT = typeof engine.getEffectiveUnitT === 'function' ? engine.getEffectiveUnitT() : 80;
+  const strokes = engine.recentStrokes || [];
+
+  const telemUnitT = typeof document !== 'undefined' ? document.getElementById('telem-unit-t') : null;
+  const telemJitter = typeof document !== 'undefined' ? document.getElementById('telem-jitter') : null;
+  const telemRatioText = typeof document !== 'undefined' ? document.getElementById('telem-ratio-text') : null;
+  const telemRatioBar = typeof document !== 'undefined' ? document.getElementById('telem-ratio-bar') : null;
+
+  if (telemUnitT) {
+    telemUnitT.innerHTML = `${unitT} <span class="telem-unit">ms</span>`;
+  }
+
+  const dits = strokes.filter(s => s.units === 1);
+  const dahs = strokes.filter(s => s.units === 3);
+
+  if (telemJitter) {
+    if (dits.length > 0) {
+      const mean = dits.reduce((acc, s) => acc + s.duration, 0) / dits.length;
+      const variance = dits.reduce((acc, s) => acc + Math.pow(s.duration - mean, 2), 0) / dits.length;
+      const jitterMs = Math.round(Math.sqrt(variance));
+      telemJitter.innerHTML = `&plusmn;${jitterMs} <span class="telem-unit">ms</span>`;
+    } else {
+      telemJitter.innerHTML = `&plusmn;0 <span class="telem-unit">ms</span>`;
+    }
+  }
+
+  if (telemRatioText && telemRatioBar) {
+    if (dits.length > 0 && dahs.length > 0) {
+      const avgDit = dits.reduce((acc, s) => acc + s.duration, 0) / dits.length;
+      const avgDah = dahs.reduce((acc, s) => acc + s.duration, 0) / dahs.length;
+      const ratio = avgDit > 0 ? (avgDah / avgDit) : 3.0;
+      telemRatioText.textContent = `1 : ${ratio.toFixed(2)}`;
+
+      const pct = Math.max(10, Math.min(100, Math.round((ratio / 5.0) * 100)));
+      telemRatioBar.style.width = `${pct}%`;
+    } else {
+      telemRatioText.textContent = '1 : 3.00';
+      telemRatioBar.style.width = '60%';
+    }
+  }
 }
 
 function stopGapCountdown() {
@@ -359,6 +410,7 @@ if (typeof window !== 'undefined') {
   window.startGapCountdown = startGapCountdown;
   window.stopGapCountdown = stopGapCountdown;
   window.commitWordSpace = commitWordSpace;
+  window.updateTelemetryGauges = updateTelemetryGauges;
 }
 
 if (typeof module !== 'undefined' && module.exports) {
@@ -368,6 +420,7 @@ if (typeof module !== 'undefined' && module.exports) {
     stopMeterAnimation,
     startGapCountdown,
     stopGapCountdown,
-    commitWordSpace
+    commitWordSpace,
+    updateTelemetryGauges
   };
 }

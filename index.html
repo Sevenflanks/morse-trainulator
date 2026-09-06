@@ -727,6 +727,36 @@
 
     <!-- Right / Settings Column: Parameters, Presets & Audio -->
     <div class="telemetry-column" id="col-telemetry">
+      <!-- Timing Vector Telemetry Deck -->
+      <div class="panel" id="timing-vector-deck" style="margin-bottom: 12px;">
+        <div class="panel-title" style="display: flex; align-items: center; justify-content: space-between;">
+          <span style="display: inline-flex; align-items: center; gap: 6px;">
+            <svg class="mdi-icon" viewBox="0 0 24 24" style="width:14px; height:14px; fill:var(--cyan); vertical-align:middle;"><path d="M12,2A10,10 0 0,0 2,12A10,10 0 0,0 12,22A10,10 0 0,0 22,12A10,10 0 0,0 12,2M12,4A8,8 0 0,1 20,12C20,13.41 19.63,14.74 19,15.89L15.34,13.78C15.75,13.14 16,12.39 16,11.58A4,4 0 0,0 12,7.58A4,4 0 0,0 8,11.58C8,12.39 8.25,13.14 8.66,13.78L5,15.89C4.37,14.74 4,13.41 4,12A8,8 0 0,1 12,4M12,9.58A2,2 0 0,1 14,11.58C14,12.36 13.55,13.04 12.9,13.38L15,17H9L11.1,13.38C10.45,13.04 10,12.36 10,11.58A2,2 0 0,1 12,9.58Z"/></svg>
+            電信遙測向量儀 (Telemetry Vector)
+          </span>
+          <span style="font-size:0.65rem; color:var(--cyan); font-family:var(--font-mono); letter-spacing:0.5px;">LIVE 1:3.00</span>
+        </div>
+        <div class="telemetry-grid">
+          <div class="telem-card">
+            <div class="telem-label">標準時基 (Unit T)</div>
+            <div class="telem-value" id="telem-unit-t">80 <span class="telem-unit">ms</span></div>
+          </div>
+          <div class="telem-card">
+            <div class="telem-label">時差抖動 (Jitter)</div>
+            <div class="telem-value" id="telem-jitter">&plusmn;0 <span class="telem-unit">ms</span></div>
+          </div>
+          <div class="ratio-bar-wrap">
+            <div style="display: flex; justify-content: space-between; align-items: baseline;">
+              <span class="telem-label">點劃比率 (Dit:Dah Ratio)</span>
+              <span id="telem-ratio-text" style="font-family: var(--font-mono); font-size: 0.85rem; font-weight: 700; color: var(--gold-light);">1 : 3.00</span>
+            </div>
+            <div class="ratio-meter-track">
+              <div class="ratio-meter-fill" id="telem-ratio-bar" style="width: 60%;"></div>
+              <div class="ratio-target-mark" title="理想標準 1:3"></div>
+            </div>
+          </div>
+        </div>
+      </div>
 
       <!-- Settings Panel -->
       <div class="panel">
