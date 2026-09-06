@@ -22,6 +22,7 @@ const kochState = {
   runStartIndex: 0,
   timeoutCount: 0,
   challengeResetCount: 0,
+  isMercyCutoff: false,
   hasStarted: false,
   isFinished: false,
   showHints: false
@@ -296,10 +297,10 @@ function setKochAssessmentMode(mode) {
       descEl.innerHTML = '<i class="mdi mdi-check-circle"></i> 基礎練習：無超時限制，適合熟悉新字元音形與手感。';
       descEl.style.color = '#889';
     } else if (mode === 'standard') {
-      descEl.innerHTML = '<i class="mdi mdi-trophy"></i> 正規考核：計時連續考核，啟用 2.0s 反射倒數，正確率 ≥90% 通關。';
+      descEl.innerHTML = '<i class="mdi mdi-trophy"></i> 正規考核：限時 1 分鐘（可自選），啟用 2.0s 反射倒數與提前停損，正確率 ≥90% 通關。';
       descEl.style.color = '#00e5ff';
     } else if (mode === 'challenge') {
-      descEl.innerHTML = '<i class="mdi mdi-fire"></i> 極限挑戰：限時連續考核，啟用 2.0s 反射倒數，正確率跌破 90% 重置計時。';
+      descEl.innerHTML = '<i class="mdi mdi-fire"></i> 極限挑戰：限時 3 分鐘防線，思考限時減半（1.0s），正確率跌破 90% 即時重置。';
       descEl.style.color = '#ff9100';
     }
   }
@@ -366,7 +367,14 @@ function startReflexTimer() {
   const reflexBar = document.getElementById('koch-reflex-bar');
   if (reflexContainer) reflexContainer.style.display = 'block';
 
-  kochState.reflexDuration = kochState.reflexTimeoutMs || 2000;
+  let reflexMs = kochState.reflexTimeoutMs || 2000;
+  if (kochState.mode === 'challenge') {
+    const letterGap = (typeof window !== 'undefined' && window.engine && window.engine.config && window.engine.config.letterGap)
+      ? window.engine.config.letterGap
+      : 240;
+    reflexMs = Math.max(letterGap, Math.round(reflexMs / 2));
+  }
+  kochState.reflexDuration = reflexMs;
   kochState.reflexStartTime = Date.now();
   kochState.reflexPaused = false;
 
@@ -430,7 +438,7 @@ function startKochSessionTiming() {
     const evalStatus = document.getElementById('eval-status');
     if (evalStatus) {
       if (kochState.mode === 'challenge') {
-        evalStatus.innerHTML = '<i class="mdi mdi-fire"></i> 極限挑戰進行中...失誤直接重置計時！可按 Esc 隨時結束。';
+        evalStatus.innerHTML = '<i class="mdi mdi-fire"></i> 極限挑戰進行中...思考限時減半，失誤直接重置計時！可按 Esc 隨時結束。';
         evalStatus.style.color = '#ff9100';
       } else if (kochState.mode === 'standard') {
         evalStatus.innerHTML = '<i class="mdi mdi-trophy"></i> 正規考核進行中...請在 2.0s 內反射發報！可按 Esc 結束。';
@@ -540,6 +548,26 @@ function rollKochRow(finishedIdx) {
   }
 }
 
+function checkStandardMercyRule() {
+  if (kochState.mode !== 'standard' || !kochState.running || kochState.isFinished) return false;
+  const answered = kochState.charResults.filter(r => r !== null);
+  const totalDone = answered.length;
+  if (totalDone < 5) return false;
+  const correct = answered.filter(r => r && r.isCorrect).length;
+  const errors = totalDone - correct;
+  if (errors === 0) return false;
+
+  const remSec = kochState.timeRemaining;
+  if (remSec <= 0) return false;
+
+  // 物理極限推估：每字最快耗時約 0.75 秒 (含拍發與 3T 間隔)
+  const maxPossibleRemainingChars = Math.ceil(remSec / 0.75);
+  const maxPossibleAcc = (correct + maxPossibleRemainingChars) / (totalDone + maxPossibleRemainingChars);
+  const theoreticalMaxPct = Math.round(maxPossibleAcc * 100);
+
+  return (theoreticalMaxPct < 90);
+}
+
 function handleReflexTimeout() {
   if (!kochState.running || kochState.isFinished) return;
   const idx = kochState.currentIndex;
@@ -598,9 +626,16 @@ function handleReflexTimeout() {
     }
   } else {
     if (evalStatus) {
-      evalStatus.innerHTML = `<i class="mdi mdi-timer-sand"></i> 反射超時！未在 2.0s 內發報 (目標: ${target})`;
+      const durSec = (kochState.reflexDuration / 1000).toFixed(1);
+      evalStatus.innerHTML = `<i class="mdi mdi-timer-sand"></i> 反射超時！未在 ${durSec}s 內發報 (目標: ${target})`;
       evalStatus.style.color = '#ff9100';
     }
+  }
+
+  // 檢查正規考核提前停損（Mercy Rule）
+  if (kochState.mode === 'standard' && checkStandardMercyRule()) {
+    finishKochDrillSession(false, true);
+    return;
   }
 
   const ROW_SIZE = 12;
@@ -723,6 +758,7 @@ function startKochDrill() {
   kochState.currentIndex = 0;
   kochState.timeoutCount = 0;
   kochState.challengeResetCount = 0;
+  kochState.isMercyCutoff = false;
   kochState.runStartIndex = 0;
   kochState.isFinished = false;
   kochState.running = true;
@@ -769,7 +805,7 @@ function startKochDrill() {
     const durInput = (kochState.mode === 'challenge')
       ? document.querySelector('input[name="koch-duration-ch"]:checked')
       : document.querySelector('input[name="koch-duration"]:checked');
-    const dur = durInput ? parseInt(durInput.value, 10) : 180;
+    const dur = durInput ? parseInt(durInput.value, 10) : (kochState.mode === 'standard' ? 60 : 180);
     kochState.duration = dur;
     kochState.timeRemaining = dur;
 
@@ -820,7 +856,7 @@ function startKochDrill() {
 
   if (evalStatus) {
     if (kochState.mode === 'challenge') {
-      evalStatus.innerHTML = '<i class="mdi mdi-fire"></i> 準備就緒！發報第 1 個字母開始計時 · 失誤重置 · 按 Esc 結束';
+      evalStatus.innerHTML = '<i class="mdi mdi-fire"></i> 準備就緒！發報第 1 個字母開始計時 · 思考限時減半 · 失誤重置 · 按 Esc 結束';
       evalStatus.style.color = '#ff9100';
     } else if (kochState.mode === 'standard') {
       evalStatus.innerHTML = '<i class="mdi mdi-trophy"></i> 準備就緒！發報第 1 個字母開始計時 · 反射限時 2.0s · 按 Esc 結束';
@@ -957,6 +993,12 @@ function finalizeLetterKochMode(res) {
     }
   }
 
+  // 檢查正規考核提前停損（Mercy Rule）
+  if (kochState.mode === 'standard' && checkStandardMercyRule()) {
+    finishKochDrillSession(false, true);
+    return;
+  }
+
   const ROW_SIZE = 12;
   if (kochState.mode === 'quick') {
     kochState.currentIndex++;
@@ -975,7 +1017,7 @@ function finalizeLetterKochMode(res) {
   }
 }
 
-function finishKochDrillSession(isManualStop = false) {
+function finishKochDrillSession(isManualStop = false, isMercyStop = false) {
   const kochManager = window.kochManager;
   const engine = window.engine;
   clearKochTimers();
@@ -983,6 +1025,7 @@ function finishKochDrillSession(isManualStop = false) {
   kochState.isFinished = true;
   kochState.running = false;
   kochState.hasStarted = false;
+  kochState.isMercyCutoff = !!isMercyStop;
   if (typeof document !== 'undefined' && document.body) {
     document.body.classList.remove('koch-drilling');
   }
@@ -1186,17 +1229,27 @@ function finishKochDrillSession(isManualStop = false) {
     }
   } else {
     if (kochScTitle) {
-      kochScTitle.innerHTML = isManualStop ? '<i class="mdi mdi-clipboard-text"></i> 考核手動結算 (Drill Settled)' : '<i class="mdi mdi-alert"></i> 未達通關門檻';
-      kochScTitle.style.color = '#ffb703';
+      if (isMercyStop) {
+        kochScTitle.innerHTML = '<i class="mdi mdi-hand-back-right"></i> 提前停損 (Mercy Cutoff)';
+        kochScTitle.style.color = '#ff9100';
+      } else if (isManualStop) {
+        kochScTitle.innerHTML = '<i class="mdi mdi-clipboard-text"></i> 考核手動結算 (Drill Settled)';
+        kochScTitle.style.color = '#ffb703';
+      } else {
+        kochScTitle.innerHTML = '<i class="mdi mdi-alert"></i> 未達通關門檻';
+        kochScTitle.style.color = '#ffb703';
+      }
     }
-    if (kochScorecard) kochScorecard.style.borderColor = '#ffb703';
+    if (kochScorecard) kochScorecard.style.borderColor = isMercyStop ? '#ff9100' : '#ffb703';
 
     const resetNotice = (kochState.mode === 'challenge' && kochState.challengeResetCount > 0)
       ? `<br><span style="color:#ffb703;"><i class="mdi mdi-alert"></i> 考核期間重置計時：<strong>${kochState.challengeResetCount}</strong> 次（累計發報 ${allTotal} 題）</span>`
       : '';
 
     if (kochScDesc) {
-      if (total < 5) {
+      if (isMercyStop) {
+        kochScDesc.innerHTML = `已累積 <strong>${errors}</strong> 次失誤（當前正確率 <strong>${accuracy}%</strong>）。<br>在剩餘時間（${formatTime(kochState.timeRemaining)}）內即使全對亦無法達到 90% 通關門檻。<br>已啟動<strong>提前停損機制</strong>為您結算，省下無效等待時間。請放鬆手感，按 <strong>R</strong> 重新挑戰！`;
+      } else if (total < 5) {
         kochScDesc.innerHTML = `有效題目數過少（僅完成 ${total} 題），請重新發起考核並持續發報。${resetNotice}`;
       } else {
         const reason = isManualStop ? '手動結束考核。' : '';
@@ -1207,8 +1260,13 @@ function finishKochDrillSession(isManualStop = false) {
     if (btnKochNextStage) btnKochNextStage.style.display = 'none';
 
     if (evalStatus) {
-      evalStatus.textContent = `未達 90% 門檻 (目前 ${accuracy}%)，請按 R 重試！`;
-      evalStatus.style.color = '#ffb703';
+      if (isMercyStop) {
+        evalStatus.innerHTML = `<i class="mdi mdi-hand-back-right"></i> 提前停損：失誤已達上限（${errors} 次），按 R 重新開始！`;
+        evalStatus.style.color = '#ff9100';
+      } else {
+        evalStatus.textContent = `未達 90% 門檻 (目前 ${accuracy}%)，請按 R 重試！`;
+        evalStatus.style.color = '#ffb703';
+      }
     }
   }
 
@@ -1227,6 +1285,7 @@ if (typeof window !== 'undefined') {
   window.renderStageMatrix = renderStageMatrix;
   window.getClearBadgeHtml = getClearBadgeHtml;
   window.selectKochStage = selectKochStage;
+  window.checkStandardMercyRule = checkStandardMercyRule;
 }
 
 if (typeof module !== 'undefined' && module.exports) {
@@ -1250,6 +1309,7 @@ if (typeof module !== 'undefined' && module.exports) {
     kochModePauseReflex,
     clearReflexTimer,
     clearKochTimers,
-    handleReflexTimeout
+    handleReflexTimeout,
+    checkStandardMercyRule
   };
 }

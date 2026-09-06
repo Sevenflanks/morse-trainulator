@@ -21,7 +21,8 @@ const {
   kochModePauseReflex,
   clearReflexTimer,
   clearKochTimers,
-  handleReflexTimeout
+  handleReflexTimeout,
+  checkStandardMercyRule
 } = require(path.join(projectRoot, 'js/ui/koch-mode'));
 
 console.log('==============================================');
@@ -150,7 +151,7 @@ function setupFakeDOM() {
     },
     querySelector(selector) {
       if (selector === 'input[name="koch-len"]:checked') return { value: '24' };
-      if (selector === 'input[name="koch-duration"]:checked') return { value: '180' };
+      if (selector === 'input[name="koch-duration"]:checked') return { value: global._mockStandardDuration || '60' };
       if (selector === 'input[name="koch-duration-ch"]:checked') return { value: '180' };
       return null;
     },
@@ -165,6 +166,9 @@ function setupFakeDOM() {
     scrollTo() {},
     kochManager: null,
     engine: {
+      config: {
+        letterGap: 240
+      },
       getSequenceForLetter(c) {
         if (c === 'K') return '-.-';
         if (c === 'M') return '--';
@@ -489,6 +493,116 @@ assert.strictEqual(kochState.isFinished, true);
 assert(document.getElementById('koch-sc-title').textContent.includes('極限挑戰征服'), 'Scorecard must display Challenge Conquered');
 assert.strictEqual(document.getElementById('koch-sc-accuracy').textContent, '100%');
 console.log('  -> Challenge mode full clear (100% accuracy, timer expired naturally) verified!');
+
+// ----------------------------------------------------
+// 7. Test Challenge Mode Halved Reflex Timer (Bounded by letterGap)
+// ----------------------------------------------------
+console.log('--- 7. Testing Challenge Mode Halved Reflex Timer ---');
+setKochAssessmentMode('challenge');
+startKochDrill();
+startReflexTimer();
+// Default reflexTimeoutMs is 2000. In challenge mode, it should be halved to 1000.
+assert.strictEqual(kochState.reflexDuration, 1000, 'Challenge mode reflexDuration should be halved (2000 -> 1000ms)');
+
+// If letterGap is high (e.g. 1200ms at slow Farnsworth), reflex duration must NOT be lower than letterGap!
+window.engine.config.letterGap = 1200;
+startReflexTimer();
+assert.strictEqual(kochState.reflexDuration, 1200, 'Reflex duration must never drop below letterGap');
+
+// Reset letterGap back to 240
+window.engine.config.letterGap = 240;
+startReflexTimer();
+assert.strictEqual(kochState.reflexDuration, 1000);
+clearKochTimers();
+console.log('  -> Challenge mode halved reflex timer (1000ms bounded by letterGap) verified!');
+
+// ----------------------------------------------------
+// 8. Test Standard Mode Default Duration (60s / 1 Min)
+// ----------------------------------------------------
+console.log('--- 8. Testing Standard Mode Default Duration (60s) ---');
+setKochAssessmentMode('standard');
+startKochDrill();
+assert.strictEqual(kochState.duration, 60, 'Standard mode duration must default to 60s');
+assert.strictEqual(kochState.timeRemaining, 60);
+clearKochTimers();
+console.log('  -> Standard mode 60s default duration verified!');
+
+// ----------------------------------------------------
+// 9. Test Standard Mode Mercy Rule (提前停損)
+// ----------------------------------------------------
+console.log('--- 9. Testing Standard Mode Mercy Rule (提前停損) ---');
+setKochAssessmentMode('standard');
+startKochDrill();
+
+// Subtest 9.1: No early cutoff with < 5 answers (Sample protection)
+kochState.timeRemaining = 10; // Low remaining time
+// Answer 3 questions wrong
+for (let i = 0; i < 3; i++) {
+  const target = kochState.targetChars[i];
+  finalizeLetterKochMode({
+    isValid: true,
+    letter: (target === 'K' ? 'M' : 'K'),
+    sequence: '--'
+  });
+  assert.strictEqual(kochState.running, true, 'Mercy rule must not abort when totalDone < 5');
+  assert.strictEqual(kochState.isFinished, false);
+}
+console.log('  -> Sample size safety (< 5 answered) verified!');
+
+// Subtest 9.2: Mercy rule triggers when mathematically doomed
+// User has 10 seconds remaining, answers 6 questions with 5 errors and 1 correct.
+// In 10s at 0.75s/char, max possible remaining is ceil(10/0.75) = 14 chars.
+// If all 14 are correct: (1 + 14) / (6 + 14) = 15 / 20 = 75% (< 90%).
+// It must trigger Mercy Rule!
+startKochDrill();
+kochState.timeRemaining = 10;
+// Answer 1 correct, 5 wrong
+for (let i = 0; i < 6; i++) {
+  const target = kochState.targetChars[i];
+  const isCorrect = (i === 0);
+  finalizeLetterKochMode({
+    isValid: true,
+    letter: isCorrect ? target : (target === 'K' ? 'M' : 'K'),
+    sequence: isCorrect ? window.engine.getSequenceForLetter(target) : '--'
+  });
+}
+
+// Check state after 6th question (5 errors out of 6 at 10s left)
+assert.strictEqual(kochState.running, false, 'Mercy rule should terminate running session');
+assert.strictEqual(kochState.isFinished, true, 'Session should be marked finished');
+assert.strictEqual(kochState.isMercyCutoff, true, 'isMercyCutoff must be true');
+
+// Check Scorecard UI
+assert(document.getElementById('koch-sc-title').innerHTML.includes('提前停損 (Mercy Cutoff)'), 'Title should show Mercy Cutoff');
+assert(document.getElementById('koch-sc-desc').innerHTML.includes('提前停損機制'), 'Description should explain Mercy Rule cutoff');
+assert.strictEqual(document.getElementById('koch-scorecard').style.borderColor, '#ff9100', 'Border should be amber warning');
+assert(document.getElementById('eval-status').innerHTML.includes('提前停損'), 'evalStatus should indicate mercy cutoff');
+console.log('  -> Mercy rule mathematical trigger, scorecard and HUD UI verified!');
+
+// Subtest 9.3: Reflex timeout also triggers Mercy Rule
+startKochDrill();
+kochState.timeRemaining = 8;
+// Answer 4 correct, 1 wrong
+for (let i = 0; i < 5; i++) {
+  const target = kochState.targetChars[i];
+  const isCorrect = (i < 4);
+  finalizeLetterKochMode({
+    isValid: true,
+    letter: isCorrect ? target : (target === 'K' ? 'M' : 'K'),
+    sequence: isCorrect ? window.engine.getSequenceForLetter(target) : '--'
+  });
+}
+assert.strictEqual(kochState.running, true, 'Still running at 4/5');
+
+// Now trigger 3 consecutive reflex timeouts
+// With 8s left, max remaining is ceil(8 / 0.75) = 11 chars.
+// At 4 correct, 4 errors (total 8): (4 + 11) / (8 + 11) = 15 / 19 = 78.9% (< 90%).
+handleReflexTimeout();
+handleReflexTimeout();
+handleReflexTimeout();
+assert.strictEqual(kochState.running, false, 'Reflex timeouts must trigger mercy rule when doomed');
+assert.strictEqual(kochState.isMercyCutoff, true);
+console.log('  -> Reflex timeout mercy rule trigger verified!');
 
 console.log('==============================================');
 console.log('ALL TESTS PASSED SUCCESSFULLY (Exit code 0)!');
