@@ -46,16 +46,31 @@ _Avoid_: Mode config, speed theme
 A real-time visual progress gauge tracking current press duration against Dit/Dah threshold boundaries.
 _Avoid_: Press gauge, time bar
 
+**Center Radar Halo (A3 中央雷達光環)**:
+A dual-ring circular instrumentation HUD wrapping the decoded target character in the main stage. The inner arc ($r=70$) animates clockwise during tone press, while the outer arc ($r=85$) animates during gap silence, explicitly hitting the $3T$ (Gold, Letter Settlement) and $7T$ (Cyan, Word Space) gate dots. Consolidates timing metrics directly around the operator's focal point, eliminating vertical head/eye movement.
+_Avoid_: Circle gauge, donut timer
+
+**Ergonomic Morphing Deck (K5 雙翼變形工學座)**:
+A low-profile (96px) bottom workstation dock designed for zero-latency mobile touch ergonomics. Flanks two curved thumb-wing pads around a Center Control Island. The island integrates a micro 3-mode segmented capsule (`[☵] Paddle` / `[⊙] Straight` / `[∿] Bug`), WPM stepper, and reverse toggle, smoothly morphing the wings into dual paddles, dual-hand straight keys, or a vibrating bug key with zero vertical height penalty.
+_Avoid_: Big button bar, paddle dock
+
+**Workspace Nomenclature (工作台命名準則)**:
+System terminology strictly follows short, direct, and professional amateur radio standards:
+- **`Tx` / 發報**: Transmit workspace (formerly 發報實戰).
+- **`Rx` / 抄收**: Receive & copy workspace (formerly 聽力抄收).
+- **`QSO` / 通聯**: Contact simulation workspace (formerly 模擬 CW 通聯).
+_Avoid_: 遊戲模式, 考試模式, 實戰演練
+
+**Free Input Mode**:
+Operating mode where arbitrary Morse keying produces live decoding on the card with no target text.
+_Avoid_: Sandbox mode, manual mode
+
 **Settlement Gap Timeline**:
 A continuous, dual-threshold visual timeline gauge ($0 \to 3T \to 7T$) tracking silence duration upon key release. Explicitly renders both the Letter Settlement threshold ($3T$, Gold marker) and Word Settlement threshold ($7T$, Cyan marker), guiding the operator's keying rhythm across three functional zones:
 - $0 \sim 3T$: Intra-character continuation zone (可接續同字母).
 - $3T \sim 7T$: Same-word next-letter zone (字母已結算，按鍵為同單字下一字母).
 - $\ge 7T$: Word break zone (單字已結算，自動插入空格).
 _Avoid_: Gap bar, timeout gauge
-
-**Free Input Mode**:
-Operating mode where arbitrary Morse keying produces live decoding on the card with no target text.
-_Avoid_: Sandbox mode, manual mode
 
 **Text Mode**:
 Operating mode featuring target passage entry, automated replay performance, and live keying comparison with green/red verification.
@@ -133,6 +148,37 @@ _Avoid_: Cookie save, session cache
 **Iconography Standard (UI 圖示規範)**:
 All iconography across interface buttons, status meters, and challenge indicators must strictly use Material Design Icons (MDI) via `<i class="mdi mdi-..."></i>` or inline SVG equivalents. Unicode emojis and emoticons (顏文字) are strictly prohibited in production UI to ensure vector crispness, uniform typography alignment, and cross-platform consistency.
 _Avoid_: Emoji, Unicode pictographs, emoticon, 顏文字
+
+**Three-Zone Architecture (三層工作台佈局)**:
+A unified layout framework partitioning the viewport into three fixed, responsive interaction zones: Zone 1 Top Bar (branding HUD & workspace switcher), Zone 2 Main Stage (adaptive viewport with segmented view modes), and Zone 3 Bottom Dock (fixed thumb-zone keyer/input deck), complemented by a slide-up settings drawer.
+_Avoid_: Single-page scroll, monolithic dashboard
+
+**Transmit Workspace (發報實戰工作台)**:
+The primary interactive workspace dedicated to Morse keying practice, housing Free Input, Text Passage, and Koch Progression drills, driven by straight keys or dual paddles.
+_Avoid_: Keyer tab, sending room
+
+**Receive Workspace (聽力抄收工作台)**:
+The dedicated acoustic reception workspace where the system generates CW audio and the operator decodes by ear, inputting answers via keyboard or a dedicated mobile on-screen keypad.
+_Avoid_: Dictation page, listening test
+
+**QSO Simulator Workspace (空通模擬工作台)**:
+The advanced operational workspace simulating real-world amateur radio on-air CW contacts (exchanging RST, QTH, Operator Name, 73) with simulated RF noise and interactive dialog logging.
+_Avoid_: Chat mode, contact tester
+
+**Segmented View Modes (三段式主舞台視圖模式)**:
+A three-way view selector in the Transmit workspace:
+- **Tree View (二元樹視圖)**: Iconic default visual perspective rendering the full PCB copper traces and glowing letter path.
+- **Focus HUD (專注 HUD 視圖)**: Minimalist, high-contrast blind-keying display featuring large decoded letters and rhythm feedback with zero visual tree distractions.
+- **Telemetry View (電信示波視圖)**: Deep diagnostic layout highlighting the 60FPS oscilloscope ribbon and timing discrepancy meters.
+_Avoid_: Layout toggles, page themes
+
+**Slide-up Settings Drawer (抽屜式電信設定)**:
+An off-canvas, slide-up panel housing all non-realtime radio parameters (Unit T, Farnsworth, Tone, Iambic Mode A/B, Bug Key, Paddle Reverse, Keybinding Recorder), preserving clean stage visibility.
+_Avoid_: Settings modal, config popup
+
+**Brand Mark (品牌標章)**:
+The official vector SVG emblem of Morse Trainulator combining telegraph key contacts, Morse timing pulses (· / —), and PCB circuitry into a cyber-brass insignia.
+_Avoid_: Favicon image, site icon
 
 ---
 

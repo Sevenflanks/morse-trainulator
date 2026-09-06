@@ -1,0 +1,1647 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <title>Morse Trainulator - Keying Deck Variations Prototype</title>
+  <!-- Material Design Icons (MDI) -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@mdi/font@7.4.47/css/materialdesignicons.min.css">
+  <style>
+    :root {
+      --bg-dark: #0a0c10;
+      --bg-panel: #11141b;
+      --bg-surface: #171c26;
+      --gold: #ffd700;
+      --gold-dim: #b89700;
+      --cyan: #00e5ff;
+      --cyan-dim: #009cb3;
+      --green: #00e676;
+      --red: #ff5252;
+      --text-main: #f0f4fc;
+      --text-dim: #8c9ba8;
+      --border-subtle: #242c38;
+      --border-gold: rgba(255, 215, 0, 0.3);
+      --border-cyan: rgba(0, 229, 255, 0.3);
+      --font-mono: 'JetBrains Mono', 'Fira Code', 'Roboto Mono', monospace;
+      --font-ui: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      user-select: none;
+      -webkit-user-select: none;
+      -webkit-touch-callout: none;
+    }
+
+    body {
+      background: var(--bg-dark);
+      color: var(--text-main);
+      font-family: var(--font-ui);
+      height: 100vh;
+      height: 100dvh;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .mdi {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      line-height: 1;
+      font-size: 1.1em;
+    }
+
+    .brand-mark {
+      width: 28px;
+      height: 28px;
+      flex-shrink: 0;
+    }
+
+    #app-container {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      height: 100%;
+      overflow: hidden;
+      position: relative;
+    }
+
+    .variant-view {
+      display: none;
+      flex-direction: column;
+      flex: 1;
+      height: 100%;
+      overflow: hidden;
+    }
+    .variant-view.active {
+      display: flex;
+    }
+
+    /* Top Bar */
+    .va-topbar {
+      height: 52px;
+      background: var(--bg-panel);
+      border-bottom: 1px solid var(--border-subtle);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 16px;
+      z-index: 10;
+      flex-shrink: 0;
+    }
+    .va-brand {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-weight: 700;
+      letter-spacing: 0.5px;
+      font-size: 0.95rem;
+    }
+    .va-brand-tag {
+      font-size: 0.7rem;
+      background: rgba(0, 229, 255, 0.12);
+      color: var(--cyan);
+      border: 1px solid var(--border-cyan);
+      padding: 2px 8px;
+      border-radius: 4px;
+      font-family: var(--font-mono);
+      font-weight: 600;
+    }
+    .va-workspace-nav {
+      display: flex;
+      gap: 4px;
+      background: var(--bg-dark);
+      padding: 3px;
+      border-radius: 8px;
+      border: 1px solid var(--border-subtle);
+    }
+    .va-ws-btn {
+      padding: 6px 12px;
+      border: none;
+      background: transparent;
+      color: var(--text-dim);
+      font-size: 0.8rem;
+      font-weight: 600;
+      border-radius: 6px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      transition: all 0.15s ease;
+    }
+    .va-ws-btn.active {
+      background: var(--bg-surface);
+      color: var(--cyan);
+      box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+    }
+
+    /* Main Stage */
+    .va-stage {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      position: relative;
+      background: radial-gradient(circle at 50% 32%, #141924 0%, #090b10 75%);
+    }
+
+    .va-stage-header {
+      padding: 10px 16px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border-bottom: 1px solid rgba(255,255,255,0.05);
+      flex-shrink: 0;
+    }
+    .va-submode-chips {
+      display: flex;
+      gap: 6px;
+    }
+    .chip {
+      padding: 4px 10px;
+      border-radius: 20px;
+      font-size: 0.75rem;
+      background: rgba(255,255,255,0.05);
+      color: var(--text-dim);
+      cursor: pointer;
+      border: 1px solid transparent;
+    }
+    .chip.active {
+      background: rgba(255, 215, 0, 0.15);
+      color: var(--gold);
+      border-color: var(--border-gold);
+      font-weight: 600;
+    }
+
+    /* Common Stage Center: A3 Radar Halo */
+    .stage-center-box {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 12px 16px;
+      position: relative;
+    }
+
+    .a3-halo-stage {
+      position: relative;
+      width: 200px;
+      height: 200px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 12px;
+      flex-shrink: 0;
+    }
+    .a3-halo-svg {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      transform: rotate(-90deg);
+      transform-origin: 50% 50%;
+    }
+    .halo-bg-ring {
+      fill: none;
+      stroke: #18202d;
+      stroke-width: 6;
+    }
+    .halo-press-arc {
+      fill: none;
+      stroke: var(--cyan);
+      stroke-width: 6;
+      stroke-dasharray: 440;
+      stroke-dashoffset: 440;
+      stroke-linecap: round;
+      transition: stroke-dashoffset 0.04s linear;
+    }
+    .halo-gap-arc {
+      fill: none;
+      stroke: #2c394c;
+      stroke-width: 6;
+      stroke-dasharray: 534;
+      stroke-dashoffset: 534;
+      stroke-linecap: round;
+      transition: stroke-dashoffset 0.04s linear;
+    }
+    .halo-gate-dot {
+      fill: #ffd700;
+      transition: transform 0.1s;
+    }
+
+    .a3-halo-inner {
+      text-align: center;
+      z-index: 2;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+    }
+    .hud-char-large {
+      font-size: 4.6rem;
+      font-weight: 900;
+      color: var(--gold);
+      font-family: var(--font-mono);
+      line-height: 0.95;
+      text-shadow: 0 0 20px rgba(255, 215, 0, 0.4);
+    }
+    .hud-seq-code {
+      font-size: 1.3rem;
+      color: var(--cyan);
+      font-family: var(--font-mono);
+      letter-spacing: 4px;
+      margin-top: 4px;
+    }
+
+    .hud-status-line {
+      font-size: 0.78rem;
+      font-family: var(--font-mono);
+      color: var(--text-dim);
+      margin-top: 6px;
+      min-height: 18px;
+    }
+
+    .hud-committed-stream {
+      background: var(--bg-surface);
+      border: 1px solid var(--border-subtle);
+      border-radius: 8px;
+      padding: 8px 14px;
+      font-family: var(--font-mono);
+      font-size: 1rem;
+      letter-spacing: 2px;
+      min-height: 40px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--text-main);
+      box-shadow: inset 0 2px 6px rgba(0,0,0,0.5);
+      max-width: 480px;
+      width: 100%;
+      margin-top: 10px;
+    }
+
+    /* Common Dock Base */
+    .va-keyer-dock {
+      background: var(--bg-panel);
+      border-top: 1px solid var(--border-subtle);
+      padding: 12px 16px 14px 16px;
+      flex-shrink: 0;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      z-index: 10;
+    }
+
+    /* ==========================================================================
+       KEYING VARIANT 1 (K1): HARDWARE CONSOLE PADDLES (電台儀表擬真雙撥片)
+       ========================================================================== */
+    .k1-console-housing {
+      background: linear-gradient(180deg, #181d27 0%, #10141c 100%);
+      border: 1px solid #2e3748;
+      border-radius: 12px;
+      padding: 10px 14px;
+      box-shadow: inset 0 1px 0 rgba(255,255,255,0.06), 0 4px 16px rgba(0,0,0,0.4);
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+    .k1-console-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 0.72rem;
+      color: var(--text-dim);
+      font-family: var(--font-mono);
+      border-bottom: 1px solid rgba(255,255,255,0.05);
+      padding-bottom: 4px;
+    }
+    .k1-led-group {
+      display: flex;
+      gap: 12px;
+      align-items: center;
+    }
+    .k1-led-item {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      font-size: 0.68rem;
+    }
+    .k1-led-dot {
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: #252e3c;
+      transition: all 0.08s;
+    }
+    .k1-led-dot.active-cyan { background: var(--cyan); box-shadow: 0 0 8px var(--cyan); }
+    .k1-led-dot.active-gold { background: var(--gold); box-shadow: 0 0 8px var(--gold); }
+
+    .k1-paddles-rig {
+      display: flex;
+      align-items: stretch;
+      gap: 12px;
+      height: 80px;
+      position: relative;
+    }
+    .k1-pivot-center {
+      position: absolute;
+      left: 50%;
+      top: 50%;
+      transform: translate(-50%, -50%);
+      width: 14px;
+      height: 48px;
+      background: linear-gradient(90deg, #2c3545, #1a202c);
+      border: 1px solid #475569;
+      border-radius: 4px;
+      z-index: 3;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .k1-pivot-screw {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: #ffd700;
+      box-shadow: 0 0 4px rgba(255, 215, 0, 0.4);
+    }
+
+    .k1-paddle-lever {
+      flex: 1;
+      background: linear-gradient(180deg, #222938 0%, #151923 100%);
+      border: 1px solid #374358;
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 16px;
+      cursor: pointer;
+      position: relative;
+      touch-action: none;
+      transition: all 0.05s ease;
+    }
+    .k1-paddle-lever.left { border-bottom: 4px solid var(--cyan); }
+    .k1-paddle-lever.right { border-bottom: 4px solid var(--gold); flex-direction: row-reverse; }
+    .k1-paddle-lever.active {
+      background: linear-gradient(180deg, #131720 0%, #0a0d13 100%);
+      transform: translateY(2px);
+      border-bottom-width: 2px;
+    }
+    .k1-paddle-lever.left.active { box-shadow: 0 0 16px rgba(0, 229, 255, 0.4); }
+    .k1-paddle-lever.right.active { box-shadow: 0 0 16px rgba(255, 215, 0, 0.4); }
+
+    .k1-contact-pin {
+      width: 12px;
+      height: 12px;
+      border-radius: 50%;
+      background: radial-gradient(circle, #ffe082 0%, #b28900 100%);
+      box-shadow: 0 0 6px rgba(255,215,0,0.3);
+      border: 1px solid #fff;
+      flex-shrink: 0;
+    }
+    .k1-paddle-text {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+    .k1-sym { font-size: 2rem; font-family: var(--font-mono); font-weight: 800; line-height: 1; }
+    .k1-name { font-size: 0.72rem; color: var(--text-dim); }
+    .k1-badge {
+      font-size: 0.65rem;
+      background: rgba(0,0,0,0.5);
+      border: 1px solid #445;
+      padding: 1px 6px;
+      border-radius: 4px;
+      font-family: var(--font-mono);
+      color: #aab;
+    }
+
+    /* ==========================================================================
+       KEYING VARIANT 2 (K2): ERGONOMIC THUMB WINGS (行動端雙手大拇指工學翼)
+       ========================================================================== */
+    .k2-dock-container {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      height: 96px;
+    }
+    .k2-thumb-wing {
+      flex: 1.1;
+      height: 100%;
+      background: linear-gradient(145deg, #1e2635 0%, #11151f 100%);
+      border: 1.5px solid #2f3c52;
+      border-radius: 20px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      position: relative;
+      touch-action: none;
+      transition: all 0.06s ease;
+      box-shadow: 0 4px 14px rgba(0,0,0,0.4);
+    }
+    .k2-thumb-wing.left {
+      border-bottom-left-radius: 28px;
+      border-left: 3px solid var(--cyan);
+      border-bottom: 3px solid var(--cyan);
+    }
+    .k2-thumb-wing.right {
+      border-bottom-right-radius: 28px;
+      border-right: 3px solid var(--gold);
+      border-bottom: 3px solid var(--gold);
+    }
+    .k2-thumb-wing.active {
+      transform: scale(0.97) translateY(2px);
+      background: linear-gradient(145deg, #10141c 0%, #07090e 100%);
+    }
+    .k2-thumb-wing.left.active { box-shadow: 0 0 20px rgba(0, 229, 255, 0.45); }
+    .k2-thumb-wing.right.active { box-shadow: 0 0 20px rgba(255, 215, 0, 0.45); }
+
+    .k2-wing-symbol { font-size: 2.2rem; font-family: var(--font-mono); font-weight: 900; line-height: 1; }
+    .k2-wing-title { font-size: 0.8rem; font-weight: 700; margin-top: 2px; }
+    .k2-wing-hint { font-size: 0.65rem; color: var(--text-dim); margin-top: 2px; font-family: var(--font-mono); }
+
+    .k2-center-island {
+      width: 100px;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+    .k2-island-pill {
+      background: #090c12;
+      border: 1px solid #283344;
+      border-radius: 14px;
+      padding: 4px 8px;
+      width: 100%;
+      text-align: center;
+      font-size: 0.7rem;
+      color: var(--text-dim);
+      font-family: var(--font-mono);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .k2-island-btn {
+      background: var(--bg-surface);
+      border: 1px solid var(--border-subtle);
+      color: var(--text-main);
+      width: 20px;
+      height: 20px;
+      border-radius: 4px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.8rem;
+    }
+    .k2-quick-btn {
+      background: #141924;
+      border: 1px solid #2a3548;
+      border-radius: 6px;
+      color: var(--text-dim);
+      padding: 4px 6px;
+      font-size: 0.65rem;
+      cursor: pointer;
+      width: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 4px;
+    }
+
+    /* ==========================================================================
+       KEYING VARIANT 3 (K3): FULL-WIDTH NEON RAILS (霓虹全域電容感應板)
+       ========================================================================== */
+    .k3-neon-deck {
+      height: 90px;
+      border-radius: 12px;
+      overflow: hidden;
+      display: flex;
+      position: relative;
+      background: #05070a;
+      border: 1px solid #1e2635;
+      box-shadow: inset 0 2px 10px rgba(0,0,0,0.8);
+    }
+    .k3-neon-rail {
+      flex: 1;
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      position: relative;
+      touch-action: none;
+      transition: background 0.08s, box-shadow 0.08s;
+      overflow: hidden;
+    }
+    .k3-neon-rail.dit-rail {
+      background: linear-gradient(180deg, rgba(0, 229, 255, 0.03) 0%, rgba(0, 229, 255, 0.08) 100%);
+    }
+    .k3-neon-rail.dah-rail {
+      background: linear-gradient(180deg, rgba(255, 215, 0, 0.03) 0%, rgba(255, 215, 0, 0.08) 100%);
+    }
+    .k3-neon-rail.active.dit-rail {
+      background: linear-gradient(180deg, rgba(0, 229, 255, 0.25) 0%, rgba(0, 229, 255, 0.45) 100%);
+      box-shadow: inset 0 0 24px var(--cyan);
+    }
+    .k3-neon-rail.active.dah-rail {
+      background: linear-gradient(180deg, rgba(255, 215, 0, 0.25) 0%, rgba(255, 215, 0, 0.45) 100%);
+      box-shadow: inset 0 0 24px var(--gold);
+    }
+    .k3-divider-line {
+      width: 2px;
+      height: 100%;
+      background: linear-gradient(180deg, transparent 0%, #3a475d 30%, #3a475d 70%, transparent 100%);
+      position: relative;
+      z-index: 2;
+    }
+    .k3-rail-icon { font-size: 2.2rem; font-family: var(--font-mono); font-weight: 900; line-height: 1; }
+    .k3-rail-label { font-size: 0.75rem; letter-spacing: 1px; margin-top: 4px; font-weight: 600; opacity: 0.8; }
+    .k3-rail-key { font-size: 0.65rem; font-family: var(--font-mono); opacity: 0.5; margin-top: 2px; }
+
+    /* ==========================================================================
+       KEYING VARIANT 4 (K4): MORPHING TRI-KEY DECK (三合一多重電鍵變形座)
+       ========================================================================== */
+    .k4-selector-tabs {
+      display: flex;
+      gap: 6px;
+      background: #090c12;
+      padding: 3px;
+      border-radius: 8px;
+      border: 1px solid #232c3c;
+    }
+    .k4-tab-btn {
+      flex: 1;
+      padding: 5px 8px;
+      border: none;
+      background: transparent;
+      color: var(--text-dim);
+      font-size: 0.72rem;
+      font-weight: 600;
+      border-radius: 6px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 4px;
+      transition: all 0.15s;
+    }
+    .k4-tab-btn.active {
+      background: var(--bg-surface);
+      color: var(--gold);
+      box-shadow: 0 2px 6px rgba(0,0,0,0.4);
+    }
+
+    .k4-morph-stage {
+      height: 84px;
+      position: relative;
+    }
+    .k4-subview {
+      display: none;
+      width: 100%;
+      height: 100%;
+    }
+    .k4-subview.active {
+      display: flex;
+    }
+
+    /* Subview 4A: Straight Key */
+    .k4-straight-box {
+      width: 100%;
+      height: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .k4-straight-knob {
+      width: 100%;
+      max-width: 360px;
+      height: 72px;
+      background: radial-gradient(circle at 50% 35%, #2a3344 0%, #151b24 100%);
+      border: 2px solid #4a5974;
+      border-radius: 36px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 16px;
+      cursor: pointer;
+      touch-action: none;
+      box-shadow: 0 6px 16px rgba(0,0,0,0.5), inset 0 2px 4px rgba(255,255,255,0.1);
+      transition: all 0.05s ease;
+    }
+    .k4-straight-knob.active {
+      transform: translateY(3px) scale(0.98);
+      background: radial-gradient(circle at 50% 45%, #151b24 0%, #0d1218 100%);
+      box-shadow: 0 2px 8px rgba(0,0,0,0.8), 0 0 20px rgba(255, 215, 0, 0.4);
+      border-color: var(--gold);
+    }
+    .knob-brass-core {
+      width: 38px;
+      height: 38px;
+      border-radius: 50%;
+      background: radial-gradient(circle, #ffd700 0%, #b8860b 80%, #5c4308 100%);
+      box-shadow: 0 0 10px rgba(255,215,0,0.5), inset 0 1px 2px #fff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #000;
+      font-size: 1.2rem;
+    }
+    .knob-info {
+      display: flex;
+      flex-direction: column;
+    }
+    .knob-title { font-size: 0.95rem; font-weight: 700; color: var(--gold); }
+    .knob-sub { font-size: 0.68rem; color: var(--text-dim); }
+
+    /* Subview 4C: Bug Key */
+    .k4-bug-container {
+      width: 100%;
+      height: 100%;
+      display: flex;
+      gap: 12px;
+    }
+    .k4-bug-paddle {
+      flex: 1;
+      height: 100%;
+      background: #171c26;
+      border: 1px solid #303b4d;
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 12px;
+      cursor: pointer;
+      touch-action: none;
+      position: relative;
+    }
+    .k4-bug-paddle.left { border-left: 4px solid var(--cyan); }
+    .k4-bug-paddle.right { border-right: 4px solid var(--gold); }
+    .k4-bug-paddle.active {
+      background: #0d1017;
+      transform: translateY(2px);
+    }
+    .spring-vibe-icon {
+      font-size: 1.8rem;
+      color: var(--cyan);
+      transition: transform 0.05s;
+    }
+    .k4-bug-paddle.left.active .spring-vibe-icon {
+      animation: springVibe 0.1s infinite alternate;
+    }
+    @keyframes springVibe {
+      0% { transform: scaleX(1) translateX(0); }
+      100% { transform: scaleX(1.3) translateX(4px); }
+    }
+
+    /* Floating Switcher */
+    #prototype-bar {
+      position: fixed;
+      bottom: 14px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: rgba(16, 20, 28, 0.95);
+      border: 1.5px solid var(--cyan);
+      backdrop-filter: blur(14px);
+      -webkit-backdrop-filter: blur(14px);
+      border-radius: 30px;
+      box-shadow: 0 8px 32px rgba(0, 229, 255, 0.28), 0 4px 16px rgba(0,0,0,0.8);
+      display: flex;
+      align-items: center;
+      padding: 4px 8px;
+      z-index: 9999;
+      gap: 8px;
+    }
+    .proto-btn {
+      width: 30px;
+      height: 30px;
+      border-radius: 50%;
+      background: var(--bg-surface);
+      border: 1px solid var(--border-subtle);
+      color: var(--text-main);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: all 0.15s;
+    }
+    .proto-btn:hover { background: var(--cyan); color: #000; }
+    .proto-label {
+      font-size: 0.8rem;
+      font-weight: 700;
+      padding: 0 6px;
+      white-space: nowrap;
+      font-family: var(--font-mono);
+      color: var(--gold);
+    }
+    .proto-hint { font-size: 0.65rem; color: #789; padding-right: 4px; }
+
+    /* ==========================================================================
+       KEYING VARIANT 5 (K5): HYBRID ERGONOMIC MORPHING DECK (K2+K4 融合工學變形座)
+       ========================================================================== */
+    .k5-dock-container {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      height: 96px;
+    }
+    .k5-center-smart-island {
+      width: 104px;
+      display: flex;
+      flex-direction: column;
+      gap: 5px;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+    .k5-device-capsule {
+      display: flex;
+      gap: 2px;
+      background: #090c12;
+      border: 1px solid #283344;
+      border-radius: 12px;
+      padding: 2px;
+      width: 100%;
+    }
+    .k5-dev-pill {
+      flex: 1;
+      height: 22px;
+      border: none;
+      background: transparent;
+      color: var(--text-dim);
+      border-radius: 9px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.85rem;
+      transition: all 0.12s;
+    }
+    .k5-dev-pill.active {
+      background: var(--bg-surface);
+      color: var(--gold);
+      box-shadow: 0 1px 4px rgba(0,0,0,0.5);
+    }
+    .k5-mode-badge {
+      font-size: 0.62rem;
+      color: #889;
+      font-family: var(--font-mono);
+      white-space: nowrap;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Floating Prototype Switcher Pill -->
+  <div id="prototype-bar">
+    <button class="proto-btn" id="btn-proto-prev" title="前一個方案 (鍵盤左鍵)"><i class="mdi mdi-chevron-left"></i></button>
+    <div class="proto-label" id="proto-active-label">方案 K1: 電台儀表擬真雙撥片</div>
+    <span class="proto-hint">(方向鍵 ← / → 切換)</span>
+    <button class="proto-btn" id="btn-proto-next" title="後一個方案 (鍵盤右鍵)"><i class="mdi mdi-chevron-right"></i></button>
+  </div>
+
+  <div id="app-container">
+
+    <!-- ====================================================================
+         VARIANT K1: HARDWARE CONSOLE PADDLES (電台儀表擬真雙撥片)
+         ==================================================================== -->
+    <div id="variant-K1" class="variant-view active">
+      <header class="va-topbar">
+        <div class="va-brand">
+          <svg class="brand-mark" viewBox="0 0 36 36" fill="none"><polygon points="18,2 33,10.5 33,25.5 18,34 3,25.5 3,10.5" stroke="#00e5ff" stroke-width="1.8" fill="#101520"/><circle cx="12" cy="18" r="3.2" fill="#ffd700"/><rect x="19" y="15.8" width="8.5" height="4.4" rx="2.2" fill="#00e5ff"/></svg>
+          <span>Morse Trainulator</span>
+          <span class="va-brand-tag">方案 K1: 擬真雙撥片</span>
+        </div>
+        <div class="va-workspace-nav">
+          <button class="va-ws-btn active"><i class="mdi mdi-flash"></i> 發報實戰</button>
+          <button class="va-ws-btn"><i class="mdi mdi-headphones"></i> 聽力抄收</button>
+        </div>
+      </header>
+      <main class="va-stage">
+        <div class="stage-center-box">
+          <!-- A3 Central Radar Halo -->
+          <div class="a3-halo-stage">
+            <svg class="a3-halo-svg" viewBox="0 0 200 200">
+              <circle class="halo-bg-ring" cx="100" cy="100" r="70"/>
+              <circle class="halo-bg-ring" cx="100" cy="100" r="85"/>
+              <circle class="halo-press-arc press-arc-el" cx="100" cy="100" r="70"/>
+              <circle class="halo-gap-arc gap-arc-el" cx="100" cy="100" r="85"/>
+              <!-- 3T Gate Dot (42% ≈ 151 deg) -->
+              <circle class="halo-gate-dot" cx="25.5" cy="140.9" r="3.5" title="3T 結算點"/>
+              <!-- 7T Gate Dot (95% ≈ 342 deg) -->
+              <circle class="halo-gate-dot" cx="180.8" cy="73.7" r="3.5" title="7T 空格點"/>
+            </svg>
+            <div class="a3-halo-inner">
+              <div class="hud-char-large char-target">K</div>
+              <div class="hud-seq-code seq-target">— · —</div>
+            </div>
+          </div>
+          <div class="hud-status-line status-line-el">敲擊撥片開始發報</div>
+          <div class="hud-committed-stream">CQ CQ CQ DE BV2AB K</div>
+        </div>
+      </main>
+      <footer class="va-keyer-dock">
+        <!-- K1 Console Housing -->
+        <div class="k1-console-housing">
+          <div class="k1-console-header">
+            <span><i class="mdi mdi-tune-vertical"></i> IAMBIC KEYER (MODE B)</span>
+            <div class="k1-led-group">
+              <div class="k1-led-item"><span class="k1-led-dot" id="k1-led-dit"></span> DIT MEM</div>
+              <div class="k1-led-item"><span class="k1-led-dot" id="k1-led-dah"></span> DAH MEM</div>
+            </div>
+          </div>
+          <div class="k1-paddles-rig">
+            <div class="k1-paddle-lever left paddle-btn" data-paddle="left">
+              <div class="k1-paddle-text">
+                <span class="k1-sym" style="color:var(--cyan);">·</span>
+                <span class="k1-name">點 Dit</span>
+              </div>
+              <div class="k1-contact-pin"></div>
+              <span class="k1-badge">F</span>
+            </div>
+            <div class="k1-pivot-center"><div class="k1-pivot-screw"></div></div>
+            <div class="k1-paddle-lever right paddle-btn" data-paddle="right">
+              <div class="k1-paddle-text">
+                <span class="k1-sym" style="color:var(--gold);">—</span>
+                <span class="k1-name">劃 Dah</span>
+              </div>
+              <div class="k1-contact-pin"></div>
+              <span class="k1-badge">J</span>
+            </div>
+          </div>
+        </div>
+      </footer>
+    </div>
+
+    <!-- ====================================================================
+         VARIANT K2: ERGONOMIC THUMB WINGS (行動端拇指工學翼)
+         ==================================================================== -->
+    <div id="variant-K2" class="variant-view">
+      <header class="va-topbar">
+        <div class="va-brand">
+          <svg class="brand-mark" viewBox="0 0 36 36" fill="none"><polygon points="18,2 33,10.5 33,25.5 18,34 3,25.5 3,10.5" stroke="#00e5ff" stroke-width="1.8" fill="#101520"/><circle cx="12" cy="18" r="3.2" fill="#ffd700"/><rect x="19" y="15.8" width="8.5" height="4.4" rx="2.2" fill="#00e5ff"/></svg>
+          <span>Morse Trainulator</span>
+          <span class="va-brand-tag">方案 K2: 拇指工學翼</span>
+        </div>
+        <div class="va-workspace-nav">
+          <button class="va-ws-btn active"><i class="mdi mdi-flash"></i> 發報實戰</button>
+          <button class="va-ws-btn"><i class="mdi mdi-headphones"></i> 聽力抄收</button>
+        </div>
+      </header>
+      <main class="va-stage">
+        <div class="stage-center-box">
+          <!-- A3 Central Radar Halo -->
+          <div class="a3-halo-stage">
+            <svg class="a3-halo-svg" viewBox="0 0 200 200">
+              <circle class="halo-bg-ring" cx="100" cy="100" r="70"/>
+              <circle class="halo-bg-ring" cx="100" cy="100" r="85"/>
+              <circle class="halo-press-arc press-arc-el" cx="100" cy="100" r="70"/>
+              <circle class="halo-gap-arc gap-arc-el" cx="100" cy="100" r="85"/>
+              <circle class="halo-gate-dot" cx="25.5" cy="140.9" r="3.5" title="3T 結算點"/>
+              <circle class="halo-gate-dot" cx="180.8" cy="73.7" r="3.5" title="7T 空格點"/>
+            </svg>
+            <div class="a3-halo-inner">
+              <div class="hud-char-large char-target">K</div>
+              <div class="hud-seq-code seq-target">— · —</div>
+            </div>
+          </div>
+          <div class="hud-status-line status-line-el">手機雙手拇指專用弧形觸控座</div>
+          <div class="hud-committed-stream">CQ CQ CQ DE BV2AB K</div>
+        </div>
+      </main>
+      <footer class="va-keyer-dock">
+        <div class="k2-dock-container">
+          <!-- Left Thumb Wing (Dit) -->
+          <div class="k2-thumb-wing left paddle-btn" data-paddle="left">
+            <span class="k2-wing-symbol" style="color:var(--cyan);">·</span>
+            <span class="k2-wing-title">左拇指 Dit</span>
+            <span class="k2-wing-hint">鍵盤 F / 點擊</span>
+          </div>
+
+          <!-- Center Control Island -->
+          <div class="k2-center-island">
+            <div class="k2-island-pill">
+              <button class="k2-island-btn" id="k2-wpm-minus">-</button>
+              <span id="k2-wpm-val" style="color:var(--gold); font-weight:700;">20 WPM</span>
+              <button class="k2-island-btn" id="k2-wpm-plus">+</button>
+            </div>
+            <button class="k2-quick-btn" id="k2-reverse-btn" title="左右手反轉">
+              <i class="mdi mdi-swap-horizontal"></i> 反轉
+            </button>
+            <div style="font-size:0.62rem; color:#667; font-family:var(--font-mono);">700 Hz</div>
+          </div>
+
+          <!-- Right Thumb Wing (Dah) -->
+          <div class="k2-thumb-wing right paddle-btn" data-paddle="right">
+            <span class="k2-wing-symbol" style="color:var(--gold);">—</span>
+            <span class="k2-wing-title">右拇指 Dah</span>
+            <span class="k2-wing-hint">鍵盤 J / 點擊</span>
+          </div>
+        </div>
+      </footer>
+    </div>
+
+    <!-- ====================================================================
+         VARIANT K3: FULL-WIDTH NEON RAILS (霓虹全域電容感應板)
+         ==================================================================== -->
+    <div id="variant-K3" class="variant-view">
+      <header class="va-topbar">
+        <div class="va-brand">
+          <svg class="brand-mark" viewBox="0 0 36 36" fill="none"><polygon points="18,2 33,10.5 33,25.5 18,34 3,25.5 3,10.5" stroke="#00e5ff" stroke-width="1.8" fill="#101520"/><circle cx="12" cy="18" r="3.2" fill="#ffd700"/><rect x="19" y="15.8" width="8.5" height="4.4" rx="2.2" fill="#00e5ff"/></svg>
+          <span>Morse Trainulator</span>
+          <span class="va-brand-tag">方案 K3: 霓虹全域板</span>
+        </div>
+        <div class="va-workspace-nav">
+          <button class="va-ws-btn active"><i class="mdi mdi-flash"></i> 發報實戰</button>
+          <button class="va-ws-btn"><i class="mdi mdi-headphones"></i> 聽力抄收</button>
+        </div>
+      </header>
+      <main class="va-stage">
+        <div class="stage-center-box">
+          <!-- A3 Central Radar Halo -->
+          <div class="a3-halo-stage">
+            <svg class="a3-halo-svg" viewBox="0 0 200 200">
+              <circle class="halo-bg-ring" cx="100" cy="100" r="70"/>
+              <circle class="halo-bg-ring" cx="100" cy="100" r="85"/>
+              <circle class="halo-press-arc press-arc-el" cx="100" cy="100" r="70"/>
+              <circle class="halo-gap-arc gap-arc-el" cx="100" cy="100" r="85"/>
+              <circle class="halo-gate-dot" cx="25.5" cy="140.9" r="3.5" title="3T 結算點"/>
+              <circle class="halo-gate-dot" cx="180.8" cy="73.7" r="3.5" title="7T 空格點"/>
+            </svg>
+            <div class="a3-halo-inner">
+              <div class="hud-char-large char-target">K</div>
+              <div class="hud-seq-code seq-target">— · —</div>
+            </div>
+          </div>
+          <div class="hud-status-line status-line-el">50% / 50% 全寬電容觸控感應區</div>
+          <div class="hud-committed-stream">CQ CQ CQ DE BV2AB K</div>
+        </div>
+      </main>
+      <footer class="va-keyer-dock">
+        <!-- K3 Full-Width Neon Rails -->
+        <div class="k3-neon-deck">
+          <div class="k3-neon-rail dit-rail paddle-btn" data-paddle="left">
+            <span class="k3-rail-icon" style="color:var(--cyan);">·</span>
+            <span class="k3-rail-label" style="color:var(--cyan);">DIT RAIL</span>
+            <span class="k3-rail-key">點 Dit (F)</span>
+          </div>
+          <div class="k3-divider-line"></div>
+          <div class="k3-neon-rail dah-rail paddle-btn" data-paddle="right">
+            <span class="k3-rail-icon" style="color:var(--gold);">—</span>
+            <span class="k3-rail-label" style="color:var(--gold);">DAH RAIL</span>
+            <span class="k3-rail-key">劃 Dah (J)</span>
+          </div>
+        </div>
+      </footer>
+    </div>
+
+    <!-- ====================================================================
+         VARIANT K4: MORPHING TRI-KEY DECK (三合一多重電鍵變形座)
+         ==================================================================== -->
+    <div id="variant-K4" class="variant-view">
+      <header class="va-topbar">
+        <div class="va-brand">
+          <svg class="brand-mark" viewBox="0 0 36 36" fill="none"><polygon points="18,2 33,10.5 33,25.5 18,34 3,25.5 3,10.5" stroke="#00e5ff" stroke-width="1.8" fill="#101520"/><circle cx="12" cy="18" r="3.2" fill="#ffd700"/><rect x="19" y="15.8" width="8.5" height="4.4" rx="2.2" fill="#00e5ff"/></svg>
+          <span>Morse Trainulator</span>
+          <span class="va-brand-tag">方案 K4: 三合一變形座</span>
+        </div>
+        <div class="va-workspace-nav">
+          <button class="va-ws-btn active"><i class="mdi mdi-flash"></i> 發報實戰</button>
+          <button class="va-ws-btn"><i class="mdi mdi-headphones"></i> 聽力抄收</button>
+        </div>
+      </header>
+      <main class="va-stage">
+        <div class="stage-center-box">
+          <!-- A3 Central Radar Halo -->
+          <div class="a3-halo-stage">
+            <svg class="a3-halo-svg" viewBox="0 0 200 200">
+              <circle class="halo-bg-ring" cx="100" cy="100" r="70"/>
+              <circle class="halo-bg-ring" cx="100" cy="100" r="85"/>
+              <circle class="halo-press-arc press-arc-el" cx="100" cy="100" r="70"/>
+              <circle class="halo-gap-arc gap-arc-el" cx="100" cy="100" r="85"/>
+              <circle class="halo-gate-dot" cx="25.5" cy="140.9" r="3.5" title="3T 結算點"/>
+              <circle class="halo-gate-dot" cx="180.8" cy="73.7" r="3.5" title="7T 空格點"/>
+            </svg>
+            <div class="a3-halo-inner">
+              <div class="hud-char-large char-target">K</div>
+              <div class="hud-seq-code seq-target">— · —</div>
+            </div>
+          </div>
+          <div class="hud-status-line status-line-el" id="k4-device-desc">雙撥片模式 · 左右夾發</div>
+          <div class="hud-committed-stream">CQ CQ CQ DE BV2AB K</div>
+        </div>
+      </main>
+      <footer class="va-keyer-dock">
+        <!-- Sub-selector inside K4 dock -->
+        <div class="k4-selector-tabs">
+          <button class="k4-tab-btn" data-subview="straight"><i class="mdi mdi-radiobox-marked"></i> 直鍵 (Straight)</button>
+          <button class="k4-tab-btn active" data-subview="paddle"><i class="mdi mdi-tune-vertical"></i> 雙撥片 (Paddle)</button>
+          <button class="k4-tab-btn" data-subview="bug"><i class="mdi mdi-metronome"></i> 震報鍵 (Bug)</button>
+        </div>
+
+        <div class="k4-morph-stage">
+          <!-- Subview 1: Straight Key Knob -->
+          <div class="k4-subview" id="k4-view-straight">
+            <div class="k4-straight-box">
+              <div class="k4-straight-knob paddle-btn" data-keytype="straight">
+                <div class="knob-brass-core"><i class="mdi mdi-ray-vertex"></i></div>
+                <div class="knob-info">
+                  <span class="knob-title">手電鍵 (Straight Key)</span>
+                  <span class="knob-sub">長按發劃 · 短按發點 (空白鍵 Space / 點擊)</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Subview 2: Classic Dual Paddle -->
+          <div class="k4-subview active" id="k4-view-paddle">
+            <div style="display:flex; gap:10px; width:100%;">
+              <button class="k1-paddle-lever left paddle-btn" data-paddle="left" style="flex:1; height:74px;">
+                <div class="k1-paddle-text">
+                  <span class="k1-sym" style="color:var(--cyan);">·</span>
+                  <span class="k1-name">點 Dit</span>
+                </div>
+                <span class="k1-badge">F</span>
+              </button>
+              <button class="k1-paddle-lever right paddle-btn" data-paddle="right" style="flex:1; height:74px;">
+                <div class="k1-paddle-text">
+                  <span class="k1-sym" style="color:var(--gold);">—</span>
+                  <span class="k1-name">劃 Dah</span>
+                </div>
+                <span class="k1-badge">J</span>
+              </button>
+            </div>
+          </div>
+
+          <!-- Subview 3: Bug Key Deck -->
+          <div class="k4-subview" id="k4-view-bug">
+            <div class="k4-bug-container">
+              <div class="k4-bug-paddle left paddle-btn" data-paddle="left">
+                <i class="mdi mdi-sine-wave spring-vibe-icon"></i>
+                <div style="display:flex; flex-direction:column;">
+                  <span style="font-weight:700; color:var(--cyan);">機械連點 (Dit)</span>
+                  <span style="font-size:0.68rem; color:#889;">彈簧阻尼震動 (F)</span>
+                </div>
+              </div>
+              <div class="k4-bug-paddle right paddle-btn" data-paddle="right">
+                <i class="mdi mdi-hand-pointing-right" style="font-size:1.6rem; color:var(--gold);"></i>
+                <div style="display:flex; flex-direction:column;">
+                  <span style="font-weight:700; color:var(--gold);">手動控制 (Dah)</span>
+                  <span style="font-size:0.68rem; color:#889;">手感長音 (J)</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </footer>
+    </div>
+
+    <!-- ====================================================================
+         VARIANT K5: HYBRID ERGONOMIC MORPHING DECK (K2+K4 融合工學變形座)
+         ==================================================================== -->
+    <div id="variant-K5" class="variant-view">
+      <header class="va-topbar">
+        <div class="va-brand">
+          <svg class="brand-mark" viewBox="0 0 36 36" fill="none"><polygon points="18,2 33,10.5 33,25.5 18,34 3,25.5 3,10.5" stroke="#00e5ff" stroke-width="1.8" fill="#101520"/><circle cx="12" cy="18" r="3.2" fill="#ffd700"/><rect x="19" y="15.8" width="8.5" height="4.4" rx="2.2" fill="#00e5ff"/></svg>
+          <span>Morse Trainulator</span>
+          <span class="va-brand-tag" style="color:var(--gold); border-color:var(--border-gold); background:rgba(255,215,0,0.1);">方案 K5: K2+K4 融合座</span>
+        </div>
+        <div class="va-workspace-nav">
+          <button class="va-ws-btn active"><i class="mdi mdi-flash"></i> 發報實戰</button>
+          <button class="va-ws-btn"><i class="mdi mdi-headphones"></i> 聽力抄收</button>
+        </div>
+      </header>
+      <main class="va-stage">
+        <div class="stage-center-box">
+          <!-- A3 Central Radar Halo -->
+          <div class="a3-halo-stage">
+            <svg class="a3-halo-svg" viewBox="0 0 200 200">
+              <circle class="halo-bg-ring" cx="100" cy="100" r="70"/>
+              <circle class="halo-bg-ring" cx="100" cy="100" r="85"/>
+              <circle class="halo-press-arc press-arc-el" cx="100" cy="100" r="70"/>
+              <circle class="halo-gap-arc gap-arc-el" cx="100" cy="100" r="85"/>
+              <circle class="halo-gate-dot" cx="25.5" cy="140.9" r="3.5" title="3T 結算點"/>
+              <circle class="halo-gate-dot" cx="180.8" cy="73.7" r="3.5" title="7T 空格點"/>
+            </svg>
+            <div class="a3-halo-inner">
+              <div class="hud-char-large char-target">K</div>
+              <div class="hud-seq-code seq-target">— · —</div>
+            </div>
+          </div>
+          <div class="hud-status-line status-line-el" id="k5-device-desc">中島微型切換電鍵 · 拇指工學翼動態變形 (零額外高度)</div>
+          <div class="hud-committed-stream">CQ CQ CQ DE BV2AB K</div>
+        </div>
+      </main>
+      <footer class="va-keyer-dock">
+        <div class="k5-dock-container">
+          <!-- Left Ergonomic Wing (Adaptive) -->
+          <div class="k2-thumb-wing left paddle-btn" id="k5-wing-left" data-paddle="left">
+            <span class="k2-wing-symbol" id="k5-left-sym" style="color:var(--cyan);">·</span>
+            <span class="k2-wing-title" id="k5-left-title">點 Dit</span>
+            <span class="k2-wing-hint" id="k5-left-hint">鍵盤 F / 點擊</span>
+          </div>
+
+          <!-- Center Smart Island (Zero Extra Height!) -->
+          <div class="k5-center-smart-island">
+            <!-- Tri-Mode Segmented Capsule -->
+            <div class="k5-device-capsule">
+              <button class="k5-dev-pill active" data-mode="paddle" title="雙撥片 (Iambic)"><i class="mdi mdi-tune-vertical"></i></button>
+              <button class="k5-dev-pill" data-mode="straight" title="直鍵 (Straight Key)"><i class="mdi mdi-radiobox-marked"></i></button>
+              <button class="k5-dev-pill" data-mode="bug" title="機械震報鍵 (Bug)"><i class="mdi mdi-metronome"></i></button>
+            </div>
+            <!-- WPM Stepper -->
+            <div class="k2-island-pill">
+              <button class="k2-island-btn" id="k5-wpm-minus">-</button>
+              <span id="k5-wpm-val" style="color:var(--gold); font-weight:700;">20 WPM</span>
+              <button class="k2-island-btn" id="k5-wpm-plus">+</button>
+            </div>
+            <!-- Dynamic Mode Indicator Badge -->
+            <span class="k5-mode-badge" id="k5-mode-badge">雙撥片 Mode B</span>
+          </div>
+
+          <!-- Right Ergonomic Wing (Adaptive) -->
+          <div class="k2-thumb-wing right paddle-btn" id="k5-wing-right" data-paddle="right">
+            <span class="k2-wing-symbol" id="k5-right-sym" style="color:var(--gold);">—</span>
+            <span class="k2-wing-title" id="k5-right-title">劃 Dah</span>
+            <span class="k2-wing-hint" id="k5-right-hint">鍵盤 J / 點擊</span>
+          </div>
+        </div>
+      </footer>
+    </div>
+
+  </div>
+
+  <script>
+    // ==========================================================================
+    // AUDIO ENGINE (Web Audio API)
+    // ==========================================================================
+    let audioCtx = null;
+    let activeOsc = null;
+    let activeGain = null;
+
+    function startAudioTone(freq = 700) {
+      try {
+        if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        if (audioCtx.state === 'suspended') audioCtx.resume();
+        if (activeOsc) return;
+
+        activeOsc = audioCtx.createOscillator();
+        activeGain = audioCtx.createGain();
+        activeOsc.type = 'sine';
+        activeOsc.frequency.setValueAtTime(freq, audioCtx.currentTime);
+
+        activeGain.gain.setValueAtTime(0.001, audioCtx.currentTime);
+        activeGain.gain.exponentialRampToValueAtTime(0.18, audioCtx.currentTime + 0.006);
+
+        activeOsc.connect(activeGain);
+        activeGain.connect(audioCtx.destination);
+        activeOsc.start();
+      } catch (_) {}
+    }
+
+    function stopAudioTone() {
+      try {
+        if (activeOsc && activeGain && audioCtx) {
+          activeGain.gain.setValueAtTime(activeGain.gain.value, audioCtx.currentTime);
+          activeGain.gain.exponentialRampToValueAtTime(0.0001, audioCtx.currentTime + 0.008);
+          const oldOsc = activeOsc;
+          setTimeout(() => {
+            try { oldOsc.stop(); oldOsc.disconnect(); } catch (_) {}
+          }, 12);
+          activeOsc = null;
+          activeGain = null;
+        }
+      } catch (_) {}
+    }
+
+    // ==========================================================================
+    // A3 RADAR HALO TIMING CONTROLLER
+    // ==========================================================================
+    let pressTimer = null;
+    let gapTimer = null;
+    let pressStartTime = 0;
+    let gapStartTime = 0;
+    let currentWpm = 20;
+
+    function getUnitT() {
+      return Math.round(1200 / currentWpm); // e.g. 60ms at 20 WPM
+    }
+
+    function updateAllStatus(text, color = 'var(--text-dim)') {
+      document.querySelectorAll('.status-line-el').forEach(el => {
+        el.innerHTML = text;
+        el.style.color = color;
+      });
+    }
+
+    function startPressAnim(isDah = false) {
+      if (pressTimer) cancelAnimationFrame(pressTimer);
+      if (gapTimer) cancelAnimationFrame(gapTimer);
+      pressStartTime = performance.now();
+      const unitT = getUnitT();
+      const targetDuration = isDah ? unitT * 3 : unitT;
+
+      // Reset Gap Arcs
+      document.querySelectorAll('.gap-arc-el').forEach(arc => {
+        arc.style.strokeDashoffset = '534';
+      });
+
+      // LED Flash for K1
+      const ledDit = document.getElementById('k1-led-dit');
+      const ledDah = document.getElementById('k1-led-dah');
+      if (ledDit && !isDah) { ledDit.classList.add('active-cyan'); setTimeout(() => ledDit.classList.remove('active-cyan'), 120); }
+      if (ledDah && isDah) { ledDah.classList.add('active-gold'); setTimeout(() => ledDah.classList.remove('active-gold'), 180); }
+
+      function frame() {
+        const elapsed = Math.round(performance.now() - pressStartTime);
+        const pct = Math.min(100, (elapsed / (unitT * 3.2)) * 100);
+        const offset = 440 - (440 * (pct / 100));
+
+        document.querySelectorAll('.press-arc-el').forEach(arc => {
+          arc.style.strokeDashoffset = offset;
+          arc.style.stroke = isDah ? 'var(--gold)' : 'var(--cyan)';
+        });
+
+        updateAllStatus(`發報中: <span style="color:${isDah ? 'var(--gold)' : 'var(--cyan)'}; font-weight:bold;">${isDah ? '— DAH' : '· DIT'}</span> (${elapsed}ms)`);
+
+        if (elapsed < targetDuration) {
+          pressTimer = requestAnimationFrame(frame);
+        } else {
+          stopPressAnim(targetDuration, isDah);
+        }
+      }
+      pressTimer = requestAnimationFrame(frame);
+    }
+
+    function stopPressAnim(duration, isDah) {
+      if (pressTimer) cancelAnimationFrame(pressTimer);
+      document.querySelectorAll('.press-arc-el').forEach(arc => {
+        arc.style.strokeDashoffset = '440';
+      });
+      startGapAnim();
+    }
+
+    function startGapAnim() {
+      gapStartTime = performance.now();
+      const unitT = getUnitT();
+      const letterGap = unitT * 3; // 180ms
+      const wordGap = unitT * 7;   // 420ms
+      const maxGapScale = 430;
+
+      function frame() {
+        const elapsed = Math.round(performance.now() - gapStartTime);
+        const pct = Math.min(100, (elapsed / maxGapScale) * 100);
+        const offset = 534 - (534 * (pct / 100));
+
+        const gapArcs = document.querySelectorAll('.gap-arc-el');
+        if (elapsed < letterGap) {
+          gapArcs.forEach(arc => {
+            arc.style.strokeDashoffset = offset;
+            arc.style.stroke = '#2c394c';
+          });
+          updateAllStatus(`間隔計時: ${elapsed}ms`);
+        } else if (elapsed < wordGap) {
+          gapArcs.forEach(arc => {
+            arc.style.strokeDashoffset = offset;
+            arc.style.stroke = 'var(--gold)';
+          });
+          updateAllStatus(`<span style="color:var(--gold); font-weight:bold;">⚡ 字母結算 (3T: ${elapsed}ms)</span>`);
+        } else {
+          gapArcs.forEach(arc => {
+            arc.style.strokeDashoffset = offset;
+            arc.style.stroke = 'var(--cyan)';
+          });
+          updateAllStatus(`<span style="color:var(--cyan); font-weight:bold;">␣ 單字空格結算 (7T: ${elapsed}ms)</span>`);
+          return;
+        }
+
+        gapTimer = requestAnimationFrame(frame);
+      }
+      gapTimer = requestAnimationFrame(frame);
+    }
+
+    // Demo Letters Sequence
+    const demoLetters = [
+      { c: 'K', s: '— · —' },
+      { c: 'M', s: '— —' },
+      { c: 'R', s: '· — ·' },
+      { c: 'S', s: '· · ·' },
+      { c: 'O', s: '— — —' },
+      { c: 'A', s: '· —' },
+      { c: 'W', s: '· — —' }
+    ];
+    let demoIndex = 0;
+    function triggerNextDemoChar() {
+      demoIndex = (demoIndex + 1) % demoLetters.length;
+      const item = demoLetters[demoIndex];
+      document.querySelectorAll('.char-target').forEach(el => el.textContent = item.c);
+      document.querySelectorAll('.seq-target').forEach(el => el.textContent = item.s);
+    }
+
+    // Handle user keying press
+    function triggerPaddle(isDah = false) {
+      startAudioTone(700);
+      startPressAnim(isDah);
+      setTimeout(() => stopAudioTone(), isDah ? 180 : 60);
+      triggerNextDemoChar();
+    }
+
+    // Straight Key manual hold
+    let straightPressStart = 0;
+    let straightHoldTimer = null;
+    function startStraightPress() {
+      straightPressStart = performance.now();
+      startAudioTone(700);
+      if (gapTimer) cancelAnimationFrame(gapTimer);
+      document.querySelectorAll('.gap-arc-el').forEach(arc => arc.style.strokeDashoffset = '534');
+
+      function loop() {
+        const dur = Math.round(performance.now() - straightPressStart);
+        const unitT = getUnitT();
+        const isDah = dur >= unitT * 2;
+        const pct = Math.min(100, (dur / (unitT * 3.5)) * 100);
+        const offset = 440 - (440 * (pct / 100));
+
+        document.querySelectorAll('.press-arc-el').forEach(arc => {
+          arc.style.strokeDashoffset = offset;
+          arc.style.stroke = isDah ? 'var(--gold)' : 'var(--cyan)';
+        });
+        updateAllStatus(`直鍵按住: <span style="color:${isDah ? 'var(--gold)' : 'var(--cyan)'}; font-weight:bold;">${isDah ? '— 長劃' : '· 短點'}</span> (${dur}ms)`);
+        straightHoldTimer = requestAnimationFrame(loop);
+      }
+      straightHoldTimer = requestAnimationFrame(loop);
+    }
+
+    function stopStraightPress() {
+      if (straightHoldTimer) cancelAnimationFrame(straightHoldTimer);
+      stopAudioTone();
+      document.querySelectorAll('.press-arc-el').forEach(arc => arc.style.strokeDashoffset = '440');
+      startGapAnim();
+      triggerNextDemoChar();
+    }
+
+    // Bind paddle elements
+    document.querySelectorAll('.paddle-btn').forEach(btn => {
+      const isStraight = btn.dataset.keytype === 'straight';
+      const isDah = btn.dataset.paddle === 'right';
+
+      btn.addEventListener('pointerdown', (e) => {
+        e.preventDefault();
+        btn.classList.add('active');
+        if (isStraight) {
+          startStraightPress();
+        } else {
+          triggerPaddle(isDah);
+        }
+      });
+
+      btn.addEventListener('pointerup', () => {
+        btn.classList.remove('active');
+        if (isStraight) stopStraightPress();
+      });
+      btn.addEventListener('pointercancel', () => {
+        btn.classList.remove('active');
+        if (isStraight) stopStraightPress();
+      });
+    });
+
+    // Keyboard bindings (F = Dit, J = Dah, Space = Straight)
+    window.addEventListener('keydown', (e) => {
+      if (e.repeat) return;
+      const activeVariant = document.querySelector('.variant-view.active');
+      if (!activeVariant) return;
+
+      if (e.code === 'KeyF' || e.key === 'f') {
+        const left = activeVariant.querySelector('.paddle-btn[data-paddle="left"]');
+        if (left) {
+          left.classList.add('active');
+          triggerPaddle(false);
+        }
+      } else if (e.code === 'KeyJ' || e.key === 'j') {
+        const right = activeVariant.querySelector('.paddle-btn[data-paddle="right"]');
+        if (right) {
+          right.classList.add('active');
+          triggerPaddle(true);
+        }
+      } else if (e.code === 'Space' || e.key === ' ') {
+        const straight = activeVariant.querySelector('.paddle-btn[data-keytype="straight"]');
+        if (straight) {
+          e.preventDefault();
+          straight.classList.add('active');
+          startStraightPress();
+        }
+      }
+    });
+
+    window.addEventListener('keyup', (e) => {
+      const activeVariant = document.querySelector('.variant-view.active');
+      if (!activeVariant) return;
+
+      if (e.code === 'KeyF' || e.key === 'f') {
+        const left = activeVariant.querySelector('.paddle-btn[data-paddle="left"]');
+        if (left) left.classList.remove('active');
+      } else if (e.code === 'KeyJ' || e.key === 'j') {
+        const right = activeVariant.querySelector('.paddle-btn[data-paddle="right"]');
+        if (right) right.classList.remove('active');
+      } else if (e.code === 'Space' || e.key === ' ') {
+        const straight = activeVariant.querySelector('.paddle-btn[data-keytype="straight"]');
+        if (straight) {
+          straight.classList.remove('active');
+          stopStraightPress();
+        }
+      }
+    });
+
+    // K2 Speed Island Controls
+    const wpmEl = document.getElementById('k2-wpm-val');
+    document.getElementById('k2-wpm-minus')?.addEventListener('click', () => {
+      currentWpm = Math.max(10, currentWpm - 1);
+      if (wpmEl) wpmEl.textContent = `${currentWpm} WPM`;
+    });
+    document.getElementById('k2-wpm-plus')?.addEventListener('click', () => {
+      currentWpm = Math.min(40, currentWpm + 1);
+      if (wpmEl) wpmEl.textContent = `${currentWpm} WPM`;
+    });
+
+
+    // K5 Adaptive Morphing Island Controls
+    const k5LeftWing = document.getElementById('k5-wing-left');
+    const k5RightWing = document.getElementById('k5-wing-right');
+    const k5LeftSym = document.getElementById('k5-left-sym');
+    const k5LeftTitle = document.getElementById('k5-left-title');
+    const k5LeftHint = document.getElementById('k5-left-hint');
+    const k5RightSym = document.getElementById('k5-right-sym');
+    const k5RightTitle = document.getElementById('k5-right-title');
+    const k5RightHint = document.getElementById('k5-right-hint');
+    const k5ModeBadge = document.getElementById('k5-mode-badge');
+    const k5Desc = document.getElementById('k5-device-desc');
+
+    document.querySelectorAll('.k5-dev-pill').forEach(pill => {
+      pill.addEventListener('click', () => {
+        document.querySelectorAll('.k5-dev-pill').forEach(p => p.classList.remove('active'));
+        pill.classList.add('active');
+        const mode = pill.dataset.mode;
+
+        if (mode === 'paddle') {
+          k5LeftWing.dataset.keytype = '';
+          k5LeftWing.dataset.paddle = 'left';
+          k5LeftWing.style.borderLeft = '3px solid var(--cyan)';
+          k5LeftWing.style.borderBottom = '3px solid var(--cyan)';
+          k5LeftSym.textContent = '·';
+          k5LeftSym.style.color = 'var(--cyan)';
+          k5LeftTitle.textContent = '點 Dit';
+          k5LeftHint.textContent = '鍵盤 F / 點擊';
+
+          k5RightWing.dataset.keytype = '';
+          k5RightWing.dataset.paddle = 'right';
+          k5RightWing.style.borderRight = '3px solid var(--gold)';
+          k5RightWing.style.borderBottom = '3px solid var(--gold)';
+          k5RightSym.textContent = '—';
+          k5RightSym.style.color = 'var(--gold)';
+          k5RightTitle.textContent = '劃 Dah';
+          k5RightHint.textContent = '鍵盤 J / 點擊';
+
+          if (k5ModeBadge) k5ModeBadge.textContent = '雙撥片 Mode B';
+          if (k5Desc) k5Desc.textContent = '雙撥片模式 · 左右夾發 (F=Dit, J=Dah)';
+        } else if (mode === 'straight') {
+          k5LeftWing.dataset.keytype = 'straight';
+          k5LeftWing.dataset.paddle = '';
+          k5LeftWing.style.borderLeft = '3px solid var(--gold)';
+          k5LeftWing.style.borderBottom = '3px solid var(--gold)';
+          k5LeftSym.innerHTML = '<i class="mdi mdi-ray-vertex"></i>';
+          k5LeftSym.style.color = 'var(--gold)';
+          k5LeftTitle.textContent = '直鍵 (左手)';
+          k5LeftHint.textContent = '空白鍵 / 點擊長短音';
+
+          k5RightWing.dataset.keytype = 'straight';
+          k5RightWing.dataset.paddle = '';
+          k5RightWing.style.borderRight = '3px solid var(--gold)';
+          k5RightWing.style.borderBottom = '3px solid var(--gold)';
+          k5RightSym.innerHTML = '<i class="mdi mdi-ray-vertex"></i>';
+          k5RightSym.style.color = 'var(--gold)';
+          k5RightTitle.textContent = '直鍵 (右手)';
+          k5RightHint.textContent = '空白鍵 / 點擊長短音';
+
+          if (k5ModeBadge) k5ModeBadge.textContent = '直鍵手電鍵';
+          if (k5Desc) k5Desc.textContent = '直鍵模式 · 雙手拇指均可手控長短音 (空白鍵 / 觸控)';
+        } else if (mode === 'bug') {
+          k5LeftWing.dataset.keytype = '';
+          k5LeftWing.dataset.paddle = 'left';
+          k5LeftWing.style.borderLeft = '3px solid var(--cyan)';
+          k5LeftWing.style.borderBottom = '3px solid var(--cyan)';
+          k5LeftSym.innerHTML = '<i class="mdi mdi-sine-wave"></i>';
+          k5LeftSym.style.color = 'var(--cyan)';
+          k5LeftTitle.textContent = '機械連點';
+          k5LeftHint.textContent = '彈簧震動 Dit (F)';
+
+          k5RightWing.dataset.keytype = '';
+          k5RightWing.dataset.paddle = 'right';
+          k5RightWing.style.borderRight = '3px solid var(--gold)';
+          k5RightWing.style.borderBottom = '3px solid var(--gold)';
+          k5RightSym.innerHTML = '<i class="mdi mdi-hand-pointing-right"></i>';
+          k5RightSym.style.color = 'var(--gold)';
+          k5RightTitle.textContent = '手動長音';
+          k5RightHint.textContent = '手動長劃 Dah (J)';
+
+          if (k5ModeBadge) k5ModeBadge.textContent = '震報鍵 Bug';
+          if (k5Desc) k5Desc.textContent = '機械震報鍵 · 左彈簧連點 / 右手動長劃';
+        }
+      });
+    });
+
+    // K5 WPM Stepper
+    const k5WpmEl = document.getElementById('k5-wpm-val');
+    document.getElementById('k5-wpm-minus')?.addEventListener('click', () => {
+      currentWpm = Math.max(10, currentWpm - 1);
+      if (k5WpmEl) k5WpmEl.textContent = `${currentWpm} WPM`;
+      if (wpmEl) wpmEl.textContent = `${currentWpm} WPM`;
+    });
+    document.getElementById('k5-wpm-plus')?.addEventListener('click', () => {
+      currentWpm = Math.min(40, currentWpm + 1);
+      if (k5WpmEl) k5WpmEl.textContent = `${currentWpm} WPM`;
+      if (wpmEl) wpmEl.textContent = `${currentWpm} WPM`;
+    });
+
+    // K4 Subview Switcher
+    const k4DescMap = {
+      'straight': '直鍵模式 · 按住發報 (空白鍵 / 點擊長短音)',
+      'paddle': '雙撥片模式 · 左右夾發 (Iambic Mode B)',
+      'bug': '機械震報鍵 · 左彈簧連點 / 右手動長劃'
+    };
+    document.querySelectorAll('.k4-tab-btn').forEach(tab => {
+      tab.addEventListener('click', () => {
+        document.querySelectorAll('.k4-tab-btn').forEach(b => b.classList.remove('active'));
+        tab.classList.add('active');
+        const sub = tab.dataset.subview;
+        document.querySelectorAll('.k4-subview').forEach(v => v.classList.remove('active'));
+        const targetView = document.getElementById(`k4-view-${sub}`);
+        if (targetView) targetView.classList.add('active');
+        const desc = document.getElementById('k4-device-desc');
+        if (desc && k4DescMap[sub]) desc.textContent = k4DescMap[sub];
+      });
+    });
+
+    // ==========================================================================
+    // PROTOTYPE SWITCHER (K1 ~ K4)
+    // ==========================================================================
+    const VARIANTS = [
+      { id: 'K5', name: '方案 K5: 雙翼變形工學座 (K2+K4 融合推薦)' },
+      { id: 'K2', name: '方案 K2: 行動端拇指工學翼 (Ergonomic Thumb Wings)' },
+      { id: 'K4', name: '方案 K4: 三合一多重電鍵變形座 (Morphing Tri-Key Deck)' },
+      { id: 'K1', name: '方案 K1: 電台儀表擬真雙撥片 (Console Paddles)' },
+      { id: 'K3', name: '方案 K3: 霓虹全域電容感應板 (Full-Width Neon Rails)' }
+    ];
+
+    function getVariantFromUrl() {
+      const p = new URLSearchParams(window.location.search);
+      const v = p.get('variant');
+      return VARIANTS.some(item => item.id === v) ? v : 'K5';
+    }
+
+    function setVariant(id) {
+      const url = new URL(window.location);
+      url.searchParams.set('variant', id);
+      window.history.replaceState({}, '', url);
+
+      document.querySelectorAll('.variant-view').forEach(el => el.classList.remove('active'));
+      const activeEl = document.getElementById(`variant-${id}`);
+      if (activeEl) activeEl.classList.add('active');
+
+      const vInfo = VARIANTS.find(x => x.id === id);
+      const label = document.getElementById('proto-active-label');
+      if (label && vInfo) label.textContent = vInfo.name;
+    }
+
+    setVariant(getVariantFromUrl());
+
+    function cycleVariant(delta) {
+      const cur = getVariantFromUrl();
+      let idx = VARIANTS.findIndex(x => x.id === cur);
+      idx = (idx + delta + VARIANTS.length) % VARIANTS.length;
+      setVariant(VARIANTS[idx].id);
+    }
+
+    document.getElementById('btn-proto-prev').addEventListener('click', () => cycleVariant(-1));
+    document.getElementById('btn-proto-next').addEventListener('click', () => cycleVariant(1));
+
+    window.addEventListener('keydown', (e) => {
+      if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return;
+      if (e.key === 'ArrowLeft') {
+        cycleVariant(-1);
+      } else if (e.key === 'ArrowRight') {
+        cycleVariant(1);
+      }
+    });
+  </script>
+</body>
+</html>
