@@ -5662,6 +5662,16 @@
         }
 
         const char = textState.targetChars[textState.currentIndex];
+        const hudChar = document.getElementById('hud-char-target');
+        const hudSeq = document.getElementById('hud-seq-target');
+        if (hudChar && char) {
+          hudChar.textContent = (char === ' ') ? '␣' : char;
+        }
+        if (hudSeq && char) {
+          const seq = (char === ' ') ? '7T' : (engine ? (engine.getSequenceForLetter(char) || '') : '');
+          hudSeq.textContent = seq;
+        }
+
         if (char === ' ') {
           fbTarget.textContent = '單字空格 (Word Gap)';
         } else {
@@ -6791,6 +6801,15 @@
 
       if (idx < total) {
         const target = kochState.targetChars[idx];
+        const hudChar = document.getElementById('hud-char-target');
+        const hudSeq = document.getElementById('hud-seq-target');
+        if (hudChar && target) {
+          hudChar.textContent = target;
+        }
+        if (hudSeq && target) {
+          hudSeq.textContent = kochState.showHints ? (engine ? (engine.getSequenceForLetter(target) || '') : '') : '';
+        }
+
         if (kochFbTarget) {
           kochFbTarget.textContent = kochState.showHints
             ? `${target} (${engine ? (engine.getSequenceForLetter(target) || '') : ''})`
