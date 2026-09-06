@@ -2129,6 +2129,43 @@
   word-break: break-all;
 }
 
+
+/* ==========================================================================
+   Stage View Switcher (Tree View / Focus HUD / Telemetry View)
+   ========================================================================== */
+.stage-view-switcher {
+  display: flex;
+  gap: 6px;
+  background: #0b0c10;
+  padding: 3px;
+  border-radius: 8px;
+  border: 1px solid #232936;
+  margin-top: 10px;
+}
+.stage-view-btn {
+  padding: 6px 14px;
+  border: none;
+  background: transparent;
+  color: var(--text-muted);
+  font-size: 0.82rem;
+  font-weight: 600;
+  border-radius: 6px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  transition: all 0.15s ease;
+}
+.stage-view-btn:hover {
+  color: #fff;
+  background: rgba(255, 255, 255, 0.05);
+}
+.stage-view-btn.active {
+  background: #1e2430;
+  color: var(--neon-blue);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+}
+
   </style>
 </head>
 <body>
@@ -2168,6 +2205,19 @@
   <div id="ws-container-tx" class="workspace-view active">
     <div class="header-subbar">
       <div class="subtitle">電報模擬與練習工具 · 支援直鍵 / 雙撥片 / 機械震報鍵 · PCB 二元樹尋路 · 節奏儀表</div>
+
+      <!-- Stage View Switcher (Tree / Focus HUD / Telemetry) -->
+      <div class="stage-view-switcher" id="stage-view-switcher">
+        <button type="button" class="stage-view-btn active" id="view-tab-tree" data-view="tree" title="PCB 二元樹尋路視圖">
+          <i class="mdi mdi-sitemap"></i> <span>二元樹 (Tree)</span>
+        </button>
+        <button type="button" class="stage-view-btn" id="view-tab-focus" data-view="focus" title="A3 雷達光環專注視圖">
+          <i class="mdi mdi-target"></i> <span>專注 (Focus HUD)</span>
+        </button>
+        <button type="button" class="stage-view-btn" id="view-tab-telemetry" data-view="telemetry" title="電報示波儀表視圖">
+          <i class="mdi mdi-sine-wave"></i> <span>示波儀表 (Telemetry)</span>
+        </button>
+      </div>
       <div class="layout-switch-container">
         <button type="button" class="layout-switch-btn active" id="btn-layout-2col" title="切換為雙欄專注佈局">
           <span><i class="mdi mdi-view-column"></i> 雙欄專注</span>
@@ -2180,7 +2230,7 @@
 
 
     <!-- Zone 2: Focus HUD Stage (A3 Center Radar Halo) -->
-    <div id="focus-hud-stage" class="focus-hud-stage">
+    <div id="focus-hud-stage" class="focus-hud-stage" style="display:none;">
       <div class="a3-halo-stage">
         <svg class="a3-halo-svg" viewBox="0 0 200 200">
           <circle class="halo-bg-ring" cx="100" cy="100" r="70" />
@@ -8065,6 +8115,66 @@ function updateK5MorphingUI() {
   }
 }
 
+    
+// ----------------------------------------------------
+// Stage View Switcher Controller (Tree / Focus / Telemetry)
+// ----------------------------------------------------
+function setupStageViewSwitching() {
+  const tabs = [
+    { id: 'view-tab-tree', view: 'tree' },
+    { id: 'view-tab-focus', view: 'focus' },
+    { id: 'view-tab-telemetry', view: 'telemetry' }
+  ];
+
+  tabs.forEach(t => {
+    const btn = document.getElementById(t.id);
+    if (!btn) return;
+    btn.addEventListener('click', () => setStageView(t.view));
+  });
+
+  if (typeof settingsManager !== 'undefined' && settingsManager.settings && settingsManager.settings.stageView) {
+    setStageView(settingsManager.settings.stageView);
+  }
+}
+
+function setStageView(view) {
+  const btnTree = document.getElementById('view-tab-tree');
+  const btnFocus = document.getElementById('view-tab-focus');
+  const btnTelemetry = document.getElementById('view-tab-telemetry');
+  const focusStage = document.getElementById('focus-hud-stage');
+  const colHardware = document.getElementById('col-hardware');
+  const meterPanel = document.getElementById('meter-panel');
+
+  if (btnTree) btnTree.classList.toggle('active', view === 'tree');
+  if (btnFocus) btnFocus.classList.toggle('active', view === 'focus');
+  if (btnTelemetry) btnTelemetry.classList.toggle('active', view === 'telemetry');
+
+  if (view === 'focus') {
+    if (focusStage) focusStage.style.display = 'flex';
+    if (colHardware) colHardware.style.display = 'none';
+  } else if (view === 'telemetry') {
+    if (focusStage) focusStage.style.display = 'none';
+    if (colHardware) colHardware.style.display = 'none';
+    if (meterPanel) meterPanel.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+  } else {
+    // Default 'tree'
+    if (focusStage) focusStage.style.display = 'none';
+    if (colHardware) colHardware.style.display = 'flex';
+  }
+
+  setTimeout(() => {
+    const ribbonCanvas = document.getElementById('cw-ribbon');
+    if (ribbonCanvas && ribbonCanvas.parentElement) {
+      ribbonCanvas.width = ribbonCanvas.parentElement.clientWidth || 500;
+    }
+  }, 50);
+
+  if (typeof settingsManager !== 'undefined' && settingsManager.settings) {
+    settingsManager.settings.stageView = view;
+    settingsManager.save();
+  }
+}
+
     function setupWorkspaceNavigation() {
       const wsTabs = [
         { btnId: 'ws-tab-tx', viewId: 'ws-container-tx' },
@@ -8155,6 +8265,7 @@ function updateK5MorphingUI() {
     // Startup
     setupWorkspaceNavigation();
     setupK5Dock();
+    setupStageViewSwitching();
     renderCardSvg();
     applyLoadedSettings();
     setupScenarios();

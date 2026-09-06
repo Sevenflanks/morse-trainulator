@@ -62,6 +62,19 @@
   <div id="ws-container-tx" class="workspace-view active">
     <div class="header-subbar">
       <div class="subtitle">電報模擬與練習工具 · 支援直鍵 / 雙撥片 / 機械震報鍵 · PCB 二元樹尋路 · 節奏儀表</div>
+
+      <!-- Stage View Switcher (Tree / Focus HUD / Telemetry) -->
+      <div class="stage-view-switcher" id="stage-view-switcher">
+        <button type="button" class="stage-view-btn active" id="view-tab-tree" data-view="tree" title="PCB 二元樹尋路視圖">
+          <i class="mdi mdi-sitemap"></i> <span>二元樹 (Tree)</span>
+        </button>
+        <button type="button" class="stage-view-btn" id="view-tab-focus" data-view="focus" title="A3 雷達光環專注視圖">
+          <i class="mdi mdi-target"></i> <span>專注 (Focus HUD)</span>
+        </button>
+        <button type="button" class="stage-view-btn" id="view-tab-telemetry" data-view="telemetry" title="電報示波儀表視圖">
+          <i class="mdi mdi-sine-wave"></i> <span>示波儀表 (Telemetry)</span>
+        </button>
+      </div>
       <div class="layout-switch-container">
         <button type="button" class="layout-switch-btn active" id="btn-layout-2col" title="切換為雙欄專注佈局">
           <span><i class="mdi mdi-view-column"></i> 雙欄專注</span>
@@ -74,7 +87,7 @@
 
 
     <!-- Zone 2: Focus HUD Stage (A3 Center Radar Halo) -->
-    <div id="focus-hud-stage" class="focus-hud-stage">
+    <div id="focus-hud-stage" class="focus-hud-stage" style="display:none;">
       <div class="a3-halo-stage">
         <svg class="a3-halo-svg" viewBox="0 0 200 200">
           <circle class="halo-bg-ring" cx="100" cy="100" r="70" />

@@ -1467,6 +1467,7 @@ function initApp() {
   initDomReferences();
   setupWorkspaceNavigation();
   setupK5Dock();
+  setupStageViewSwitching();
   ribbon = new CWRibbon('cw-ribbon', engine);
   window.ribbon = ribbon;
 
@@ -1756,6 +1757,66 @@ function updateK5MorphingUI() {
       if (rightHint) rightHint.textContent = '鍵盤 J / 點擊';
     }
     if (modeBadge) modeBadge.textContent = '雙撥片 Mode ' + (keyer.mode || 'B');
+  }
+}
+
+
+// ----------------------------------------------------
+// Stage View Switcher Controller (Tree / Focus / Telemetry)
+// ----------------------------------------------------
+function setupStageViewSwitching() {
+  const tabs = [
+    { id: 'view-tab-tree', view: 'tree' },
+    { id: 'view-tab-focus', view: 'focus' },
+    { id: 'view-tab-telemetry', view: 'telemetry' }
+  ];
+
+  tabs.forEach(t => {
+    const btn = document.getElementById(t.id);
+    if (!btn) return;
+    btn.addEventListener('click', () => setStageView(t.view));
+  });
+
+  if (typeof settingsManager !== 'undefined' && settingsManager.settings && settingsManager.settings.stageView) {
+    setStageView(settingsManager.settings.stageView);
+  }
+}
+
+function setStageView(view) {
+  const btnTree = document.getElementById('view-tab-tree');
+  const btnFocus = document.getElementById('view-tab-focus');
+  const btnTelemetry = document.getElementById('view-tab-telemetry');
+  const focusStage = document.getElementById('focus-hud-stage');
+  const colHardware = document.getElementById('col-hardware');
+  const meterPanel = document.getElementById('meter-panel');
+
+  if (btnTree) btnTree.classList.toggle('active', view === 'tree');
+  if (btnFocus) btnFocus.classList.toggle('active', view === 'focus');
+  if (btnTelemetry) btnTelemetry.classList.toggle('active', view === 'telemetry');
+
+  if (view === 'focus') {
+    if (focusStage) focusStage.style.display = 'flex';
+    if (colHardware) colHardware.style.display = 'none';
+  } else if (view === 'telemetry') {
+    if (focusStage) focusStage.style.display = 'none';
+    if (colHardware) colHardware.style.display = 'none';
+    if (meterPanel) meterPanel.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+  } else {
+    // Default 'tree'
+    if (focusStage) focusStage.style.display = 'none';
+    if (colHardware) colHardware.style.display = 'flex';
+  }
+
+  setTimeout(() => {
+    const ribbonCanvas = document.getElementById('cw-ribbon');
+    if (ribbonCanvas && ribbonCanvas.parentElement) {
+      ribbonCanvas.width = ribbonCanvas.parentElement.clientWidth || 500;
+    }
+  }, 50);
+
+  if (typeof settingsManager !== 'undefined' && settingsManager.settings) {
+    settingsManager.settings.stageView = view;
+    settingsManager.save();
   }
 }
 

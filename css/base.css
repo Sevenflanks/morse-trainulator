@@ -722,3 +722,40 @@ h1 {
   box-sizing: border-box;
   word-break: break-all;
 }
+
+
+/* ==========================================================================
+   Stage View Switcher (Tree View / Focus HUD / Telemetry View)
+   ========================================================================== */
+.stage-view-switcher {
+  display: flex;
+  gap: 6px;
+  background: #0b0c10;
+  padding: 3px;
+  border-radius: 8px;
+  border: 1px solid #232936;
+  margin-top: 10px;
+}
+.stage-view-btn {
+  padding: 6px 14px;
+  border: none;
+  background: transparent;
+  color: var(--text-muted);
+  font-size: 0.82rem;
+  font-weight: 600;
+  border-radius: 6px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  transition: all 0.15s ease;
+}
+.stage-view-btn:hover {
+  color: #fff;
+  background: rgba(255, 255, 255, 0.05);
+}
+.stage-view-btn.active {
+  background: #1e2430;
+  color: var(--neon-blue);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+}
