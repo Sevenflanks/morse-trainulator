@@ -789,13 +789,14 @@ h1 {
   .k2-wing-symbol {
     font-size: 1.5rem;
   }
-  .k2-wing-name {
+  .k2-wing-title {
     font-size: 0.75rem;
   }
   .k2-wing-hint {
     display: none;
   }
-  .k5-center-island {
+  #k5-center-island,
+  .k5-center-smart-island {
     padding: 4px 6px;
   }
   .settings-drawer {

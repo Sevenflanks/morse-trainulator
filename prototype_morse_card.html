@@ -2196,13 +2196,14 @@
   .k2-wing-symbol {
     font-size: 1.5rem;
   }
-  .k2-wing-name {
+  .k2-wing-title {
     font-size: 0.75rem;
   }
   .k2-wing-hint {
     display: none;
   }
-  .k5-center-island {
+  #k5-center-island,
+  .k5-center-smart-island {
     padding: 4px 6px;
   }
   .settings-drawer {
@@ -4512,6 +4513,15 @@
     const paramQrnVol = document.getElementById('param-qrn-vol');
     const tagQrnVol = document.getElementById('tag-qrn-vol');
 
+    // Top Bar & K5 Dock WPM Display Synchronization
+    function updateTopbarWpm(wpm) {
+      const valEl = document.getElementById('topbar-wpm-val');
+      if (valEl) valEl.textContent = wpm;
+      const k5WpmVal = document.getElementById('k5-wpm-val');
+      if (k5WpmVal) k5WpmVal.textContent = `${wpm} WPM`;
+    }
+    window.updateTopbarWpm = updateTopbarWpm;
+
     // Mode Switching Elements
     let currentMode = 'free'; // 'free' | 'text' | 'koch'
     const tabModeFree = document.getElementById('tab-mode-free');
@@ -4852,6 +4862,9 @@
 
       updateMeterMarkers();
 
+      const currentWpm = Math.round(1200 / p.unitT);
+      if (typeof updateTopbarWpm === 'function') updateTopbarWpm(currentWpm);
+
       if (saveToSettings && typeof settingsManager !== 'undefined') {
         settingsManager.settings.speedPreset = key;
         settingsManager.settings.unitT = p.unitT;
@@ -5040,6 +5053,8 @@
     function startMeterAnimation() {
       const startTime = engine.pressStartTime;
       const th = engine.getEffectiveThreshold();
+      const haloPressArc = document.getElementById('halo-press-arc');
+      const hudTimingStatus = document.getElementById('hud-timing-status');
 
       function frame() {
         if (!engine.isKeyDown) return;
@@ -5048,8 +5063,6 @@
         const pct = Math.min(100, (elapsed / maxMeterScale) * 100);
 
         meterBar.style.width = pct + '%';
-        const haloPressArc = document.getElementById('halo-press-arc');
-        const hudTimingStatus = document.getElementById('hud-timing-status');
         if (haloPressArc) {
           const pressPct = Math.min(100, (elapsed / maxMeterScale) * 100);
           const pressOffset = 440 - (440 * (pressPct / 100));
@@ -5155,6 +5168,7 @@
     function startGapCountdown() {
       if (gapAnimFrame) cancelAnimationFrame(gapAnimFrame);
       const haloGapArc = document.getElementById('halo-gap-arc');
+      const hudTimingStatus = document.getElementById('hud-timing-status');
       if (haloGapArc) haloGapArc.style.strokeDashoffset = '534';
       letterSettled = false;
       wordSettled = false;
@@ -5174,10 +5188,16 @@
         const pct = Math.min(100, (elapsed / maxGapScale) * 100);
 
         gapBar.style.width = pct + '%';
-        const haloGapArc = document.getElementById('halo-gap-arc');
-        const hudTimingStatus = document.getElementById('hud-timing-status');
         if (haloGapArc) {
-          const gapOffset = 534 - (534 * (pct / 100));
+          let haloGapPct = 0;
+          if (elapsed <= letterGap) {
+            haloGapPct = (elapsed / letterGap) * 42;
+          } else if (elapsed <= wordGap) {
+            haloGapPct = 42 + ((elapsed - letterGap) / (wordGap - letterGap)) * 53;
+          } else {
+            haloGapPct = Math.min(100, 95 + ((elapsed - wordGap) / (wordGap * 0.18)) * 5);
+          }
+          const gapOffset = 534 - (534 * (haloGapPct / 100));
           haloGapArc.style.strokeDashoffset = gapOffset;
           if (elapsed < letterGap) {
             haloGapArc.style.stroke = '#2c394c';
@@ -7460,6 +7480,8 @@
       engine.updateConfig({ unitT: val });
       tagUnitT.textContent = `${val}ms`;
       updateMeterMarkers();
+      const currentWpm = Math.round(1200 / val);
+      if (typeof updateTopbarWpm === 'function') updateTopbarWpm(currentWpm);
       if (typeof settingsManager !== 'undefined') {
         settingsManager.settings.unitT = val;
         settingsManager.settings.speedPreset = null;
@@ -7868,6 +7890,8 @@
           btn.classList.remove('active-preset');
         });
         updateMeterMarkers();
+        const currentWpm = Math.round(1200 / s.unitT);
+        if (typeof updateTopbarWpm === 'function') updateTopbarWpm(currentWpm);
       }
 
       // 2. CW Sidetone Frequency
@@ -7964,6 +7988,10 @@
       // 9. Layout Mode (2-Column Focus vs 3-Column Cockpit)
       if (s.layoutMode) {
         setLayoutMode(s.layoutMode);
+      }
+
+      if (typeof updateTopbarWpm === 'function' && engine && engine.config && engine.config.unitT) {
+        updateTopbarWpm(Math.round(1200 / engine.config.unitT));
       }
     }
 
@@ -8312,8 +8340,12 @@ function setStageView(view) {
           }
         });
       });
+    }
 
-      // Settings Drawer Toggle
+    // ----------------------------------------------------
+    // Settings Slide-up Drawer Controller
+    // ----------------------------------------------------
+    function setupSettingsDrawer() {
       const btnOpenSettings = document.getElementById('btn-open-settings');
       const btnCloseSettings = document.getElementById('btn-close-settings');
       const btnOpenSettingsTelemetry = document.getElementById('btn-open-settings-telemetry');
@@ -8345,10 +8377,7 @@ function setStageView(view) {
       if (btnOpenSettingsTelemetry) btnOpenSettingsTelemetry.addEventListener('click', openDrawer);
 
       // Sync WPM in Top Bar
-      window.updateTopbarWpm = function(wpm) {
-        const valEl = document.getElementById('topbar-wpm-val');
-        if (valEl) valEl.textContent = wpm;
-      };
+      window.updateTopbarWpm = updateTopbarWpm;
     }
 
     function setLayoutMode(mode) {
@@ -8385,6 +8414,7 @@ function setStageView(view) {
 
     // Startup
     setupWorkspaceNavigation();
+    setupSettingsDrawer();
     setupK5Dock();
     setupStageViewSwitching();
     renderCardSvg();
@@ -8392,7 +8422,6 @@ function setStageView(view) {
     setupScenarios();
     initTextModePassage(textInput.value || 'SOS CQ');
     updateKochUI();
-    applyLoadedSettings();
   </script>
 </body>
 </html>

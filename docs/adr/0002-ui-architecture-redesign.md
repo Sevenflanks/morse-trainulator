@@ -34,10 +34,11 @@ Accepted (已採納)
    - **專注 HUD 視圖 (Focus HUD)**：隱藏二元樹，提供極簡、高對比、大字號的盲打當前字元與文本流，專注於肌肉記憶與聽覺反射。
    - **電信示波視圖 (Telemetry View)**：呈現大面積 60FPS 示波帶與三軸時間差儀表，專供微調點劃比率與手感。
 
-4. **漸進式技術演進策略 (Progressive Library Strategy)**：
-   - 本系統主要運行與部署目標為 **GitHub Pages Web App**，行動端主要透過網頁瀏覽，放寬過往「本機完全無網 `file:///` 零依賴」之絕對限制。
-   - **Phase 1**：維持原生 Vanilla JS/CSS，引入輕量 CDN 版 GSAP 打造絲滑 60FPS 抽屜與視圖切換，不破壞既有核心邏輯與測試。
-   - **後續評估**：若後續聽寫與 QSO 通聯狀態複雜度持續提升，以 Phase 1 建立的乾淨元件階層作為基石，漸進過渡至現代化模組前端（如 React/Vue/Svelte + Tailwind/Vite）。
+4. **堅持零外部依賴與本機雙軌運行 (Zero-Dependency & Offline Execution)**：
+   - 恪守專案核心工程原則：系統完全以 100% 原生 Vanilla JS 與純 CSS 實現，不引入任何外部運行時框架或第三方動畫庫（如 GSAP）。
+   - 抽屜平滑開闔與視圖切換全數採用硬體加速 CSS transitions / transforms 與 requestAnimationFrame 實現 60FPS 絲滑動態。
+   - 保證 `index.html` 與 `prototype_morse_card.html` 在離線本機 `file:///` 環境下 100% 完整運作無虞，不依賴任何網路請求或 CDN。
+   - 後續擴展 Rx 與 QSO 工作台時，持續維持此零外部依賴與純原生標準。
 
 5. **品牌識別標誌 (Brand Mark)**：
    - 建立專屬向量 SVG Logo/Mark，融合摩斯電碼節奏（Dit/Dah）、電報電鍵與 PCB 導線意象，提升專業儀式感與產品辨識度。

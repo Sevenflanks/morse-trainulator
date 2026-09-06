@@ -116,6 +116,123 @@ console.log('\n4. Verifying Professional Telegraphic Terminology...');
   console.log(`   -> ${name} verified with professional telegraphic terminology!`);
 });
 
+// 5. Dynamic Controller Behaviors Verification (setWpmFromStepper, setStageView, updateTopbarWpm)
+console.log('\n5. Verifying Dynamic Controllers (setWpmFromStepper, setStageView, updateTopbarWpm)...');
+
+global.window = global;
+const mockElements = {};
+function createMockEl(id) {
+  return {
+    id,
+    style: {},
+    classList: {
+      _classes: new Set(),
+      add(cls) { this._classes.add(cls); },
+      remove(cls) { this._classes.delete(cls); },
+      toggle(cls, force) {
+        if (force !== undefined) {
+          if (force) this._classes.add(cls);
+          else this._classes.delete(cls);
+          return force;
+        }
+        if (this._classes.has(cls)) { this._classes.delete(cls); return false; }
+        this._classes.add(cls); return true;
+      },
+      contains(cls) { return this._classes.has(cls); }
+    },
+    value: '',
+    textContent: '',
+    innerHTML: '',
+    scrollIntoView() {}
+  };
+}
+
+const mockIds = [
+  'view-tab-tree', 'view-tab-focus', 'view-tab-telemetry',
+  'focus-hud-stage', 'col-hardware', 'meter-panel',
+  'k5-wpm-val', 'topbar-wpm-val', 'state-wpm', 'readout-wpm', 'meter-wpm-badge',
+  'param-unit-t', 'tag-unit-t', 'param-threshold', 'tag-threshold',
+  'param-gap', 'tag-gap', 'param-word-gap', 'tag-word-gap'
+];
+mockIds.forEach(id => {
+  mockElements[id] = createMockEl(id);
+});
+
+global.document = {
+  readyState: 'loading',
+  addEventListener: () => {},
+  getElementById: (id) => mockElements[id] || null,
+  querySelectorAll: () => []
+};
+
+global.MorseData = require('../js/core/morse-data');
+global.KEY_PROFILES = global.MorseData.KEY_PROFILES;
+global.MorseEngine = require('../js/core/morse-engine').MorseEngine;
+global.MorseAudio = require('../js/core/morse-audio').MorseAudio;
+global.IambicKeyer = require('../js/core/iambic-keyer').IambicKeyer;
+global.SettingsManager = require('../js/core/settings-manager').SettingsManager;
+global.KeybindingManager = require('../js/core/keybinding-manager').KeybindingManager;
+global.KochManager = require('../js/core/koch-manager').KochManager;
+
+const app = require('../js/app');
+const { setWpmFromStepper, setStageView, updateTopbarWpm, engine } = app;
+
+// 5a. Test setWpmFromStepper boundary clamping & timing calculations
+setWpmFromStepper(5); // Below 10 min -> clamped to 10
+assert.strictEqual(mockElements['k5-wpm-val'].textContent, '10 WPM');
+assert.strictEqual(mockElements['topbar-wpm-val'].textContent, 10);
+assert.strictEqual(engine.config.unitT, 120); // 1200 / 10
+assert.strictEqual(engine.config.threshold, 240); // 2 * 120
+assert.strictEqual(engine.config.letterGap, 360); // 3 * 120
+assert.strictEqual(engine.config.wordGap, 840); // 7 * 120
+console.log('   -> setWpmFromStepper(5) clamped to 10 WPM and calculated timing verified!');
+
+setWpmFromStepper(50); // Above 40 max -> clamped to 40
+assert.strictEqual(mockElements['k5-wpm-val'].textContent, '40 WPM');
+assert.strictEqual(mockElements['topbar-wpm-val'].textContent, 40);
+assert.strictEqual(engine.config.unitT, 30); // 1200 / 40
+assert.strictEqual(engine.config.threshold, 60); // 2 * 30
+assert.strictEqual(engine.config.letterGap, 90); // 3 * 30
+assert.strictEqual(engine.config.wordGap, 210); // 7 * 30
+console.log('   -> setWpmFromStepper(50) clamped to 40 WPM and calculated timing verified!');
+
+setWpmFromStepper(25); // Mid-range 25
+assert.strictEqual(mockElements['k5-wpm-val'].textContent, '25 WPM');
+assert.strictEqual(mockElements['topbar-wpm-val'].textContent, 25);
+assert.strictEqual(engine.config.unitT, 48); // 1200 / 25
+assert.strictEqual(engine.config.threshold, 96);
+assert.strictEqual(engine.config.letterGap, 144);
+assert.strictEqual(engine.config.wordGap, 336);
+console.log('   -> setWpmFromStepper(25) verified with 48ms unit timing!');
+
+// 5b. Test setStageView stage switching
+setStageView('focus');
+assert.strictEqual(mockElements['focus-hud-stage'].style.display, 'flex');
+assert.strictEqual(mockElements['col-hardware'].style.display, 'none');
+assert.ok(mockElements['view-tab-focus'].classList.contains('active'));
+assert.ok(!mockElements['view-tab-tree'].classList.contains('active'));
+assert.ok(!mockElements['view-tab-telemetry'].classList.contains('active'));
+console.log('   -> setStageView("focus") verified with HUD display flex and hardware column hidden!');
+
+setStageView('tree');
+assert.strictEqual(mockElements['focus-hud-stage'].style.display, 'none');
+assert.strictEqual(mockElements['col-hardware'].style.display, 'flex');
+assert.ok(mockElements['view-tab-tree'].classList.contains('active'));
+assert.ok(!mockElements['view-tab-focus'].classList.contains('active'));
+console.log('   -> setStageView("tree") verified with HUD display none and hardware column flex!');
+
+setStageView('telemetry');
+assert.strictEqual(mockElements['focus-hud-stage'].style.display, 'none');
+assert.strictEqual(mockElements['col-hardware'].style.display, 'none');
+assert.ok(mockElements['view-tab-telemetry'].classList.contains('active'));
+console.log('   -> setStageView("telemetry") verified with telemetry tab active!');
+
+// 5c. Test updateTopbarWpm direct synchronization
+updateTopbarWpm(28);
+assert.strictEqual(mockElements['topbar-wpm-val'].textContent, 28);
+assert.strictEqual(mockElements['k5-wpm-val'].textContent, '28 WPM');
+console.log('   -> updateTopbarWpm(28) synchronized topbar and K5 dock!');
+
 console.log('\n====================================================');
 console.log('ALL WORKSTATION ARCHITECTURE TESTS PASSED!');
 console.log('====================================================\n');

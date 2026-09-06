@@ -808,6 +808,9 @@ function applySpeedPreset(key, saveToSettings = true) {
 
   updateMeterMarkers();
 
+  const currentWpm = Math.round(1200 / p.unitT);
+  if (typeof updateTopbarWpm === 'function') updateTopbarWpm(currentWpm);
+
   if (saveToSettings) {
     settingsManager.settings.speedPreset = key;
     settingsManager.settings.unitT = p.unitT;
@@ -847,6 +850,8 @@ function applyLoadedSettings() {
       btn.classList.remove('active-preset');
     });
     updateMeterMarkers();
+    const currentWpm = Math.round(1200 / s.unitT);
+    if (typeof updateTopbarWpm === 'function') updateTopbarWpm(currentWpm);
   }
 
   // 2. CW Frequency
@@ -943,6 +948,10 @@ function applyLoadedSettings() {
   // 9. Layout Mode (2-Column Focus vs 3-Column Cockpit)
   if (s.layoutMode) {
     setLayoutMode(s.layoutMode);
+  }
+
+  if (typeof updateTopbarWpm === 'function' && engine && engine.config && engine.config.unitT) {
+    updateTopbarWpm(Math.round(1200 / engine.config.unitT));
   }
 }
 
@@ -1177,6 +1186,8 @@ function setupEventListeners() {
       engine.updateConfig({ unitT: val });
       if (dom.tagUnitT) dom.tagUnitT.textContent = `${val}ms`;
       updateMeterMarkers();
+      const currentWpm = Math.round(1200 / val);
+      if (typeof updateTopbarWpm === 'function') updateTopbarWpm(currentWpm);
       settingsManager.settings.unitT = val;
       settingsManager.settings.speedPreset = null;
       settingsManager.save();
@@ -1482,6 +1493,7 @@ function setupEventListeners() {
 function initApp() {
   initDomReferences();
   setupWorkspaceNavigation();
+  setupSettingsDrawer();
   setupK5Dock();
   setupStageViewSwitching();
   ribbon = new CWRibbon('cw-ribbon', engine);
@@ -1505,18 +1517,6 @@ if (typeof document !== 'undefined') {
   } else {
     initApp();
   }
-}
-
-if (typeof module !== 'undefined' && module.exports) {
-  module.exports = {
-    engine,
-    synth,
-    keyer,
-    keybindingManager,
-    settingsManager,
-    kochManager,
-    initApp
-  };
 }
 
 
@@ -1864,8 +1864,12 @@ function setupWorkspaceNavigation() {
       }
     });
   });
+}
 
-  // Settings Drawer Toggle
+// ----------------------------------------------------
+// Settings Slide-up Drawer Controller
+// ----------------------------------------------------
+function setupSettingsDrawer() {
   const btnOpenSettings = document.getElementById('btn-open-settings');
   const btnCloseSettings = document.getElementById('btn-close-settings');
   const btnOpenSettingsTelemetry = document.getElementById('btn-open-settings-telemetry');
@@ -1897,8 +1901,40 @@ function setupWorkspaceNavigation() {
   if (btnOpenSettingsTelemetry) btnOpenSettingsTelemetry.addEventListener('click', openDrawer);
 
   // Sync WPM in Top Bar
-  window.updateTopbarWpm = function(wpm) {
-    const valEl = document.getElementById('topbar-wpm-val');
-    if (valEl) valEl.textContent = wpm;
+  if (typeof window !== 'undefined') {
+    window.updateTopbarWpm = updateTopbarWpm;
+  }
+}
+
+// ----------------------------------------------------
+// Top Bar & K5 Dock WPM Display Synchronization
+// ----------------------------------------------------
+function updateTopbarWpm(wpm) {
+  const valEl = document.getElementById('topbar-wpm-val');
+  if (valEl) valEl.textContent = wpm;
+  const k5WpmVal = document.getElementById('k5-wpm-val');
+  if (k5WpmVal) k5WpmVal.textContent = `${wpm} WPM`;
+}
+if (typeof window !== 'undefined') {
+  window.updateTopbarWpm = updateTopbarWpm;
+}
+
+if (typeof module !== 'undefined' && module.exports) {
+  module.exports = {
+    engine,
+    synth,
+    keyer,
+    keybindingManager,
+    settingsManager,
+    kochManager,
+    initApp,
+    setupK5Dock,
+    setWpmFromStepper,
+    updateK5MorphingUI,
+    setupStageViewSwitching,
+    setStageView,
+    setupWorkspaceNavigation,
+    setupSettingsDrawer,
+    updateTopbarWpm
   };
 }
