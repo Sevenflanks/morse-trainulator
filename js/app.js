@@ -950,7 +950,9 @@ function applyLoadedSettings() {
     setLayoutMode(s.layoutMode);
   }
 
-  if (typeof updateTopbarWpm === 'function' && engine && engine.config && engine.config.unitT) {
+  if (typeof updateWpmDisplays === 'function') {
+    updateWpmDisplays();
+  } else if (typeof updateTopbarWpm === 'function' && engine && engine.config && engine.config.unitT) {
     updateTopbarWpm(Math.round(1200 / engine.config.unitT));
   }
 }
@@ -1253,6 +1255,7 @@ function setupEventListeners() {
       updateMeterMarkers();
       settingsManager.settings.farnsworthEnabled = enabled;
       settingsManager.save();
+      updateWpmDisplays();
     });
   }
 
@@ -1265,6 +1268,7 @@ function setupEventListeners() {
       updateMeterMarkers();
       settingsManager.settings.farnsworthWpm = wpm;
       settingsManager.save();
+      updateWpmDisplays();
     });
   }
 
@@ -1555,15 +1559,25 @@ function setupK5Dock() {
 
   if (wpmMinus) {
     wpmMinus.addEventListener('click', () => {
-      const current = (engine && typeof engine.getBaselineWpm === 'function') ? engine.getBaselineWpm() : 20;
-      setWpmFromStepper(current - 1);
+      if (engine && engine.config && engine.config.farnsworthEnabled) {
+        const curCharWpm = engine.config.charWpm || (settingsManager ? settingsManager.settings.farnsworthWpm : 20) || 20;
+        setFarnsworthWpmFromStepper(curCharWpm - 1);
+      } else {
+        const current = (engine && typeof engine.getBaselineWpm === 'function') ? engine.getBaselineWpm() : 20;
+        setWpmFromStepper(current - 1);
+      }
     });
   }
 
   if (wpmPlus) {
     wpmPlus.addEventListener('click', () => {
-      const current = (engine && typeof engine.getBaselineWpm === 'function') ? engine.getBaselineWpm() : 20;
-      setWpmFromStepper(current + 1);
+      if (engine && engine.config && engine.config.farnsworthEnabled) {
+        const curCharWpm = engine.config.charWpm || (settingsManager ? settingsManager.settings.farnsworthWpm : 20) || 20;
+        setFarnsworthWpmFromStepper(curCharWpm + 1);
+      } else {
+        const current = (engine && typeof engine.getBaselineWpm === 'function') ? engine.getBaselineWpm() : 20;
+        setWpmFromStepper(current + 1);
+      }
     });
   }
 
@@ -1623,6 +1637,64 @@ function setupK5Dock() {
   updateK5MorphingUI();
 }
 
+function updateWpmDisplays() {
+  const isFarnsworth = !!(engine && engine.config && engine.config.farnsworthEnabled);
+  const baseWpm = (engine && engine.config && engine.config.unitT) ? Math.max(1, Math.round(1200 / engine.config.unitT)) : 15;
+  const charWpm = (engine && engine.config && engine.config.charWpm) ? engine.config.charWpm : 20;
+
+  const k5WpmVal = document.getElementById('k5-wpm-val');
+  const topbarWpmVal = document.getElementById('topbar-wpm-val');
+  const topbarPill = document.getElementById('topbar-wpm-pill');
+
+  if (isFarnsworth) {
+    if (k5WpmVal) {
+      k5WpmVal.textContent = `${charWpm} WPM`;
+      k5WpmVal.style.color = 'var(--neon-blue)';
+      k5WpmVal.style.textShadow = '0 0 8px rgba(0, 229, 255, 0.6)';
+      k5WpmVal.title = `法恩斯沃斯字元速: ${charWpm} WPM (間隔基準: ${baseWpm} WPM)`;
+    }
+    if (topbarWpmVal) {
+      topbarWpmVal.textContent = charWpm;
+    }
+    if (topbarPill) {
+      topbarPill.style.borderColor = 'var(--neon-blue)';
+      topbarPill.style.color = 'var(--neon-blue)';
+      topbarPill.title = `即時發報速度: ${charWpm} WPM (法恩斯沃斯模式 · 間隔基準 ${baseWpm} WPM)`;
+    }
+  } else {
+    if (k5WpmVal) {
+      k5WpmVal.textContent = `${baseWpm} WPM`;
+      k5WpmVal.style.color = 'var(--gold)';
+      k5WpmVal.style.textShadow = '';
+      k5WpmVal.title = '電報速度 (WPM)';
+    }
+    if (topbarWpmVal) {
+      topbarWpmVal.textContent = baseWpm;
+    }
+    if (topbarPill) {
+      topbarPill.style.borderColor = '';
+      topbarPill.style.color = '';
+      topbarPill.title = '即時速度';
+    }
+  }
+}
+
+function setFarnsworthWpmFromStepper(wpm) {
+  const clamped = Math.max(12, Math.min(45, wpm));
+  engine.updateConfig({ charWpm: clamped });
+  if (dom.paramFarnsworthWpm) dom.paramFarnsworthWpm.value = clamped;
+  const t = Math.round(1200 / clamped);
+  if (dom.tagFarnsworthWpm) dom.tagFarnsworthWpm.textContent = `${clamped} WPM (${t}ms)`;
+  if (typeof updateMeterMarkers === 'function') updateMeterMarkers();
+
+  if (settingsManager && settingsManager.settings) {
+    settingsManager.settings.farnsworthWpm = clamped;
+    settingsManager.save();
+  }
+
+  updateWpmDisplays();
+}
+
 function setWpmFromStepper(wpm) {
   const clamped = Math.max(10, Math.min(40, wpm));
   const t = Math.round(1200 / clamped);
@@ -1660,6 +1732,8 @@ function setWpmFromStepper(wpm) {
     settingsManager.settings.wordGap = Math.round(t * 7);
     settingsManager.save();
   }
+
+  updateWpmDisplays();
 }
 
 function updateK5MorphingUI() {
@@ -1689,9 +1763,7 @@ function updateK5MorphingUI() {
     revToggle.classList.toggle('active', !!keyer.reversed);
   }
 
-  if (k5WpmVal && engine && typeof engine.getBaselineWpm === 'function') {
-    k5WpmVal.textContent = `${engine.getBaselineWpm()} WPM`;
-  }
+  updateWpmDisplays();
 
   if (currentKeyerDevice === 'straight') {
     wingLeft.style.borderLeft = '3px solid var(--gold)';
@@ -1917,6 +1989,8 @@ function updateTopbarWpm(wpm) {
 }
 if (typeof window !== 'undefined') {
   window.updateTopbarWpm = updateTopbarWpm;
+  window.updateWpmDisplays = updateWpmDisplays;
+  window.setFarnsworthWpmFromStepper = setFarnsworthWpmFromStepper;
 }
 
 if (typeof module !== 'undefined' && module.exports) {
@@ -1930,6 +2004,8 @@ if (typeof module !== 'undefined' && module.exports) {
     initApp,
     setupK5Dock,
     setWpmFromStepper,
+    setFarnsworthWpmFromStepper,
+    updateWpmDisplays,
     updateK5MorphingUI,
     setupStageViewSwitching,
     setStageView,
