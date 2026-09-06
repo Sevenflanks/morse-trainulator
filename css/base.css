@@ -398,3 +398,202 @@ h1 {
   padding: 16px 18px;
   overflow-y: auto;
 }
+
+
+/* ==========================================================================
+   Zone 3: K5 Ergonomic Morphing Dock (雙翼變形工學座)
+   ========================================================================== */
+.va-keyer-dock {
+  width: 100%;
+  max-width: 1280px;
+  background: #141720;
+  border-top: 1px solid #232936;
+  border-radius: 0 0 12px 12px;
+  padding: 10px 16px;
+  box-sizing: border-box;
+  margin-top: 12px;
+  flex-shrink: 0;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
+  z-index: 10;
+}
+.k5-dock-container {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  height: 96px;
+  box-sizing: border-box;
+}
+.k2-thumb-wing {
+  flex: 1.1;
+  height: 96px;
+  background: linear-gradient(145deg, #1e2635 0%, #11151f 100%);
+  border: 1.5px solid #2f3c52;
+  border-radius: 20px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  position: relative;
+  touch-action: none;
+  user-select: none;
+  -webkit-user-select: none;
+  transition: all 0.08s ease;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.4);
+  box-sizing: border-box;
+}
+.k2-thumb-wing.left {
+  border-bottom-left-radius: 28px;
+  border-left: 3px solid var(--neon-blue);
+  border-bottom: 3px solid var(--neon-blue);
+}
+.k2-thumb-wing.right {
+  border-bottom-right-radius: 28px;
+  border-right: 3px solid var(--gold);
+  border-bottom: 3px solid var(--gold);
+}
+.k2-thumb-wing.active {
+  transform: scale(0.97) translateY(2px);
+  background: linear-gradient(145deg, #10141c 0%, #07090e 100%);
+}
+.k2-thumb-wing.left.active {
+  box-shadow: 0 0 20px rgba(0, 229, 255, 0.45);
+}
+.k2-thumb-wing.right.active {
+  box-shadow: 0 0 20px rgba(255, 215, 0, 0.45);
+}
+.k2-wing-symbol {
+  font-size: 2.2rem;
+  font-family: monospace;
+  font-weight: 900;
+  line-height: 1;
+}
+.k2-wing-title {
+  font-size: 0.82rem;
+  font-weight: 700;
+  margin-top: 2px;
+  color: #fff;
+}
+.k2-wing-hint {
+  font-size: 0.68rem;
+  color: var(--text-muted);
+  margin-top: 2px;
+  font-family: monospace;
+}
+.k5-center-smart-island {
+  width: 124px;
+  height: 96px;
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  box-sizing: border-box;
+}
+.k5-device-capsule {
+  display: flex;
+  gap: 2px;
+  background: #090c12;
+  border: 1px solid #283344;
+  border-radius: 12px;
+  padding: 2px;
+  width: 100%;
+  box-sizing: border-box;
+}
+.k5-dev-pill {
+  flex: 1;
+  height: 24px;
+  border: none;
+  background: transparent;
+  color: var(--text-muted);
+  border-radius: 9px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.95rem;
+  transition: all 0.12s;
+  padding: 0;
+}
+.k5-dev-pill:hover {
+  color: #fff;
+}
+.k5-dev-pill.active {
+  background: #1e2430;
+  color: var(--gold);
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.5);
+}
+.k5-island-controls {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  width: 100%;
+  box-sizing: border-box;
+}
+.k2-island-pill {
+  background: #090c12;
+  border: 1px solid #283344;
+  border-radius: 14px;
+  padding: 2px 6px;
+  flex: 1;
+  text-align: center;
+  font-size: 0.72rem;
+  color: var(--text-muted);
+  font-family: monospace;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  box-sizing: border-box;
+}
+.k2-island-btn {
+  background: #1a1e28;
+  border: 1px solid #2e3648;
+  color: #cfd6e6;
+  width: 18px;
+  height: 18px;
+  border-radius: 4px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.8rem;
+  line-height: 1;
+  padding: 0;
+}
+.k2-island-btn:hover {
+  border-color: var(--neon-blue);
+  color: #fff;
+}
+.k5-rev-btn {
+  width: 24px;
+  height: 24px;
+  border-radius: 6px;
+  background: #090c12;
+  border: 1px solid #283344;
+  color: var(--text-muted);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.88rem;
+  transition: all 0.12s;
+  padding: 0;
+  flex-shrink: 0;
+}
+.k5-rev-btn:hover {
+  color: var(--gold);
+  border-color: var(--gold);
+}
+.k5-rev-btn.active {
+  background: #252010;
+  color: var(--gold);
+  border-color: var(--gold);
+  box-shadow: 0 0 6px rgba(255, 215, 0, 0.3);
+}
+.k5-mode-badge {
+  font-size: 0.65rem;
+  color: var(--text-muted);
+  font-family: monospace;
+  white-space: nowrap;
+}

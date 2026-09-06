@@ -907,6 +907,56 @@
 
     </div> <!-- /col-telemetry -->
   </div> <!-- /main-container -->
+
+    <!-- K5 Ergonomic Morphing Dock (Zone 3) -->
+    <footer class="va-keyer-dock" id="k5-dock">
+      <div class="k5-dock-container">
+        <!-- Left Ergonomic Wing (Adaptive) -->
+        <div class="k2-thumb-wing left" id="k5-wing-left" data-paddle="left">
+          <span class="k2-wing-symbol" id="k5-left-sym" style="color:var(--neon-blue);">·</span>
+          <span class="k2-wing-title" id="k5-left-title">點 Dit</span>
+          <span class="k2-wing-hint" id="k5-left-hint">鍵盤 F / 點擊</span>
+        </div>
+
+        <!-- Center Smart Island (Zero Extra Height!) -->
+        <div class="k5-center-smart-island" id="k5-center-island">
+          <!-- Tri-Mode Segmented Capsule -->
+          <div class="k5-device-capsule">
+            <button type="button" class="k5-dev-pill active" id="k5-pill-paddle" data-mode="paddle" title="雙撥片 (Iambic Paddle)">
+              <i class="mdi mdi-tune-vertical"></i>
+            </button>
+            <button type="button" class="k5-dev-pill" id="k5-pill-straight" data-mode="straight" title="直鍵 (Straight Key)">
+              <i class="mdi mdi-radiobox-marked"></i>
+            </button>
+            <button type="button" class="k5-dev-pill" id="k5-pill-bug" data-mode="bug" title="機械震報鍵 (Bug Key)">
+              <i class="mdi mdi-metronome"></i>
+            </button>
+          </div>
+
+          <!-- Island Controls: WPM Stepper & Reverse Toggle -->
+          <div class="k5-island-controls">
+            <div class="k2-island-pill">
+              <button type="button" class="k2-island-btn" id="k5-wpm-minus" title="降低速度">-</button>
+              <span id="k5-wpm-val" style="color:var(--gold); font-weight:700;">20 WPM</span>
+              <button type="button" class="k2-island-btn" id="k5-wpm-plus" title="提高速度">+</button>
+            </div>
+            <button type="button" class="k5-rev-btn" id="k5-reverse-toggle" title="左右撥片互換 (Reverse Dit/Dah)">
+              <i class="mdi mdi-swap-horizontal"></i>
+            </button>
+          </div>
+
+          <!-- Dynamic Mode Indicator Badge -->
+          <span class="k5-mode-badge" id="k5-mode-badge">雙撥片 Mode B</span>
+        </div>
+
+        <!-- Right Ergonomic Wing (Adaptive) -->
+        <div class="k2-thumb-wing right" id="k5-wing-right" data-paddle="right">
+          <span class="k2-wing-symbol" id="k5-right-sym" style="color:var(--gold);">—</span>
+          <span class="k2-wing-title" id="k5-right-title">劃 Dah</span>
+          <span class="k2-wing-hint" id="k5-right-hint">鍵盤 J / 點擊</span>
+        </div>
+      </div>
+    </footer>
   </div> <!-- /ws-container-tx -->
 
   <!-- Workspace 2: Rx (抄收) -->

@@ -1462,6 +1462,7 @@ function setupEventListeners() {
 function initApp() {
   initDomReferences();
   setupWorkspaceNavigation();
+  setupK5Dock();
   ribbon = new CWRibbon('cw-ribbon', engine);
   window.ribbon = ribbon;
 
@@ -1501,6 +1502,259 @@ if (typeof module !== 'undefined' && module.exports) {
 // ----------------------------------------------------
 // Three-Zone Shell & Workspace Navigation (Tx / Rx / QSO)
 // ----------------------------------------------------
+
+// ----------------------------------------------------
+// K5 Ergonomic Morphing Dock Controller
+// ----------------------------------------------------
+function setupK5Dock() {
+  const wingLeft = document.getElementById('k5-wing-left');
+  const wingRight = document.getElementById('k5-wing-right');
+  const pillPaddle = document.getElementById('k5-pill-paddle');
+  const pillStraight = document.getElementById('k5-pill-straight');
+  const pillBug = document.getElementById('k5-pill-bug');
+  const wpmMinus = document.getElementById('k5-wpm-minus');
+  const wpmPlus = document.getElementById('k5-wpm-plus');
+  const wpmVal = document.getElementById('k5-wpm-val');
+  const revToggle = document.getElementById('k5-reverse-toggle');
+
+  if (!wingLeft || !wingRight) return;
+
+  const pills = [
+    { el: pillPaddle, mode: 'paddle' },
+    { el: pillStraight, mode: 'straight' },
+    { el: pillBug, mode: 'bug' }
+  ];
+
+  pills.forEach(p => {
+    if (!p.el) return;
+    p.el.addEventListener('click', () => {
+      switchKeyerDevice(p.mode);
+    });
+  });
+
+  if (wpmMinus) {
+    wpmMinus.addEventListener('click', () => {
+      const current = (engine && typeof engine.getBaselineWpm === 'function') ? engine.getBaselineWpm() : 20;
+      setWpmFromStepper(current - 1);
+    });
+  }
+
+  if (wpmPlus) {
+    wpmPlus.addEventListener('click', () => {
+      const current = (engine && typeof engine.getBaselineWpm === 'function') ? engine.getBaselineWpm() : 20;
+      setWpmFromStepper(current + 1);
+    });
+  }
+
+  if (revToggle) {
+    revToggle.addEventListener('click', () => {
+      const nextRev = !keyer.reversed;
+      keyer.setReversed(nextRev);
+      revToggle.classList.toggle('active', nextRev);
+      const chkReverse = document.getElementById('chk-paddle-reverse');
+      if (chkReverse) chkReverse.checked = nextRev;
+      if (settingsManager && settingsManager.settings) {
+        settingsManager.settings.paddleReverse = nextRev;
+        settingsManager.save();
+      }
+      updatePaddleLabels();
+      updateK5MorphingUI();
+    });
+  }
+
+  function bindWing(wingEl, side) {
+    let isPressed = false;
+
+    function onDown(e) {
+      e.preventDefault();
+      if (isPressed) return;
+      isPressed = true;
+      wingEl.classList.add('active');
+
+      if (currentKeyerDevice === 'straight') {
+        handleKeyDown();
+      } else if (currentKeyerDevice === 'paddle' || currentKeyerDevice === 'bug') {
+        keyer.setPhysicalContact(side, true);
+      }
+    }
+
+    function onUp(e) {
+      if (!isPressed) return;
+      isPressed = false;
+      wingEl.classList.remove('active');
+
+      if (currentKeyerDevice === 'straight') {
+        handleKeyUp();
+      } else if (currentKeyerDevice === 'paddle' || currentKeyerDevice === 'bug') {
+        keyer.setPhysicalContact(side, false);
+      }
+    }
+
+    wingEl.addEventListener('pointerdown', onDown);
+    wingEl.addEventListener('pointerup', onUp);
+    wingEl.addEventListener('pointerleave', onUp);
+    wingEl.addEventListener('pointercancel', onUp);
+  }
+
+  bindWing(wingLeft, 'left');
+  bindWing(wingRight, 'right');
+
+  updateK5MorphingUI();
+}
+
+function setWpmFromStepper(wpm) {
+  const clamped = Math.max(10, Math.min(40, wpm));
+  const t = Math.round(1200 / clamped);
+  engine.updateConfig({
+    unitT: t,
+    threshold: Math.round(t * 2),
+    letterGap: Math.round(t * 3),
+    wordGap: Math.round(t * 7)
+  });
+  if (dom.paramUnitT) dom.paramUnitT.value = t;
+  if (dom.tagUnitT) dom.tagUnitT.textContent = `${t}ms`;
+  if (dom.paramThreshold) dom.paramThreshold.value = Math.round(t * 2);
+  if (dom.tagThreshold) dom.tagThreshold.textContent = `${Math.round(t * 2)}ms`;
+  if (dom.paramGap) dom.paramGap.value = Math.round(t * 3);
+  if (dom.tagGap) dom.tagGap.textContent = `${Math.round(t * 3)}ms`;
+  if (dom.paramWordGap) dom.paramWordGap.value = Math.round(t * 7);
+  if (dom.tagWordGap) dom.tagWordGap.textContent = `${Math.round(t * 7)}ms`;
+  if (typeof updateMeterMarkers === 'function') updateMeterMarkers();
+
+  const k5WpmVal = document.getElementById('k5-wpm-val');
+  if (k5WpmVal) k5WpmVal.textContent = `${clamped} WPM`;
+  const topbarWpmVal = document.getElementById('topbar-wpm-val');
+  if (topbarWpmVal) topbarWpmVal.textContent = clamped;
+  const stateWpm = document.getElementById('state-wpm');
+  if (stateWpm) stateWpm.textContent = `(${clamped} WPM)`;
+  const readoutWpm = document.getElementById('readout-wpm');
+  if (readoutWpm) readoutWpm.textContent = `(${clamped} WPM)`;
+  const meterBadge = document.getElementById('meter-wpm-badge');
+  if (meterBadge) meterBadge.textContent = `即時 ${clamped} WPM`;
+
+  if (settingsManager && settingsManager.settings) {
+    settingsManager.settings.unitT = t;
+    settingsManager.settings.threshold = Math.round(t * 2);
+    settingsManager.settings.letterGap = Math.round(t * 3);
+    settingsManager.settings.wordGap = Math.round(t * 7);
+    settingsManager.save();
+  }
+}
+
+function updateK5MorphingUI() {
+  const wingLeft = document.getElementById('k5-wing-left');
+  const wingRight = document.getElementById('k5-wing-right');
+  const leftSym = document.getElementById('k5-left-sym');
+  const leftTitle = document.getElementById('k5-left-title');
+  const leftHint = document.getElementById('k5-left-hint');
+  const rightSym = document.getElementById('k5-right-sym');
+  const rightTitle = document.getElementById('k5-right-title');
+  const rightHint = document.getElementById('k5-right-hint');
+  const modeBadge = document.getElementById('k5-mode-badge');
+  const revToggle = document.getElementById('k5-reverse-toggle');
+  const k5WpmVal = document.getElementById('k5-wpm-val');
+
+  const pillPaddle = document.getElementById('k5-pill-paddle');
+  const pillStraight = document.getElementById('k5-pill-straight');
+  const pillBug = document.getElementById('k5-pill-bug');
+
+  if (!wingLeft || !wingRight) return;
+
+  if (pillPaddle) pillPaddle.classList.toggle('active', currentKeyerDevice === 'paddle');
+  if (pillStraight) pillStraight.classList.toggle('active', currentKeyerDevice === 'straight');
+  if (pillBug) pillBug.classList.toggle('active', currentKeyerDevice === 'bug');
+
+  if (revToggle) {
+    revToggle.classList.toggle('active', !!keyer.reversed);
+  }
+
+  if (k5WpmVal && engine && typeof engine.getBaselineWpm === 'function') {
+    k5WpmVal.textContent = `${engine.getBaselineWpm()} WPM`;
+  }
+
+  if (currentKeyerDevice === 'straight') {
+    wingLeft.style.borderLeft = '3px solid var(--gold)';
+    wingLeft.style.borderBottom = '3px solid var(--gold)';
+    if (leftSym) {
+      leftSym.innerHTML = '<i class="mdi mdi-ray-vertex"></i>';
+      leftSym.style.color = 'var(--gold)';
+    }
+    if (leftTitle) leftTitle.textContent = '直鍵 (左手)';
+    if (leftHint) leftHint.textContent = '空白鍵 / 點擊長短音';
+
+    wingRight.style.borderRight = '3px solid var(--gold)';
+    wingRight.style.borderBottom = '3px solid var(--gold)';
+    if (rightSym) {
+      rightSym.innerHTML = '<i class="mdi mdi-ray-vertex"></i>';
+      rightSym.style.color = 'var(--gold)';
+    }
+    if (rightTitle) rightTitle.textContent = '直鍵 (右手)';
+    if (rightHint) rightHint.textContent = '空白鍵 / 點擊長短音';
+
+    if (modeBadge) modeBadge.textContent = '直鍵手電鍵';
+  } else if (currentKeyerDevice === 'bug') {
+    wingLeft.style.borderLeft = '3px solid var(--neon-blue)';
+    wingLeft.style.borderBottom = '3px solid var(--neon-blue)';
+    if (leftSym) {
+      leftSym.innerHTML = '<i class="mdi mdi-sine-wave"></i>';
+      leftSym.style.color = 'var(--neon-blue)';
+    }
+    if (leftTitle) leftTitle.textContent = '機械連點';
+    if (leftHint) leftHint.textContent = '彈簧震動 Dit (F)';
+
+    wingRight.style.borderRight = '3px solid var(--gold)';
+    wingRight.style.borderBottom = '3px solid var(--gold)';
+    if (rightSym) {
+      rightSym.innerHTML = '<i class="mdi mdi-hand-pointing-right"></i>';
+      rightSym.style.color = 'var(--gold)';
+    }
+    if (rightTitle) rightTitle.textContent = '手動長音';
+    if (rightHint) rightHint.textContent = '手動長劃 Dah (J)';
+
+    if (modeBadge) modeBadge.textContent = '震報鍵 Bug';
+  } else {
+    const isRev = !!keyer.reversed;
+    if (isRev) {
+      wingLeft.style.borderLeft = '3px solid var(--gold)';
+      wingLeft.style.borderBottom = '3px solid var(--gold)';
+      if (leftSym) {
+        leftSym.textContent = '—';
+        leftSym.style.color = 'var(--gold)';
+      }
+      if (leftTitle) leftTitle.textContent = '劃 Dah';
+      if (leftHint) leftHint.textContent = '鍵盤 J / 點擊';
+
+      wingRight.style.borderRight = '3px solid var(--neon-blue)';
+      wingRight.style.borderBottom = '3px solid var(--neon-blue)';
+      if (rightSym) {
+        rightSym.textContent = '·';
+        rightSym.style.color = 'var(--neon-blue)';
+      }
+      if (rightTitle) rightTitle.textContent = '點 Dit';
+      if (rightHint) rightHint.textContent = '鍵盤 F / 點擊';
+    } else {
+      wingLeft.style.borderLeft = '3px solid var(--neon-blue)';
+      wingLeft.style.borderBottom = '3px solid var(--neon-blue)';
+      if (leftSym) {
+        leftSym.textContent = '·';
+        leftSym.style.color = 'var(--neon-blue)';
+      }
+      if (leftTitle) leftTitle.textContent = '點 Dit';
+      if (leftHint) leftHint.textContent = '鍵盤 F / 點擊';
+
+      wingRight.style.borderRight = '3px solid var(--gold)';
+      wingRight.style.borderBottom = '3px solid var(--gold)';
+      if (rightSym) {
+        rightSym.textContent = '—';
+        rightSym.style.color = 'var(--gold)';
+      }
+      if (rightTitle) rightTitle.textContent = '劃 Dah';
+      if (rightHint) rightHint.textContent = '鍵盤 J / 點擊';
+    }
+    if (modeBadge) modeBadge.textContent = '雙撥片 Mode ' + (keyer.mode || 'B');
+  }
+}
+
 function setupWorkspaceNavigation() {
   const wsTabs = [
     { btnId: 'ws-tab-tx', viewId: 'ws-container-tx' },
