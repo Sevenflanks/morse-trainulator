@@ -112,6 +112,24 @@ h1 {
   width: 100%;
   margin: 0 auto;
   transition: max-width 0.3s ease;
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  padding: 4px 16px 8px 16px;
+}
+
+.main-container::-webkit-scrollbar {
+  width: 6px;
+}
+.main-container::-webkit-scrollbar-track {
+  background: transparent;
+}
+.main-container::-webkit-scrollbar-thumb {
+  background: #232b3b;
+  border-radius: 3px;
+}
+.main-container::-webkit-scrollbar-thumb:hover {
+  background: var(--cyan-dim);
 }
 
 /* 1. Two-Column Focus Mode (Default) */
@@ -141,6 +159,7 @@ h1 {
   align-items: center;
   gap: 10px;
   width: 100%;
+  align-self: start;
 }
 
 .training-column, #col-training {
@@ -149,6 +168,7 @@ h1 {
   flex-direction: column;
   gap: 10px;
   width: 100%;
+  align-self: start;
 }
 
 .telemetry-column, #col-telemetry {
@@ -157,6 +177,7 @@ h1 {
   flex-direction: column;
   gap: 10px;
   width: 100%;
+  align-self: start;
 }
 
 /* Responsive fallbacks */
@@ -553,11 +574,11 @@ h1 {
   background: #141720;
   border-top: 1px solid #232936;
   border-radius: 0 0 12px 12px;
-  padding: 10px 16px;
+  padding: 8px 16px;
   box-sizing: border-box;
-  margin-top: 12px;
+  margin-top: auto;
   flex-shrink: 0;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
+  box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.5);
   z-index: 10;
 }
 .k5-dock-container {

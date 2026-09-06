@@ -801,6 +801,14 @@ function startKochDrill() {
   updateKochCursor();
   clearReflexTimer();
   window.scrollTo({ top: 0, behavior: 'smooth' });
+  const mainContainer = document.getElementById('main-container');
+  if (mainContainer) {
+    if (typeof mainContainer.scrollTo === 'function') {
+      mainContainer.scrollTo({ top: 0, behavior: 'smooth' });
+    } else {
+      mainContainer.scrollTop = 0;
+    }
+  }
 
   if (evalStatus) {
     if (kochState.mode === 'challenge') {

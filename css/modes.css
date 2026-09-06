@@ -529,15 +529,15 @@
   background: #0a0f16;
   border: 1px solid #1c2738;
   border-radius: 8px;
-  padding: 10px;
-  margin-bottom: 12px;
+  padding: 8px 10px;
+  margin-bottom: 8px;
 }
 
 .koch-stage-grid {
   display: grid;
   grid-template-columns: repeat(7, 1fr);
-  gap: 5px;
-  max-height: 220px;
+  gap: 4px;
+  max-height: 175px;
   overflow-y: auto;
   padding-right: 2px;
 }
