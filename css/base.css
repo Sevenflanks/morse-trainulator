@@ -117,6 +117,7 @@ h1 {
   flex: 1;
   min-height: 0;
   overflow-y: auto;
+  scroll-behavior: smooth;
   padding: 4px 16px 8px 16px;
 }
 
@@ -199,6 +200,7 @@ h1 {
   .main-container.layout-3col {
     display: flex;
     flex-direction: column;
+    justify-content: flex-start;
     align-items: center;
     max-width: 100%;
   }

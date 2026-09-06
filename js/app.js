@@ -791,6 +791,21 @@ function switchMode(mode) {
     }
   }
 
+  if (typeof document !== 'undefined' && document.body) {
+    document.body.classList.remove('koch-drilling');
+  }
+
+  // Mobile UX: Auto-scroll to mode container so users never miss controls
+  if (typeof window !== 'undefined' && window.innerWidth <= 768) {
+    if (mode === 'koch' && dom.kochModeContainer && typeof dom.kochModeContainer.scrollIntoView === 'function') {
+      dom.kochModeContainer.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    } else if (mode === 'text' && dom.textModeContainer && typeof dom.textModeContainer.scrollIntoView === 'function') {
+      dom.textModeContainer.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    } else if (mode === 'free' && dom.mainContainer && typeof dom.mainContainer.scrollTo === 'function') {
+      dom.mainContainer.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+  }
+
   updatePcbKochVisuals();
 }
 

@@ -688,3 +688,29 @@
   color: #889;
 }
 
+/* Mobile Handheld Focus Mode during Koch Drill */
+@media (max-width: 768px) {
+  body.koch-drilling #col-hardware {
+    display: none !important;
+  }
+  body.koch-drilling .main-container {
+    padding-top: 2px;
+  }
+  body.koch-drilling #cockpit-top-ribbon {
+    margin-bottom: 2px;
+  }
+  /* Enhanced Spotlight for current target on mobile */
+  .char-chip.state-current {
+    transform: scale(1.18);
+    box-shadow: 0 0 14px rgba(0, 229, 255, 0.75);
+    border-color: #00e5ff !important;
+    background: #00364d !important;
+    z-index: 2;
+  }
+  #koch-fb-target {
+    font-size: 1.15rem;
+    letter-spacing: 1px;
+  }
+}
+
+

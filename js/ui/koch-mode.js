@@ -716,6 +716,9 @@ function startKochDrill() {
   if (kochScorecard) kochScorecard.style.display = 'none';
   if (kochSetupCard) kochSetupCard.style.display = 'none';
   if (kochHudHeader) kochHudHeader.style.display = 'flex';
+  if (typeof document !== 'undefined' && document.body) {
+    document.body.classList.add('koch-drilling');
+  }
 
   kochState.currentIndex = 0;
   kochState.timeoutCount = 0;
@@ -800,7 +803,9 @@ function startKochDrill() {
   updateKochProgressBadge();
   updateKochCursor();
   clearReflexTimer();
-  window.scrollTo({ top: 0, behavior: 'smooth' });
+  if (typeof window !== 'undefined') {
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
   const mainContainer = document.getElementById('main-container');
   if (mainContainer) {
     if (typeof mainContainer.scrollTo === 'function') {
@@ -808,6 +813,9 @@ function startKochDrill() {
     } else {
       mainContainer.scrollTop = 0;
     }
+  }
+  if (kochHudHeader && typeof kochHudHeader.scrollIntoView === 'function') {
+    kochHudHeader.scrollIntoView({ behavior: 'smooth', block: 'start' });
   }
 
   if (evalStatus) {
@@ -840,6 +848,9 @@ function updateKochCursor() {
   const curChip = document.getElementById('koch-char-chip-' + idx);
   if (curChip) {
     curChip.classList.add('state-current');
+    if (typeof curChip.scrollIntoView === 'function') {
+      curChip.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
+    }
   }
 
   if (idx < total) {
@@ -972,6 +983,9 @@ function finishKochDrillSession(isManualStop = false) {
   kochState.isFinished = true;
   kochState.running = false;
   kochState.hasStarted = false;
+  if (typeof document !== 'undefined' && document.body) {
+    document.body.classList.remove('koch-drilling');
+  }
 
   const btnStart = document.getElementById('btn-start-koch-drill');
   const btnStop = document.getElementById('btn-stop-koch-drill');
@@ -1200,6 +1214,9 @@ function finishKochDrillSession(isManualStop = false) {
 
   if (kochScorecard) {
     kochScorecard.style.display = 'block';
+    if (typeof kochScorecard.scrollIntoView === 'function') {
+      kochScorecard.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
   }
   updateKochUI();
   updatePcbKochVisuals();
