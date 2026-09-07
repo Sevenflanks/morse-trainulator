@@ -1382,14 +1382,9 @@ function setupEventListeners() {
 
   if (dom.btnKochNextStage) {
     dom.btnKochNextStage.addEventListener('click', () => {
-      if (kochManager.currentLevel < kochManager.maxUnlockedLevel) {
-        kochManager.currentLevel++;
-      } else if (kochManager.currentLevel < 35) {
-        kochManager.currentLevel = kochManager.maxUnlockedLevel;
+      if (typeof advanceToNextKochStage === 'function') {
+        advanceToNextKochStage();
       }
-      updateKochUI();
-      updatePcbKochVisuals();
-      startKochDrill();
     });
   }
 

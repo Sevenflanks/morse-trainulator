@@ -6,6 +6,7 @@ const assert = require('assert');
 const path = require('path');
 const projectRoot = path.resolve(__dirname, '..');
 const { KochManager, KOCH_SEQUENCE } = require(path.join(projectRoot, 'js/core/koch-manager'));
+global.KOCH_SEQUENCE = KOCH_SEQUENCE;
 const {
   kochState,
   setKochAssessmentMode,
@@ -22,7 +23,8 @@ const {
   clearReflexTimer,
   clearKochTimers,
   handleReflexTimeout,
-  checkStandardMercyRule
+  checkStandardMercyRule,
+  advanceToNextKochStage
 } = require(path.join(projectRoot, 'js/ui/koch-mode'));
 
 console.log('==============================================');
@@ -106,12 +108,15 @@ function setupFakeDOM() {
     'koch-fb-target', 'koch-fb-input', 'koch-fb-result', 'koch-stage-badge', 'koch-mastery-text',
     'koch-mastery-bar', 'koch-stage1-card', 'koch-standard-card', 'koch-target-char',
     'koch-target-seq', 'koch-pool-text', 'koch-pool-stage1', 'koch-stage-select',
-    'btn-start-koch-drill', 'btn-stop-koch-drill', 'btn-stop-koch-panel'
+    'btn-start-koch-drill', 'btn-stop-koch-drill', 'btn-stop-koch-panel',
+    'koch-setup-card', 'koch-hud-header'
   ];
 
   ids.forEach(id => { elements[id] = makeEl(id); });
 
+  const bodyEl = makeEl('body');
   global.document = {
+    body: bodyEl,
     getElementById(id) {
       if (!elements[id]) elements[id] = makeEl(id);
       return elements[id];
@@ -603,6 +608,59 @@ handleReflexTimeout();
 assert.strictEqual(kochState.running, false, 'Reflex timeouts must trigger mercy rule when doomed');
 assert.strictEqual(kochState.isMercyCutoff, true);
 console.log('  -> Reflex timeout mercy rule trigger verified!');
+
+// ----------------------------------------------------
+// 10. Test Stage Advancement to Staging Area (Issue #23)
+// ----------------------------------------------------
+console.log('--- 10. Testing Next Stage Advancement to Staging Area ---');
+// Set up completed level 1
+km.currentLevel = 1;
+km.maxUnlockedLevel = 1;
+setKochAssessmentMode('quick');
+startKochDrill();
+
+// Complete 24 characters with 100% accuracy to clear stage 1
+for (let i = 0; i < 24; i++) {
+  const target = kochState.targetChars[i];
+  finalizeLetterKochMode({
+    isValid: true,
+    letter: target,
+    sequence: window.engine.getSequenceForLetter(target)
+  });
+}
+
+// Stage 1 cleared, maxUnlockedLevel should be 2, newChar is R
+assert.strictEqual(km.maxUnlockedLevel, 2);
+assert.strictEqual(kochState.isFinished, true);
+const nextBtn = document.getElementById('btn-koch-next-stage');
+assert.strictEqual(nextBtn.style.display, 'inline-block');
+assert(nextBtn.innerHTML.includes('整備區'), 'Next stage button must mention 整備區');
+assert(nextBtn.innerHTML.includes('解鎖 R'), 'Next stage button must mention 解鎖 R');
+
+// Now click next stage (advanceToNextKochStage)
+advanceToNextKochStage();
+
+// Verify: level advanced to 2
+assert.strictEqual(km.currentLevel, 2, 'Current level must advance to 2');
+// Verify: NOT in running drill! Stays in staging!
+assert.strictEqual(kochState.running, false, 'Should NOT start drill immediately');
+assert.strictEqual(kochState.isFinished, false, 'isFinished must be reset to false');
+assert.strictEqual(document.getElementById('koch-scorecard').style.display, 'none', 'Scorecard must be hidden');
+assert.strictEqual(document.getElementById('koch-drill-panel').style.display, 'none', 'Drill panel must be hidden');
+assert.strictEqual(document.getElementById('koch-setup-card').style.display, 'block', 'Setup card must be visible');
+assert.strictEqual(document.getElementById('koch-standard-card').style.display, 'flex', 'Standard stage card must be displayed');
+assert.strictEqual(document.getElementById('koch-target-char').textContent, 'R', 'Target char must show R');
+assert.strictEqual(document.getElementById('koch-target-seq').textContent, '.-.', 'Target sequence must show .-.');
+assert(document.getElementById('eval-status').textContent.includes('第 2 關整備中'), 'evalStatus must indicate staging');
+console.log('  -> Stage advancement to staging area (setup card visible, drill not started) verified!');
+
+// Now verify manual start from staging (e.g. user presses Enter or R)
+startKochDrill();
+assert.strictEqual(kochState.running, true, 'Drill should start when user triggers startKochDrill()');
+assert.strictEqual(document.getElementById('koch-setup-card').style.display, 'none', 'Setup card should hide on drill start');
+assert.strictEqual(document.getElementById('koch-drill-panel').style.display, 'block', 'Drill panel should display');
+clearKochTimers();
+console.log('  -> Manual drill start from staging area verified!');
 
 console.log('==============================================');
 console.log('ALL TESTS PASSED SUCCESSFULLY (Exit code 0)!');
