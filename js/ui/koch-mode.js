@@ -525,7 +525,7 @@ function rollKochRow(finishedIdx) {
   if (rowToRemove) {
     rowToRemove.classList.remove('row-init-fade');
     rowToRemove.classList.add('row-sliding-out');
-    const isBrowser = (typeof window !== 'undefined' && typeof document !== 'undefined' && document.body);
+    const isBrowser = (typeof window !== 'undefined' && typeof document !== 'undefined' && document.body && !(typeof process !== 'undefined' && process.versions && process.versions.node));
     if (isBrowser) {
       const rowHeight = rowToRemove.offsetHeight || 42;
       const gap = 8;
@@ -1181,8 +1181,9 @@ function finishKochDrillSession(isManualStop = false, isMercyStop = false) {
 
     if (currentLvl === maxLvl && maxLvl < 35) {
       kochManager.maxUnlockedLevel++;
-      kochManager.saveProgress();
-      const newChar = KOCH_SEQUENCE[kochManager.maxUnlockedLevel];
+      if (typeof kochManager.saveProgress === 'function') kochManager.saveProgress();
+      const seqList = (typeof KOCH_SEQUENCE !== 'undefined') ? KOCH_SEQUENCE : (typeof window !== 'undefined' && window.KOCH_SEQUENCE ? window.KOCH_SEQUENCE : []);
+      const newChar = seqList[kochManager.maxUnlockedLevel] || (kochManager.getTargetChar ? kochManager.getTargetChar(kochManager.maxUnlockedLevel) : '');
 
       if (kochScDesc) {
         kochScDesc.innerHTML = `太棒了！正確率達到 <strong>${accuracy}%</strong>（高於 90% 通關標準）！${resetNotice}${honorNotice}<br>
@@ -1191,12 +1192,12 @@ function finishKochDrillSession(isManualStop = false, isMercyStop = false) {
 
       if (btnKochNextStage) {
         btnKochNextStage.style.display = 'inline-block';
-        btnKochNextStage.innerHTML = `<span>前往第 ${kochManager.maxUnlockedLevel} 關 (解鎖 ${newChar}) <i class="mdi mdi-arrow-right"></i> <span style="font-size:0.7rem; background:#332200; color:#ffd700; padding:1px 5px; border-radius:2px; margin-left:3px;">Enter</span></span>`;
+        btnKochNextStage.innerHTML = `<span>前往第 ${kochManager.maxUnlockedLevel} 關整備區 (解鎖 ${newChar}) <i class="mdi mdi-arrow-right"></i> <span style="font-size:0.7rem; background:#332200; color:#ffd700; padding:1px 5px; border-radius:2px; margin-left:3px;">Enter</span></span>`;
       }
 
       setTimeout(() => {
         const seq = engine ? engine.getSequenceForLetter(newChar) : null;
-        const newNode = seq ? document.getElementById('node-' + seqToId(seq)) : null;
+        const newNode = (seq && typeof seqToId === 'function') ? document.getElementById('node-' + seqToId(seq)) : null;
         const newChip = document.getElementById('num-chip-' + newChar);
         const targetEl = newNode || newChip;
         if (targetEl) {
@@ -1210,7 +1211,7 @@ function finishKochDrillSession(isManualStop = false, isMercyStop = false) {
       }
       if (btnKochNextStage) {
         btnKochNextStage.style.display = 'inline-block';
-        btnKochNextStage.innerHTML = `<span>進入下一關 <i class="mdi mdi-arrow-right"></i> <span style="font-size:0.7rem; background:#332200; color:#ffd700; padding:1px 5px; border-radius:2px; margin-left:3px;">Enter</span></span>`;
+        btnKochNextStage.innerHTML = `<span>前往下一關整備區 <i class="mdi mdi-arrow-right"></i> <span style="font-size:0.7rem; background:#332200; color:#ffd700; padding:1px 5px; border-radius:2px; margin-left:3px;">Enter</span></span>`;
       }
     } else {
       if (kochScDesc) {
@@ -1280,12 +1281,73 @@ function finishKochDrillSession(isManualStop = false, isMercyStop = false) {
   updatePcbKochVisuals();
 }
 
+function advanceToNextKochStage() {
+  const kochManager = window.kochManager;
+  const engine = window.engine;
+  if (!kochManager) return;
+
+  if (kochManager.currentLevel < kochManager.maxUnlockedLevel) {
+    kochManager.currentLevel++;
+  } else if (kochManager.currentLevel < 35) {
+    kochManager.currentLevel = kochManager.maxUnlockedLevel;
+  }
+
+  kochState.running = false;
+  kochState.isFinished = false;
+  clearKochTimers();
+
+  if (typeof document !== 'undefined' && document.body) {
+    document.body.classList.remove('koch-drilling');
+  }
+
+  const kochScorecard = document.getElementById('koch-scorecard');
+  const kochDrillPanel = document.getElementById('koch-drill-panel');
+  const kochHudHeader = document.getElementById('koch-hud-header');
+  const kochSetupCard = document.getElementById('koch-setup-card');
+  const evalStatus = document.getElementById('eval-status');
+
+  if (kochScorecard) kochScorecard.style.display = 'none';
+  if (kochDrillPanel) kochDrillPanel.style.display = 'none';
+  if (kochHudHeader) kochHudHeader.style.display = 'none';
+  if (kochSetupCard) kochSetupCard.style.display = 'block';
+
+  updateKochUI();
+  updatePcbKochVisuals();
+
+  const curLvl = kochManager.currentLevel;
+  const target = (curLvl === 1) ? 'K, M' : kochManager.getTargetChar(curLvl);
+  const seq = (curLvl === 1) ? '-.-, --' : (engine && engine.getSequenceForLetter ? (engine.getSequenceForLetter(target) || '') : '');
+
+  if (evalStatus) {
+    evalStatus.innerHTML = `<i class="mdi mdi-bullseye-arrow"></i> 第 ${curLvl} 關整備中：新字元 [ ${target} ] (${seq})，熟悉音形後按 R 或點擊開始考核！`;
+    evalStatus.style.color = 'var(--neon-blue)';
+  }
+
+  if (curLvl > 1 && engine) {
+    const seqToHighlight = (typeof seqToId === 'function' && engine.getSequenceForLetter) ? engine.getSequenceForLetter(target) : null;
+    const newNode = (seqToHighlight && typeof seqToId === 'function') ? document.getElementById('node-' + seqToId(seqToHighlight)) : null;
+    const newChip = document.getElementById('num-chip-' + target);
+    const targetEl = newNode || newChip;
+    if (targetEl) {
+      targetEl.classList.remove('koch-just-unlocked');
+      if (typeof targetEl.offsetWidth !== 'undefined') void targetEl.offsetWidth;
+      targetEl.classList.add('koch-just-unlocked');
+      setTimeout(() => targetEl.classList.remove('koch-just-unlocked'), 2500);
+    }
+  }
+
+  if (kochSetupCard && typeof kochSetupCard.scrollIntoView === 'function') {
+    kochSetupCard.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }
+}
+
 if (typeof window !== 'undefined') {
   window.startKochSessionTiming = startKochSessionTiming;
   window.renderStageMatrix = renderStageMatrix;
   window.getClearBadgeHtml = getClearBadgeHtml;
   window.selectKochStage = selectKochStage;
   window.checkStandardMercyRule = checkStandardMercyRule;
+  window.advanceToNextKochStage = advanceToNextKochStage;
 }
 
 if (typeof module !== 'undefined' && module.exports) {
@@ -1310,6 +1372,7 @@ if (typeof module !== 'undefined' && module.exports) {
     clearReflexTimer,
     clearKochTimers,
     handleReflexTimeout,
-    checkStandardMercyRule
+    checkStandardMercyRule,
+    advanceToNextKochStage
   };
 }
