@@ -3,7 +3,9 @@
  * 驗證建議一（常駐振盪器）與建議二（PCB 高光快取）的效能與正確性
  */
 const assert = require('assert');
+const fs = require('fs');
 const path = require('path');
+const projectRoot = path.resolve(__dirname, '..');
 
 // 1. Mock Web Audio API for Node environment
 class MockGainNode {
@@ -215,7 +217,30 @@ assert.ok(activeChipsCache[0].classList.contains('active-dit-chip'), 'Chip 5 has
 
 console.log('   -> PCB Renderer O(1) zero-query cache passed all checks!');
 
+// Test SVG transform-box for node-burst / kochUnlockFlash centering (Issue #25)
+const pcbCss = fs.readFileSync(path.join(projectRoot, 'css/pcb-card.css'), 'utf8');
+const protoHtml = fs.readFileSync(path.join(projectRoot, 'prototype_morse_card.html'), 'utf8');
+
+[
+  { name: 'pcb-card.css', content: pcbCss },
+  { name: 'prototype_morse_card.html', content: protoHtml }
+].forEach(({ name, content }) => {
+  // Check node-shape rule includes transform-box: fill-box
+  const nodeShapeMatch = content.match(/\.node-shape\s*\{([^}]+)\}/);
+  assert.ok(nodeShapeMatch, `${name} must define .node-shape`);
+  assert.ok(nodeShapeMatch[1].includes('transform-box: fill-box'), `${name} .node-shape must include transform-box: fill-box`);
+  assert.ok(nodeShapeMatch[1].includes('transform-origin: center'), `${name} .node-shape must include transform-origin: center`);
+
+  // Check number-chip rect rule includes transform-box: fill-box
+  const numberChipMatch = content.match(/\.number-chip\s+rect\s*\{([^}]+)\}/);
+  assert.ok(numberChipMatch, `${name} must define .number-chip rect`);
+  assert.ok(numberChipMatch[1].includes('transform-box: fill-box'), `${name} .number-chip rect must include transform-box: fill-box`);
+  assert.ok(numberChipMatch[1].includes('transform-origin: center'), `${name} .number-chip rect must include transform-origin: center`);
+});
+console.log('   -> SVG transform-box: fill-box centering (Issue #25) verified in dual-track CSS!');
+
 console.log('\n========================================');
 console.log('All Optimization Tests Passed 100% (Exit 0)!');
 console.log('========================================');
+
 
