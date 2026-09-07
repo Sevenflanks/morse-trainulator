@@ -49,7 +49,8 @@ const requiredCssInPcb = [
   '.node-group.active-node',
   '.node-group.committed-node',
   'node-burst',
-  'pulse-wire'
+  'pulse-wire',
+  'transform-box: fill-box'
 ];
 
 requiredCssInPcb.forEach(rule => {
