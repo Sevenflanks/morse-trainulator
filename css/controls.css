@@ -348,9 +348,10 @@
 
 /* Settings Controls */
 .settings-row {
-  display: flex;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 125px 48px;
+  gap: 10px;
   align-items: center;
-  justify-content: space-between;
   margin-bottom: 8px;
   font-size: 0.8rem;
 }
@@ -359,23 +360,28 @@
   color: #bbb;
   display: flex;
   flex-direction: column;
+  min-width: 0;
 }
 
 .settings-row label span {
   font-size: 0.7rem;
   color: var(--text-muted);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .settings-row input[type="range"] {
-  width: 130px;
+  width: 100%;
   accent-color: var(--gold);
   cursor: pointer;
+  margin: 0;
 }
 
 .settings-row .val-tag {
   font-family: monospace;
   color: var(--gold);
-  width: 55px;
+  width: 100%;
   text-align: right;
 }
 
