@@ -5260,6 +5260,88 @@
       }
     };
 
+    // ==========================================
+    // TELEGRAPHY RX DICTIONARIES & GENERATORS (Issue #31)
+    // ==========================================
+    const CALLSIGN_PREFIXES = [
+      'BV', 'BX', 'BM', 'BN', 'BO', 'BP', // Taiwan
+      'JA', 'JH', 'JR', 'JE', 'JF', 'JG', '7N', '7M', // Japan
+      'W', 'K', 'N', 'AA', 'AB', 'AC', 'WA', 'WB', // USA
+      'DL', 'G', 'F', 'I', 'EA', 'VE', 'VK', 'ZL', 'VR2' // Global
+    ];
+
+    const CW_Q_CODES = [
+      { code: 'QTH', desc: '你的位置 / 所在地' },
+      { code: 'QSL', desc: '確認收悉 / 收據' },
+      { code: 'QRM', desc: '人為干擾' },
+      { code: 'QRN', desc: '天候底噪 / 大氣干擾' },
+      { code: 'QSO', desc: '通聯 / 互相通報' },
+      { code: 'QSY', desc: '轉變頻率' },
+      { code: 'QRZ', desc: '誰在呼叫我？' },
+      { code: 'QRS', desc: '請發慢一點' },
+      { code: 'QRQ', desc: '請發快一點' },
+      { code: 'QRT', desc: '停止發報 / 關機' }
+    ];
+
+    const CW_ABBREVIATIONS = [
+      { word: 'CQ', desc: '普遍呼叫所有電台' },
+      { word: 'DE', desc: '這裡是 (This is)' },
+      { word: 'RST', desc: '信號報告 (可辨度/強度/音質)' },
+      { word: '73', desc: '祝美好安好 (Best regards)' },
+      { word: '88', desc: '熱愛問候 (Love and kisses)' },
+      { word: 'SK', desc: '結束通聯 (End of contact)' },
+      { word: 'BK', desc: '插話 / 中斷 (Break)' },
+      { word: 'UR', desc: '你的 (Your / You are)' },
+      { word: 'NAME', desc: '姓名 / 台長名字' },
+      { word: 'RIG', desc: '電台發射器材' },
+      { word: 'ANT', desc: '天線 (Antenna)' },
+      { word: 'WX', desc: '天氣 (Weather)' },
+      { word: 'HW', desc: '如何？(How copy?)' }
+    ];
+
+    function generateKochRxTargets(maxLevel, count = 10) {
+      const maxIdx = Math.max(2, Math.min(36, maxLevel + 1));
+      const pool = KOCH_SEQUENCE.slice(0, maxIdx);
+      const result = [];
+      for (let i = 0; i < count; i++) {
+        const rIdx = Math.floor(Math.random() * pool.length);
+        result.push(pool[rIdx]);
+      }
+      return result;
+    }
+
+    function generateCallsign() {
+      const prefix = CALLSIGN_PREFIXES[Math.floor(Math.random() * CALLSIGN_PREFIXES.length)];
+      const digit = Math.floor(Math.random() * 10);
+      const suffixLen = Math.floor(Math.random() * 3) + 1; // 1 to 3 letters
+      let suffix = '';
+      for (let i = 0; i < suffixLen; i++) {
+        suffix += String.fromCharCode(65 + Math.floor(Math.random() * 26));
+      }
+      return `${prefix}${digit}${suffix}`;
+    }
+
+    function generateCodeGroup(length = 5, charSet = null) {
+      const defaultChars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+      const pool = charSet || defaultChars;
+      let res = '';
+      for (let i = 0; i < length; i++) {
+        res += pool[Math.floor(Math.random() * pool.length)];
+      }
+      return res;
+    }
+
+    function generateQSignalOrAbbreviation() {
+      const isQ = Math.random() < 0.5;
+      if (isQ) {
+        const item = CW_Q_CODES[Math.floor(Math.random() * CW_Q_CODES.length)];
+        return { text: item.code, desc: item.desc, type: 'qcode' };
+      } else {
+        const item = CW_ABBREVIATIONS[Math.floor(Math.random() * CW_ABBREVIATIONS.length)];
+        return { text: item.word, desc: item.desc, type: 'abbreviation' };
+      }
+    }
+
     function applySpeedPreset(key, saveToSettings = true) {
       const p = speedPresets[key];
       if (!p) return;
