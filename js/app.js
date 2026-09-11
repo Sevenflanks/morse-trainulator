@@ -199,6 +199,8 @@ function initDomReferences() {
     tagWordGap: document.getElementById('tag-word-gap'),
     paramFreq: document.getElementById('param-freq'),
     tagFreq: document.getElementById('tag-freq'),
+    paramSidetoneVol: document.getElementById('param-sidetone-vol'),
+    tagSidetoneVol: document.getElementById('tag-sidetone-vol'),
 
     chkFarnsworth: document.getElementById('chk-farnsworth'),
     farnsworthControls: document.getElementById('farnsworth-controls'),
@@ -894,11 +896,17 @@ function applyLoadedSettings() {
     if (typeof updateTopbarWpm === 'function') updateTopbarWpm(currentWpm);
   }
 
-  // 2. CW Frequency
+  // 2. CW Frequency & Sidetone Volume
   if (s.freq && dom.paramFreq) {
     dom.paramFreq.value = s.freq;
     synth.setFrequency(s.freq);
     if (dom.tagFreq) dom.tagFreq.textContent = `${s.freq}Hz`;
+  }
+  const sidetoneVol = (s.sidetoneVolume !== undefined) ? s.sidetoneVolume : 70;
+  if (dom.paramSidetoneVol) {
+    dom.paramSidetoneVol.value = sidetoneVol;
+    synth.setMasterVolume(sidetoneVol / 100);
+    if (dom.tagSidetoneVol) dom.tagSidetoneVol.textContent = `${sidetoneVol}%`;
   }
 
   // 3. Farnsworth Timing
@@ -1287,6 +1295,16 @@ function setupEventListeners() {
     });
   }
 
+  if (dom.paramSidetoneVol) {
+    dom.paramSidetoneVol.addEventListener('input', (e) => {
+      const val = parseInt(e.target.value);
+      synth.setMasterVolume(val / 100);
+      if (dom.tagSidetoneVol) dom.tagSidetoneVol.textContent = `${val}%`;
+      settingsManager.settings.sidetoneVolume = val;
+      settingsManager.save();
+    });
+  }
+
   // Farnsworth Listeners
   if (dom.chkFarnsworth) {
     dom.chkFarnsworth.addEventListener('change', (e) => {
@@ -1542,6 +1560,16 @@ function initApp() {
   setupStageViewSwitching();
   ribbon = new CWRibbon('cw-ribbon', engine);
   window.ribbon = ribbon;
+
+  if (typeof CWPlayer !== 'undefined') {
+    window.cwPlayer = new CWPlayer({
+      synth,
+      unitT: engine ? engine.getEffectiveUnitT() : 80,
+      farnsworthEnabled: engine && engine.config ? engine.config.farnsworthEnabled : false,
+      charWpm: engine && engine.config ? engine.config.charWpm : 20,
+      getSequence: (char) => (engine ? engine.getSequenceForLetter(char) : '')
+    });
+  }
 
   setupKeyerCallbacks();
   setupEventListeners();

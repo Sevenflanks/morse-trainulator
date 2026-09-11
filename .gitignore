@@ -34,3 +34,4 @@ build/
 # Local AI Agent Workspaces
 .agents/
 skills-lock.json
+.scratch/

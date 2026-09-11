@@ -164,6 +164,7 @@ const DEFAULT_SETTINGS = {
   letterGap: 240,
   wordGap: 560,
   freq: 680,
+  sidetoneVolume: 70,
   farnsworthEnabled: false,
   farnsworthWpm: 18,
   qrnEnabled: false,

@@ -3326,18 +3326,25 @@
     </div>
     <div class="drawer-body" id="drawer-settings-content">
 
-      <!-- Sidetone Frequency -->
+      <!-- Sidetone Frequency & Volume -->
       <div class="settings-card-section" style="background:#14161f; border:1px solid #282d3c; border-radius:8px; padding:12px;">
         <div style="font-size:0.8rem; font-weight:bold; color:var(--neon-blue); margin-bottom:10px; display:flex; justify-content:space-between; align-items:center;">
-          <span><i class="mdi mdi-sine-wave"></i> 側音頻率 (CW Sidetone)</span>
-          <span style="font-size:0.7rem; color:#888;">音調調整 (400–1000 Hz)</span>
+          <span><i class="mdi mdi-sine-wave"></i> 側音與音量 (CW Sidetone & Vol)</span>
+          <span style="font-size:0.7rem; color:#888;">耳機與音頻調校</span>
         </div>
-        <div class="settings-row" style="margin-bottom:0;">
+        <div class="settings-row">
           <label>側音頻率 (CW Sidetone)
             <span>正弦波側音頻率</span>
           </label>
           <input type="range" id="param-freq" min="400" max="1000" step="20" value="680">
           <div class="val-tag" id="tag-freq">680Hz</div>
+        </div>
+        <div class="settings-row" style="margin-bottom:0;">
+          <label>側音音量 (Sidetone Vol)
+            <span>發報與抄收耳機音量</span>
+          </label>
+          <input type="range" id="param-sidetone-vol" min="0" max="100" step="5" value="70">
+          <div class="val-tag" id="tag-sidetone-vol">70%</div>
         </div>
       </div>
 
@@ -3775,6 +3782,8 @@
         this.osc = null;
         this.gain = null;
         this.frequency = 650;
+        this.masterVolume = 0.7;
+        this.masterGain = null;
 
         // QRN Atmospheric Noise components
         this.noiseNode = null;
@@ -3788,9 +3797,13 @@
         if (!this.ctx) {
           const AudioContext = window.AudioContext || window.webkitAudioContext;
           this.ctx = new AudioContext();
+          this.masterGain = this.ctx.createGain();
+          this.masterGain.gain.value = this.masterVolume;
+          this.masterGain.connect(this.ctx.destination);
+
           this.gain = this.ctx.createGain();
           this.gain.gain.value = 0;
-          this.gain.connect(this.ctx.destination);
+          this.gain.connect(this.masterGain);
         }
         if (this.ctx.state === 'suspended') {
           this.ctx.resume();
@@ -3807,6 +3820,16 @@
         }
         if (this.noiseFilter && this.ctx) {
           this.noiseFilter.frequency.setValueAtTime(f, this.ctx.currentTime);
+        }
+      }
+
+      setMasterVolume(vol) {
+        this.masterVolume = Math.max(0, Math.min(1, vol));
+        if (this.masterGain && this.ctx) {
+          const now = this.ctx.currentTime;
+          this.masterGain.gain.cancelScheduledValues(now);
+          this.masterGain.gain.setValueAtTime(this.masterGain.gain.value, now);
+          this.masterGain.gain.linearRampToValueAtTime(this.masterVolume, now + 0.01);
         }
       }
 
@@ -3913,6 +3936,164 @@
         if (this.noiseGain) {
           try { this.noiseGain.disconnect(); } catch(_) {}
           this.noiseGain = null;
+        }
+      }
+    }
+
+    /**
+     * CW PLAYER MODULE: CWPlayer
+     * 純邏輯 CW 音訊排程器與播放引擎 (Zero DOM Dependencies)
+     */
+    class CWPlayer {
+      constructor(options = {}) {
+        this.synth = options.synth || null;
+        this.unitT = options.unitT || 80;
+        this.charWpm = options.charWpm || 20;
+        this.farnsworthEnabled = !!options.farnsworthEnabled;
+        this.getSequence = options.getSequence || ((typeof window !== 'undefined' && window.engine) ? (c) => window.engine.getSequenceForLetter(c) : null);
+
+        this._listeners = {};
+        this._abort = false;
+        this._isPlaying = false;
+        this._currentTimeout = null;
+      }
+
+      on(event, callback) {
+        if (!this._listeners[event]) this._listeners[event] = [];
+        this._listeners[event].push(callback);
+        return this;
+      }
+
+      off(event, callback) {
+        if (!this._listeners[event]) return this;
+        this._listeners[event] = this._listeners[event].filter(cb => cb !== callback);
+        return this;
+      }
+
+      emit(event, ...args) {
+        const cbs = this._listeners[event];
+        if (cbs) {
+          cbs.forEach(cb => {
+            try { cb(...args); } catch (e) { console.error(e); }
+          });
+        }
+      }
+
+      get isPlaying() {
+        return this._isPlaying;
+      }
+
+      getUnitT() {
+        return this.unitT;
+      }
+
+      setUnitT(unitT) {
+        this.unitT = unitT;
+      }
+
+      setFarnsworth(enabled, charWpm) {
+        this.farnsworthEnabled = !!enabled;
+        if (charWpm) this.charWpm = charWpm;
+      }
+
+      calculateTimings(char) {
+        const charUnitT = (this.farnsworthEnabled && this.charWpm)
+          ? Math.round(1200 / this.charWpm)
+          : this.unitT;
+        const interElementGap = charUnitT;
+        const interCharGap = this.unitT * 3;
+        const wordGap = this.unitT * 7;
+        return {
+          charUnitT,
+          interElementGap,
+          interCharGap,
+          wordGap
+        };
+      }
+
+      async sleep(ms) {
+        if (ms <= 0) return;
+        return new Promise((resolve) => {
+          const tid = setTimeout(resolve, ms);
+          this._currentTimeout = tid;
+        });
+      }
+
+      stop() {
+        this._abort = true;
+        if (this._currentTimeout) {
+          clearTimeout(this._currentTimeout);
+          this._currentTimeout = null;
+        }
+        if (this.synth && typeof this.synth.stop === 'function') {
+          try { this.synth.stop(); } catch (e) {}
+        }
+        if (this._isPlaying) {
+          this._isPlaying = false;
+          this.emit('playbackAbort');
+        }
+      }
+
+      async playSequence(seq, timings) {
+        if (!seq || this._abort) return;
+        const t = timings || this.calculateTimings();
+        for (let i = 0; i < seq.length; i++) {
+          if (this._abort) break;
+          const sym = seq[i];
+          const dur = (sym === '.') ? t.charUnitT : (t.charUnitT * 3);
+
+          this.emit('pulseStart', sym, dur);
+          if (this.synth) this.synth.start();
+          await this.sleep(dur);
+
+          if (this.synth) this.synth.stop();
+          this.emit('pulseEnd', sym);
+
+          // Intra-character element gap (1T)
+          if (i < seq.length - 1 && !this._abort) {
+            await this.sleep(t.interElementGap);
+          }
+        }
+      }
+
+      async playText(text, options = {}) {
+        if (!text) return;
+        this.stop();
+        this._abort = false;
+        this._isPlaying = true;
+
+        const getSeq = options.getSequence || this.getSequence || ((c) => '');
+        const timings = options.timings || this.calculateTimings();
+
+        const chars = text.toUpperCase().split('');
+        for (let i = 0; i < chars.length; i++) {
+          if (this._abort) break;
+          const char = chars[i];
+
+          if (char === ' ') {
+            this.emit('wordGapStart', timings.wordGap);
+            await this.sleep(timings.wordGap);
+            this.emit('wordGapEnd');
+            continue;
+          }
+
+          const seq = getSeq(char);
+          this.emit('charStart', char, seq);
+          if (seq) {
+            await this.playSequence(seq, timings);
+          }
+          this.emit('charComplete', char, seq);
+
+          // Inter-character gap (3T)
+          const nextChar = chars[i + 1];
+          if (nextChar && nextChar !== ' ' && !this._abort) {
+            await this.sleep(timings.interCharGap);
+          }
+        }
+
+        if (!this._abort) {
+          this._isPlaying = false;
+          this.emit('playbackComplete');
         }
       }
     }
@@ -4612,6 +4793,7 @@
       letterGap: 240,
       wordGap: 560,
       freq: 680,
+      sidetoneVolume: 70,
       farnsworthEnabled: false,
       farnsworthWpm: 18,
       qrnEnabled: false,
@@ -4743,11 +4925,13 @@
     const paramGap = document.getElementById('param-gap');
     const paramWordGap = document.getElementById('param-word-gap');
     const paramFreq = document.getElementById('param-freq');
+    const paramSidetoneVol = document.getElementById('param-sidetone-vol');
     const tagUnitT = document.getElementById('tag-unit-t');
     const tagThreshold = document.getElementById('tag-threshold');
     const tagGap = document.getElementById('tag-gap');
     const tagWordGap = document.getElementById('tag-word-gap');
     const tagFreq = document.getElementById('tag-freq');
+    const tagSidetoneVol = document.getElementById('tag-sidetone-vol');
     const wordTotalReadout = document.getElementById('word-total-readout');
     const presetDescBox = document.getElementById('preset-desc-box');
 
@@ -7871,6 +8055,18 @@
       }
     });
 
+    if (paramSidetoneVol) {
+      paramSidetoneVol.addEventListener('input', (e) => {
+        const val = parseInt(e.target.value);
+        synth.setMasterVolume(val / 100);
+        if (tagSidetoneVol) tagSidetoneVol.textContent = `${val}%`;
+        if (typeof settingsManager !== 'undefined') {
+          settingsManager.settings.sidetoneVolume = val;
+          settingsManager.save();
+        }
+      });
+    }
+
     // Farnsworth Timing listeners
     chkFarnsworth.addEventListener('change', (e) => {
       const enabled = e.target.checked;
@@ -8230,11 +8426,17 @@
         if (typeof updateTopbarWpm === 'function') updateTopbarWpm(currentWpm);
       }
 
-      // 2. CW Sidetone Frequency
+      // 2. CW Sidetone Frequency & Volume
       if (s.freq) {
         paramFreq.value = s.freq;
         synth.setFrequency(s.freq);
         tagFreq.textContent = `${s.freq}Hz`;
+      }
+      const sidetoneVol = (s.sidetoneVolume !== undefined) ? s.sidetoneVolume : 70;
+      if (paramSidetoneVol) {
+        paramSidetoneVol.value = sidetoneVol;
+        synth.setMasterVolume(sidetoneVol / 100);
+        if (tagSidetoneVol) tagSidetoneVol.textContent = `${sidetoneVol}%`;
       }
 
       // 3. Farnsworth Timing

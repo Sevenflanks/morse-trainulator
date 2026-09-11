@@ -929,18 +929,25 @@
     </div>
     <div class="drawer-body" id="drawer-settings-content">
 
-      <!-- Sidetone Frequency -->
+      <!-- Sidetone Frequency & Volume -->
       <div class="settings-card-section" style="background:#14161f; border:1px solid #282d3c; border-radius:8px; padding:12px;">
         <div style="font-size:0.8rem; font-weight:bold; color:var(--neon-blue); margin-bottom:10px; display:flex; justify-content:space-between; align-items:center;">
-          <span><i class="mdi mdi-sine-wave"></i> 側音頻率 (CW Sidetone)</span>
-          <span style="font-size:0.7rem; color:#888;">音調調整 (400–1000 Hz)</span>
+          <span><i class="mdi mdi-sine-wave"></i> 側音與音量 (CW Sidetone & Vol)</span>
+          <span style="font-size:0.7rem; color:#888;">耳機與音頻調校</span>
         </div>
-        <div class="settings-row" style="margin-bottom:0;">
+        <div class="settings-row">
           <label>側音頻率 (CW Sidetone)
             <span>正弦波側音頻率</span>
           </label>
           <input type="range" id="param-freq" min="400" max="1000" step="20" value="680">
           <div class="val-tag" id="tag-freq">680Hz</div>
+        </div>
+        <div class="settings-row" style="margin-bottom:0;">
+          <label>側音音量 (Sidetone Vol)
+            <span>發報與抄收耳機音量</span>
+          </label>
+          <input type="range" id="param-sidetone-vol" min="0" max="100" step="5" value="70">
+          <div class="val-tag" id="tag-sidetone-vol">70%</div>
         </div>
       </div>
 
@@ -1083,6 +1090,7 @@
   <script src="js/core/morse-data.js?v=1.3.3"></script>
   <script src="js/core/morse-engine.js?v=1.3.3"></script>
   <script src="js/core/morse-audio.js?v=1.3.3"></script>
+  <script src="js/core/cw-player.js?v=1.3.3"></script>
   <script src="js/core/iambic-keyer.js?v=1.3.3"></script>
   <script src="js/core/cw-ribbon.js?v=1.3.3"></script>
   <script src="js/core/koch-manager.js?v=1.3.3"></script>

@@ -11,6 +11,7 @@ const _DEFAULT_SETTINGS = (typeof DEFAULT_SETTINGS !== 'undefined') ? DEFAULT_SE
   letterGap: 240,
   wordGap: 560,
   freq: 680,
+  sidetoneVolume: 70,
   farnsworthEnabled: false,
   farnsworthWpm: 18,
   qrnEnabled: false,
