@@ -1571,6 +1571,14 @@ function initApp() {
     });
   }
 
+  if (typeof RxMode !== 'undefined') {
+    window.rxMode = new RxMode({
+      cwPlayer: window.cwPlayer,
+      submode: 'koch'
+    });
+    window.rxMode.init();
+  }
+
   setupKeyerCallbacks();
   setupEventListeners();
 
@@ -1996,6 +2004,11 @@ function setupWorkspaceNavigation() {
     const btn = document.getElementById(item.btnId);
     if (!btn) return;
     btn.addEventListener('click', () => {
+      // Stop CWPlayer audio playback if switching away
+      if (typeof window !== 'undefined' && window.cwPlayer && window.cwPlayer.isPlaying) {
+        window.cwPlayer.stop();
+      }
+
       wsTabs.forEach(t => {
         const b = document.getElementById(t.btnId);
         const v = document.getElementById(t.viewId);
@@ -2010,6 +2023,13 @@ function setupWorkspaceNavigation() {
       if (targetView) {
         targetView.style.display = 'flex';
         targetView.classList.add('active');
+      }
+
+      // Auto start Rx session on first entry if IDLE
+      if (item.viewId === 'ws-container-rx' && typeof window !== 'undefined' && window.rxMode) {
+        if (window.rxMode.state === 'IDLE') {
+          window.rxMode.startSession();
+        }
       }
     });
   });

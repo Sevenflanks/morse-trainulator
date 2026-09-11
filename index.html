@@ -59,16 +59,17 @@
     </div>
   </header>
 
+  <!-- Panoramic Top HUD Ribbon (75px) -->
+  <div class="p3b-top-ribbon" id="cockpit-top-ribbon">
+    <div class="scope-bezel-text">
+      <i class="mdi mdi-sine-wave"></i> PANORAMIC SPECTRUM HUD · 100% HORIZONTAL CARRIER MONITOR
+    </div>
+    <canvas id="cw-ribbon" class="scope-canvas" height="75"></canvas>
+    <div class="scope-graticule"></div>
+  </div>
+
   <!-- Workspace 1: Tx (發報) -->
   <div id="ws-container-tx" class="workspace-view active">
-    <!-- Panoramic Top HUD Ribbon (75px) -->
-    <div class="p3b-top-ribbon" id="cockpit-top-ribbon">
-      <div class="scope-bezel-text">
-        <i class="mdi mdi-sine-wave"></i> PANORAMIC SPECTRUM HUD · 100% HORIZONTAL CARRIER MONITOR
-      </div>
-      <canvas id="cw-ribbon" class="scope-canvas" height="75"></canvas>
-      <div class="scope-graticule"></div>
-    </div>
 
     <div class="header-subbar noise-hidden" style="display:none;">
       <div class="subtitle">電報模擬與練習工具 · 支援直鍵 / 雙撥片 / 機械震報鍵 · PCB 二元樹尋路 · 節奏儀表</div>
@@ -1277,6 +1278,7 @@
   <script src="js/ui/free-mode.js?v=1.3.3"></script>
   <script src="js/ui/text-mode.js?v=1.3.3"></script>
   <script src="js/ui/koch-mode.js?v=1.3.3"></script>
+  <script src="js/ui/rx-mode.js?v=1.3.3"></script>
 
   <!-- Application Bootstrap -->
   <script src="js/app.js?v=1.3.3"></script>

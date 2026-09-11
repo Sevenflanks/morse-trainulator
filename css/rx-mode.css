@@ -9,7 +9,7 @@
   width: 100%;
   max-width: 1200px;
   margin: 0 auto;
-  padding: 12px 16px;
+  padding: 12px 16px 140px;
   box-sizing: border-box;
 }
 
@@ -321,4 +321,41 @@
   font-size: 0.72rem;
   color: #888;
   padding: 4px;
+}
+
+/* Blind Mode Masking on PCB */
+.pcb-blind-mode #wires-layer,
+.pcb-blind-mode #nodes-layer,
+.pcb-blind-mode #digits-bus-layer,
+.pcb-blind-mode .tree-path,
+.pcb-blind-mode .node-group {
+  opacity: 0.12;
+  filter: blur(2px) grayscale(0.8);
+  pointer-events: none;
+  transition: all 0.3s ease;
+}
+
+/* Keypad Active Press Animation */
+.keypad-key.active-press {
+  background: var(--neon-blue) !important;
+  color: #000 !important;
+  transform: scale(0.95);
+  box-shadow: 0 0 10px rgba(0, 229, 255, 0.6);
+}
+
+/* Confusion Matrix List Styling */
+.rx-confusion-item {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 3px 0;
+  font-family: monospace;
+}
+.rx-confusion-item .confusion-exp {
+  color: #00e676;
+  font-weight: bold;
+}
+.rx-confusion-item .confusion-act {
+  color: #ff5252;
+  font-weight: bold;
 }
