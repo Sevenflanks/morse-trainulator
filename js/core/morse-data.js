@@ -180,7 +180,8 @@ const DEFAULT_SETTINGS = {
   textShowHints: true,
   textStrictMode: false,
   kochShowHints: false,
-  layoutMode: '2col' // '2col' | '3col'
+  layoutMode: '2col', // '2col' | '3col'
+  themePreset: 'cyber-brass' // 'cyber-brass' | 'classic-amber' | 'green-phosphor'
 };
 
 const speedPresets = {
