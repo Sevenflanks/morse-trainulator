@@ -148,6 +148,17 @@ class CWRibbon {
       ctx.lineTo(x2, this.baselineY);
       ctx.stroke();
 
+      // CRT Phosphor Decay Trail on Falling Edge (x2)
+      if (x2 >= 0 && x2 <= W) {
+        const trailWidth = 14;
+        const phosphorGrad = ctx.createLinearGradient(x2, 0, x2 + trailWidth, 0);
+        const trailColor = p.isDit ? 'rgba(0, 229, 255, 0.32)' : 'rgba(255, 215, 0, 0.32)';
+        phosphorGrad.addColorStop(0, trailColor);
+        phosphorGrad.addColorStop(1, 'rgba(0, 0, 0, 0)');
+        ctx.fillStyle = phosphorGrad;
+        ctx.fillRect(x2, this.highY, trailWidth, this.baselineY - this.highY);
+      }
+
       if (w > 18) {
         ctx.fillStyle = color;
         ctx.font = 'bold 8px monospace';

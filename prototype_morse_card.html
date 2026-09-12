@@ -614,10 +614,16 @@
     }
 
     .key-button:active, .key-button.active {
-      transform: translateY(2px);
+      transform: translateY(2px) scale(0.98);
       background: linear-gradient(180deg, #443a1d 0%, #26200e 100%);
       border-color: var(--gold);
-      box-shadow: 0 0 18px var(--gold-glow);
+      box-shadow: 0 0 18px var(--gold-glow), inset 0 0 8px rgba(0, 229, 255, 0.4);
+    }
+
+    .key-button:active span i, .key-button.active span i {
+      color: #fff;
+      filter: drop-shadow(0 0 6px var(--cyan)) drop-shadow(0 0 12px var(--gold));
+      animation: contact-spark 0.08s infinite alternate;
     }
 
     /* Keyer Device Switcher Tabs */
@@ -695,6 +701,19 @@
       background: linear-gradient(180deg, #3d3419 0%, #1c1809 100%);
       border-color: var(--gold);
       box-shadow: 0 0 14px var(--gold-glow);
+    }
+
+    #paddle-left {
+      transform-origin: center right;
+    }
+    #paddle-right {
+      transform-origin: center left;
+    }
+    #paddle-left:active, #paddle-left.active {
+      transform: translateY(2px) rotate(-1.5deg);
+    }
+    #paddle-right:active, #paddle-right.active {
+      transform: translateY(2px) rotate(1.5deg);
     }
 
     .paddle-lever.active-dah {
@@ -3204,21 +3223,38 @@
   border-bottom-left-radius: 28px;
   border-left: 3px solid var(--neon-blue);
   border-bottom: 3px solid var(--neon-blue);
+  transform-origin: center right;
 }
 .k2-thumb-wing.right {
   border-bottom-right-radius: 28px;
   border-right: 3px solid var(--gold);
   border-bottom: 3px solid var(--gold);
+  transform-origin: center left;
 }
 .k2-thumb-wing.active {
   transform: scale(0.97) translateY(2px);
   background: linear-gradient(145deg, #10141c 0%, #07090e 100%);
 }
-.k2-thumb-wing.left.active {
-  box-shadow: 0 0 20px rgba(0, 229, 255, 0.45);
+.k2-thumb-wing.left:not(.mode-straight).active {
+  transform: scale(0.97) translateY(2px) rotate(-1.5deg);
+  box-shadow: 0 0 22px rgba(0, 229, 255, 0.55);
 }
-.k2-thumb-wing.right.active {
-  box-shadow: 0 0 20px rgba(255, 215, 0, 0.45);
+.k2-thumb-wing.right:not(.mode-straight).active {
+  transform: scale(0.97) translateY(2px) rotate(1.5deg);
+  box-shadow: 0 0 22px rgba(255, 215, 0, 0.55);
+}
+.k2-thumb-wing.mode-straight.active {
+  transform: scale(0.97) translateY(2px);
+  box-shadow: 0 0 24px rgba(255, 215, 0, 0.5), inset 0 0 10px rgba(0, 229, 255, 0.3);
+}
+.k2-thumb-wing.mode-straight.active .k2-wing-symbol {
+  color: #fff;
+  text-shadow: 0 0 8px #fff, 0 0 16px rgba(255, 215, 0, 0.9), 0 0 24px rgba(0, 229, 255, 0.8);
+  animation: contact-spark 0.08s infinite alternate;
+}
+@keyframes contact-spark {
+  0% { transform: scale(1); filter: brightness(1); }
+  100% { transform: scale(1.08); filter: brightness(1.35) drop-shadow(0 0 6px #00e5ff); }
 }
 .k2-wing-symbol {
   font-size: 2.2rem;
@@ -7492,6 +7528,17 @@
           ctx.moveTo(x2, this.highY);
           ctx.lineTo(x2, this.baselineY);
           ctx.stroke();
+
+          // CRT Phosphor Decay Trail on Falling Edge (x2)
+          if (x2 >= 0 && x2 <= W) {
+            const trailWidth = 14;
+            const phosphorGrad = ctx.createLinearGradient(x2, 0, x2 + trailWidth, 0);
+            const trailColor = p.isDit ? 'rgba(0, 229, 255, 0.32)' : 'rgba(255, 215, 0, 0.32)';
+            phosphorGrad.addColorStop(0, trailColor);
+            phosphorGrad.addColorStop(1, 'rgba(0, 0, 0, 0)');
+            ctx.fillStyle = phosphorGrad;
+            ctx.fillRect(x2, this.highY, trailWidth, this.baselineY - this.highY);
+          }
 
           if (w > 18) {
             ctx.fillStyle = color;
@@ -11895,6 +11942,9 @@ function updateK5MorphingUI() {
   const pillBug = document.getElementById('k5-pill-bug');
 
   if (!wingLeft || !wingRight) return;
+
+  wingLeft.classList.toggle('mode-straight', currentKeyerDevice === 'straight');
+  wingRight.classList.toggle('mode-straight', currentKeyerDevice === 'straight');
 
   if (pillPaddle) pillPaddle.classList.toggle('active', currentKeyerDevice === 'paddle');
   if (pillStraight) pillStraight.classList.toggle('active', currentKeyerDevice === 'straight');

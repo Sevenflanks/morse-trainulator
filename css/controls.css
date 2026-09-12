@@ -198,10 +198,16 @@
 }
 
 .key-button:active, .key-button.active {
-  transform: translateY(2px);
+  transform: translateY(2px) scale(0.98);
   background: linear-gradient(180deg, #443a1d 0%, #26200e 100%);
   border-color: var(--gold);
-  box-shadow: 0 0 18px var(--gold-glow);
+  box-shadow: 0 0 18px var(--gold-glow), inset 0 0 8px rgba(0, 229, 255, 0.4);
+}
+
+.key-button:active span i, .key-button.active span i {
+  color: #fff;
+  filter: drop-shadow(0 0 6px var(--cyan)) drop-shadow(0 0 12px var(--gold));
+  animation: contact-spark 0.08s infinite alternate;
 }
 
 /* Keyer Device Switcher Tabs */
@@ -279,6 +285,19 @@
   background: linear-gradient(180deg, #3d3419 0%, #1c1809 100%);
   border-color: var(--gold);
   box-shadow: 0 0 14px var(--gold-glow);
+}
+
+#paddle-left {
+  transform-origin: center right;
+}
+#paddle-right {
+  transform-origin: center left;
+}
+#paddle-left:active, #paddle-left.active {
+  transform: translateY(2px) rotate(-1.5deg);
+}
+#paddle-right:active, #paddle-right.active {
+  transform: translateY(2px) rotate(1.5deg);
 }
 
 .paddle-lever.active-dah {
