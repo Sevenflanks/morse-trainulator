@@ -1485,6 +1485,7 @@
                 <th>地點 (QTH)</th>
                 <th>網格</th>
                 <th>狀態</th>
+                <th>操作</th>
               </tr>
             </thead>
             <tbody id="qso-logbook-tbody">
@@ -1500,6 +1501,52 @@
     </div> <!-- /qso-workspace-stage -->
   </div>
   <!-- /ws-container-qso -->
+
+  <!-- QSL Confirmation Card Modal Panel -->
+  <div id="qsl-modal-backdrop" class="qsl-modal-backdrop" style="display:none;"></div>
+  <div id="qsl-modal" class="qsl-modal" style="display:none;">
+    <div class="qsl-modal-header">
+      <div class="qsl-modal-title">
+        <i class="mdi mdi-card-account-details"></i> QSL 通聯確認卡 (QSL Confirmation Card)
+      </div>
+      <button type="button" id="btn-close-qsl" class="btn-icon" title="關閉"><i class="mdi mdi-close"></i></button>
+    </div>
+    <div class="qsl-modal-body">
+      <!-- Theme Switcher Pills -->
+      <div class="qsl-theme-bar">
+        <span class="qsl-bar-label"><i class="mdi mdi-palette-outline"></i> 卡片風格主題：</span>
+        <button type="button" class="qsl-theme-pill active" data-qsl-theme="cyber-brass">
+          <i class="mdi mdi-chip"></i> 賽博黃銅 (Cyber Brass)
+        </button>
+        <button type="button" class="qsl-theme-pill" data-qsl-theme="vintage-telegraph">
+          <i class="mdi mdi-feather"></i> 復古老電報 (Vintage Telegraph)
+        </button>
+        <button type="button" class="qsl-theme-pill" data-qsl-theme="classic-arrl">
+          <i class="mdi mdi-radio-tower"></i> 經典聯盟 (Classic Radio)
+        </button>
+      </div>
+
+      <!-- Canvas Card Preview Wrapper -->
+      <div class="qsl-canvas-wrapper">
+        <canvas id="qsl-card-canvas" width="1200" height="800"></canvas>
+      </div>
+
+      <!-- Modal Action Toolbar -->
+      <div class="qsl-modal-actions">
+        <div class="qsl-meta-hint" id="qsl-modal-meta-hint">
+          <i class="mdi mdi-information-outline"></i> 高畫質 1200×800 (3:2 明信片規格)，離線即時繪製
+        </div>
+        <div class="qsl-action-buttons">
+          <button type="button" class="btn-qso-action" id="btn-qsl-copy">
+            <i class="mdi mdi-content-copy"></i> 複製卡片圖片
+          </button>
+          <button type="button" class="btn-qso-send" id="btn-qsl-download">
+            <i class="mdi mdi-download"></i> 下載 QSL 卡 (PNG)
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
 
   <!-- Slide-up Settings Drawer Skeleton -->
   <div id="settings-drawer-backdrop" class="drawer-backdrop" style="display:none;"></div>
@@ -1712,6 +1759,7 @@
   <script src="js/ui/text-mode.js?v=1.3.3"></script>
   <script src="js/ui/koch-mode.js?v=1.3.3"></script>
   <script src="js/ui/rx-mode.js?v=1.3.3"></script>
+  <script src="js/ui/qsl-card-renderer.js?v=1.3.3"></script>
   <script src="js/ui/qso-mode.js?v=1.3.3"></script>
 
   <!-- Application Bootstrap -->

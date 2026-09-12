@@ -1639,10 +1639,15 @@ function initApp() {
     window.qsoLogManager = new QsoLogManager();
   }
 
+  if (typeof QslCardRenderer !== 'undefined') {
+    window.qslCardRenderer = new QslCardRenderer();
+  }
+
   if (typeof QsoMode !== 'undefined') {
     window.qsoMode = new QsoMode({
       qsoManager: window.qsoManager,
       qsoLogManager: window.qsoLogManager,
+      qslRenderer: window.qslCardRenderer,
       cwPlayer: window.cwPlayer,
       synth: window.synth,
       engine: window.engine

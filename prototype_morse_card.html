@@ -4977,6 +4977,147 @@
   }
 }
 
+/* ==========================================================================
+   10. QSL Card Modal Preview & Actions
+   ========================================================================== */
+.qsl-modal-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.75);
+  backdrop-filter: blur(4px);
+  z-index: 1000;
+}
+
+.qsl-modal {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 90%;
+  max-width: 920px;
+  max-height: 90vh;
+  overflow-y: auto;
+  background: #11141c;
+  border: 1.5px solid var(--gold);
+  border-radius: 12px;
+  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.8), 0 0 25px rgba(255, 215, 0, 0.2);
+  z-index: 1001;
+  display: flex;
+  flex-direction: column;
+}
+
+.qsl-modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px 16px;
+  background: #161a25;
+  border-bottom: 1px solid #252e40;
+}
+
+.qsl-modal-title {
+  font-size: 1rem;
+  font-weight: 800;
+  color: var(--gold);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.qsl-modal-body {
+  padding: 14px 18px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.qsl-theme-bar {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.qsl-bar-label {
+  font-size: 0.75rem;
+  color: #8c9cb0;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.qsl-theme-pill {
+  background: #171b26;
+  border: 1px solid #293245;
+  color: #9aa8bc;
+  padding: 6px 12px;
+  border-radius: 6px;
+  font-size: 0.76rem;
+  font-weight: 600;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  transition: all 0.15s ease;
+}
+
+.qsl-theme-pill:hover {
+  border-color: var(--neon-blue);
+  color: #fff;
+}
+
+.qsl-theme-pill.active {
+  background: rgba(0, 229, 255, 0.15);
+  border-color: var(--neon-blue);
+  color: var(--neon-blue);
+  box-shadow: 0 0 8px rgba(0, 229, 255, 0.25);
+}
+
+.qsl-canvas-wrapper {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background: #090a0f;
+  border: 1px solid #1c2230;
+  border-radius: 8px;
+  padding: 10px;
+  box-sizing: border-box;
+}
+
+#qsl-card-canvas {
+  width: 100%;
+  max-width: 840px;
+  height: auto;
+  aspect-ratio: 3 / 2;
+  border-radius: 6px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.7);
+  display: block;
+}
+
+.qsl-modal-actions {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px;
+  padding-top: 4px;
+}
+
+.qsl-meta-hint {
+  font-size: 0.74rem;
+  color: #6e7e96;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.qsl-action-buttons {
+  display: flex;
+  gap: 8px;
+}
+
   </style>
 </head>
 <body>
@@ -6419,6 +6560,7 @@
                 <th>地點 (QTH)</th>
                 <th>網格</th>
                 <th>狀態</th>
+                <th>操作</th>
               </tr>
             </thead>
             <tbody id="qso-logbook-tbody">
@@ -6434,6 +6576,52 @@
     </div> <!-- /qso-workspace-stage -->
   </div>
   <!-- /ws-container-qso -->
+
+  <!-- QSL Confirmation Card Modal Panel -->
+  <div id="qsl-modal-backdrop" class="qsl-modal-backdrop" style="display:none;"></div>
+  <div id="qsl-modal" class="qsl-modal" style="display:none;">
+    <div class="qsl-modal-header">
+      <div class="qsl-modal-title">
+        <i class="mdi mdi-card-account-details"></i> QSL 通聯確認卡 (QSL Confirmation Card)
+      </div>
+      <button type="button" id="btn-close-qsl" class="btn-icon" title="關閉"><i class="mdi mdi-close"></i></button>
+    </div>
+    <div class="qsl-modal-body">
+      <!-- Theme Switcher Pills -->
+      <div class="qsl-theme-bar">
+        <span class="qsl-bar-label"><i class="mdi mdi-palette-outline"></i> 卡片風格主題：</span>
+        <button type="button" class="qsl-theme-pill active" data-qsl-theme="cyber-brass">
+          <i class="mdi mdi-chip"></i> 賽博黃銅 (Cyber Brass)
+        </button>
+        <button type="button" class="qsl-theme-pill" data-qsl-theme="vintage-telegraph">
+          <i class="mdi mdi-feather"></i> 復古老電報 (Vintage Telegraph)
+        </button>
+        <button type="button" class="qsl-theme-pill" data-qsl-theme="classic-arrl">
+          <i class="mdi mdi-radio-tower"></i> 經典聯盟 (Classic Radio)
+        </button>
+      </div>
+
+      <!-- Canvas Card Preview Wrapper -->
+      <div class="qsl-canvas-wrapper">
+        <canvas id="qsl-card-canvas" width="1200" height="800"></canvas>
+      </div>
+
+      <!-- Modal Action Toolbar -->
+      <div class="qsl-modal-actions">
+        <div class="qsl-meta-hint" id="qsl-modal-meta-hint">
+          <i class="mdi mdi-information-outline"></i> 高畫質 1200×800 (3:2 明信片規格)，離線即時繪製
+        </div>
+        <div class="qsl-action-buttons">
+          <button type="button" class="btn-qso-action" id="btn-qsl-copy">
+            <i class="mdi mdi-content-copy"></i> 複製卡片圖片
+          </button>
+          <button type="button" class="btn-qso-send" id="btn-qsl-download">
+            <i class="mdi mdi-download"></i> 下載 QSL 卡 (PNG)
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
 
 
   <!-- Slide-up Settings Drawer Skeleton -->
@@ -8004,6 +8192,10 @@
 
         this.save();
         return entry;
+      }
+
+      getLogs() {
+        return this.logs ? [...this.logs] : [];
       }
 
       getLog(id) {
@@ -9649,23 +9841,712 @@
     }
 
     /**
+     * QSL CONFIRMATION CARD RENDERER: qsl-card-renderer.js
+     * 純原生 HTML5 Canvas 2D 高畫質 QSL 通聯確認卡繪製引擎 (Zero External Dependencies)
+     * 規格：1200×800 高解析度 (3:2 明信片黃金比例)
+     * 三款經典主題：賽博黃銅 (cyber-brass)、復古老電報 (vintage-telegraph)、經典聯盟 (classic-arrl)
+     * (100% Zero-Emoji, Material Design Icons, file:/// Offline Compatible)
+     */
+    
+    class QslCardRenderer {
+      constructor() {
+        this.width = 1200;
+        this.height = 800;
+      }
+    
+      /**
+       * Main Render Entry Point
+       * @param {HTMLCanvasElement} canvas
+       * @param {Object} data - QSO contact data
+       * @param {string} theme - 'cyber-brass' | 'vintage-telegraph' | 'classic-arrl'
+       */
+      render(canvas, data = {}, theme = 'cyber-brass') {
+        if (!canvas) return;
+        canvas.width = this.width;
+        canvas.height = this.height;
+    
+        const ctx = canvas.getContext('2d');
+        if (!ctx) return;
+    
+        // Normalize QSO data with robust defaults
+        const qso = this._normalizeData(data);
+    
+        switch (theme) {
+          case 'vintage-telegraph':
+            this._renderVintageTelegraph(ctx, qso);
+            break;
+          case 'classic-arrl':
+            this._renderClassicArrl(ctx, qso);
+            break;
+          case 'cyber-brass':
+          default:
+            this._renderCyberBrass(ctx, qso);
+            break;
+        }
+      }
+    
+      _normalizeData(data) {
+        const now = new Date();
+        return {
+          myCall: String(data.myCall || 'BV2TT').trim().toUpperCase(),
+          dxCall: String(data.dxCall || 'JA1ABC').trim().toUpperCase(),
+          dateDisplay: String(data.dateDisplay || now.toISOString().slice(0, 10)).trim(),
+          timeDisplay: String(data.timeDisplay || (now.toISOString().slice(11, 16) + ' UTC')).trim(),
+          band: String(data.band || '20M').trim().toUpperCase(),
+          freq: String(data.freq || '14.025').trim(),
+          mode: String(data.mode || 'CW').trim().toUpperCase(),
+          rstSent: String(data.rstSent || '599').trim(),
+          rstRcvd: String(data.rstRcvd || '599').trim(),
+          myName: String(data.myName || 'EDDIE').trim().toUpperCase(),
+          dxName: String(data.dxName || data.name || 'KEN').trim().toUpperCase(),
+          myQth: String(data.myQth || 'TAIPEI, TAIWAN').trim().toUpperCase(),
+          dxQth: String(data.dxQth || data.qth || 'TOKYO, JAPAN').trim().toUpperCase(),
+          myGrid: String(data.myGrid || 'PL05').trim().toUpperCase(),
+          dxGrid: String(data.dxGrid || data.grid || 'PM95').trim().toUpperCase(),
+          rig: String(data.rig || '100W').trim().toUpperCase(),
+          ant: String(data.ant || 'DIPOLE').trim().toUpperCase(),
+          notes: String(data.notes || 'TNX FER FB CW QSO! 73 ES GL').trim()
+        };
+      }
+    
+      // ==========================================
+      // THEME 1: CYBER BRASS (賽博黃銅)
+      // ==========================================
+      _renderCyberBrass(ctx, qso) {
+        const w = this.width;
+        const h = this.height;
+    
+        // 1. Base Obsidian Background
+        const bgGrad = ctx.createLinearGradient(0, 0, w, h);
+        bgGrad.addColorStop(0, '#0c0e14');
+        bgGrad.addColorStop(0.5, '#121620');
+        bgGrad.addColorStop(1, '#090b10');
+        ctx.fillStyle = bgGrad;
+        ctx.fillRect(0, 0, w, h);
+    
+        // Subtle brushed diagonal lines
+        ctx.strokeStyle = 'rgba(255, 215, 0, 0.02)';
+        ctx.lineWidth = 1;
+        for (let x = -h; x < w + h; x += 16) {
+          ctx.beginPath();
+          ctx.moveTo(x, 0);
+          ctx.lineTo(x + h, h);
+          ctx.stroke();
+        }
+    
+        // 2. High-Tech PCB Vector Circuit Traces & Watermark
+        ctx.strokeStyle = 'rgba(0, 229, 255, 0.12)';
+        ctx.lineWidth = 1.5;
+        ctx.beginPath();
+        // Trace 1
+        ctx.moveTo(40, 200);
+        ctx.lineTo(160, 200);
+        ctx.lineTo(220, 260);
+        ctx.lineTo(380, 260);
+        ctx.stroke();
+    
+        // Trace 2
+        ctx.moveTo(w - 40, 180);
+        ctx.lineTo(w - 180, 180);
+        ctx.lineTo(w - 240, 240);
+        ctx.lineTo(w - 420, 240);
+        ctx.stroke();
+    
+        // Solder pads
+        ctx.fillStyle = '#00e5ff';
+        [ [160, 200], [220, 260], [380, 260], [w - 180, 180], [w - 240, 240], [w - 420, 240] ].forEach(([px, py]) => {
+          ctx.beginPath();
+          ctx.arc(px, py, 3, 0, Math.PI * 2);
+          ctx.fill();
+        });
+    
+        // 3. Double Chassis Beveled Border & Corner Rivets
+        ctx.strokeStyle = '#d4af37';
+        ctx.lineWidth = 4;
+        ctx.strokeRect(28, 28, w - 56, h - 56);
+    
+        ctx.strokeStyle = 'rgba(0, 229, 255, 0.6)';
+        ctx.lineWidth = 1.5;
+        ctx.strokeRect(40, 40, w - 80, h - 80);
+    
+        // 4 Corner Screws / Vias
+        const corners = [ [40, 40], [w - 40, 40], [40, h - 40], [w - 40, h - 40] ];
+        corners.forEach(([cx, cy]) => {
+          ctx.fillStyle = '#1e2638';
+          ctx.beginPath();
+          ctx.arc(cx, cy, 8, 0, Math.PI * 2);
+          ctx.fill();
+          ctx.strokeStyle = '#ffd700';
+          ctx.lineWidth = 2;
+          ctx.stroke();
+        });
+    
+        // 4. Header Bar
+        ctx.fillStyle = '#d4af37';
+        ctx.font = '700 15px "SF Mono", Consolas, monospace';
+        ctx.textAlign = 'center';
+        ctx.letterSpacing = '3px';
+        ctx.fillText('MORSE TRAINULATOR · AMATEUR RADIO CW QSO CONFIRMATION', w / 2, 78);
+    
+        ctx.fillStyle = '#6e7d94';
+        ctx.font = '600 13px "SF Mono", Consolas, monospace';
+        ctx.fillText(`OPERATOR: ${qso.myName} · QTH: ${qso.myQth} · GRID: ${qso.myGrid} · RIG: ${qso.rig} (${qso.ant})`, w / 2, 102);
+    
+        ctx.strokeStyle = 'rgba(212, 175, 55, 0.3)';
+        ctx.lineWidth = 1;
+        ctx.beginPath();
+        ctx.moveTo(80, 118);
+        ctx.lineTo(w - 80, 118);
+        ctx.stroke();
+    
+        // 5. Massive Dual Station Callsigns
+        ctx.textAlign = 'center';
+    
+        // My Station Box (Left)
+        ctx.fillStyle = '#ffd700';
+        ctx.font = '900 84px "SF Mono", Consolas, monospace';
+        ctx.shadowColor = 'rgba(255, 215, 0, 0.4)';
+        ctx.shadowBlur = 16;
+        ctx.fillText(qso.myCall, w / 2 - 270, 220);
+        ctx.shadowBlur = 0;
+    
+        ctx.fillStyle = '#8c9bb0';
+        ctx.font = '700 14px "SF Mono", Consolas, monospace';
+        ctx.fillText('TRANSMITTING STATION', w / 2 - 270, 252);
+    
+        // Center Badge
+        ctx.fillStyle = '#00e5ff';
+        ctx.font = '800 18px "SF Mono", Consolas, monospace';
+        ctx.fillText('2-WAY CW', w / 2, 200);
+        ctx.fillStyle = '#6e7d94';
+        ctx.font = '700 12px "SF Mono", Consolas, monospace';
+        ctx.fillText('CONFIRMED WITH', w / 2, 224);
+    
+        ctx.strokeStyle = 'rgba(0, 229, 255, 0.4)';
+        ctx.lineWidth = 1.5;
+        ctx.beginPath();
+        ctx.arc(w / 2, 208, 48, 0, Math.PI * 2);
+        ctx.stroke();
+    
+        // Remote Station Box (Right)
+        ctx.fillStyle = '#00e5ff';
+        ctx.font = '900 84px "SF Mono", Consolas, monospace';
+        ctx.shadowColor = 'rgba(0, 229, 255, 0.5)';
+        ctx.shadowBlur = 16;
+        ctx.fillText(qso.dxCall, w / 2 + 270, 220);
+        ctx.shadowBlur = 0;
+    
+        ctx.fillStyle = '#8c9bb0';
+        ctx.font = '700 14px "SF Mono", Consolas, monospace';
+        ctx.fillText(`OP: ${qso.dxName} · ${qso.dxQth}`, w / 2 + 270, 252);
+    
+        // 6. High-Tech Telemetry Data Grid Table
+        const tableX = 70;
+        const tableY = 300;
+        const tableW = w - 140;
+        const tableH = 190;
+    
+        ctx.fillStyle = 'rgba(12, 16, 25, 0.85)';
+        ctx.fillRect(tableX, tableY, tableW, tableH);
+        ctx.strokeStyle = '#222b3d';
+        ctx.lineWidth = 1.5;
+        ctx.strokeRect(tableX, tableY, tableW, tableH);
+    
+        // Columns: Date | Time | Band | Freq | Mode | RST Sent | RST Rcvd | 2-Way
+        const cols = [
+          { label: 'DATE (UTC)', val: qso.dateDisplay, width: 140 },
+          { label: 'TIME (UTC)', val: qso.timeDisplay, width: 120 },
+          { label: 'BAND', val: qso.band, width: 90 },
+          { label: 'FREQ (MHz)', val: `${qso.freq}.00`, width: 150 },
+          { label: 'MODE', val: '2-WAY CW', width: 120 },
+          { label: 'RST SENT', val: qso.rstSent, width: 110 },
+          { label: 'RST RCVD', val: qso.rstRcvd, width: 110 },
+          { label: 'QSL STATUS', val: 'CONFIRMED', width: 140 }
+        ];
+    
+        // Header Row
+        ctx.fillStyle = '#161d2b';
+        ctx.fillRect(tableX, tableY, tableW, 46);
+        ctx.strokeStyle = '#243044';
+        ctx.beginPath();
+        ctx.moveTo(tableX, tableY + 46);
+        ctx.lineTo(tableX + tableW, tableY + 46);
+        ctx.stroke();
+    
+        let curX = tableX;
+        cols.forEach((col, idx) => {
+          // Header text
+          ctx.fillStyle = '#7a8ba3';
+          ctx.font = '700 12px "SF Mono", Consolas, monospace';
+          ctx.textAlign = 'center';
+          ctx.fillText(col.label, curX + col.width / 2, tableY + 28);
+    
+          // Data text
+          ctx.fillStyle = (col.label === 'QSL STATUS') ? '#00e676' : (col.label === 'FREQ (MHz)' || col.label === 'MODE' ? '#ffd700' : '#ffffff');
+          ctx.font = '800 18px "SF Mono", Consolas, monospace';
+          ctx.fillText(col.val, curX + col.width / 2, tableY + 115);
+    
+          if (idx < cols.length - 1) {
+            ctx.strokeStyle = '#1e2638';
+            ctx.beginPath();
+            ctx.moveTo(curX + col.width, tableY);
+            ctx.lineTo(curX + col.width, tableY + tableH);
+            ctx.stroke();
+          }
+          curX += col.width;
+        });
+    
+        // Sub-row notes inside table
+        ctx.strokeStyle = '#1c2436';
+        ctx.beginPath();
+        ctx.moveTo(tableX, tableY + 145);
+        ctx.lineTo(tableX + tableW, tableY + 145);
+        ctx.stroke();
+    
+        ctx.fillStyle = '#7e90aa';
+        ctx.font = '600 13px "SF Mono", Consolas, monospace';
+        ctx.textAlign = 'left';
+        ctx.fillText(`REMARKS / LOG: ${qso.notes}`, tableX + 16, tableY + 172);
+    
+        // 7. Security Vector Stamp (Bottom Right)
+        const stampX = w - 170;
+        const stampY = h - 145;
+    
+        ctx.save();
+        ctx.translate(stampX, stampY);
+        ctx.strokeStyle = '#00e5ff';
+        ctx.lineWidth = 2;
+        ctx.beginPath();
+        ctx.arc(0, 0, 62, 0, Math.PI * 2);
+        ctx.stroke();
+    
+        ctx.strokeStyle = 'rgba(0, 229, 255, 0.4)';
+        ctx.setLineDash([4, 4]);
+        ctx.beginPath();
+        ctx.arc(0, 0, 54, 0, Math.PI * 2);
+        ctx.stroke();
+        ctx.setLineDash([]);
+    
+        ctx.fillStyle = '#00e5ff';
+        ctx.font = '800 11px "SF Mono", Consolas, monospace';
+        ctx.textAlign = 'center';
+        ctx.fillText('MORSE TRAINULATOR', 0, -22);
+        ctx.fillStyle = '#ffd700';
+        ctx.font = '900 17px "SF Mono", Consolas, monospace';
+        ctx.fillText('73 & GL', 0, 4);
+        ctx.fillStyle = '#00e676';
+        ctx.font = '700 10px "SF Mono", Consolas, monospace';
+        ctx.fillText('VERIFIED QSO', 0, 26);
+        ctx.restore();
+    
+        // 8. Bottom Footer Signoff
+        ctx.fillStyle = '#637287';
+        ctx.font = '600 12px "SF Mono", Consolas, monospace';
+        ctx.textAlign = 'left';
+        ctx.fillText('ELECTRONIC QSL CONFIRMATION GENERATED BY MORSE TRAINULATOR (ZERO LATENCY DSP)', 70, h - 80);
+        ctx.fillText('THANKS FOR THE CONTACT AND SEE YOU ON THE AIRWAVES! 73 DE EDDIE', 70, h - 60);
+      }
+    
+      // ==========================================
+      // THEME 2: VINTAGE TELEGRAPH (復古老電報)
+      // ==========================================
+      _renderVintageTelegraph(ctx, qso) {
+        const w = this.width;
+        const h = this.height;
+    
+        // 1. Aged Warm Parchment Background
+        const bgGrad = ctx.createLinearGradient(0, 0, 0, h);
+        bgGrad.addColorStop(0, '#fbf6ea');
+        bgGrad.addColorStop(0.5, '#f4ecd8');
+        bgGrad.addColorStop(1, '#ede2ca');
+        ctx.fillStyle = bgGrad;
+        ctx.fillRect(0, 0, w, h);
+    
+        // Subtle paper grain noise
+        ctx.fillStyle = 'rgba(100, 70, 30, 0.015)';
+        for (let y = 0; y < h; y += 4) {
+          ctx.fillRect(0, y, w, 2);
+        }
+    
+        // 2. Ornate Telegraph Double Border
+        ctx.strokeStyle = '#3e2723';
+        ctx.lineWidth = 5;
+        ctx.strokeRect(32, 32, w - 64, h - 64);
+    
+        ctx.lineWidth = 1.5;
+        ctx.strokeRect(44, 44, w - 88, h - 88);
+    
+        // Corner Ornaments
+        const cornerSize = 20;
+        const cornerPts = [
+          [44, 44], [w - 44, 44], [44, h - 44], [w - 44, h - 44]
+        ];
+        cornerPts.forEach(([cx, cy]) => {
+          ctx.fillStyle = '#3e2723';
+          ctx.fillRect(cx - 4, cy - 4, 8, 8);
+        });
+    
+        // 3. Header Typography
+        ctx.fillStyle = '#3e2723';
+        ctx.font = '900 24px "Times New Roman", Georgia, serif';
+        ctx.textAlign = 'center';
+        ctx.fillText('INTERNATIONAL POSTAL & TELEGRAPH ADMINISTRATION', w / 2, 88);
+    
+        ctx.font = 'italic 700 15px "Times New Roman", Georgia, serif';
+        ctx.fillStyle = '#5d4037';
+        ctx.fillText('OFFICIAL RADIOTELEGRAPH DISPATCH · TWO-WAY CW CONTACT ACKNOWLEDGEMENT', w / 2, 114);
+    
+        ctx.strokeStyle = '#3e2723';
+        ctx.lineWidth = 2;
+        ctx.beginPath();
+        ctx.moveTo(120, 130);
+        ctx.lineTo(w - 120, 130);
+        ctx.stroke();
+    
+        // 4. Station Callsigns in Antique Serif
+        ctx.fillStyle = '#2b1b17';
+        ctx.font = '900 80px "Times New Roman", Georgia, serif';
+        ctx.textAlign = 'center';
+        ctx.fillText(qso.myCall, w / 2 - 260, 225);
+    
+        ctx.font = 'italic 700 18px "Times New Roman", Georgia, serif';
+        ctx.fillStyle = '#4e342e';
+        ctx.fillText('Confirming QSO with', w / 2, 205);
+        ctx.font = '700 14px "Times New Roman", Georgia, serif';
+        ctx.fillText('VIA CW TELEGRAPHY', w / 2, 230);
+    
+        ctx.font = '900 80px "Times New Roman", Georgia, serif';
+        ctx.fillStyle = '#2b1b17';
+        ctx.fillText(qso.dxCall, w / 2 + 260, 225);
+    
+        // Sub details
+        ctx.font = '700 14px "Times New Roman", Georgia, serif';
+        ctx.fillStyle = '#5d4037';
+        ctx.fillText(`OPERATOR: ${qso.myName} · QTH: ${qso.myQth}`, w / 2 - 260, 260);
+        ctx.fillText(`OPERATOR: ${qso.dxName} · QTH: ${qso.dxQth}`, w / 2 + 260, 260);
+    
+        // 5. Classic Telegram Ledger Box
+        const boxX = 80;
+        const boxY = 300;
+        const boxW = w - 160;
+        const boxH = 200;
+    
+        ctx.fillStyle = 'rgba(255, 255, 255, 0.5)';
+        ctx.fillRect(boxX, boxY, boxW, boxH);
+        ctx.strokeStyle = '#4e342e';
+        ctx.lineWidth = 2;
+        ctx.strokeRect(boxX, boxY, boxW, boxH);
+    
+        // Table rows
+        const cols = [
+          { label: 'DATE (GMT)', val: qso.dateDisplay, w: 140 },
+          { label: 'TIME (UTC)', val: qso.timeDisplay, w: 120 },
+          { label: 'BAND', val: qso.band, w: 100 },
+          { label: 'MC/S (FREQ)', val: `${qso.freq} MC/S`, w: 150 },
+          { label: 'EMISSION', val: 'A1A (CW)', w: 120 },
+          { label: 'UR RST', val: qso.rstSent, w: 110 },
+          { label: 'MY RST', val: qso.rstRcvd, w: 110 },
+          { label: 'DISPATCH', val: 'RECORDED', w: 140 }
+        ];
+    
+        ctx.fillStyle = '#e8d8bd';
+        ctx.fillRect(boxX, boxY, boxW, 44);
+        ctx.strokeStyle = '#4e342e';
+        ctx.beginPath();
+        ctx.moveTo(boxX, boxY + 44);
+        ctx.lineTo(boxX + boxW, boxY + 44);
+        ctx.stroke();
+    
+        let cx = boxX;
+        cols.forEach((col, idx) => {
+          ctx.fillStyle = '#3e2723';
+          ctx.font = '700 13px "Courier New", monospace';
+          ctx.textAlign = 'center';
+          ctx.fillText(col.label, cx + col.w / 2, boxY + 28);
+    
+          ctx.fillStyle = '#1b120c';
+          ctx.font = '800 19px "Courier New", monospace';
+          ctx.fillText(col.val, cx + col.w / 2, boxY + 115);
+    
+          if (idx < cols.length - 1) {
+            ctx.strokeStyle = '#c4b294';
+            ctx.beginPath();
+            ctx.moveTo(cx + col.w, boxY);
+            ctx.lineTo(cx + col.w, boxY + boxH);
+            ctx.stroke();
+          }
+          cx += col.w;
+        });
+    
+        // Telegram Remarks Line
+        ctx.strokeStyle = '#d7c7aa';
+        ctx.beginPath();
+        ctx.moveTo(boxX, boxY + 150);
+        ctx.lineTo(boxX + boxW, boxY + 150);
+        ctx.stroke();
+    
+        ctx.fillStyle = '#4e342e';
+        ctx.font = 'italic 700 14px "Times New Roman", Georgia, serif';
+        ctx.textAlign = 'left';
+        ctx.fillText(`TELEGRAM MESSAGE: "${qso.notes}"`, boxX + 16, boxY + 178);
+    
+        // 6. Authentic Postal Rubber Stamp (Rotated)
+        ctx.save();
+        ctx.translate(w - 200, h - 150);
+        ctx.rotate(-0.12); // -7 degrees
+    
+        ctx.strokeStyle = 'rgba(180, 40, 40, 0.85)';
+        ctx.lineWidth = 3;
+        ctx.beginPath();
+        ctx.arc(0, 0, 68, 0, Math.PI * 2);
+        ctx.stroke();
+    
+        ctx.lineWidth = 1.5;
+        ctx.beginPath();
+        ctx.arc(0, 0, 58, 0, Math.PI * 2);
+        ctx.stroke();
+    
+        ctx.fillStyle = 'rgba(180, 40, 40, 0.85)';
+        ctx.font = '900 11px "Times New Roman", Georgia, serif';
+        ctx.textAlign = 'center';
+        ctx.fillText('TAIPEI RADIO TELEGRAPH', 0, -26);
+        ctx.font = '900 20px "Times New Roman", Georgia, serif';
+        ctx.fillText('CONFIRMED', 0, 6);
+        ctx.font = '700 12px "Times New Roman", Georgia, serif';
+        ctx.fillText(qso.dateDisplay, 0, 26);
+        ctx.fillText('73 · CW QSO', 0, 42);
+        ctx.restore();
+    
+        // 7. Signature & Stamp Footer
+        ctx.fillStyle = '#4e342e';
+        ctx.font = '700 14px "Times New Roman", Georgia, serif';
+        ctx.textAlign = 'left';
+        ctx.fillText(`APPARATUS: ${qso.rig} TRANSMITTER · ${qso.ant} ANTENNA SYSTEM`, boxX, h - 100);
+        ctx.fillText('CERTIFIED BY CHIEF TELEGRAPH OPERATOR: __________________________ (EDDIE, BV2TT)', boxX, h - 70);
+      }
+    
+      // ==========================================
+      // THEME 3: CLASSIC ARRL (經典聯盟)
+      // ==========================================
+      _renderClassicArrl(ctx, qso) {
+        const w = this.width;
+        const h = this.height;
+    
+        // 1. Crisp White Background
+        ctx.fillStyle = '#ffffff';
+        ctx.fillRect(0, 0, w, h);
+    
+        // 2. Navy Blue Banner Header
+        ctx.fillStyle = '#0a2342';
+        ctx.fillRect(0, 0, w, 110);
+    
+        ctx.fillStyle = '#d4af37';
+        ctx.fillRect(0, 110, w, 8);
+    
+        ctx.fillStyle = '#ffffff';
+        ctx.font = '900 28px Arial, Helvetica, sans-serif';
+        ctx.textAlign = 'center';
+        ctx.fillText('AMATEUR RADIO STATION · 2-WAY CW QSO CONFIRMATION', w / 2, 56);
+    
+        ctx.fillStyle = '#cbd5e1';
+        ctx.font = '700 14px Arial, Helvetica, sans-serif';
+        ctx.fillText('MEMBER INTERNATIONAL AMATEUR RADIO UNION (IARU) · AIRWAVES HERITAGE', w / 2, 88);
+    
+        // 3. Station Callsign Display
+        ctx.fillStyle = '#0a2342';
+        ctx.font = '900 96px Arial, Helvetica, sans-serif';
+        ctx.textAlign = 'center';
+        ctx.letterSpacing = '4px';
+        ctx.fillText(qso.myCall, w / 2, 235);
+    
+        ctx.fillStyle = '#475569';
+        ctx.font = '700 15px Arial, Helvetica, sans-serif';
+        ctx.fillText(`TAIPEI, TAIWAN · CQ ZONE 24 · ITU ZONE 44 · GRID SQUARE: ${qso.myGrid}`, w / 2, 268);
+    
+        ctx.fillStyle = '#0a2342';
+        ctx.font = '800 18px Arial, Helvetica, sans-serif';
+        ctx.fillText(`CONFIRMING TWO-WAY MORSE CODE (CW) CONTACT WITH RADIO STATION:`, w / 2, 310);
+    
+        ctx.fillStyle = '#d4af37';
+        ctx.font = '900 54px Arial, Helvetica, sans-serif';
+        ctx.fillText(qso.dxCall, w / 2, 375);
+    
+        ctx.fillStyle = '#64748b';
+        ctx.font = '700 14px Arial, Helvetica, sans-serif';
+        ctx.fillText(`OPERATOR: ${qso.dxName} · QTH: ${qso.dxQth} (GRID: ${qso.dxGrid})`, w / 2, 404);
+    
+        // 4. Standard ARRL Log Table
+        const tblX = 60;
+        const tblY = 440;
+        const tblW = w - 120;
+        const tblH = 180;
+    
+        ctx.strokeStyle = '#0a2342';
+        ctx.lineWidth = 2.5;
+        ctx.strokeRect(tblX, tblY, tblW, tblH);
+    
+        ctx.fillStyle = '#0a2342';
+        ctx.fillRect(tblX, tblY, tblW, 44);
+    
+        const cols = [
+          { label: 'YEAR / DATE', val: qso.dateDisplay, w: 150 },
+          { label: 'UTC TIME', val: qso.timeDisplay, w: 130 },
+          { label: 'BAND', val: qso.band, w: 100 },
+          { label: 'FREQ (MHz)', val: `${qso.freq}.00`, w: 150 },
+          { label: '2-WAY MODE', val: 'CW (A1A)', w: 130 },
+          { label: 'RST SENT', val: qso.rstSent, w: 110 },
+          { label: 'RST RCVD', val: qso.rstRcvd, w: 110 },
+          { label: 'QSL STATUS', val: 'TNX QSO', w: 140 }
+        ];
+    
+        let xPos = tblX;
+        cols.forEach((col, idx) => {
+          ctx.fillStyle = '#ffffff';
+          ctx.font = '800 13px Arial, Helvetica, sans-serif';
+          ctx.textAlign = 'center';
+          ctx.fillText(col.label, xPos + col.w / 2, tblY + 28);
+    
+          ctx.fillStyle = '#0a2342';
+          ctx.font = '900 18px Arial, Helvetica, sans-serif';
+          ctx.fillText(col.val, xPos + col.w / 2, tblY + 110);
+    
+          if (idx < cols.length - 1) {
+            ctx.strokeStyle = '#0a2342';
+            ctx.lineWidth = 1.5;
+            ctx.beginPath();
+            ctx.moveTo(xPos + col.w, tblY);
+            ctx.lineTo(xPos + col.w, tblY + tblH);
+            ctx.stroke();
+          }
+          xPos += col.w;
+        });
+    
+        // Notes Row in table
+        ctx.strokeStyle = '#cbd5e1';
+        ctx.beginPath();
+        ctx.moveTo(tblX, tblY + 140);
+        ctx.lineTo(tblX + tblW, tblY + 140);
+        ctx.stroke();
+    
+        ctx.fillStyle = '#475569';
+        ctx.font = '600 13px Arial, Helvetica, sans-serif';
+        ctx.textAlign = 'left';
+        ctx.fillText(`NOTES: ${qso.notes} · RIG: ${qso.rig} · ANT: ${qso.ant}`, tblX + 16, tblY + 164);
+    
+        // 5. Official Diamond Logo Emblem (Left)
+        ctx.save();
+        ctx.translate(140, h - 85);
+        ctx.strokeStyle = '#0a2342';
+        ctx.lineWidth = 3;
+        ctx.beginPath();
+        ctx.moveTo(0, -32);
+        ctx.lineTo(32, 0);
+        ctx.lineTo(0, 32);
+        ctx.lineTo(-32, 0);
+        ctx.closePath();
+        ctx.stroke();
+    
+        ctx.fillStyle = '#0a2342';
+        ctx.font = '900 18px Arial, Helvetica, sans-serif';
+        ctx.textAlign = 'center';
+        ctx.fillText('CW', 0, 6);
+        ctx.restore();
+    
+        // 6. Signoff & Operator Line (Right)
+        ctx.fillStyle = '#0a2342';
+        ctx.font = '700 16px Arial, Helvetica, sans-serif';
+        ctx.textAlign = 'right';
+        ctx.fillText(`MANY THANKS FOR THE EXCELLENT QSO! 73 ES CU AGN`, w - 80, h - 90);
+        ctx.fillStyle = '#64748b';
+        ctx.font = 'italic 700 15px Arial, Helvetica, sans-serif';
+        ctx.fillText(`73 DE ${qso.myName} (${qso.myCall})`, w - 80, h - 64);
+      }
+    
+      // ==========================================
+      // EXPORT UTILITIES
+      // ==========================================
+      toDataURL(canvas, type = 'image/png') {
+        if (!canvas || typeof canvas.toDataURL !== 'function') return '';
+        return canvas.toDataURL(type);
+      }
+    
+      toBlob(canvas, type = 'image/png') {
+        return new Promise((resolve) => {
+          if (!canvas || typeof canvas.toBlob !== 'function') {
+            resolve(null);
+            return;
+          }
+          canvas.toBlob((blob) => resolve(blob), type);
+        });
+      }
+    
+      downloadCard(canvas, filename = 'QSL_CARD.png') {
+        if (typeof document === 'undefined') return;
+        const dataUrl = this.toDataURL(canvas, 'image/png');
+        if (!dataUrl) return;
+    
+        const a = document.createElement('a');
+        a.href = dataUrl;
+        a.download = filename;
+        document.body.appendChild(a);
+        a.click();
+        setTimeout(() => {
+          document.body.removeChild(a);
+        }, 100);
+      }
+    
+      async copyToClipboard(canvas) {
+        if (typeof navigator === 'undefined' || !navigator.clipboard || typeof ClipboardItem === 'undefined') {
+          return false;
+        }
+        const blob = await this.toBlob(canvas, 'image/png');
+        if (!blob) return false;
+    
+        try {
+          await navigator.clipboard.write([
+            new ClipboardItem({ 'image/png': blob })
+          ]);
+          return true;
+        } catch (e) {
+          console.warn('[QslCardRenderer] Failed to copy to clipboard:', e);
+          return false;
+        }
+      }
+    }
+    
+    // Global window registration
+    if (typeof window !== 'undefined') {
+      window.QslCardRenderer = QslCardRenderer;
+    }
+    
+    // Export for Node.js test environment
+    if (typeof module !== 'undefined' && module.exports) {
+      module.exports = { QslCardRenderer };
+    }
+    
+
+    /**
      * UI CONTROLLER: QsoMode
      * Workspace 3: 擬真電台 CW QSO 通聯工作台控制器
      * (100% Zero-Emoji, Material Design Icons, Dual-Track Architecture)
      */
-
+    
     class QsoMode {
       constructor(options = {}) {
         this.qsoManager = options.qsoManager || (typeof window !== 'undefined' ? window.qsoManager : null);
         this.qsoLogManager = options.qsoLogManager || (typeof window !== 'undefined' ? window.qsoLogManager : null);
+        this.qslRenderer = options.qslRenderer || (typeof window !== 'undefined' ? (window.qslCardRenderer || (window.QslCardRenderer ? new window.QslCardRenderer() : null)) : null);
         this.cwPlayer = options.cwPlayer || (typeof window !== 'undefined' ? window.cwPlayer : null);
         this.synth = options.synth || (typeof window !== 'undefined' ? window.synth : null);
         this.engine = options.engine || (typeof window !== 'undefined' ? window.engine : null);
-
+    
         this.qrnEnabled = false;
         this.qsbEnabled = true;
         this.bfoPitch = 660;
-
+    
+        this.currentQslTheme = 'cyber-brass';
+        this.activeQslData = null;
+    
         this._boundCwPulseStart = null;
         this._boundCwPulseEnd = null;
         this._boundCwPlaybackComplete = null;
@@ -9673,46 +10554,46 @@
         this._qsbTimer = null;
         this._initialized = false;
       }
-
+    
       isWorkspaceActive() {
         if (typeof document === 'undefined') return false;
         const ws = document.getElementById('ws-container-qso');
         return !!(ws && (ws.classList.contains('active') || ws.style.display === 'flex' || ws.style.display === 'block'));
       }
-
+    
       init() {
         if (typeof document === 'undefined') return;
-
+    
         // Cache elements
         this.el = {
           wsContainer: document.getElementById('ws-container-qso'),
           submodePills: document.querySelectorAll('.qso-mode-pill'),
           cockpitStage: document.getElementById('qso-cockpit-stage'),
           logbookStage: document.getElementById('qso-logbook-stage'),
-
+    
           // VFO & SDR Bar
           bandButtons: document.querySelectorAll('.qso-band-btn'),
           vfoFreq: document.getElementById('qso-vfo-freq'),
-
+    
           // S-Meter & Carrier
           smeterNeedle: document.getElementById('qso-smeter-needle-group'),
           smeterReadout: document.getElementById('qso-smeter-readout'),
           smeterLadder: document.getElementById('qso-smeter-ladder'),
           carrierDot: document.getElementById('qso-carrier-dot'),
           carrierText: document.getElementById('qso-carrier-text'),
-
+    
           // RF Controls
           chkQrn: document.getElementById('chk-qso-qrn'),
           chkQsb: document.getElementById('chk-qso-qsb'),
           selBfo: document.getElementById('sel-qso-bfo'),
-
+    
           // Guided Step Info
           stageGuide: document.getElementById('qso-stage-guide'),
           stepBadges: document.querySelectorAll('.qso-step-badge'),
           guidePrompt: document.getElementById('qso-guide-prompt'),
           guideHint: document.getElementById('qso-guide-hint'),
           btnUseHint: document.getElementById('btn-qso-use-hint'),
-
+    
           // Terminal
           terminalFeed: document.getElementById('qso-terminal-feed'),
           remoteCall: document.getElementById('qso-remote-call'),
@@ -9721,41 +10602,51 @@
           myDetails: document.getElementById('qso-my-details'),
           btnReplayRx: document.getElementById('btn-qso-replay-rx'),
           btnNewStation: document.getElementById('btn-qso-new-station'),
-
+    
           // Macros
           macroButtons: document.querySelectorAll('.qso-macro-btn'),
-
+    
           // TX Cockpit
           txBuffer: document.getElementById('qso-tx-buffer'),
           btnClearTx: document.getElementById('btn-qso-tx-clear'),
           btnSendTx: document.getElementById('btn-qso-tx-send'),
           lastAck: document.getElementById('qso-last-ack'),
-
+    
           // Logbook
           logbookTbody: document.getElementById('qso-logbook-tbody'),
           logbookEmpty: document.getElementById('qso-logbook-empty'),
           btnExportAdif: document.getElementById('btn-qso-export-adif'),
           btnExportCsv: document.getElementById('btn-qso-export-csv'),
           btnClearLogs: document.getElementById('btn-qso-clear-logs'),
-          btnBackCockpit: document.getElementById('btn-qso-back-cockpit')
+          btnBackCockpit: document.getElementById('btn-qso-back-cockpit'),
+    
+          // QSL Modal
+          qslModal: document.getElementById('qsl-modal'),
+          qslModalBackdrop: document.getElementById('qsl-modal-backdrop'),
+          btnCloseQsl: document.getElementById('btn-close-qsl'),
+          qslCanvas: document.getElementById('qsl-card-canvas'),
+          qslThemePills: document.querySelectorAll('.qsl-theme-pill'),
+          btnQslDownload: document.getElementById('btn-qsl-download'),
+          btnQslCopy: document.getElementById('btn-qsl-copy'),
+          qslMetaHint: document.getElementById('qsl-modal-meta-hint')
         };
-
+    
         this.bindEvents();
         this.bindManagerEvents();
         this.syncOperatorSettings();
         this.updateStationMeta();
         this.updateGuidedUI();
         this.setSmeterLevel(1, false);
-
+    
         // Initial system print
         this.printFeed('SYS', 'SDR 接收機就緒 · VFO 鎖定於 14.025.00 MHz (20M)');
         if (this.qsoManager && this.qsoManager.remoteStation) {
           this.printFeed('SYS', `偵測到遠端電台呼叫訊號 [${this.qsoManager.remoteStation.call}]，等待建立通聯...`);
         }
-
+    
         this._initialized = true;
       }
-
+    
       // ==========================================
       // EVENT BINDINGS
       // ==========================================
@@ -9769,7 +10660,7 @@
             });
           });
         }
-
+    
         // 2. Band Switcher
         if (this.el.bandButtons) {
           this.el.bandButtons.forEach(btn => {
@@ -9779,7 +10670,7 @@
             });
           });
         }
-
+    
         // 3. RF Atmosphere Controls
         if (this.el.chkQrn) {
           this.el.chkQrn.addEventListener('change', (e) => {
@@ -9793,20 +10684,20 @@
             }
           });
         }
-
+    
         if (this.el.chkQsb) {
           this.el.chkQsb.addEventListener('change', (e) => {
             this.qsbEnabled = e.target.checked;
           });
         }
-
+    
         if (this.el.selBfo) {
           this.el.selBfo.addEventListener('change', (e) => {
             this.bfoPitch = parseInt(e.target.value, 10) || 660;
             if (this.synth) this.synth.frequency = this.bfoPitch;
           });
         }
-
+    
         // 4. Guided Hint Button
         if (this.el.btnUseHint) {
           this.el.btnUseHint.addEventListener('click', () => {
@@ -9818,7 +10709,7 @@
             }
           });
         }
-
+    
         // 5. Terminal Actions
         if (this.el.btnReplayRx) {
           this.el.btnReplayRx.addEventListener('click', () => {
@@ -9827,7 +10718,7 @@
             }
           });
         }
-
+    
         if (this.el.btnNewStation) {
           this.el.btnNewStation.addEventListener('click', () => {
             if (this.qsoManager) {
@@ -9838,7 +10729,7 @@
             }
           });
         }
-
+    
         // 6. Macro Buttons Deck
         if (this.el.macroButtons) {
           this.el.macroButtons.forEach(btn => {
@@ -9854,14 +10745,14 @@
             });
           });
         }
-
+    
         // 7. TX Input & Send
         if (this.el.btnSendTx) {
           this.el.btnSendTx.addEventListener('click', () => {
             this.transmitCurrentBuffer();
           });
         }
-
+    
         if (this.el.btnClearTx) {
           this.el.btnClearTx.addEventListener('click', () => {
             if (this.el.txBuffer) {
@@ -9870,7 +10761,7 @@
             }
           });
         }
-
+    
         if (this.el.txBuffer) {
           this.el.txBuffer.addEventListener('keydown', (e) => {
             if (e.key === 'Enter') {
@@ -9879,26 +10770,26 @@
             }
           });
         }
-
+    
         // 8. Logbook Action Buttons
         if (this.el.btnBackCockpit) {
           this.el.btnBackCockpit.addEventListener('click', () => {
             this.switchSubmode('guided');
           });
         }
-
+    
         if (this.el.btnExportAdif) {
           this.el.btnExportAdif.addEventListener('click', () => {
             this.exportADIF();
           });
         }
-
+    
         if (this.el.btnExportCsv) {
           this.el.btnExportCsv.addEventListener('click', () => {
             this.exportCSV();
           });
         }
-
+    
         if (this.el.btnClearLogs) {
           this.el.btnClearLogs.addEventListener('click', () => {
             if (confirm('確定要清空所有電台通聯日誌嗎？此動作無法復原。')) {
@@ -9909,37 +10800,78 @@
             }
           });
         }
+    
+        // 9. QSL Confirmation Modal Controls
+        if (this.el.btnCloseQsl) {
+          this.el.btnCloseQsl.addEventListener('click', () => {
+            this.closeQslModal();
+          });
+        }
+    
+        if (this.el.qslModalBackdrop) {
+          this.el.qslModalBackdrop.addEventListener('click', () => {
+            this.closeQslModal();
+          });
+        }
+    
+        if (this.el.qslThemePills) {
+          this.el.qslThemePills.forEach(pill => {
+            pill.addEventListener('click', () => {
+              const theme = pill.getAttribute('data-qsl-theme');
+              this.setQslTheme(theme);
+            });
+          });
+        }
+    
+        if (this.el.btnQslDownload) {
+          this.el.btnQslDownload.addEventListener('click', () => {
+            this.downloadQslCard();
+          });
+        }
+    
+        if (this.el.btnQslCopy) {
+          this.el.btnQslCopy.addEventListener('click', () => {
+            this.copyQslCard();
+          });
+        }
       }
-
+    
       bindManagerEvents() {
         if (!this.qsoManager) return;
-
+    
         this.qsoManager.on('phaseChanged', () => {
           this.updateGuidedUI();
         });
-
+    
         this.qsoManager.on('botResponseReady', (data) => {
           if (data && data.text) {
             this.playRemoteCw(data.text, data.delay || 800);
           }
         });
-
+    
         this.qsoManager.on('qsoComplete', (logEntry) => {
+          let savedLog = logEntry;
           if (this.qsoLogManager && logEntry) {
-            this.qsoLogManager.addLog(logEntry);
+            savedLog = this.qsoLogManager.addLog(logEntry);
           }
           this.printFeed('SYS', `73! 通聯圓滿完成！日誌已記錄 [${logEntry ? logEntry.dxCall : 'DX'}]`);
           if (this.el.lastAck) {
-            this.el.lastAck.textContent = '通聯完成！已自動記錄至電台日誌 (可切換至日誌頁檢視)';
+            this.el.lastAck.innerHTML = `通聯完成！已自動記錄至電台日誌 · <button type="button" class="btn-xs-util" id="btn-quick-qsl" style="margin-left:6px; cursor:pointer;"><i class="mdi mdi-card-account-details"></i> 簽發 QSL 卡</button>`;
+            const btnQuick = document.getElementById('btn-quick-qsl');
+            if (btnQuick) {
+              btnQuick.addEventListener('click', () => {
+                this.openQslModal(savedLog || logEntry);
+              });
+            }
           }
         });
-
+    
         this.qsoManager.on('validationWarning', (data) => {
           if (data && data.feedback) {
             this.printFeed('SYS', `[發報提示] ${data.feedback}`);
           }
         });
-
+    
         this.qsoManager.on('bandChanged', (data) => {
           if (this.el.vfoFreq && data) {
             this.el.vfoFreq.textContent = `${data.freq}.00`;
@@ -9947,7 +10879,7 @@
           this.printFeed('SYS', `VFO 已切換至 ${data.band} 頻段 (${data.freq}.00 MHz)`);
         });
       }
-
+    
       syncOperatorSettings() {
         const settings = (typeof window !== 'undefined' && window.settingsManager) ? window.settingsManager.settings : null;
         if (settings && this.qsoManager) {
@@ -9961,7 +10893,7 @@
           });
         }
       }
-
+    
       // ==========================================
       // WORKSPACE LIFECYCLE & K5 DOCK REPARENTING
       // ==========================================
@@ -9969,25 +10901,25 @@
         this.syncOperatorSettings();
         this.updateStationMeta();
         this.updateGuidedUI();
-
+    
         // Dynamically reparent K5 Dock into ws-container-qso so keyer is immediately available
         const k5Dock = document.getElementById('k5-dock');
         const wsQso = document.getElementById('ws-container-qso');
         if (k5Dock && wsQso && k5Dock.parentElement !== wsQso) {
           wsQso.appendChild(k5Dock);
         }
-
+    
         // Start QRN noise if enabled
         if (this.qrnEnabled && this.synth && typeof this.synth.startNoise === 'function') {
           this.synth.startNoise();
         }
-
+    
         // Scroll terminal to latest
         if (this.el.terminalFeed) {
           this.el.terminalFeed.scrollTop = this.el.terminalFeed.scrollHeight;
         }
       }
-
+    
       onLeaveQso() {
         // Reparent K5 Dock back into ws-container-tx
         const k5Dock = document.getElementById('k5-dock');
@@ -9995,35 +10927,35 @@
         if (k5Dock && wsTx && k5Dock.parentElement !== wsTx) {
           wsTx.appendChild(k5Dock);
         }
-
+    
         // Stop remote audio playback if in progress
         if (this.cwPlayer && this.cwPlayer.isPlaying) {
           this.cwPlayer.stop();
         }
-
+    
         // Stop QRN noise
         if (this.synth && typeof this.synth.stopNoise === 'function') {
           this.synth.stopNoise();
         }
-
+    
         // Reset S-meter
         this.setSmeterLevel(0, false);
         this.setCarrierState('IDLE');
       }
-
+    
       // ==========================================
       // SUBMODE & BAND SWITCHING
       // ==========================================
       switchSubmode(submode) {
         if (!submode) return;
-
+    
         if (this.el.submodePills) {
           this.el.submodePills.forEach(pill => {
             const pSub = pill.getAttribute('data-submode');
             pill.classList.toggle('active', pSub === submode);
           });
         }
-
+    
         if (submode === 'logbook') {
           if (this.el.cockpitStage) this.el.cockpitStage.style.display = 'none';
           if (this.el.logbookStage) this.el.logbookStage.style.display = 'flex';
@@ -10031,43 +10963,43 @@
         } else {
           if (this.el.cockpitStage) this.el.cockpitStage.style.display = 'flex';
           if (this.el.logbookStage) this.el.logbookStage.style.display = 'none';
-
+    
           if (this.el.stageGuide) {
             this.el.stageGuide.style.display = (submode === 'guided') ? 'flex' : 'none';
           }
-
+    
           if (this.qsoManager) {
             this.qsoManager.setSubmode(submode);
             this.updateStationMeta();
             this.updateGuidedUI();
           }
-
+    
           const labelMap = { guided: '標準引導模式 (Guided)', free: '空中自由頻段 (Free)', contest: '競賽連珠模式 (Contest)' };
           this.printFeed('SYS', `工作台子模式切換為: ${labelMap[submode] || submode}`);
         }
       }
-
+    
       setBand(bandId) {
         if (!bandId) return;
-
+    
         if (this.el.bandButtons) {
           this.el.bandButtons.forEach(btn => {
             btn.classList.toggle('active', btn.getAttribute('data-band') === bandId);
           });
         }
-
+    
         if (this.qsoManager) {
           this.qsoManager.setBand(bandId);
         }
       }
-
+    
       // ==========================================
       // TRANSMISSION & TELETYPE TERMINAL
       // ==========================================
       handleLetterDecoded(char) {
         if (!this.isWorkspaceActive()) return;
         if (!this.el.txBuffer) return;
-
+    
         if (char === '<HH>') {
           // Erase last word
           const val = this.el.txBuffer.value.trimEnd();
@@ -10075,10 +11007,10 @@
           this.el.txBuffer.value = (lastSpace !== -1) ? val.slice(0, lastSpace + 1) : '';
           return;
         }
-
+    
         this.el.txBuffer.value += char;
         this.el.txBuffer.scrollLeft = this.el.txBuffer.scrollWidth;
-
+    
         // Carrier TX blip
         this.setCarrierState('TX');
         clearTimeout(this._txBlipTimer);
@@ -10086,93 +11018,93 @@
           if (!this._isRemotePlaying) this.setCarrierState('IDLE');
         }, 300);
       }
-
+    
       transmitCurrentBuffer() {
         if (!this.el.txBuffer) return;
         const text = this.el.txBuffer.value.trim();
         if (!text) return;
-
+    
         if (!this.qsoManager) return;
-
+    
         // Send to domain state machine
         const res = this.qsoManager.handleUserTransmit(text);
-
+    
         // Print to terminal feed
         const myCall = (this.qsoManager.myStation && this.qsoManager.myStation.call) ? this.qsoManager.myStation.call : 'BV2TT';
         this.printFeed('TX', text, myCall);
-
+    
         // Clear input buffer
         this.el.txBuffer.value = '';
-
+    
         if (this.el.lastAck) {
           this.el.lastAck.textContent = res.feedback || '電文已發射';
         }
       }
-
+    
       printFeed(sender, text, callsign = '') {
         if (!this.el.terminalFeed || !text) return;
-
+    
         const line = document.createElement('div');
         line.className = 'qso-feed-line';
-
+    
         const now = new Date();
         const timeStr = `${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}:${String(now.getSeconds()).padStart(2, '0')}`;
-
+    
         const timeSpan = document.createElement('span');
         timeSpan.className = 'qso-feed-time';
         timeSpan.textContent = timeStr;
         line.appendChild(timeSpan);
-
+    
         const tagSpan = document.createElement('span');
         tagSpan.className = `qso-feed-tag ${sender.toLowerCase()}`;
         tagSpan.textContent = callsign ? `${sender} ${callsign}` : sender;
         line.appendChild(tagSpan);
-
+    
         const textSpan = document.createElement('span');
         textSpan.className = `qso-feed-text ${sender.toLowerCase()}`;
         textSpan.textContent = text;
         line.appendChild(textSpan);
-
+    
         this.el.terminalFeed.appendChild(line);
         this.el.terminalFeed.scrollTop = this.el.terminalFeed.scrollHeight;
       }
-
+    
       // ==========================================
       // REMOTE CW PLAYBACK & S-METER
       // ==========================================
       async playRemoteCw(text, delayMs = 600) {
         if (!text) return;
-
+    
         if (delayMs > 0) {
           await new Promise(r => setTimeout(r, delayMs));
         }
-
+    
         if (!this.isWorkspaceActive()) return;
-
+    
         this._isRemotePlaying = true;
         this.setCarrierState('RX');
-
+    
         // Calculate target S-meter level (S7 to S9+20dB with QSB)
         let targetS = 9;
         if (this.qsbEnabled) {
           targetS = Math.floor(Math.random() * 5) + 6; // S6 ~ S10 (S9+10dB)
         }
-
+    
         // Attach transient CWPlayer pulse listeners to drive S-Meter
         const onPulseStart = () => {
           const flutter = this.qsbEnabled ? (Math.random() * 2 - 1) : 0;
           this.setSmeterLevel(targetS + flutter, true);
         };
-
+    
         const onPulseEnd = () => {
           this.setSmeterLevel(1, false);
         };
-
+    
         if (this.cwPlayer) {
           this.cwPlayer.on('pulseStart', onPulseStart);
           this.cwPlayer.on('pulseEnd', onPulseEnd);
         }
-
+    
         try {
           if (this.cwPlayer) {
             // Adjust tone to remote station pitch if available
@@ -10180,9 +11112,9 @@
             if (this.synth && this.qsoManager && this.qsoManager.remoteStation && this.qsoManager.remoteStation.pitchHz) {
               this.synth.frequency = this.qsoManager.remoteStation.pitchHz;
             }
-
+    
             await this.cwPlayer.playText(text);
-
+    
             // Restore BFO pitch
             if (this.synth) this.synth.frequency = this.bfoPitch;
           }
@@ -10193,20 +11125,20 @@
             this.cwPlayer.off('pulseStart', onPulseStart);
             this.cwPlayer.off('pulseEnd', onPulseEnd);
           }
-
+    
           this._isRemotePlaying = false;
           this.setCarrierState('IDLE');
           this.setSmeterLevel(1, false);
-
+    
           // Print received message into terminal feed
           const remoteCall = (this.qsoManager && this.qsoManager.remoteStation) ? this.qsoManager.remoteStation.call : 'DX';
           this.printFeed('RX', text, remoteCall);
         }
       }
-
+    
       setCarrierState(state) {
         if (!this.el.carrierDot || !this.el.carrierText) return;
-
+    
         this.el.carrierDot.className = 'qso-carrier-dot';
         if (state === 'RX') {
           this.el.carrierDot.classList.add('active-rx');
@@ -10221,18 +11153,18 @@
           this.el.carrierText.style.color = '#6e7d94';
         }
       }
-
+    
       setSmeterLevel(level, active = true) {
         const clampedLevel = Math.max(0, Math.min(11, level));
-
+    
         // Map level 0~11 to rotation angle: -45deg (S0) to +45deg (S9+30dB)
         // S0: -45deg, S5: -10deg, S9: +18deg, S9+30dB: +45deg
         const angle = -45 + (clampedLevel / 11) * 90;
-
+    
         if (this.el.smeterNeedle) {
           this.el.smeterNeedle.setAttribute('transform', `rotate(${angle.toFixed(1)}, 100, 80)`);
         }
-
+    
         // Readout badge text
         if (this.el.smeterReadout) {
           if (!active || clampedLevel <= 1) {
@@ -10249,7 +11181,7 @@
             this.el.smeterReadout.style.color = '#ff3d00';
           }
         }
-
+    
         // LED ladder segments
         if (this.el.smeterLadder) {
           const leds = this.el.smeterLadder.querySelectorAll('.smeter-led');
@@ -10259,17 +11191,17 @@
           });
         }
       }
-
+    
       // ==========================================
       // METADATA & GUIDED UI UPDATES
       // ==========================================
       updateStationMeta() {
         if (!this.qsoManager) return;
-
+    
         const my = this.qsoManager.myStation;
         if (this.el.myCall) this.el.myCall.textContent = my.call;
         if (this.el.myDetails) this.el.myDetails.textContent = `(${my.name} · ${my.qth} · ${my.rig})`;
-
+    
         const dx = this.qsoManager.remoteStation;
         if (dx) {
           if (this.el.remoteCall) this.el.remoteCall.textContent = dx.call;
@@ -10279,15 +11211,15 @@
           if (this.el.remoteDetails) this.el.remoteDetails.textContent = '(尚未建立呼叫)';
         }
       }
-
+    
       updateGuidedUI() {
         if (!this.qsoManager) return;
         const stepInfo = this.qsoManager.getGuidedStepInfo();
         if (!stepInfo) return;
-
+    
         if (this.el.guidePrompt) this.el.guidePrompt.textContent = stepInfo.prompt;
         if (this.el.guideHint) this.el.guideHint.textContent = stepInfo.hint;
-
+    
         if (this.el.stepBadges) {
           this.el.stepBadges.forEach(badge => {
             const bStep = parseInt(badge.getAttribute('data-step'), 10);
@@ -10296,23 +11228,23 @@
           });
         }
       }
-
+    
       // ==========================================
       // LOGBOOK VIEW & EXPORTS
       // ==========================================
       renderLogbook() {
         if (!this.qsoLogManager || !this.el.logbookTbody) return;
-
+    
         const logs = this.qsoLogManager.getLogs();
         this.el.logbookTbody.innerHTML = '';
-
+    
         if (logs.length === 0) {
           if (this.el.logbookEmpty) this.el.logbookEmpty.style.display = 'flex';
           return;
         }
-
+    
         if (this.el.logbookEmpty) this.el.logbookEmpty.style.display = 'none';
-
+    
         logs.forEach(log => {
           const tr = document.createElement('tr');
           tr.innerHTML = `
@@ -10326,23 +11258,56 @@
             <td>${log.qth || '—'}</td>
             <td>${log.grid || '—'}</td>
             <td style="color:#00e676;"><i class="mdi mdi-check-circle-outline"></i> 確認</td>
+            <td>
+              <div style="display:flex; gap:4px; align-items:center;">
+                <button type="button" class="btn-xs-util btn-view-qsl" data-id="${log.id}" title="檢視與下載 QSL 卡片">
+                  <i class="mdi mdi-card-account-details"></i> QSL
+                </button>
+                <button type="button" class="btn-xs-util btn-del-log" data-id="${log.id}" title="刪除通聯記錄" style="color:#ff5252;">
+                  <i class="mdi mdi-delete-outline"></i>
+                </button>
+              </div>
+            </td>
           `;
           this.el.logbookTbody.appendChild(tr);
         });
+    
+        // Bind row action buttons
+        const qslBtns = this.el.logbookTbody.querySelectorAll('.btn-view-qsl');
+        qslBtns.forEach(btn => {
+          btn.addEventListener('click', () => {
+            const id = btn.getAttribute('data-id');
+            const targetLog = logs.find(l => String(l.id) === String(id));
+            if (targetLog) {
+              this.openQslModal(targetLog);
+            }
+          });
+        });
+    
+        const delBtns = this.el.logbookTbody.querySelectorAll('.btn-del-log');
+        delBtns.forEach(btn => {
+          btn.addEventListener('click', () => {
+            const id = btn.getAttribute('data-id');
+            if (confirm('確定要刪除這筆通聯記錄嗎？')) {
+              this.qsoLogManager.deleteLog(id);
+              this.renderLogbook();
+            }
+          });
+        });
       }
-
+    
       exportADIF() {
         if (!this.qsoLogManager) return;
         const adif = this.qsoLogManager.exportADIF();
         this._downloadFile(adif, `morse_qso_log_${new Date().toISOString().slice(0, 10)}.adi`, 'text/plain');
       }
-
+    
       exportCSV() {
         if (!this.qsoLogManager) return;
         const csv = this.qsoLogManager.exportCSV();
         this._downloadFile(csv, `morse_qso_log_${new Date().toISOString().slice(0, 10)}.csv`, 'text/csv');
       }
-
+    
       _downloadFile(content, fileName, mimeType) {
         if (typeof document === 'undefined') return;
         const blob = new Blob([content], { type: mimeType });
@@ -10357,17 +11322,119 @@
           URL.revokeObjectURL(url);
         }, 100);
       }
+    
+      // ==========================================
+      // QSL CONFIRMATION CARD MODAL & EXPORT
+      // ==========================================
+      _buildCurrentQsoData() {
+        const my = (this.qsoManager && this.qsoManager.myStation) ? this.qsoManager.myStation : {};
+        const dx = (this.qsoManager && this.qsoManager.remoteStation) ? this.qsoManager.remoteStation : {};
+        const now = new Date();
+        return {
+          myCall: my.call || 'BV2TT',
+          dxCall: dx.call || 'JA1ABC',
+          dateDisplay: now.toISOString().slice(0, 10),
+          timeDisplay: now.toISOString().slice(11, 16) + ' UTC',
+          band: (this.qsoManager && this.qsoManager.band) || '20M',
+          freq: (this.qsoManager && this.qsoManager.freq) || '14.025',
+          mode: 'CW',
+          rstSent: dx.rstSent || '599',
+          rstRcvd: dx.rstRcvd || '599',
+          myName: my.name || 'EDDIE',
+          dxName: dx.name || 'KEN',
+          myQth: my.qth || 'TAIPEI, TAIWAN',
+          dxQth: dx.qth ? `${dx.qth}, ${dx.country || ''}`.trim() : 'TOKYO, JAPAN',
+          myGrid: my.grid || 'PL05',
+          dxGrid: dx.grid || 'PM95',
+          rig: my.rig || '100W',
+          ant: my.ant || 'DIPOLE',
+          notes: 'TNX FER FB CW QSO! 73 ES GL'
+        };
+      }
+    
+      openQslModal(qsoData = null) {
+        this.activeQslData = qsoData || this._buildCurrentQsoData();
+    
+        if (this.el.qslModal) this.el.qslModal.style.display = 'flex';
+        if (this.el.qslModalBackdrop) this.el.qslModalBackdrop.style.display = 'block';
+    
+        this.renderCurrentQslCard();
+      }
+    
+      closeQslModal() {
+        if (this.el.qslModal) this.el.qslModal.style.display = 'none';
+        if (this.el.qslModalBackdrop) this.el.qslModalBackdrop.style.display = 'none';
+      }
+    
+      setQslTheme(theme) {
+        if (!theme) return;
+        this.currentQslTheme = theme;
+    
+        if (this.el.qslThemePills) {
+          this.el.qslThemePills.forEach(pill => {
+            pill.classList.toggle('active', pill.getAttribute('data-qsl-theme') === theme);
+          });
+        }
+    
+        this.renderCurrentQslCard();
+      }
+    
+      renderCurrentQslCard() {
+        if (!this.qslRenderer) {
+          if (typeof window !== 'undefined' && window.QslCardRenderer) {
+            this.qslRenderer = new window.QslCardRenderer();
+          } else if (typeof QslCardRenderer !== 'undefined') {
+            this.qslRenderer = new QslCardRenderer();
+          }
+        }
+    
+        if (!this.qslRenderer || !this.el.qslCanvas) return;
+    
+        const data = this.activeQslData || this._buildCurrentQsoData();
+        this.qslRenderer.render(this.el.qslCanvas, data, this.currentQslTheme);
+      }
+    
+      downloadQslCard() {
+        if (!this.qslRenderer || !this.el.qslCanvas) return;
+        const data = this.activeQslData || this._buildCurrentQsoData();
+        const dateStr = (data.dateDisplay || '').replace(/[^0-9]/g, '') || new Date().toISOString().slice(0, 10).replace(/-/g, '');
+        const filename = `QSL_${data.myCall || 'BV2TT'}_${data.dxCall || 'STATION'}_${dateStr}.png`;
+        this.qslRenderer.downloadCard(this.el.qslCanvas, filename);
+      }
+    
+      async copyQslCard() {
+        if (!this.qslRenderer || !this.el.qslCanvas) return;
+        const ok = await this.qslRenderer.copyToClipboard(this.el.qslCanvas);
+        if (this.el.btnQslCopy) {
+          const originalHTML = this.el.btnQslCopy.innerHTML;
+          if (ok) {
+            this.el.btnQslCopy.innerHTML = '<i class="mdi mdi-check"></i> 已複製卡片圖片';
+            this.el.btnQslCopy.style.color = '#00e676';
+            this.el.btnQslCopy.style.borderColor = '#00e676';
+          } else {
+            this.el.btnQslCopy.innerHTML = '<i class="mdi mdi-alert-circle-outline"></i> 請直接點擊下載';
+          }
+          setTimeout(() => {
+            if (this.el.btnQslCopy) {
+              this.el.btnQslCopy.innerHTML = originalHTML;
+              this.el.btnQslCopy.style.color = '';
+              this.el.btnQslCopy.style.borderColor = '';
+            }
+          }, 2000);
+        }
+      }
     }
-
+    
     // Global window registration
     if (typeof window !== 'undefined') {
       window.QsoMode = QsoMode;
     }
-
+    
     // Export for Node.js test environment
     if (typeof module !== 'undefined' && module.exports) {
       module.exports = { QsoMode };
     }
+    
 
 
     /**
@@ -11248,9 +12315,13 @@
     const qsoLogManager = new QsoLogManager();
     window.qsoLogManager = qsoLogManager;
 
+    const qslCardRenderer = new QslCardRenderer();
+    window.qslCardRenderer = qslCardRenderer;
+
     const qsoMode = new QsoMode({
       qsoManager,
       qsoLogManager,
+      qslRenderer: qslCardRenderer,
       cwPlayer,
       synth,
       engine
