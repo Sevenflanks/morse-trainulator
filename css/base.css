@@ -892,6 +892,19 @@ h1 {
   padding: 16px 18px;
   overflow-y: auto;
 }
+.drawer-body::-webkit-scrollbar {
+  width: 6px;
+}
+.drawer-body::-webkit-scrollbar-track {
+  background: transparent;
+}
+.drawer-body::-webkit-scrollbar-thumb {
+  background: #232b3b;
+  border-radius: 3px;
+}
+.drawer-body::-webkit-scrollbar-thumb:hover {
+  background: #333e54;
+}
 
 /* Theme Preset Selector Grid */
 .theme-preset-grid {

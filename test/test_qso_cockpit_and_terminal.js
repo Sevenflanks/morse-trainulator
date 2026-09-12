@@ -70,7 +70,7 @@ const requiredDomElements = [
   'data-step="5"',
   'id="qso-guide-prompt"',
   'id="qso-guide-hint"',
-  'id="btn-qso-use-hint"',
+  'id="btn-qso-play-demo"',
 
   // Two-way Teletype Terminal
   'class="qso-terminal"',
@@ -91,11 +91,14 @@ const requiredDomElements = [
   'id="macro-btn-tu"',
   'id="macro-btn-agn"',
 
-  // Transmitter Input Cockpit
-  'class="qso-tx-strip"',
-  'id="qso-tx-buffer"',
-  'id="btn-qso-tx-clear"',
-  'id="btn-qso-tx-send"',
+  // Live Telemetry Deck & Over Action
+  'id="qso-telemetry-deck"',
+  'id="qso-telem-seq"',
+  'id="qso-telem-char"',
+  'id="qso-telem-wpm"',
+  'id="qso-gap-bar"',
+  'id="btn-qso-tx-over"',
+  'id="btn-qso-clear-feed"',
   'id="qso-last-ack"',
 
   // Logbook View
@@ -158,9 +161,9 @@ const requiredCssSelectors = [
   '.qso-feed-text.tx',
   '.qso-macro-deck',
   '.qso-macro-btn',
-  '.qso-tx-strip',
-  '.qso-tx-input',
-  '.btn-qso-send',
+  '.qso-telemetry-deck',
+  '.qso-telem-card',
+  '.btn-qso-over',
   '.qso-logbook-table',
   '.qso-logbook-empty',
   '@media (max-width: 900px)',
@@ -250,28 +253,27 @@ assert.strictEqual(qsoMode.el.carrierText.textContent, 'CARRIER IDLE');
 console.log('   -> Carrier LED & status text transitions verified!');
 
 // D. Decoded Letter Routing & Backspace <HH> handling
-let mockBufferValue = '';
 qsoMode.isWorkspaceActive = () => true;
-qsoMode.el.txBuffer = {
-  get value() { return mockBufferValue; },
-  set value(v) { mockBufferValue = v; },
-  scrollLeft: 0,
-  scrollWidth: 100
+let mockTerminalFeed = {
+  appendChild(child) {},
+  scrollTop: 0,
+  scrollHeight: 100
 };
+qsoMode.el.terminalFeed = mockTerminalFeed;
 
 qsoMode.handleLetterDecoded('C');
 qsoMode.handleLetterDecoded('Q');
 qsoMode.handleLetterDecoded(' ');
-assert.strictEqual(mockBufferValue, 'CQ ');
+assert.strictEqual(qsoMode._liveTxText, 'CQ ');
 
 qsoMode.handleLetterDecoded('D');
 qsoMode.handleLetterDecoded('E');
 qsoMode.handleLetterDecoded(' ');
-assert.strictEqual(mockBufferValue, 'CQ DE ');
+assert.strictEqual(qsoMode._liveTxText, 'CQ DE ');
 
 // Error signal <HH> should erase last word
 qsoMode.handleLetterDecoded('<HH>');
-assert.strictEqual(mockBufferValue, 'CQ ', '<HH> correctly erased last word "DE "');
+assert.strictEqual(qsoMode._liveTxText, 'CQ ', '<HH> correctly erased last word "DE "');
 console.log('   -> CW Keyer character decoding and <HH> word erase verified!');
 
 // E. Band switching logic

@@ -102,7 +102,8 @@ class RxMode {
       rxDock: document.getElementById('rx-dock'),
       btnToggleDock: document.getElementById('btn-rx-toggle-dock'),
       dockToggleText: document.getElementById('rx-dock-toggle-text'),
-      dockChevron: document.getElementById('rx-dock-chevron')
+      dockChevron: document.getElementById('rx-dock-chevron'),
+      scTotalSub: document.getElementById('rx-sc-total-sub')
     };
 
     if (this.el.wsContainer) {
@@ -1150,7 +1151,8 @@ class RxMode {
       if (this.el.scLatency) this.el.scLatency.textContent = `${avgLatency} ms`;
       if (this.el.scMedianLatency) this.el.scMedianLatency.textContent = medianLatency > 0 ? `${medianLatency} ms` : '-- ms';
       if (this.el.scLow25Latency) this.el.scLow25Latency.textContent = low25Latency > 0 ? `${low25Latency} ms` : '-- ms';
-      if (this.el.scTotal) this.el.scTotal.textContent = `${correctCount} / ${total} (正確率 ${accuracy}%)`;
+      if (this.el.scTotal) this.el.scTotal.textContent = `${correctCount} / ${total}`;
+      if (this.el.scTotalSub) this.el.scTotalSub.textContent = `共 ${total} 題 · 正確率 ${accuracy}%`;
 
       // Breakthrough Box in Drill Mode
       if (this.submode === 'drill' && this.drillTarget) {

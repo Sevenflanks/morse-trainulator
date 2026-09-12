@@ -419,6 +419,48 @@
   right: 7px;
 }
 
+.rx-sc-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+  gap: 12px;
+  margin-bottom: 16px;
+}
+
+.rx-sc-card {
+  background: #1a1c26;
+  padding: 10px;
+  border-radius: 6px;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+
+.rx-sc-card-label {
+  font-size: 0.7rem;
+  color: #888;
+  margin-bottom: 2px;
+  white-space: nowrap;
+}
+
+.rx-sc-card-val {
+  font-size: 1.3rem;
+  font-weight: bold;
+  font-variant-numeric: tabular-nums;
+  font-feature-settings: "tnum" 1;
+  white-space: nowrap;
+}
+
+.rx-sc-card-sub {
+  font-size: 0.68rem;
+  color: #8c9bb0;
+  margin-top: 2px;
+  white-space: nowrap;
+  font-variant-numeric: tabular-nums;
+  font-feature-settings: "tnum" 1;
+}
+
 .rx-sc-history-bar {
   display: flex;
   align-items: center;

@@ -582,6 +582,12 @@ function handleKeyUp() {
   if (hudSeqKey) hudSeqKey.textContent = res.sequence || '';
   if (dom.stateDuration) dom.stateDuration.textContent = `${res.duration} ms`;
 
+  if (typeof window !== 'undefined' && window.qsoMode && typeof window.qsoMode.isWorkspaceActive === 'function' && window.qsoMode.isWorkspaceActive()) {
+    if (typeof window.qsoMode.updateKeyingTelemetry === 'function') {
+      window.qsoMode.updateKeyingTelemetry(res.sequence, res.letter || (res.isValid ? '...' : ''), res.duration, Math.round(1200 / engine.getEffectiveUnitT()));
+    }
+  }
+
   if (res.letter === '<HH>') {
     if (dom.evalStatus) {
       dom.evalStatus.innerHTML = '<i class="mdi mdi-alert"></i> 檢測到更正訊號 (Error: 8 Dits)';
@@ -608,6 +614,16 @@ function finalizeLetter() {
   if (engine.isKeyDown) return;
   const res = engine.commitCurrentSequence();
   if (!res) return;
+
+  // Forward decoded character to QSO workspace transmitter if active
+  if (typeof window !== 'undefined' && window.qsoMode && typeof window.qsoMode.isWorkspaceActive === 'function' && window.qsoMode.isWorkspaceActive()) {
+    if (res.isErrorSignal || res.letter === '<HH>') {
+      window.qsoMode.handleLetterDecoded('<HH>');
+    } else if (res.isValid) {
+      window.qsoMode.handleLetterDecoded(res.letter);
+    }
+    return;
+  }
 
   if (currentMode === 'text') {
     finalizeLetterTextMode(res);
@@ -661,15 +677,6 @@ function finalizeLetter() {
       dom.evalStatus.style.color = '#888';
     }
     highlightPath('', false, engine, dom.antennaShape);
-  }
-
-  // Forward decoded character to QSO workspace transmitter if active
-  if (typeof window !== 'undefined' && window.qsoMode && typeof window.qsoMode.isWorkspaceActive === 'function' && window.qsoMode.isWorkspaceActive()) {
-    if (res.isErrorSignal || res.letter === '<HH>') {
-      window.qsoMode.handleLetterDecoded('<HH>');
-    } else if (res.isValid) {
-      window.qsoMode.handleLetterDecoded(res.letter);
-    }
   }
 
   setTimeout(() => {

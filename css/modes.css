@@ -32,6 +32,20 @@
   line-height: 1;
 }
 
+.passage-box::-webkit-scrollbar {
+  width: 6px;
+}
+.passage-box::-webkit-scrollbar-track {
+  background: transparent;
+}
+.passage-box::-webkit-scrollbar-thumb {
+  background: #232b3b;
+  border-radius: 3px;
+}
+.passage-box::-webkit-scrollbar-thumb:hover {
+  background: #333e54;
+}
+
 .char-chip {
   display: inline-flex;
   flex-direction: column;

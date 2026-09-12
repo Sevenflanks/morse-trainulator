@@ -20,6 +20,14 @@ class QsoMode {
     this.currentQslTheme = 'cyber-brass';
     this.activeQslData = null;
 
+    this._liveLineEl = null;
+    this._liveContentEl = null;
+    this._liveTxText = '';
+    this._autoFinalizeTimer = null;
+    this._isDemoPlaying = false;
+    this._txBlipTimer = null;
+    this._originalSidetoneFreq = null;
+
     this._boundCwPulseStart = null;
     this._boundCwPulseEnd = null;
     this._boundCwPlaybackComplete = null;
@@ -65,7 +73,7 @@ class QsoMode {
       stepBadges: document.querySelectorAll('.qso-step-badge'),
       guidePrompt: document.getElementById('qso-guide-prompt'),
       guideHint: document.getElementById('qso-guide-hint'),
-      btnUseHint: document.getElementById('btn-qso-use-hint'),
+      btnPlayDemo: document.getElementById('btn-qso-play-demo'),
 
       // Terminal
       terminalFeed: document.getElementById('qso-terminal-feed'),
@@ -76,13 +84,18 @@ class QsoMode {
       btnReplayRx: document.getElementById('btn-qso-replay-rx'),
       btnNewStation: document.getElementById('btn-qso-new-station'),
 
+      // Live Keying Telemetry Deck
+      telemSeq: document.getElementById('qso-telem-seq'),
+      telemChar: document.getElementById('qso-telem-char'),
+      telemWpm: document.getElementById('qso-telem-wpm'),
+      gapBar: document.getElementById('qso-gap-bar'),
+      btnTxOver: document.getElementById('btn-qso-tx-over'),
+      btnClearFeed: document.getElementById('btn-qso-clear-feed'),
+
       // Macros
       macroButtons: document.querySelectorAll('.qso-macro-btn'),
 
-      // TX Cockpit
-      txBuffer: document.getElementById('qso-tx-buffer'),
-      btnClearTx: document.getElementById('btn-qso-tx-clear'),
-      btnSendTx: document.getElementById('btn-qso-tx-send'),
+      // Status Bar
       lastAck: document.getElementById('qso-last-ack'),
 
       // Logbook
@@ -171,15 +184,12 @@ class QsoMode {
       });
     }
 
-    // 4. Guided Hint Button
-    if (this.el.btnUseHint) {
-      this.el.btnUseHint.addEventListener('click', () => {
-        if (!this.qsoManager) return;
-        const step = this.qsoManager.getGuidedStepInfo();
-        if (step && step.hint && this.el.txBuffer) {
-          this.el.txBuffer.value = step.hint;
-          this.el.txBuffer.focus();
-        }
+    // 4. Guided Hint Demo Playback (示範播放)
+    if (this.el.btnPlayDemo) {
+      this.el.btnPlayDemo.addEventListener('click', () => {
+        const step = this.qsoManager ? this.qsoManager.getGuidedStepInfo() : null;
+        const text = (step && step.hint) ? step.hint : 'CQ CQ CQ DE BV2TT BV2TT K';
+        this.playDemoTransmission(text);
       });
     }
 
@@ -203,43 +213,36 @@ class QsoMode {
       });
     }
 
-    // 6. Macro Buttons Deck
+    // 6. Macro Buttons Deck (點擊自動示範發報)
     if (this.el.macroButtons) {
       this.el.macroButtons.forEach(btn => {
         btn.addEventListener('click', () => {
           const macro = btn.getAttribute('data-macro');
           if (this.qsoManager) {
             const text = this.qsoManager.generateMacroText(macro);
-            if (text && this.el.txBuffer) {
-              this.el.txBuffer.value = text;
-              this.el.txBuffer.focus();
+            if (text) {
+              this.playDemoTransmission(text);
             }
           }
         });
       });
     }
 
-    // 7. TX Input & Send
-    if (this.el.btnSendTx) {
-      this.el.btnSendTx.addEventListener('click', () => {
-        this.transmitCurrentBuffer();
+    // 7. Live Telemetry Deck Actions
+    if (this.el.btnTxOver) {
+      this.el.btnTxOver.addEventListener('click', () => {
+        this.finalizeLiveTx();
       });
     }
 
-    if (this.el.btnClearTx) {
-      this.el.btnClearTx.addEventListener('click', () => {
-        if (this.el.txBuffer) {
-          this.el.txBuffer.value = '';
-          this.el.txBuffer.focus();
-        }
-      });
-    }
-
-    if (this.el.txBuffer) {
-      this.el.txBuffer.addEventListener('keydown', (e) => {
-        if (e.key === 'Enter') {
-          e.preventDefault();
-          this.transmitCurrentBuffer();
+    if (this.el.btnClearFeed) {
+      this.el.btnClearFeed.addEventListener('click', () => {
+        if (this.el.terminalFeed) {
+          this.el.terminalFeed.innerHTML = '';
+          this._liveLineEl = null;
+          this._liveContentEl = null;
+          this._liveTxText = '';
+          this.printFeed('SYS', '電傳記錄已清空。');
         }
       });
     }
@@ -375,11 +378,20 @@ class QsoMode {
     this.updateStationMeta();
     this.updateGuidedUI();
 
+    // Cache user's original sidetone frequency for safe restoration
+    if (typeof window !== 'undefined' && window.settingsManager && window.settingsManager.settings) {
+      this._originalSidetoneFreq = window.settingsManager.settings.sidetoneFreq;
+    } else if (this.synth) {
+      this._originalSidetoneFreq = this.synth.frequency;
+    }
+
     // Dynamically reparent K5 Dock into ws-container-qso so keyer is immediately available
-    const k5Dock = document.getElementById('k5-dock');
-    const wsQso = document.getElementById('ws-container-qso');
-    if (k5Dock && wsQso && k5Dock.parentElement !== wsQso) {
-      wsQso.appendChild(k5Dock);
+    if (typeof document !== 'undefined') {
+      const k5Dock = document.getElementById('k5-dock');
+      const wsQso = document.getElementById('ws-container-qso');
+      if (k5Dock && wsQso && k5Dock.parentElement !== wsQso) {
+        wsQso.appendChild(k5Dock);
+      }
     }
 
     // Start QRN noise if enabled
@@ -388,17 +400,24 @@ class QsoMode {
     }
 
     // Scroll terminal to latest
-    if (this.el.terminalFeed) {
+    if (this.el && this.el.terminalFeed) {
       this.el.terminalFeed.scrollTop = this.el.terminalFeed.scrollHeight;
     }
   }
 
   onLeaveQso() {
     // Reparent K5 Dock back into ws-container-tx
-    const k5Dock = document.getElementById('k5-dock');
-    const wsTx = document.getElementById('ws-container-tx');
-    if (k5Dock && wsTx && k5Dock.parentElement !== wsTx) {
-      wsTx.appendChild(k5Dock);
+    if (typeof document !== 'undefined') {
+      const k5Dock = document.getElementById('k5-dock');
+      const wsTx = document.getElementById('ws-container-tx');
+      if (k5Dock && wsTx && k5Dock.parentElement !== wsTx) {
+        wsTx.appendChild(k5Dock);
+      }
+    }
+
+    // Stop demo playback if running
+    if (this._isDemoPlaying) {
+      this.stopDemoTransmission();
     }
 
     // Stop remote audio playback if in progress
@@ -406,9 +425,20 @@ class QsoMode {
       this.cwPlayer.stop();
     }
 
+    // Clear timers
+    if (this._autoFinalizeTimer) {
+      clearTimeout(this._autoFinalizeTimer);
+      this._autoFinalizeTimer = null;
+    }
+
     // Stop QRN noise
     if (this.synth && typeof this.synth.stopNoise === 'function') {
       this.synth.stopNoise();
+    }
+
+    // Restore user's original sidetone frequency
+    if (this.synth && this._originalSidetoneFreq) {
+      this.synth.frequency = this._originalSidetoneFreq;
     }
 
     // Reset S-meter
@@ -467,54 +497,264 @@ class QsoMode {
   }
 
   // ==========================================
-  // TRANSMISSION & TELETYPE TERMINAL
+  // TRANSMISSION, TELEMETRY & STREAMING TERMINAL
   // ==========================================
+  updateKeyingTelemetry(symbol, durationMs, currentSeq) {
+    if (this.el.telemSeq) {
+      this.el.telemSeq.textContent = currentSeq || symbol || '—';
+    }
+    if (this.el.telemChar) {
+      const char = (this.engine && currentSeq) ? this.engine.getLetterForSequence(currentSeq) : '—';
+      this.el.telemChar.textContent = char || '—';
+    }
+    if (this.el.telemWpm && durationMs) {
+      const wpm = Math.round(1200 / durationMs);
+      this.el.telemWpm.textContent = `${Math.round(durationMs)} ms (${wpm} WPM)`;
+    }
+  }
+
+  _createLiveLine() {
+    if (typeof document === 'undefined') return;
+    if (!this.el.terminalFeed) return;
+
+    const line = document.createElement('div');
+    line.className = 'qso-feed-line live';
+
+    const now = new Date();
+    const timeStr = `${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}:${String(now.getSeconds()).padStart(2, '0')}`;
+
+    const timeSpan = document.createElement('span');
+    timeSpan.className = 'qso-feed-time';
+    timeSpan.textContent = timeStr;
+    line.appendChild(timeSpan);
+
+    const myCall = (this.qsoManager && this.qsoManager.myStation && this.qsoManager.myStation.call) ? this.qsoManager.myStation.call : 'BV2TT';
+    const tagSpan = document.createElement('span');
+    tagSpan.className = 'qso-feed-tag tx';
+    tagSpan.textContent = `TX ${myCall}`;
+    line.appendChild(tagSpan);
+
+    const textSpan = document.createElement('span');
+    textSpan.className = 'qso-feed-text tx';
+
+    const contentSpan = document.createElement('span');
+    contentSpan.className = 'qso-live-content';
+    textSpan.appendChild(contentSpan);
+
+    const cursorSpan = document.createElement('span');
+    cursorSpan.className = 'qso-cursor';
+    textSpan.appendChild(cursorSpan);
+
+    line.appendChild(textSpan);
+    this.el.terminalFeed.appendChild(line);
+    this.el.terminalFeed.scrollTop = this.el.terminalFeed.scrollHeight;
+
+    this._liveLineEl = line;
+    this._liveContentEl = contentSpan;
+    this._liveTxText = '';
+  }
+
+  _appendLiveTxChar(char) {
+    if (!this._liveLineEl && typeof document !== 'undefined') {
+      this._createLiveLine();
+    }
+    this._liveTxText += char;
+    if (this._liveContentEl) {
+      this._liveContentEl.textContent = this._liveTxText;
+    }
+    if (this.el.terminalFeed) {
+      this.el.terminalFeed.scrollTop = this.el.terminalFeed.scrollHeight;
+    }
+  }
+
   handleLetterDecoded(char) {
     if (!this.isWorkspaceActive()) return;
-    if (!this.el.txBuffer) return;
 
     if (char === '<HH>') {
-      // Erase last word
-      const val = this.el.txBuffer.value.trimEnd();
-      const lastSpace = val.lastIndexOf(' ');
-      this.el.txBuffer.value = (lastSpace !== -1) ? val.slice(0, lastSpace + 1) : '';
+      // Erase last word (prosign 8 dots)
+      if (this._liveTxText) {
+        const trimmed = this._liveTxText.trimEnd();
+        const lastSpace = trimmed.lastIndexOf(' ');
+        this._liveTxText = (lastSpace !== -1) ? trimmed.slice(0, lastSpace + 1) : '';
+        if (this._liveContentEl) {
+          this._liveContentEl.textContent = this._liveTxText;
+        }
+      }
+      if (this.el.telemSeq) this.el.telemSeq.textContent = '—';
+      if (this.el.telemChar) this.el.telemChar.textContent = '<HH>';
       return;
     }
 
-    this.el.txBuffer.value += char;
-    this.el.txBuffer.scrollLeft = this.el.txBuffer.scrollWidth;
+    this._appendLiveTxChar(char);
+
+    if (this.el.telemChar) this.el.telemChar.textContent = char;
+    if (this.el.telemSeq) this.el.telemSeq.textContent = '—';
 
     // Carrier TX blip
     this.setCarrierState('TX');
     clearTimeout(this._txBlipTimer);
     this._txBlipTimer = setTimeout(() => {
-      if (!this._isRemotePlaying) this.setCarrierState('IDLE');
+      if (!this._isRemotePlaying && !this._isDemoPlaying) this.setCarrierState('IDLE');
     }, 300);
+
+    // Auto-finalize countdown timer
+    clearTimeout(this._autoFinalizeTimer);
+    const trimmed = this._liveTxText.trim();
+    if (trimmed.endsWith(' K') || trimmed === 'K' || trimmed.endsWith(' AR') || trimmed.endsWith(' SK')) {
+      this._autoFinalizeTimer = setTimeout(() => {
+        this.finalizeLiveTx();
+      }, 1800);
+    } else {
+      this._autoFinalizeTimer = setTimeout(() => {
+        this.finalizeLiveTx();
+      }, 6000);
+    }
   }
 
-  transmitCurrentBuffer() {
-    if (!this.el.txBuffer) return;
-    const text = this.el.txBuffer.value.trim();
-    if (!text) return;
+  finalizeLiveTx() {
+    clearTimeout(this._autoFinalizeTimer);
+    if (!this._liveTxText || !this._liveTxText.trim()) {
+      if (this._liveLineEl && this._liveLineEl.parentElement) {
+        this._liveLineEl.parentElement.removeChild(this._liveLineEl);
+      }
+      this._liveLineEl = null;
+      this._liveContentEl = null;
+      this._liveTxText = '';
+      return;
+    }
 
-    if (!this.qsoManager) return;
+    const text = this._liveTxText.trim();
 
-    // Send to domain state machine
-    const res = this.qsoManager.handleUserTransmit(text);
+    // Remove live class and cursor
+    if (this._liveLineEl) {
+      this._liveLineEl.classList.remove('live');
+      const cursor = this._liveLineEl.querySelector('.qso-cursor');
+      if (cursor) cursor.remove();
+    }
 
-    // Print to terminal feed
-    const myCall = (this.qsoManager.myStation && this.qsoManager.myStation.call) ? this.qsoManager.myStation.call : 'BV2TT';
-    this.printFeed('TX', text, myCall);
+    this._liveLineEl = null;
+    this._liveContentEl = null;
+    this._liveTxText = '';
 
-    // Clear input buffer
-    this.el.txBuffer.value = '';
+    if (this.qsoManager) {
+      const res = this.qsoManager.handleUserTransmit(text);
+      if (this.el.lastAck) {
+        this.el.lastAck.textContent = (res && res.feedback) ? res.feedback : '電文已發射';
+      }
+    }
+  }
 
-    if (this.el.lastAck) {
-      this.el.lastAck.textContent = res.feedback || '電文已發射';
+  stopDemoTransmission() {
+    if (this.cwPlayer && this.cwPlayer.isPlaying) {
+      this.cwPlayer.stop();
+    }
+    this._isDemoPlaying = false;
+    if (this.el.btnPlayDemo) {
+      this.el.btnPlayDemo.innerHTML = '<i class="mdi mdi-play"></i> 示範播放';
+    }
+  }
+
+  async playDemoTransmission(text) {
+    if (!text) {
+      const step = this.qsoManager ? this.qsoManager.getGuidedStepInfo() : null;
+      text = (step && step.hint) ? step.hint : 'CQ CQ CQ DE BV2TT BV2TT K';
+    }
+
+    if (this._isDemoPlaying) {
+      this.stopDemoTransmission();
+      return;
+    }
+
+    if (!this.isWorkspaceActive()) return;
+
+    // Finalize any previous live transmission first
+    if (this._liveTxText && this._liveTxText.trim()) {
+      this.finalizeLiveTx();
+    }
+
+    this._isDemoPlaying = true;
+    if (this.el.btnPlayDemo) {
+      this.el.btnPlayDemo.innerHTML = '<i class="mdi mdi-stop"></i> 停止播放';
+    }
+
+    // Create live line for demo stream
+    this._createLiveLine();
+
+    const keyBtn = document.getElementById('key-button');
+    const k2Straight = document.querySelector('.k2-thumb-wing.mode-straight');
+
+    const onPulseStart = (sym, dur) => {
+      this.setCarrierState('TX');
+      if (window.ribbon && typeof window.ribbon.startPulse === 'function') {
+        window.ribbon.startPulse();
+      }
+      if (keyBtn) keyBtn.classList.add('active');
+      if (k2Straight) k2Straight.classList.add('active');
+    };
+
+    const onPulseEnd = () => {
+      if (window.ribbon && typeof window.ribbon.endPulse === 'function') {
+        window.ribbon.endPulse();
+      }
+      if (keyBtn) keyBtn.classList.remove('active');
+      if (k2Straight) k2Straight.classList.remove('active');
+    };
+
+    const onCharStart = (char, seq) => {
+      if (this.el.telemChar) this.el.telemChar.textContent = char;
+      if (this.el.telemSeq) this.el.telemSeq.textContent = seq || '—';
+      if (this.el.telemWpm) {
+        const wpm = this.cwPlayer ? (this.cwPlayer.charWpm || 20) : 20;
+        this.el.telemWpm.textContent = `示範 (${wpm} WPM)`;
+      }
+    };
+
+    const onCharComplete = (char) => {
+      this._appendLiveTxChar(char);
+    };
+
+    const onWordGapStart = () => {
+      this._appendLiveTxChar(' ');
+    };
+
+    if (this.cwPlayer) {
+      this.cwPlayer.on('pulseStart', onPulseStart);
+      this.cwPlayer.on('pulseEnd', onPulseEnd);
+      this.cwPlayer.on('charStart', onCharStart);
+      this.cwPlayer.on('charComplete', onCharComplete);
+      this.cwPlayer.on('wordGapStart', onWordGapStart);
+    }
+
+    try {
+      if (this.synth) {
+        this.synth.frequency = this.bfoPitch;
+      }
+      if (this.cwPlayer) {
+        await this.cwPlayer.playText(text);
+      }
+    } catch (e) {
+      console.error('[QsoMode] Demo transmission error:', e);
+    } finally {
+      if (this.cwPlayer) {
+        this.cwPlayer.off('pulseStart', onPulseStart);
+        this.cwPlayer.off('pulseEnd', onPulseEnd);
+        this.cwPlayer.off('charStart', onCharStart);
+        this.cwPlayer.off('charComplete', onCharComplete);
+        this.cwPlayer.off('wordGapStart', onWordGapStart);
+      }
+      if (keyBtn) keyBtn.classList.remove('active');
+      if (k2Straight) k2Straight.classList.remove('active');
+      this._isDemoPlaying = false;
+      this.setCarrierState('IDLE');
+      if (this.el.btnPlayDemo) {
+        this.el.btnPlayDemo.innerHTML = '<i class="mdi mdi-play"></i> 示範播放';
+      }
+      this.finalizeLiveTx();
     }
   }
 
   printFeed(sender, text, callsign = '') {
+    if (typeof document === 'undefined') return;
     if (!this.el.terminalFeed || !text) return;
 
     const line = document.createElement('div');
@@ -610,7 +850,7 @@ class QsoMode {
   }
 
   setCarrierState(state) {
-    if (!this.el.carrierDot || !this.el.carrierText) return;
+    if (!this.el || !this.el.carrierDot || !this.el.carrierText) return;
 
     this.el.carrierDot.className = 'qso-carrier-dot';
     if (state === 'RX') {
@@ -628,6 +868,7 @@ class QsoMode {
   }
 
   setSmeterLevel(level, active = true) {
+    if (!this.el) return;
     const clampedLevel = Math.max(0, Math.min(11, level));
 
     // Map level 0~11 to rotation angle: -45deg (S0) to +45deg (S9+30dB)
@@ -635,7 +876,7 @@ class QsoMode {
     const angle = -45 + (clampedLevel / 11) * 90;
 
     if (this.el.smeterNeedle) {
-      this.el.smeterNeedle.setAttribute('transform', `rotate(${angle.toFixed(1)}, 100, 80)`);
+      this.el.smeterNeedle.style.transform = `rotate(${angle.toFixed(1)}deg)`;
     }
 
     // Readout badge text
@@ -669,7 +910,7 @@ class QsoMode {
   // METADATA & GUIDED UI UPDATES
   // ==========================================
   updateStationMeta() {
-    if (!this.qsoManager) return;
+    if (!this.qsoManager || !this.el) return;
 
     const my = this.qsoManager.myStation;
     if (this.el.myCall) this.el.myCall.textContent = my.call;
@@ -686,7 +927,7 @@ class QsoMode {
   }
 
   updateGuidedUI() {
-    if (!this.qsoManager) return;
+    if (!this.qsoManager || !this.el) return;
     const stepInfo = this.qsoManager.getGuidedStepInfo();
     if (!stepInfo) return;
 
