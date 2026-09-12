@@ -97,7 +97,12 @@ class RxMode {
       matrixChevron: document.getElementById('rx-matrix-chevron'),
       kochMatrixPanel: document.getElementById('rx-koch-matrix-panel'),
       kochMatrixGrid: document.getElementById('rx-koch-matrix-grid'),
-      btnStageAdvance: document.getElementById('btn-rx-stage-advance')
+      btnStageAdvance: document.getElementById('btn-rx-stage-advance'),
+      workspaceStage: document.querySelector('.rx-workspace-stage'),
+      rxDock: document.getElementById('rx-dock'),
+      btnToggleDock: document.getElementById('btn-rx-toggle-dock'),
+      dockToggleText: document.getElementById('rx-dock-toggle-text'),
+      dockChevron: document.getElementById('rx-dock-chevron')
     };
 
     if (this.el.wsContainer) {
@@ -209,6 +214,13 @@ class RxMode {
         if (key) {
           this.handleKey(key);
         }
+      });
+    }
+
+    // 4b. Zone 3 Dock Collapse / Expand Toggle
+    if (this.el.btnToggleDock) {
+      this.el.btnToggleDock.addEventListener('click', () => {
+        this.toggleDockCollapse();
       });
     }
 
@@ -358,6 +370,21 @@ class RxMode {
     }
     if (this._matrixOpen) {
       this.renderStageMatrix();
+    }
+  }
+
+  toggleDockCollapse(forceState = null) {
+    if (!this.el || !this.el.rxDock) return;
+    const isCollapsed = (forceState !== null) ? !!forceState : !this.el.rxDock.classList.contains('collapsed');
+    this.el.rxDock.classList.toggle('collapsed', isCollapsed);
+    if (this.el.workspaceStage) {
+      this.el.workspaceStage.classList.toggle('dock-collapsed', isCollapsed);
+    }
+    if (this.el.dockToggleText) {
+      this.el.dockToggleText.textContent = isCollapsed ? '展開鍵盤' : '收合鍵盤';
+    }
+    if (this.el.dockChevron) {
+      this.el.dockChevron.className = isCollapsed ? 'mdi mdi-chevron-up' : 'mdi mdi-chevron-down';
     }
   }
 
@@ -686,6 +713,7 @@ class RxMode {
     // Reset UI
     if (this.el) {
       if (this.el.scorecard) this.el.scorecard.style.display = 'none';
+      if (this.el.workspaceStage) this.el.workspaceStage.scrollTop = 0;
       if (this.el.historyLog) this.el.historyLog.innerHTML = '';
       if (this.el.inputBuffer) this.el.inputBuffer.textContent = '';
       if (this.el.btnStageAdvance) this.el.btnStageAdvance.style.display = 'none';
@@ -1099,7 +1127,14 @@ class RxMode {
     const wpm = this.cwPlayer ? (this.cwPlayer.charWpm || 20) : 20;
 
     if (this.el) {
-      if (this.el.scorecard) this.el.scorecard.style.display = 'block';
+      if (this.el.scorecard) {
+        this.el.scorecard.style.display = 'block';
+        setTimeout(() => {
+          if (this.el && this.el.scorecard && typeof this.el.scorecard.scrollIntoView === 'function') {
+            this.el.scorecard.scrollIntoView({ behavior: 'smooth', block: 'end' });
+          }
+        }, 120);
+      }
       if (this.el.scModeTag) {
         if (this.submode === 'drill' && this.drillTarget) {
           this.el.scModeTag.innerHTML = `<i class="mdi mdi-sword-cross"></i> 弱點專攻 (${this.drillTarget.expected} <i class="mdi mdi-sword-cross"></i> ${this.drillTarget.actual})`;

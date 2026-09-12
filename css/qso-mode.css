@@ -14,8 +14,23 @@
   max-width: 1280px;
   margin: 0 auto;
   gap: 12px;
-  padding: 10px 14px 20px 14px;
+  padding: 10px 14px 140px 14px;
   box-sizing: border-box;
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  scroll-behavior: smooth;
+}
+
+.qso-workspace-stage::-webkit-scrollbar {
+  width: 6px;
+}
+.qso-workspace-stage::-webkit-scrollbar-track {
+  background: transparent;
+}
+.qso-workspace-stage::-webkit-scrollbar-thumb {
+  background: #232b3b;
+  border-radius: 3px;
 }
 
 .qso-mode-nav {

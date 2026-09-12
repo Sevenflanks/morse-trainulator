@@ -2312,8 +2312,29 @@
       width: 100%;
       max-width: 1200px;
       margin: 0 auto;
-      padding: 12px 16px 140px;
+      padding: 12px 16px 280px 16px;
       box-sizing: border-box;
+      flex: 1;
+      min-height: 0;
+      overflow-y: auto;
+      scroll-behavior: smooth;
+      scroll-padding-bottom: 280px;
+    }
+
+    .rx-workspace-stage.dock-collapsed {
+      padding-bottom: 100px;
+      scroll-padding-bottom: 100px;
+    }
+
+    .rx-workspace-stage::-webkit-scrollbar {
+      width: 6px;
+    }
+    .rx-workspace-stage::-webkit-scrollbar-track {
+      background: transparent;
+    }
+    .rx-workspace-stage::-webkit-scrollbar-thumb {
+      background: #232b3b;
+      border-radius: 3px;
     }
 
     .rx-mode-nav {
@@ -3012,6 +3033,15 @@
       padding: 6px 12px 10px;
       z-index: 100;
       box-shadow: 0 -4px 15px rgba(0, 0, 0, 0.6);
+      transition: all 0.2s ease-in-out;
+    }
+
+    .rx-dock.collapsed {
+      padding: 4px 12px 6px;
+    }
+
+    .rx-dock.collapsed .telegraph-keypad {
+      display: none !important;
     }
 
     .rx-dock-container {
@@ -3019,7 +3049,46 @@
       margin: 0 auto;
       display: flex;
       flex-direction: column;
-      gap: 6px;
+      gap: 5px;
+    }
+
+    .rx-dock-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      width: 100%;
+      padding: 0 4px;
+    }
+
+    .rx-dock-label {
+      font-size: 0.72rem;
+      color: #728299;
+      font-weight: 600;
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      letter-spacing: 0.5px;
+    }
+
+    .rx-dock-toggle-btn {
+      background: #181c26;
+      border: 1px solid #2e374a;
+      color: #8c9cb2;
+      font-size: 0.7rem;
+      font-weight: 600;
+      padding: 2px 8px;
+      border-radius: 4px;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      transition: all 0.15s ease;
+    }
+
+    .rx-dock-toggle-btn:hover {
+      background: #222938;
+      border-color: var(--neon-blue);
+      color: #fff;
     }
 
     .telegraph-keypad {
@@ -4077,8 +4146,23 @@
   max-width: 1280px;
   margin: 0 auto;
   gap: 12px;
-  padding: 10px 14px 20px 14px;
+  padding: 10px 14px 140px 14px;
   box-sizing: border-box;
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  scroll-behavior: smooth;
+}
+
+.qso-workspace-stage::-webkit-scrollbar {
+  width: 6px;
+}
+.qso-workspace-stage::-webkit-scrollbar-track {
+  background: transparent;
+}
+.qso-workspace-stage::-webkit-scrollbar-thumb {
+  background: #232b3b;
+  border-radius: 3px;
 }
 
 .qso-mode-nav {
@@ -6246,6 +6330,12 @@
     <!-- Zone 3 Adaptive Rx Dock (Fixed Bottom Deck) -->
     <footer class="rx-dock" id="rx-dock">
       <div class="rx-dock-container">
+        <div class="rx-dock-header" id="rx-dock-header">
+          <span class="rx-dock-label"><i class="mdi mdi-keyboard-outline"></i> 實體 / 軟鍵盤抄收</span>
+          <button type="button" id="btn-rx-toggle-dock" class="rx-dock-toggle-btn" title="收合/展開軟鍵盤">
+            <span id="rx-dock-toggle-text">收合鍵盤</span> <i class="mdi mdi-chevron-down" id="rx-dock-chevron"></i>
+          </button>
+        </div>
         <div class="telegraph-keypad" id="rx-soft-keypad">
           <!-- Number Row -->
           <div class="keypad-row">
@@ -8333,15 +8423,17 @@
     }
 
     /**
-     * RX COPYING WORKSPACE CONTROLLER: RxMode
-     * 聽力抄收工作台控制器、狀態機、評測模型與軟鍵盤交互
+     * RX COPYING WORKSPACE CONTROLLER: rx-mode.js
+     * 聽力抄收工作台控制器、狀態機、評測模型與傳輸調度控制項
+     * (100% Zero-Emoji, Material Design Icons, Dual-Track Architecture)
      */
+    
     class RxMode {
       constructor(options = {}) {
         this.cwPlayer = options.cwPlayer || (typeof window !== 'undefined' ? window.cwPlayer : null);
         this.kochManager = options.kochManager || (typeof window !== 'undefined' ? window.kochManager : null);
-        this.submode = options.submode || 'koch';
-        this.state = 'IDLE';
+        this.submode = options.submode || 'koch'; // 'koch' | 'callsign' | 'groups' | 'qcodes'
+        this.state = 'IDLE'; // 'IDLE' | 'READY' | 'PLAYING' | 'WAITING_INPUT' | 'EVALUATED' | 'COMPLETED'
         this.blindMode = (options.blindMode !== undefined) ? !!options.blindMode : true;
         this.autoAdvance = (options.autoAdvance !== undefined) ? !!options.autoAdvance : true;
         this.statsManager = options.statsManager || (typeof window !== 'undefined' && window.rxStatsManager ? window.rxStatsManager : (typeof RxStatsManager !== 'undefined' ? new RxStatsManager() : null));
@@ -8350,27 +8442,28 @@
         this.trials = [];
         this.currentTrial = null;
         this.inputBuffer = '';
-        this.confusionMatrix = {};
+        this.confusionMatrix = {}; // { 'B->D': 2 }
         this.customQueue = null;
         this._matrixOpen = false;
-
+    
         this._boundKeyDown = null;
         this._initialized = false;
       }
-
+    
       now() {
         return (typeof performance !== 'undefined' && typeof performance.now === 'function')
           ? performance.now()
           : Date.now();
       }
-
+    
       getKochManager() {
         return this.kochManager || (typeof window !== 'undefined' ? window.kochManager : null);
       }
-
+    
       init() {
         if (typeof document === 'undefined') return;
-
+    
+        // Cache elements
         this.el = {
           wsContainer: document.getElementById('ws-container-rx'),
           navPills: document.querySelectorAll('.rx-mode-pill'),
@@ -8428,9 +8521,14 @@
           matrixChevron: document.getElementById('rx-matrix-chevron'),
           kochMatrixPanel: document.getElementById('rx-koch-matrix-panel'),
           kochMatrixGrid: document.getElementById('rx-koch-matrix-grid'),
-          btnStageAdvance: document.getElementById('btn-rx-stage-advance')
+          btnStageAdvance: document.getElementById('btn-rx-stage-advance'),
+          workspaceStage: document.querySelector('.rx-workspace-stage'),
+          rxDock: document.getElementById('rx-dock'),
+          btnToggleDock: document.getElementById('btn-rx-toggle-dock'),
+          dockToggleText: document.getElementById('rx-dock-toggle-text'),
+          dockChevron: document.getElementById('rx-dock-chevron')
         };
-
+    
         if (this.el.wsContainer) {
           this.el.wsContainer.addEventListener('click', (e) => {
             const drillBtn = e.target.closest('.rx-btn-drill-pair');
@@ -8443,13 +8541,13 @@
             }
           });
         }
-
+    
         if (this.el.btnToggleAnalytics) {
           this.el.btnToggleAnalytics.addEventListener('click', () => {
             this.toggleAnalyticsPanel();
           });
         }
-
+    
         if (this.el.btnClearHistory) {
           this.el.btnClearHistory.addEventListener('click', () => {
             if (this.statsManager) {
@@ -8459,7 +8557,8 @@
             }
           });
         }
-
+    
+        // 1. Submode Navigation Pills
         if (this.el.navPills) {
           this.el.navPills.forEach(pill => {
             pill.addEventListener('click', () => {
@@ -8469,7 +8568,8 @@
             });
           });
         }
-
+    
+        // 2. Transport Control Buttons
         if (this.el.btnStart) {
           this.el.btnStart.addEventListener('click', () => this.startAudio());
         }
@@ -8494,8 +8594,8 @@
         if (this.el.btnNextRound) {
           this.el.btnNextRound.addEventListener('click', () => this.startSession(this.submode));
         }
-
-        // Koch Stage Controls
+    
+        // 2.1 Koch Stage Controls
         if (this.el.btnToggleMatrix) {
           this.el.btnToggleMatrix.addEventListener('click', () => {
             this.toggleMatrixPanel();
@@ -8514,7 +8614,8 @@
             this.advanceToNextStage();
           });
         }
-
+    
+        // 3. Option Switches
         if (this.el.chkAutoAdvance) {
           this.el.chkAutoAdvance.addEventListener('change', (e) => {
             this.autoAdvance = e.target.checked;
@@ -8527,7 +8628,8 @@
           });
           this.updateBlindMode(this.el.chkBlindMode.checked);
         }
-
+    
+        // 4. Zone 3 Soft Keypad (Touch / Click)
         if (this.el.softKeypad) {
           this.el.softKeypad.addEventListener('click', (e) => {
             const btn = e.target.closest('.keypad-key');
@@ -8538,11 +8640,20 @@
             }
           });
         }
-
+    
+        // 4b. Zone 3 Dock Collapse / Expand Toggle
+        if (this.el.btnToggleDock) {
+          this.el.btnToggleDock.addEventListener('click', () => {
+            this.toggleDockCollapse();
+          });
+        }
+    
+        // 5. Desktop Physical Keyboard Global Capture
         if (!this._keyboardListenerAttached && typeof window !== 'undefined') {
           this._boundKeyDown = (e) => {
             if (!this.isWorkspaceActive()) return;
-
+    
+            // Space -> Play / Replay
             if (e.code === 'Space' || e.key === ' ') {
               e.preventDefault();
               if (this.state === 'READY') {
@@ -8552,7 +8663,8 @@
               }
               return;
             }
-
+    
+            // Escape -> Stop / Skip
             if (e.key === 'Escape') {
               e.preventDefault();
               if (this.state === 'PLAYING') {
@@ -8562,13 +8674,15 @@
               }
               return;
             }
-
+    
+            // Backspace -> Delete
             if (e.key === 'Backspace') {
               e.preventDefault();
               this.handleKey('Backspace');
               return;
             }
-
+    
+            // Enter -> Submit Answer or Advance to Next Trial
             if (e.key === 'Enter') {
               e.preventDefault();
               if (this.state === 'EVALUATED') {
@@ -8578,25 +8692,27 @@
               }
               return;
             }
-
+    
+            // Alphanumeric keys
             if (/^[a-zA-Z0-9]$/.test(e.key)) {
               e.preventDefault();
               this.handleKey(e.key.toUpperCase());
             }
           };
-
+    
           window.addEventListener('keydown', this._boundKeyDown);
           this._keyboardListenerAttached = true;
         }
-
+    
+        // 6. Hook CWPlayer pulse events to CWRibbon oscilloscope
         if (this.cwPlayer) {
           this.attachPlayerHooks(this.cwPlayer);
         }
-
+    
         this._initialized = true;
         this.updateButtonsState();
       }
-
+    
       setSignalLevel(level) {
         if (!this.el || !this.el.signalLadder) return;
         const bars = this.el.signalLadder.querySelectorAll('.signal-bar');
@@ -8604,7 +8720,7 @@
           bar.classList.toggle('active', idx < level);
         });
       }
-
+    
       attachPlayerHooks(player) {
         if (!player || typeof player.on !== 'function') return;
         player.on('pulseStart', (sym) => {
@@ -8627,14 +8743,14 @@
           }
         });
       }
-
+    
       isWorkspaceActive() {
         if (!this.el || !this.el.wsContainer) return false;
         return this.el.wsContainer.classList.contains('active') ||
           this.el.wsContainer.style.display === 'flex' ||
           this.el.wsContainer.style.display === 'block';
       }
-
+    
       setSubmode(submode) {
         this.submode = submode;
         if (submode !== 'drill') {
@@ -8649,7 +8765,7 @@
             pill.classList.toggle('active', pill.dataset.submode === submode);
           });
         }
-
+    
         // Toggle Koch stage bar display
         if (this.el && this.el.kochStageBar) {
           if (submode === 'koch') {
@@ -8667,7 +8783,7 @@
           }
         }
       }
-
+    
       toggleMatrixPanel(forceState = null) {
         this._matrixOpen = (forceState !== null) ? !!forceState : !this._matrixOpen;
         if (this.el && this.el.kochMatrixPanel) {
@@ -8680,13 +8796,28 @@
           this.renderStageMatrix();
         }
       }
-
+    
+      toggleDockCollapse(forceState = null) {
+        if (!this.el || !this.el.rxDock) return;
+        const isCollapsed = (forceState !== null) ? !!forceState : !this.el.rxDock.classList.contains('collapsed');
+        this.el.rxDock.classList.toggle('collapsed', isCollapsed);
+        if (this.el.workspaceStage) {
+          this.el.workspaceStage.classList.toggle('dock-collapsed', isCollapsed);
+        }
+        if (this.el.dockToggleText) {
+          this.el.dockToggleText.textContent = isCollapsed ? '展開鍵盤' : '收合鍵盤';
+        }
+        if (this.el.dockChevron) {
+          this.el.dockChevron.className = isCollapsed ? 'mdi mdi-chevron-up' : 'mdi mdi-chevron-down';
+        }
+      }
+    
       setKochLevel(lvl) {
         const km = this.getKochManager();
         if (!km) return;
         lvl = Math.max(1, Math.min(km.maxUnlockedLevel || 1, lvl));
         km.currentLevel = lvl;
-
+    
         // Synchronize TX mode UI if present
         if (typeof window !== 'undefined') {
           if (typeof window.updateKochUI === 'function') {
@@ -8696,11 +8827,11 @@
             try { window.updatePcbKochVisuals(); } catch (_) {}
           }
         }
-
+    
         this.updateKochStageUI();
         this.startSession('koch');
       }
-
+    
       advanceToNextStage() {
         const km = this.getKochManager();
         if (!km) return;
@@ -8716,18 +8847,18 @@
           this.setKochLevel(nextLvl);
         }
       }
-
+    
       updateKochStageUI() {
         if (!this.el || !this.el.kochStageBar) return;
         const km = this.getKochManager();
         const curLvl = km ? (km.currentLevel || 1) : 1;
         const maxLvl = km ? (km.maxUnlockedLevel || 1) : 1;
-
+    
         // 1. Stage Badge
         if (this.el.kochStageBadge) {
           this.el.kochStageBadge.innerHTML = `<i class="mdi mdi-school"></i> 第 ${curLvl} 關 / 共 35 關`;
         }
-
+    
         // 2. Stage Select Dropdown
         if (this.el.kochStageSelect) {
           this.el.kochStageSelect.innerHTML = '';
@@ -8746,7 +8877,7 @@
             this.el.kochStageSelect.appendChild(opt);
           }
         }
-
+    
         // 3. Target Char Display
         if (this.el.kochTargetChar) {
           if (curLvl === 1) {
@@ -8756,14 +8887,14 @@
             this.el.kochTargetChar.textContent = targetChar;
           }
         }
-
+    
         // 4. Pool Chips with Sound Preview
         if (this.el.kochPoolChips) {
           this.el.kochPoolChips.innerHTML = '';
           const pool = (km && typeof km.getUnlockedPool === 'function') ? km.getUnlockedPool(curLvl) : ['K', 'M'];
           const targetChars = (curLvl === 1) ? ['K', 'M'] : [(km && typeof km.getTargetChar === 'function') ? km.getTargetChar(curLvl) : 'K'];
           const engine = (typeof window !== 'undefined') ? window.engine : null;
-
+    
           pool.forEach(c => {
             const chip = document.createElement('span');
             chip.className = 'rx-pool-chip' + (targetChars.includes(c) ? ' is-target' : '');
@@ -8772,24 +8903,24 @@
               : '';
             chip.innerHTML = `${c}${seq ? ` <span style="font-family:monospace; color:var(--gold); font-size:0.7rem; margin-left:3px;">${seq}</span>` : ''}`;
             chip.title = `點擊試聽 ${c} (${seq})`;
-
+    
             chip.addEventListener('click', (e) => {
               e.stopPropagation();
               if (this.cwPlayer && typeof this.cwPlayer.playText === 'function') {
                 this.cwPlayer.playText(c);
               }
             });
-
+    
             this.el.kochPoolChips.appendChild(chip);
           });
         }
-
+    
         // 5. If matrix is open, re-render
         if (this._matrixOpen) {
           this.renderStageMatrix();
         }
       }
-
+    
       renderStageMatrix() {
         if (!this.el || !this.el.kochMatrixGrid) return;
         const km = this.getKochManager();
@@ -8801,19 +8932,19 @@
           '5', 'Q', '9', 'Z', 'H', '3', '8', 'B', '4', '2',
           '7', 'C', '1', 'D', '6', 'X'
         ];
-
+    
         this.el.kochMatrixGrid.innerHTML = '';
-
+    
         for (let i = 1; i <= 35; i++) {
           const isUnlocked = (i <= maxLvl);
           const clearInfo = (km && typeof km.getStageClear === 'function') ? km.getStageClear(i) : null;
           const charLabel = (i === 1) ? 'K,M' : (seqList[i] || i);
-
+    
           const btn = document.createElement('button');
           btn.type = 'button';
           btn.className = 'stage-cell';
           btn.dataset.level = i;
-
+    
           let medalIcon = '';
           if (!isUnlocked) {
             btn.classList.add('cell-locked');
@@ -8842,13 +8973,13 @@
               btn.classList.add('cell-unlocked');
               btn.title = `第 ${i} 關 (${charLabel}) · 已解鎖 (未通關)`;
             }
-
+    
             btn.addEventListener('click', (e) => {
               e.stopPropagation();
               this.setKochLevel(i);
             });
           }
-
+    
           btn.innerHTML = `
             <div class="stage-cell-top">
               <span class="stage-num">${i}</span>
@@ -8856,23 +8987,24 @@
             </div>
             <span class="stage-char">${charLabel}</span>
           `;
-
+    
           this.el.kochMatrixGrid.appendChild(btn);
         }
       }
-
+    
       updateBlindMode(enabled) {
         this.blindMode = !!enabled;
         if (this.el && this.el.wsContainer) {
           this.el.wsContainer.classList.toggle('rx-blind-active', this.blindMode);
         }
-
+    
+        // Absolute Safety: Ensure TX Mode PCB Card is NEVER masked
         if (typeof document !== 'undefined') {
           const pcbCard = document.querySelector('.pcb-card');
           if (pcbCard) {
             pcbCard.classList.remove('pcb-blind-mode');
           }
-
+    
           // Hide/Show top oscilloscope ribbon in blind mode
           const topRibbon = document.getElementById('cockpit-top-ribbon');
           if (topRibbon) {
@@ -8883,7 +9015,7 @@
             }
           }
         }
-
+    
         this.updateVisualCue();
         if (this.el && this.el.sonarPulse) {
           if (!this.blindMode || this.state !== 'PLAYING') {
@@ -8896,7 +9028,7 @@
           this.updateKochStageUI();
         }
       }
-
+    
       onLeaveRx() {
         if (this.cwPlayer && this.cwPlayer.isPlaying) {
           this.cwPlayer.stop();
@@ -8912,33 +9044,33 @@
           }
         }
       }
-
+    
       updateVisualCue() {
         if (!this.el || !this.el.visualCue) return;
         if (this.blindMode || !this.currentTrial) {
           this.el.visualCue.innerHTML = '';
           return;
         }
-
+    
         const seqs = this.currentTrial.target.split('').map(c => {
           if (typeof window !== 'undefined' && window.engine) {
             return window.engine.getSequenceForLetter(c) || '';
           }
           return '';
         }).filter(Boolean);
-
+    
         if (seqs.length > 0) {
           this.el.visualCue.innerHTML = `<span style="color:#888; font-size:0.75rem;"><i class="mdi mdi-eye"></i> 視覺提示：</span> ${seqs.join('  ')}`;
         } else {
           this.el.visualCue.innerHTML = '';
         }
       }
-
+    
       generateTargetForSubmode(submode) {
         if (this.customQueue && this.customQueue.length > 0) {
           return this.customQueue.shift();
         }
-
+    
         switch (submode) {
           case 'koch': {
             const km = this.getKochManager();
@@ -8983,17 +9115,17 @@
             return 'CQ';
         }
       }
-
+    
       startSession(submode = this.submode, customTargets = null) {
         if (this.cwPlayer && this.cwPlayer.isPlaying) {
           this.cwPlayer.stop();
         }
-
+    
         this.setSubmode(submode);
         this.trials = [];
         this.currentTrialIndex = 0;
         this.confusionMatrix = {};
-
+    
         if (Array.isArray(customTargets) && customTargets.length > 0) {
           this.customQueue = [...customTargets];
           this.totalTrials = customTargets.length;
@@ -9001,9 +9133,11 @@
           this.customQueue = null;
           this.totalTrials = 10;
         }
-
+    
+        // Reset UI
         if (this.el) {
           if (this.el.scorecard) this.el.scorecard.style.display = 'none';
+          if (this.el.workspaceStage) this.el.workspaceStage.scrollTop = 0;
           if (this.el.historyLog) this.el.historyLog.innerHTML = '';
           if (this.el.inputBuffer) this.el.inputBuffer.textContent = '';
           if (this.el.btnStageAdvance) this.el.btnStageAdvance.style.display = 'none';
@@ -9011,20 +9145,21 @@
             this.el.wpmBadge.textContent = `速度: ${this.cwPlayer.charWpm || 20} WPM`;
           }
         }
-
+    
+        // Prepare first trial (DO NOT AUTO PLAY!)
         this.prepareTrial();
       }
-
+    
       restartSession() {
         this.startSession(this.submode);
       }
-
+    
       prepareTrial() {
         if (this.currentTrialIndex >= this.totalTrials) {
           this.completeSession();
           return;
         }
-
+    
         const target = this.generateTargetForSubmode(this.submode);
         this.currentTrial = {
           index: this.currentTrialIndex + 1,
@@ -9037,12 +9172,12 @@
           reflexLatency: 0,
           confusions: []
         };
-
+    
         this.state = 'READY';
         this.inputBuffer = '';
         this.updateProgressBadge();
         this.updateVisualCue();
-
+    
         if (this.el) {
           if (this.el.inputBuffer) this.el.inputBuffer.textContent = '';
           if (this.el.audioIndicator) this.el.audioIndicator.classList.remove('playing');
@@ -9055,10 +9190,10 @@
             this.el.feedbackMsg.innerHTML = '<span style="color:#aaa;">題目已準備，請點擊【開始】或按空白鍵聆聽電碼</span>';
           }
         }
-
+    
         this.updateButtonsState();
       }
-
+    
       updateProgressBadge() {
         if (!this.el || !this.el.progressBadge) return;
         const answeredCount = this.trials.length;
@@ -9070,15 +9205,15 @@
           this.el.progressBadge.textContent = `進度: ${this.currentTrialIndex + 1}/${this.totalTrials} · 正確率: ${acc}%`;
         }
       }
-
+    
       startAudio() {
         if (this.state !== 'READY' && this.state !== 'WAITING_INPUT') return;
         this.playCurrentAudio();
       }
-
+    
       playCurrentAudio() {
         if (!this.cwPlayer || !this.currentTrial) return;
-
+    
         this.state = 'PLAYING';
         if (this.el) {
           if (this.el.audioIndicator) this.el.audioIndicator.classList.add('playing');
@@ -9093,20 +9228,21 @@
           }
         }
         this.updateButtonsState();
-
+    
         this.currentTrial.audioStartTime = this.now();
-
+    
+        // Ensure audio synth context is unlocked
         if (this.cwPlayer.synth && typeof this.cwPlayer.synth.initAudio === 'function') {
           try { this.cwPlayer.synth.initAudio(); } catch (e) {}
         }
-
+    
         const onComplete = () => {
           this.cwPlayer.off('playbackComplete', onComplete);
-          if (this.state !== 'PLAYING') return;
-
+          if (this.state !== 'PLAYING') return; // Cancelled or stopped
+    
           this.state = 'WAITING_INPUT';
           this.currentTrial.audioEndTime = this.now();
-
+    
           if (this.el) {
             if (this.el.audioIndicator) this.el.audioIndicator.classList.remove('playing');
             if (this.el.sonarPulse) this.el.sonarPulse.classList.remove('active');
@@ -9120,11 +9256,11 @@
           }
           this.updateButtonsState();
         };
-
+    
         this.cwPlayer.on('playbackComplete', onComplete);
         this.cwPlayer.playText(this.currentTrial.target);
       }
-
+    
       stopAudio() {
         if (this.cwPlayer && this.cwPlayer.isPlaying) {
           this.cwPlayer.stop();
@@ -9142,15 +9278,16 @@
           this.updateButtonsState();
         }
       }
-
+    
       replayAudio() {
         if (this.state === 'PLAYING' || this.state === 'COMPLETED' || !this.currentTrial) return;
         this.playCurrentAudio();
       }
-
+    
       handleKey(key) {
         if (this.state === 'COMPLETED') return;
-
+    
+        // Visual soft key press animation
         if (typeof document !== 'undefined') {
           const softBtn = document.querySelector(`.keypad-key[data-key="${key}"]`);
           if (softBtn) {
@@ -9158,14 +9295,14 @@
             setTimeout(() => softBtn.classList.remove('active-press'), 120);
           }
         }
-
+    
         if (this.state === 'EVALUATED') {
           if (key === 'Enter') {
             this.advanceToNextTrial();
           }
           return;
         }
-
+    
         if (key === 'Backspace') {
           if (this.inputBuffer.length > 0) {
             this.inputBuffer = this.inputBuffer.slice(0, -1);
@@ -9175,16 +9312,17 @@
           }
           return;
         }
-
+    
         if (key === 'Enter') {
           this.submitAnswer();
           return;
         }
-
+    
+        // Alphanumeric character input
         if (this.currentTrial && !this.currentTrial.firstKeyTime) {
           this.currentTrial.firstKeyTime = this.now();
         }
-
+    
         const maxLen = this.currentTrial ? (this.currentTrial.target.length + 3) : 10;
         if (this.inputBuffer.length < maxLen) {
           this.inputBuffer += key.toUpperCase();
@@ -9192,36 +9330,38 @@
             this.el.inputBuffer.textContent = this.inputBuffer;
           }
         }
-
+    
         // 科赫盲聽 (Koch Rx) 或單字元題目：按下答案即自動送出，無需按下 enter
         const isSingleCharTrial = (this.submode === 'koch' || this.submode === 'drill' || (this.currentTrial && this.currentTrial.target && this.currentTrial.target.length === 1));
         if (isSingleCharTrial && (this.state === 'PLAYING' || this.state === 'WAITING_INPUT' || this.state === 'READY')) {
           this.submitAnswer();
         }
       }
-
+    
       submitAnswer() {
         if (this.state !== 'PLAYING' && this.state !== 'WAITING_INPUT' && this.state !== 'READY') return;
         if (!this.currentTrial) return;
-
+    
         if (this.cwPlayer && this.cwPlayer.isPlaying) {
           this.cwPlayer.stop();
         }
-
+    
         this.state = 'EVALUATED';
         const target = this.currentTrial.target;
         const input = this.inputBuffer.toUpperCase().trim();
         this.currentTrial.userInput = input;
-
+    
+        // Reflex Latency calculation
         if (this.currentTrial.firstKeyTime && this.currentTrial.audioEndTime) {
           this.currentTrial.reflexLatency = Math.max(0, Math.round(this.currentTrial.firstKeyTime - this.currentTrial.audioEndTime));
         } else {
           this.currentTrial.reflexLatency = 0;
         }
-
+    
         const isCorrect = (target === input);
         this.currentTrial.isCorrect = isCorrect;
-
+    
+        // Confusion Matrix Analysis
         if (!isCorrect) {
           const maxLen = Math.max(target.length, input.length);
           for (let i = 0; i < maxLen; i++) {
@@ -9234,15 +9374,16 @@
             }
           }
         }
-
+    
         this.trials.push({ ...this.currentTrial });
         this.updateButtonsState();
-
+    
+        // Render Immediate Live Feedback
         if (this.el) {
           if (this.el.audioIndicator) this.el.audioIndicator.classList.remove('playing');
           if (this.el.sonarPulse) this.el.sonarPulse.classList.remove('active');
           this.setSignalLevel(0);
-
+    
           // Teletype strike animation on input display (120ms)
           if (this.el.inputDisplay) {
             this.el.inputDisplay.classList.remove('teletype-strike');
@@ -9254,13 +9395,13 @@
               }
             }, 120);
           }
-
+    
           if (this.el.audioStatusText) {
             this.el.audioStatusText.innerHTML = isCorrect
               ? '<i class="mdi mdi-check-circle" style="color:#00e676;"></i> 抄收正確！'
               : '<i class="mdi mdi-close-circle" style="color:#ff5252;"></i> 抄收不合';
           }
-
+    
           if (this.el.feedbackMsg) {
             if (isCorrect) {
               this.el.feedbackMsg.innerHTML = `<span style="color:#00e676;"><i class="mdi mdi-check-circle"></i> 正確！答案為 ${target} (反射: ${this.currentTrial.reflexLatency} ms)</span>`;
@@ -9268,7 +9409,8 @@
               this.el.feedbackMsg.innerHTML = `<span style="color:#ff5252;"><i class="mdi mdi-close-circle"></i> 錯誤：目標為 ${target}，抄收為 ${input || '(空白)'}</span>`;
             }
           }
-
+    
+          // Add to History Log
           if (this.el.historyLog) {
             const chip = document.createElement('span');
             chip.className = `rx-history-chip ${isCorrect ? 'correct' : 'wrong'}`;
@@ -9277,30 +9419,32 @@
             this.el.historyLog.scrollLeft = this.el.historyLog.scrollWidth;
           }
         }
-
+    
+        // Auto-advance or wait for user to click Next
         if (this.autoAdvance) {
           setTimeout(() => {
             this.advanceToNextTrial();
           }, 1200);
         }
       }
-
+    
       advanceToNextTrial() {
         if (this.state !== 'EVALUATED') return;
-
+    
         this.currentTrialIndex++;
         if (this.currentTrialIndex >= this.totalTrials) {
           this.completeSession();
         } else {
           this.prepareTrial();
+          // User explicitly advanced -> start audio for the new trial
           this.playCurrentAudio();
         }
       }
-
+    
       nextTrial() {
         return this.advanceToNextTrial();
       }
-
+    
       skipTrial() {
         if (this.state !== 'PLAYING' && this.state !== 'WAITING_INPUT' && this.state !== 'READY') return;
         if (this.cwPlayer && this.cwPlayer.isPlaying) {
@@ -9309,11 +9453,11 @@
         this.inputBuffer = '';
         this.submitAnswer();
       }
-
+    
       updateButtonsState() {
         if (!this.el) return;
         const { btnStart, btnStop, btnReplay, btnSkip, btnNext, btnRestart } = this.el;
-
+    
         switch (this.state) {
           case 'READY':
             if (btnStart) btnStart.disabled = false;
@@ -9374,40 +9518,47 @@
             break;
         }
       }
-
+    
       completeSession() {
         this.state = 'COMPLETED';
         this.updateButtonsState();
-
+    
         const total = this.trials.length;
         const correctCount = this.trials.filter(t => t.isCorrect).length;
         const accuracy = total > 0 ? Math.round((correctCount / total) * 100) : 0;
-
+    
         const answeredTrials = this.trials.filter(t => t.reflexLatency > 0);
         const avgLatency = answeredTrials.length > 0
           ? Math.round(answeredTrials.reduce((acc, t) => acc + t.reflexLatency, 0) / answeredTrials.length)
           : 0;
-
+    
         // 反射時間序列分析 (中位數與 25% Low 遲疑反射)
         const latencies = answeredTrials.map(t => t.reflexLatency).sort((a, b) => a - b);
         let medianLatency = 0;
         let low25Latency = 0;
-
+    
         if (latencies.length > 0) {
           const mid = Math.floor(latencies.length / 2);
           medianLatency = (latencies.length % 2 !== 0)
             ? latencies[mid]
             : Math.round((latencies[mid - 1] + latencies[mid]) / 2);
-
+    
           const count25 = Math.max(1, Math.round(latencies.length * 0.25));
           const slowestTrials = latencies.slice(-count25);
           low25Latency = Math.round(slowestTrials.reduce((sum, v) => sum + v, 0) / slowestTrials.length);
         }
-
+    
         const wpm = this.cwPlayer ? (this.cwPlayer.charWpm || 20) : 20;
-
+    
         if (this.el) {
-          if (this.el.scorecard) this.el.scorecard.style.display = 'block';
+          if (this.el.scorecard) {
+            this.el.scorecard.style.display = 'block';
+            setTimeout(() => {
+              if (this.el && this.el.scorecard && typeof this.el.scorecard.scrollIntoView === 'function') {
+                this.el.scorecard.scrollIntoView({ behavior: 'smooth', block: 'end' });
+              }
+            }, 120);
+          }
           if (this.el.scModeTag) {
             if (this.submode === 'drill' && this.drillTarget) {
               this.el.scModeTag.innerHTML = `<i class="mdi mdi-sword-cross"></i> 弱點專攻 (${this.drillTarget.expected} <i class="mdi mdi-sword-cross"></i> ${this.drillTarget.actual})`;
@@ -9424,7 +9575,7 @@
           if (this.el.scMedianLatency) this.el.scMedianLatency.textContent = medianLatency > 0 ? `${medianLatency} ms` : '-- ms';
           if (this.el.scLow25Latency) this.el.scLow25Latency.textContent = low25Latency > 0 ? `${low25Latency} ms` : '-- ms';
           if (this.el.scTotal) this.el.scTotal.textContent = `${correctCount} / ${total} (正確率 ${accuracy}%)`;
-
+    
           // Breakthrough Box in Drill Mode
           if (this.submode === 'drill' && this.drillTarget) {
             if (this.el.scBreakthroughBox) {
@@ -9458,7 +9609,8 @@
               this.el.scBreakthroughBox.innerHTML = '';
             }
           }
-
+    
+          // Confusion List
           if (this.el.scConfusionBox && this.el.scConfusionList) {
             const confusions = Object.entries(this.confusionMatrix).sort((a, b) => b[1] - a[1]);
             if (confusions.length > 0) {
@@ -9490,11 +9642,12 @@
               this.el.scConfusionBox.style.display = 'none';
             }
           }
-
+    
+          // Retry Errors button visibility
           if (this.el.btnRetryErrors) {
             this.el.btnRetryErrors.style.display = (correctCount < total) ? 'inline-flex' : 'none';
           }
-
+    
           // Koch Stage Advance handling
           if (this.submode === 'koch') {
             const km = this.getKochManager();
@@ -9517,12 +9670,12 @@
               this.el.btnStageAdvance.style.display = 'none';
             }
           }
-
+    
           if (this.el.feedbackMsg) {
             this.el.feedbackMsg.innerHTML = '<span style="color:var(--gold);"><i class="mdi mdi-trophy"></i> 測驗結束！請檢視成績看板</span>';
           }
         }
-
+    
         // Record to statsManager and update history bar
         if (this.statsManager) {
           try {
@@ -9555,7 +9708,7 @@
           this.renderAnalyticsPanel();
         }
       }
-
+    
       updateHistoryBarUI() {
         if (!this.el) return;
         if (!this.statsManager) {
@@ -9576,7 +9729,7 @@
           this.el.scHistAvgLat.innerHTML = `<i class="mdi mdi-timer-outline"></i> 近期反射: ${latText}`;
         }
       }
-
+    
       toggleAnalyticsPanel(forceOpen = null) {
         if (!this.el || !this.el.analyticsPanel) return;
         this._analyticsOpen = (forceOpen !== null) ? forceOpen : !this._analyticsOpen;
@@ -9588,7 +9741,7 @@
           this.renderAnalyticsPanel();
         }
       }
-
+    
       getMorseSequence(char) {
         if (!char) return '';
         const upper = char.toUpperCase().trim();
@@ -9611,26 +9764,26 @@
         };
         return fallback[upper] || '';
       }
-
+    
       renderMorseDiffBadge(expected, actual) {
         const seqExp = this.getMorseSequence(expected);
         const seqAct = this.getMorseSequence(actual);
         if (!seqExp && !seqAct) return '';
-
+    
         const expHtml = seqExp.split('').map((sym, idx) => {
           const isMatch = (idx < seqAct.length && sym === seqAct[idx]);
           const cls = isMatch ? 'match' : 'diff exp';
           const displayChar = (sym === '.') ? '·' : '—';
           return `<span class="rhythm-sym ${cls}">${displayChar}</span>`;
         }).join('');
-
+    
         const actHtml = seqAct.split('').map((sym, idx) => {
           const isMatch = (idx < seqExp.length && sym === seqExp[idx]);
           const cls = isMatch ? 'match' : 'diff act';
           const displayChar = (sym === '.') ? '·' : '—';
           return `<span class="rhythm-sym ${cls}">${displayChar}</span>`;
         }).join('');
-
+    
         return `
           <div class="rx-morse-diff-badge" title="摩斯點劃音形對照: ${expected} vs ${actual}">
             <span class="diff-token exp">
@@ -9645,13 +9798,13 @@
           </div>
         `;
       }
-
+    
       renderLatencySparkline(recentSessions, summary) {
         const validSessions = (recentSessions || []).filter(s => typeof s.avgLatency === 'number' && s.avgLatency > 0);
         if (validSessions.length === 0) {
           return '<div class="rx-sparkline-empty"><i class="mdi mdi-chart-line"></i> 尚無反射數據</div>';
         }
-
+    
         if (validSessions.length < 2) {
           const s = validSessions[0];
           return `
@@ -9666,7 +9819,8 @@
             </div>
           `;
         }
-
+    
+        // Chronological order: oldest to newest (left to right)
         const pts = validSessions.slice(0, 10).reverse();
         const lats = pts.map(p => p.avgLatency);
         const minLat = Math.min(...lats);
@@ -9674,33 +9828,33 @@
         const range = (maxLat === minLat) ? (minLat * 0.2 || 20) : (maxLat - minLat);
         const yMin = Math.max(0, minLat - range * 0.15);
         const yMax = maxLat + range * 0.15;
-
+    
         const W = 280, H = 56;
         const padX = 14, padTop = 8, padBottom = 10;
         const plotW = W - padX * 2;
         const plotH = H - padTop - padBottom;
-
+    
         const coords = pts.map((p, idx) => {
           const x = Math.round(padX + (idx / (pts.length - 1)) * plotW);
           const norm = (p.avgLatency - yMin) / (yMax - yMin);
           const y = Math.round(padTop + (1 - norm) * plotH);
           return { x, y, lat: p.avgLatency, acc: p.accuracy, wpm: p.charWpm || 20 };
         });
-
+    
         const pathD = coords.map((c, i) => `${i === 0 ? 'M' : 'L'} ${c.x} ${c.y}`).join(' ');
         const areaD = `${pathD} L ${coords[coords.length - 1].x} ${H - 2} L ${coords[0].x} ${H - 2} Z`;
-
+    
         const circles = coords.map((c, i) => {
           const isLatest = (i === coords.length - 1);
           const r = isLatest ? 4 : 2.5;
           const cls = isLatest ? 'rx-sparkline-point latest' : 'rx-sparkline-point';
           return `<circle class="${cls}" cx="${c.x}" cy="${c.y}" r="${r}" data-lat="${c.lat}"><title>${c.lat}ms (${c.acc}%)</title></circle>`;
         }).join('');
-
+    
         const latest = coords[coords.length - 1];
         const first = coords[0];
         const avgWpm = pts[pts.length - 1].wpm;
-
+    
         return `
           <div class="rx-sparkline-container">
             <div class="rx-sparkline-header">
@@ -9727,10 +9881,10 @@
           </div>
         `;
       }
-
+    
       renderAnalyticsPanel() {
         if (!this.el || !this.statsManager) return;
-
+    
         // 1. Top 3 Confusions
         if (this.el.topConfusionsGrid) {
           const topPairs = this.statsManager.getTopConfusions(3);
@@ -9762,7 +9916,7 @@
             }).join('');
           }
         }
-
+    
         // 2. Weakest 5 Characters
         if (this.el.weakCharsList) {
           const weakest = this.statsManager.getWeakestCharacters(5);
@@ -9781,7 +9935,7 @@
             }).join('');
           }
         }
-
+    
         // 3. Latency & Speed Trend Sparkline
         if (this.el.latencyTrend) {
           const summary = this.statsManager.getSummaryStats();
@@ -9789,20 +9943,20 @@
           this.el.latencyTrend.innerHTML = this.renderLatencySparkline(recentSessions, summary);
         }
       }
-
+    
       startTargetedDrill(expected, actual) {
         const exp = (expected || 'B').toUpperCase().trim();
         const act = (actual || 'D').toUpperCase().trim();
         this.drillTarget = { expected: exp, actual: act, pairKey: `${exp}->${act}` };
         this.submode = 'drill';
-
+    
         if (this.el && this.el.scorecard) {
           this.el.scorecard.style.display = 'none';
         }
         if (this.el && this.el.kochStageBar) {
           this.el.kochStageBar.style.display = 'none';
         }
-
+    
         let drillTargets = [];
         if (typeof generateWeaknessTargets === 'function') {
           drillTargets = generateWeaknessTargets([exp, act], 10);
@@ -9811,19 +9965,19 @@
         } else {
           drillTargets = [exp, act, exp, act, exp, act, 'E', 'T', 'A', 'N'];
         }
-
+    
         this.startSession('drill', drillTargets);
         if (this.el && this.el.feedbackMsg) {
           this.el.feedbackMsg.innerHTML = `<span style="color:var(--gold);"><i class="mdi mdi-sword-cross"></i> 弱點專攻：${exp} <i class="mdi mdi-sword-cross"></i> ${act}（60% 針對混淆出題）</span>`;
         }
       }
-
+    
       retryErrors() {
         const errorTargets = this.trials.filter(t => !t.isCorrect).map(t => t.target);
         if (errorTargets.length === 0) return;
         this.startSession(this.submode, errorTargets);
       }
-
+    
       getSubmodeDisplayName(submode) {
         switch (submode) {
           case 'koch': return '科赫盲聽';
@@ -9835,7 +9989,7 @@
         }
       }
     }
-
+    
     if (typeof window !== 'undefined') {
       window.RxMode = RxMode;
     }
