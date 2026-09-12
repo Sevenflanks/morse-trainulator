@@ -13039,8 +13039,9 @@ function setStageView(view) {
       }
 
       // 5. Update weakness sparkline if open
-      if (typeof rxMode !== 'undefined' && rxMode && typeof rxMode.updateAnalyticsPanel === 'function') {
-        rxMode.updateAnalyticsPanel();
+      if (typeof rxMode !== 'undefined' && rxMode) {
+        if (typeof rxMode.renderAnalyticsPanel === 'function') rxMode.renderAnalyticsPanel();
+        if (typeof rxMode.updateAnalyticsPanel === 'function') rxMode.updateAnalyticsPanel();
       }
 
       return themeName;

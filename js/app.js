@@ -2223,8 +2223,9 @@ function applyTheme(themeName) {
   }
 
   // 5. Update weakness sparkline if open
-  if (typeof window !== 'undefined' && window.rxMode && typeof window.rxMode.updateAnalyticsPanel === 'function') {
-    window.rxMode.updateAnalyticsPanel();
+  if (typeof window !== 'undefined' && window.rxMode) {
+    if (typeof window.rxMode.renderAnalyticsPanel === 'function') window.rxMode.renderAnalyticsPanel();
+    if (typeof window.rxMode.updateAnalyticsPanel === 'function') window.rxMode.updateAnalyticsPanel();
   }
 
   return themeName;
