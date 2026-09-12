@@ -80,6 +80,45 @@ class CWRibbon {
     this.running = false;
   }
 
+  getThemeColors() {
+    if (typeof document !== 'undefined' && document.documentElement) {
+      const theme = document.documentElement.getAttribute('data-theme') || 'cyber-brass';
+      if (theme === 'classic-amber') {
+        return {
+          dit: '#ff9800',
+          dah: '#ffb000',
+          ditBg: 'rgba(255, 152, 0, 0.25)',
+          dahBg: 'rgba(255, 176, 0, 0.25)',
+          ditActiveBg: 'rgba(255, 152, 0, 0.35)',
+          dahActiveBg: 'rgba(255, 176, 0, 0.35)',
+          ditTrail: 'rgba(255, 152, 0, 0.32)',
+          dahTrail: 'rgba(255, 176, 0, 0.32)'
+        };
+      } else if (theme === 'green-phosphor') {
+        return {
+          dit: '#00ff66',
+          dah: '#00e676',
+          ditBg: 'rgba(0, 255, 102, 0.25)',
+          dahBg: 'rgba(0, 230, 118, 0.25)',
+          ditActiveBg: 'rgba(0, 255, 102, 0.35)',
+          dahActiveBg: 'rgba(0, 230, 118, 0.35)',
+          ditTrail: 'rgba(0, 255, 102, 0.32)',
+          dahTrail: 'rgba(0, 230, 118, 0.32)'
+        };
+      }
+    }
+    return {
+      dit: '#00e5ff',
+      dah: '#ffd700',
+      ditBg: 'rgba(0, 229, 255, 0.25)',
+      dahBg: 'rgba(255, 215, 0, 0.25)',
+      ditActiveBg: 'rgba(0, 229, 255, 0.35)',
+      dahActiveBg: 'rgba(255, 215, 0, 0.35)',
+      ditTrail: 'rgba(0, 229, 255, 0.32)',
+      dahTrail: 'rgba(255, 215, 0, 0.32)'
+    };
+  }
+
   draw() {
     if (!this.canvas || !this.ctx) return;
     const c = this.canvas;
@@ -87,6 +126,7 @@ class CWRibbon {
     const W = c.width;
     const H = c.height;
     const now = performance.now();
+    const themeColors = this.getThemeColors();
 
     this.baselineY = Math.round(H * 0.74);
     this.highY = Math.round(H * 0.28);
@@ -127,8 +167,8 @@ class CWRibbon {
       if (x2 < 0 || x1 > W) return;
 
       const w = Math.max(2, x2 - x1);
-      const color = p.isDit ? '#00e5ff' : '#ffd700';
-      const fillBg = p.isDit ? 'rgba(0, 229, 255, 0.25)' : 'rgba(255, 215, 0, 0.25)';
+      const color = p.isDit ? themeColors.dit : themeColors.dah;
+      const fillBg = p.isDit ? themeColors.ditBg : themeColors.dahBg;
 
       ctx.fillStyle = fillBg;
       ctx.fillRect(x1, this.highY, w, this.baselineY - this.highY);
@@ -152,7 +192,8 @@ class CWRibbon {
       if (x2 >= 0 && x2 <= W) {
         const trailWidth = 14;
         const phosphorGrad = ctx.createLinearGradient(x2, 0, x2 + trailWidth, 0);
-        const trailColor = p.isDit ? 'rgba(0, 229, 255, 0.32)' : 'rgba(255, 215, 0, 0.32)';
+        const defaultTrailColor = p.isDit ? 'rgba(0, 229, 255, 0.32)' : 'rgba(255, 215, 0, 0.32)';
+        const trailColor = (themeColors && themeColors.ditTrail) ? (p.isDit ? themeColors.ditTrail : themeColors.dahTrail) : defaultTrailColor;
         phosphorGrad.addColorStop(0, trailColor);
         phosphorGrad.addColorStop(1, 'rgba(0, 0, 0, 0)');
         ctx.fillStyle = phosphorGrad;
@@ -173,8 +214,8 @@ class CWRibbon {
       const x2 = W;
       const dur = Math.round(now - this.activePulse.start);
       const isDit = dur < this.getThreshold();
-      const color = isDit ? '#00e5ff' : '#ffd700';
-      const fillBg = isDit ? 'rgba(0, 229, 255, 0.35)' : 'rgba(255, 215, 0, 0.35)';
+      const color = isDit ? themeColors.dit : themeColors.dah;
+      const fillBg = isDit ? themeColors.ditActiveBg : themeColors.dahActiveBg;
 
       const w = Math.max(2, x2 - x1);
       ctx.fillStyle = fillBg;

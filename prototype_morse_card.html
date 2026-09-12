@@ -7,7 +7,8 @@
   <!-- Material Design Icons (MDI) -->
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@mdi/font@7.4.47/css/materialdesignicons.min.css">
   <style>
-    :root {
+    :root,
+    [data-theme="cyber-brass"] {
       --bg-dark: #080a0f;
       --bg-panel: #0f131c;
       --bg-surface: #151a27;
@@ -35,6 +36,84 @@
       --wire-base: #4a4126;
       --font-mono: 'JetBrains Mono', 'Fira Code', 'Roboto Mono', monospace;
       --font-ui: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    }
+
+    /* Classic Amber (短波琥珀黃，溫暖低炫光護眼) */
+    [data-theme="classic-amber"] {
+      --bg-dark: #0e0b06;
+      --bg-panel: #17120a;
+      --bg-surface: #20190e;
+      --bg-card: #271e12;
+      --card-bg: #17120a;
+      --gold: #ffb000;
+      --gold-dim: #c67c00;
+      --gold-glow: rgba(255, 176, 0, 0.35);
+      --gold-light: #ffe082;
+      --cyan: #ffc83b;
+      --cyan-dim: #b27b10;
+      --cyan-glow: rgba(255, 200, 59, 0.35);
+      --neon-blue: #ff9800;
+      --neon-glow: rgba(255, 152, 0, 0.85);
+      --green: #ffb000;
+      --red: #ff5252;
+      --danger: #ff5252;
+      --text-main: #fff4e0;
+      --text-dim: #bca17c;
+      --text-muted: #786348;
+      --border-subtle: #291e10;
+      --border-accent: rgba(255, 152, 0, 0.32);
+      --border-gold: rgba(255, 176, 0, 0.4);
+      --border-brass: #a86e1e;
+      --wire-base: #543810;
+      --font-mono: 'JetBrains Mono', 'Fira Code', 'Roboto Mono', monospace;
+      --font-ui: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    }
+
+    /* Green Phosphor (雷達磷光綠，P31 深綠螢光示波儀表) */
+    [data-theme="green-phosphor"] {
+      --bg-dark: #060e0a;
+      --bg-panel: #0a1710;
+      --bg-surface: #0f2218;
+      --bg-card: #142b1f;
+      --card-bg: #0a1710;
+      --gold: #00e676;
+      --gold-dim: #00a352;
+      --gold-glow: rgba(0, 230, 118, 0.35);
+      --gold-light: #b9f6ca;
+      --cyan: #69f0ae;
+      --cyan-dim: #00b27a;
+      --cyan-glow: rgba(105, 240, 174, 0.35);
+      --neon-blue: #00ff66;
+      --neon-glow: rgba(0, 255, 102, 0.85);
+      --green: #00e676;
+      --red: #ff5252;
+      --danger: #ff5252;
+      --text-main: #e0fff0;
+      --text-dim: #7ca38f;
+      --text-muted: #486958;
+      --border-subtle: #10291d;
+      --border-accent: rgba(0, 255, 102, 0.32);
+      --border-gold: rgba(0, 230, 118, 0.4);
+      --border-brass: #1b7a42;
+      --wire-base: #134426;
+      --font-mono: 'JetBrains Mono', 'Fira Code', 'Roboto Mono', monospace;
+      --font-ui: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    }
+
+    /* CRT Phosphor Scanline Overlay */
+    [data-theme="classic-amber"] body::after,
+    [data-theme="green-phosphor"] body::after {
+      content: " ";
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      pointer-events: none;
+      background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.22) 50%);
+      background-size: 100% 4px;
+      z-index: 9999;
+      opacity: 0.32;
     }
 
     * {
@@ -3488,6 +3567,70 @@
       overflow-y: auto;
     }
 
+    /* Theme Preset Selector Grid */
+    .theme-preset-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 8px;
+    }
+    .theme-preset-btn {
+      background: #1a1c24;
+      border: 1px solid #363b4b;
+      border-radius: 6px;
+      padding: 8px 4px;
+      color: var(--text-main);
+      font-size: 0.72rem;
+      cursor: pointer;
+      text-align: center;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 4px;
+      transition: all 0.2s ease;
+    }
+    .theme-preset-btn:hover {
+      border-color: var(--gold);
+      background: #222634;
+    }
+    .theme-preset-btn.active {
+      border-color: var(--gold);
+      background: rgba(255, 215, 0, 0.08);
+      box-shadow: 0 0 8px var(--gold-glow);
+    }
+    [data-theme="classic-amber"] .theme-preset-btn.active {
+      background: rgba(255, 176, 0, 0.1);
+    }
+    [data-theme="green-phosphor"] .theme-preset-btn.active {
+      background: rgba(0, 230, 118, 0.1);
+    }
+    .theme-preview-dot {
+      width: 14px;
+      height: 14px;
+      border-radius: 50%;
+      margin-bottom: 2px;
+    }
+    .dot-cyber-brass {
+      background: linear-gradient(135deg, #ffd700 50%, #00e5ff 50%);
+      box-shadow: 0 0 6px rgba(255, 215, 0, 0.6);
+    }
+    .dot-classic-amber {
+      background: linear-gradient(135deg, #ffb000 50%, #ff9800 50%);
+      box-shadow: 0 0 6px rgba(255, 176, 0, 0.6);
+    }
+    .dot-green-phosphor {
+      background: linear-gradient(135deg, #00e676 50%, #00ff66 50%);
+      box-shadow: 0 0 6px rgba(0, 230, 118, 0.6);
+    }
+    .theme-btn-title {
+      font-weight: bold;
+      font-size: 0.72rem;
+      line-height: 1.2;
+    }
+    .theme-btn-sub {
+      font-size: 0.62rem;
+      color: var(--text-muted);
+    }
+
 /* ==========================================================================
    Zone 3: K5 Ergonomic Morphing Dock (雙翼變形工學座)
    ========================================================================== */
@@ -5130,6 +5273,31 @@
     </div>
     <div class="drawer-body" id="drawer-settings-content">
 
+      <!-- CRT Theme Presets Box -->
+      <div id="theme-settings-box" class="settings-card-section" style="background:#14161f; border:1px solid #282d3c; border-radius:8px; padding:12px; margin-bottom:12px;">
+        <div style="font-size:0.8rem; font-weight:bold; color:var(--gold); margin-bottom:10px; display:flex; justify-content:space-between; align-items:center;">
+          <span><i class="mdi mdi-palette-outline"></i> 電台螢光主題 (CRT Theme Preset)</span>
+          <span id="tag-current-theme" style="font-size:0.7rem; color:var(--text-dim);">Cyber Brass</span>
+        </div>
+        <div class="theme-preset-grid">
+          <button type="button" class="theme-preset-btn active" id="btn-theme-cyber-brass" data-theme="cyber-brass" title="帝國黃金 / 霓虹青 (Cyber Brass)">
+            <div class="theme-preview-dot dot-cyber-brass"></div>
+            <div class="theme-btn-title">Cyber Brass</div>
+            <div class="theme-btn-sub">帝國黃金</div>
+          </button>
+          <button type="button" class="theme-preset-btn" id="btn-theme-classic-amber" data-theme="classic-amber" title="短波琥珀黃 (Classic Amber，低炫光護眼)">
+            <div class="theme-preview-dot dot-classic-amber"></div>
+            <div class="theme-btn-title">Classic Amber</div>
+            <div class="theme-btn-sub">短波琥珀</div>
+          </button>
+          <button type="button" class="theme-preset-btn" id="btn-theme-green-phosphor" data-theme="green-phosphor" title="雷達磷光綠 (Green Phosphor，雷達示波器)">
+            <div class="theme-preview-dot dot-green-phosphor"></div>
+            <div class="theme-btn-title">Green Phosphor</div>
+            <div class="theme-btn-sub">雷達磷光</div>
+          </button>
+        </div>
+      </div>
+
       <!-- Sidetone Frequency & Volume -->
       <div class="settings-card-section" style="background:#14161f; border:1px solid #282d3c; border-radius:8px; padding:12px;">
         <div style="font-size:0.8rem; font-weight:bold; color:var(--neon-blue); margin-bottom:10px; display:flex; justify-content:space-between; align-items:center;">
@@ -5290,6 +5458,22 @@
   <!-- /settings-drawer -->
 
   <script>
+    // Early Theme Hydration
+    (function() {
+      try {
+        var saved = typeof localStorage !== 'undefined' ? localStorage.getItem('morse_theme_preset') : null;
+        if (!saved && typeof localStorage !== 'undefined') {
+          var s = localStorage.getItem('morse_card_settings_v1');
+          if (s) saved = JSON.parse(s).themePreset;
+        }
+        if (saved && (saved === 'classic-amber' || saved === 'green-phosphor' || saved === 'cyber-brass')) {
+          if (typeof document !== 'undefined' && document.documentElement) {
+            document.documentElement.setAttribute('data-theme', saved);
+          }
+        }
+      } catch(e) {}
+    })();
+
     /**
      * UTILITY: safe id generator for DOM queries
      */
@@ -7966,12 +8150,52 @@
         requestAnimationFrame(render);
       }
 
+      getThemeColors() {
+        if (typeof document !== 'undefined' && document.documentElement) {
+          const theme = document.documentElement.getAttribute('data-theme') || 'cyber-brass';
+          if (theme === 'classic-amber') {
+            return {
+              dit: '#ff9800',
+              dah: '#ffb000',
+              ditBg: 'rgba(255, 152, 0, 0.25)',
+              dahBg: 'rgba(255, 176, 0, 0.25)',
+              ditActiveBg: 'rgba(255, 152, 0, 0.35)',
+              dahActiveBg: 'rgba(255, 176, 0, 0.35)',
+              ditTrail: 'rgba(255, 152, 0, 0.32)',
+              dahTrail: 'rgba(255, 176, 0, 0.32)'
+            };
+          } else if (theme === 'green-phosphor') {
+            return {
+              dit: '#00ff66',
+              dah: '#00e676',
+              ditBg: 'rgba(0, 255, 102, 0.25)',
+              dahBg: 'rgba(0, 230, 118, 0.25)',
+              ditActiveBg: 'rgba(0, 255, 102, 0.35)',
+              dahActiveBg: 'rgba(0, 230, 118, 0.35)',
+              ditTrail: 'rgba(0, 255, 102, 0.32)',
+              dahTrail: 'rgba(0, 230, 118, 0.32)'
+            };
+          }
+        }
+        return {
+          dit: '#00e5ff',
+          dah: '#ffd700',
+          ditBg: 'rgba(0, 229, 255, 0.25)',
+          dahBg: 'rgba(255, 215, 0, 0.25)',
+          ditActiveBg: 'rgba(0, 229, 255, 0.35)',
+          dahActiveBg: 'rgba(255, 215, 0, 0.35)',
+          ditTrail: 'rgba(0, 229, 255, 0.32)',
+          dahTrail: 'rgba(255, 215, 0, 0.32)'
+        };
+      }
+
       draw() {
         const c = this.canvas;
         const ctx = this.ctx;
         const W = c.width;
         const H = c.height;
         const now = performance.now();
+        const themeColors = this.getThemeColors();
 
         this.baselineY = Math.round(H * 0.74);
         this.highY = Math.round(H * 0.28);
@@ -8012,8 +8236,8 @@
           if (x2 < 0 || x1 > W) return;
 
           const w = Math.max(2, x2 - x1);
-          const color = p.isDit ? '#00e5ff' : '#ffd700';
-          const fillBg = p.isDit ? 'rgba(0, 229, 255, 0.25)' : 'rgba(255, 215, 0, 0.25)';
+          const color = p.isDit ? themeColors.dit : themeColors.dah;
+          const fillBg = p.isDit ? themeColors.ditBg : themeColors.dahBg;
 
           ctx.fillStyle = fillBg;
           ctx.fillRect(x1, this.highY, w, this.baselineY - this.highY);
@@ -8037,7 +8261,8 @@
           if (x2 >= 0 && x2 <= W) {
             const trailWidth = 14;
             const phosphorGrad = ctx.createLinearGradient(x2, 0, x2 + trailWidth, 0);
-            const trailColor = p.isDit ? 'rgba(0, 229, 255, 0.32)' : 'rgba(255, 215, 0, 0.32)';
+            const defaultTrailColor = p.isDit ? 'rgba(0, 229, 255, 0.32)' : 'rgba(255, 215, 0, 0.32)';
+            const trailColor = (themeColors && themeColors.ditTrail) ? (p.isDit ? themeColors.ditTrail : themeColors.dahTrail) : defaultTrailColor;
             phosphorGrad.addColorStop(0, trailColor);
             phosphorGrad.addColorStop(1, 'rgba(0, 0, 0, 0)');
             ctx.fillStyle = phosphorGrad;
@@ -8058,8 +8283,8 @@
           const x2 = W;
           const dur = Math.round(now - this.activePulse.start);
           const isDit = dur < engine.getEffectiveThreshold();
-          const color = isDit ? '#00e5ff' : '#ffd700';
-          const fillBg = isDit ? 'rgba(0, 229, 255, 0.35)' : 'rgba(255, 215, 0, 0.35)';
+          const color = isDit ? themeColors.dit : themeColors.dah;
+          const fillBg = isDit ? themeColors.ditActiveBg : themeColors.dahActiveBg;
 
           const w = Math.max(2, x2 - x1);
           ctx.fillStyle = fillBg;
@@ -8382,7 +8607,8 @@
       textShowHints: true,
       textStrictMode: false,
       kochShowHints: false,
-      layoutMode: '2col' // '2col' | '3col'
+      layoutMode: '2col', // '2col' | '3col'
+      themePreset: 'cyber-brass' // 'cyber-brass' | 'classic-amber' | 'green-phosphor'
     };
 
     class SettingsManager {
@@ -8407,9 +8633,17 @@
                 }
               }
             }
+            // Theme preset synchronization (supports direct morse_theme_preset and settings.themePreset)
+            const directTheme = localStorage.getItem('morse_theme_preset');
+            if (directTheme) {
+              this.settings.themePreset = directTheme;
+            }
           }
         } catch(e) {
           console.warn('Failed to load settings:', e);
+        }
+        if (!this.settings.themePreset) {
+          this.settings.themePreset = 'cyber-brass';
         }
         return this.settings;
       }
@@ -8418,6 +8652,9 @@
         try {
           if (typeof localStorage !== 'undefined') {
             localStorage.setItem(this.storageKey, JSON.stringify(this.settings));
+            if (this.settings.themePreset) {
+              localStorage.setItem('morse_theme_preset', this.settings.themePreset);
+            }
           }
         } catch(e) {
           console.warn('Failed to save settings:', e);
@@ -8428,6 +8665,7 @@
         try {
           if (typeof localStorage !== 'undefined') {
             localStorage.removeItem(this.storageKey);
+            localStorage.removeItem('morse_theme_preset');
           }
         } catch(_) {}
         this.settings = Object.assign({}, DEFAULT_SETTINGS);
@@ -11561,6 +11799,7 @@
     document.getElementById('btn-factory-reset').addEventListener('click', () => {
       if (confirm('確定要將所有自訂設定（速度、音訊、鍵位、電鍵模式）恢復為出廠預設值嗎？')) {
         settingsManager.reset();
+        applyTheme('cyber-brass');
         window.location.reload();
       }
     });
@@ -12152,6 +12391,10 @@
     function applyLoadedSettings() {
       const s = settingsManager.load();
 
+      // 0. CRT Theme Preset
+      const currentTheme = s.themePreset || (typeof localStorage !== 'undefined' ? localStorage.getItem('morse_theme_preset') : null) || 'cyber-brass';
+      applyTheme(currentTheme);
+
       // 1. Timing & Speed
       if (s.speedPreset && speedPresets[s.speedPreset]) {
         applySpeedPreset(s.speedPreset, false);
@@ -12732,9 +12975,77 @@ function setStageView(view) {
       if (backdrop) backdrop.addEventListener('click', closeDrawer);
       if (btnOpenSettingsTelemetry) btnOpenSettingsTelemetry.addEventListener('click', openDrawer);
 
+      // Theme Preset Switcher Buttons
+      const themeBtns = document.querySelectorAll('.theme-preset-btn');
+      themeBtns.forEach(btn => {
+        btn.addEventListener('click', () => {
+          const theme = btn.getAttribute('data-theme');
+          if (theme) {
+            applyTheme(theme);
+          }
+        });
+      });
+
       // Sync WPM in Top Bar
       window.updateTopbarWpm = updateTopbarWpm;
     }
+
+    // ----------------------------------------------------
+    // CRT Theme Preset Controller
+    // ----------------------------------------------------
+    function applyTheme(themeName) {
+      const validThemes = ['cyber-brass', 'classic-amber', 'green-phosphor'];
+      if (!validThemes.includes(themeName)) {
+        themeName = 'cyber-brass';
+      }
+
+      // 1. Update root element data-theme
+      if (typeof document !== 'undefined' && document.documentElement) {
+        document.documentElement.setAttribute('data-theme', themeName);
+      }
+
+      // 2. Persist in SettingsManager & localStorage
+      if (typeof settingsManager !== 'undefined') {
+        settingsManager.settings.themePreset = themeName;
+        settingsManager.save();
+      } else if (typeof localStorage !== 'undefined') {
+        localStorage.setItem('morse_theme_preset', themeName);
+      }
+
+      // 3. Update Theme Buttons in Drawer
+      if (typeof document !== 'undefined') {
+        const btns = document.querySelectorAll('.theme-preset-btn');
+        btns.forEach(btn => {
+          if (btn.getAttribute('data-theme') === themeName) {
+            btn.classList.add('active');
+          } else {
+            btn.classList.remove('active');
+          }
+        });
+        const tagEl = document.getElementById('tag-current-theme');
+        if (tagEl) {
+          const themeLabels = {
+            'cyber-brass': 'Cyber Brass',
+            'classic-amber': 'Classic Amber',
+            'green-phosphor': 'Green Phosphor'
+          };
+          tagEl.textContent = themeLabels[themeName] || themeName;
+        }
+      }
+
+      // 4. Update ribbon canvas rendering
+      if (typeof ribbon !== 'undefined' && ribbon && typeof ribbon.draw === 'function') {
+        ribbon.draw();
+      }
+
+      // 5. Update weakness sparkline if open
+      if (typeof rxMode !== 'undefined' && rxMode && typeof rxMode.updateAnalyticsPanel === 'function') {
+        rxMode.updateAnalyticsPanel();
+      }
+
+      return themeName;
+    }
+    window.applyTheme = applyTheme;
 
     function setLayoutMode(mode) {
       const mainContainer = document.getElementById('main-container');

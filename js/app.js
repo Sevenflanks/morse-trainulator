@@ -870,6 +870,10 @@ function applySpeedPreset(key, saveToSettings = true) {
 function applyLoadedSettings() {
   const s = settingsManager.load();
 
+  // 0. CRT Theme Preset
+  const currentTheme = s.themePreset || (typeof localStorage !== 'undefined' ? localStorage.getItem('morse_theme_preset') : null) || 'cyber-brass';
+  applyTheme(currentTheme);
+
   // 1. Timing & Speed
   if (s.speedPreset && speedPresets[s.speedPreset]) {
     applySpeedPreset(s.speedPreset, false);
@@ -1087,6 +1091,7 @@ function setupEventListeners() {
     btnFactoryReset.addEventListener('click', () => {
       if (confirm('確定要將所有自訂設定（速度、音訊、鍵位、電鍵模式）恢復為出廠預設值嗎？')) {
         settingsManager.reset();
+        applyTheme('cyber-brass');
         window.location.reload();
       }
     });
@@ -2152,10 +2157,77 @@ function setupSettingsDrawer() {
   if (backdrop) backdrop.addEventListener('click', closeDrawer);
   if (btnOpenSettingsTelemetry) btnOpenSettingsTelemetry.addEventListener('click', openDrawer);
 
+  // Theme Preset Switcher Buttons
+  const themeBtns = document.querySelectorAll('.theme-preset-btn');
+  themeBtns.forEach(btn => {
+    btn.addEventListener('click', () => {
+      const theme = btn.getAttribute('data-theme');
+      if (theme) {
+        applyTheme(theme);
+      }
+    });
+  });
+
   // Sync WPM in Top Bar
   if (typeof window !== 'undefined') {
     window.updateTopbarWpm = updateTopbarWpm;
   }
+}
+
+// ----------------------------------------------------
+// CRT Theme Preset Controller
+// ----------------------------------------------------
+function applyTheme(themeName) {
+  const validThemes = ['cyber-brass', 'classic-amber', 'green-phosphor'];
+  if (!validThemes.includes(themeName)) {
+    themeName = 'cyber-brass';
+  }
+
+  // 1. Update root element data-theme
+  if (typeof document !== 'undefined' && document.documentElement) {
+    document.documentElement.setAttribute('data-theme', themeName);
+  }
+
+  // 2. Persist in SettingsManager & localStorage
+  if (typeof settingsManager !== 'undefined') {
+    settingsManager.settings.themePreset = themeName;
+    settingsManager.save();
+  } else if (typeof localStorage !== 'undefined') {
+    localStorage.setItem('morse_theme_preset', themeName);
+  }
+
+  // 3. Update Theme Buttons in Drawer
+  if (typeof document !== 'undefined') {
+    const btns = document.querySelectorAll('.theme-preset-btn');
+    btns.forEach(btn => {
+      if (btn.getAttribute('data-theme') === themeName) {
+        btn.classList.add('active');
+      } else {
+        btn.classList.remove('active');
+      }
+    });
+    const tagEl = document.getElementById('tag-current-theme');
+    if (tagEl) {
+      const themeLabels = {
+        'cyber-brass': 'Cyber Brass',
+        'classic-amber': 'Classic Amber',
+        'green-phosphor': 'Green Phosphor'
+      };
+      tagEl.textContent = themeLabels[themeName] || themeName;
+    }
+  }
+
+  // 4. Update ribbon canvas rendering
+  if (typeof window !== 'undefined' && window.ribbon && typeof window.ribbon.draw === 'function') {
+    window.ribbon.draw();
+  }
+
+  // 5. Update weakness sparkline if open
+  if (typeof window !== 'undefined' && window.rxMode && typeof window.rxMode.updateAnalyticsPanel === 'function') {
+    window.rxMode.updateAnalyticsPanel();
+  }
+
+  return themeName;
 }
 
 // ----------------------------------------------------
@@ -2171,6 +2243,7 @@ if (typeof window !== 'undefined') {
   window.updateTopbarWpm = updateTopbarWpm;
   window.updateWpmDisplays = updateWpmDisplays;
   window.setFarnsworthWpmFromStepper = setFarnsworthWpmFromStepper;
+  window.applyTheme = applyTheme;
 }
 
 if (typeof module !== 'undefined' && module.exports) {
@@ -2191,6 +2264,7 @@ if (typeof module !== 'undefined' && module.exports) {
     setStageView,
     setupWorkspaceNavigation,
     setupSettingsDrawer,
-    updateTopbarWpm
+    updateTopbarWpm,
+    applyTheme
   };
 }

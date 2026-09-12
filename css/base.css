@@ -1,4 +1,5 @@
-:root {
+:root,
+[data-theme="cyber-brass"] {
   --bg-dark: #080a0f;
   --bg-panel: #0f131c;
   --bg-surface: #151a27;
@@ -26,6 +27,84 @@
   --wire-base: #4a4126;
   --font-mono: 'JetBrains Mono', 'Fira Code', 'Roboto Mono', monospace;
   --font-ui: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+}
+
+/* Classic Amber (短波琥珀黃，溫暖低炫光護眼) */
+[data-theme="classic-amber"] {
+  --bg-dark: #0e0b06;
+  --bg-panel: #17120a;
+  --bg-surface: #20190e;
+  --bg-card: #271e12;
+  --card-bg: #17120a;
+  --gold: #ffb000;
+  --gold-dim: #c67c00;
+  --gold-glow: rgba(255, 176, 0, 0.35);
+  --gold-light: #ffe082;
+  --cyan: #ffc83b;
+  --cyan-dim: #b27b10;
+  --cyan-glow: rgba(255, 200, 59, 0.35);
+  --neon-blue: #ff9800;
+  --neon-glow: rgba(255, 152, 0, 0.85);
+  --green: #ffb000;
+  --red: #ff5252;
+  --danger: #ff5252;
+  --text-main: #fff4e0;
+  --text-dim: #bca17c;
+  --text-muted: #786348;
+  --border-subtle: #291e10;
+  --border-accent: rgba(255, 152, 0, 0.32);
+  --border-gold: rgba(255, 176, 0, 0.4);
+  --border-brass: #a86e1e;
+  --wire-base: #543810;
+  --font-mono: 'JetBrains Mono', 'Fira Code', 'Roboto Mono', monospace;
+  --font-ui: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+}
+
+/* Green Phosphor (雷達磷光綠，P31 深綠螢光示波儀表) */
+[data-theme="green-phosphor"] {
+  --bg-dark: #060e0a;
+  --bg-panel: #0a1710;
+  --bg-surface: #0f2218;
+  --bg-card: #142b1f;
+  --card-bg: #0a1710;
+  --gold: #00e676;
+  --gold-dim: #00a352;
+  --gold-glow: rgba(0, 230, 118, 0.35);
+  --gold-light: #b9f6ca;
+  --cyan: #69f0ae;
+  --cyan-dim: #00b27a;
+  --cyan-glow: rgba(105, 240, 174, 0.35);
+  --neon-blue: #00ff66;
+  --neon-glow: rgba(0, 255, 102, 0.85);
+  --green: #00e676;
+  --red: #ff5252;
+  --danger: #ff5252;
+  --text-main: #e0fff0;
+  --text-dim: #7ca38f;
+  --text-muted: #486958;
+  --border-subtle: #10291d;
+  --border-accent: rgba(0, 255, 102, 0.32);
+  --border-gold: rgba(0, 230, 118, 0.4);
+  --border-brass: #1b7a42;
+  --wire-base: #134426;
+  --font-mono: 'JetBrains Mono', 'Fira Code', 'Roboto Mono', monospace;
+  --font-ui: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+}
+
+/* CRT Phosphor Scanline Overlay */
+[data-theme="classic-amber"] body::after,
+[data-theme="green-phosphor"] body::after {
+  content: " ";
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  pointer-events: none;
+  background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.22) 50%);
+  background-size: 100% 4px;
+  z-index: 9999;
+  opacity: 0.32;
 }
 
 * {
@@ -812,6 +891,70 @@ h1 {
 .drawer-body {
   padding: 16px 18px;
   overflow-y: auto;
+}
+
+/* Theme Preset Selector Grid */
+.theme-preset-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+}
+.theme-preset-btn {
+  background: #1a1c24;
+  border: 1px solid #363b4b;
+  border-radius: 6px;
+  padding: 8px 4px;
+  color: var(--text-main);
+  font-size: 0.72rem;
+  cursor: pointer;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  transition: all 0.2s ease;
+}
+.theme-preset-btn:hover {
+  border-color: var(--gold);
+  background: #222634;
+}
+.theme-preset-btn.active {
+  border-color: var(--gold);
+  background: rgba(255, 215, 0, 0.08);
+  box-shadow: 0 0 8px var(--gold-glow);
+}
+[data-theme="classic-amber"] .theme-preset-btn.active {
+  background: rgba(255, 176, 0, 0.1);
+}
+[data-theme="green-phosphor"] .theme-preset-btn.active {
+  background: rgba(0, 230, 118, 0.1);
+}
+.theme-preview-dot {
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  margin-bottom: 2px;
+}
+.dot-cyber-brass {
+  background: linear-gradient(135deg, #ffd700 50%, #00e5ff 50%);
+  box-shadow: 0 0 6px rgba(255, 215, 0, 0.6);
+}
+.dot-classic-amber {
+  background: linear-gradient(135deg, #ffb000 50%, #ff9800 50%);
+  box-shadow: 0 0 6px rgba(255, 176, 0, 0.6);
+}
+.dot-green-phosphor {
+  background: linear-gradient(135deg, #00e676 50%, #00ff66 50%);
+  box-shadow: 0 0 6px rgba(0, 230, 118, 0.6);
+}
+.theme-btn-title {
+  font-weight: bold;
+  font-size: 0.72rem;
+  line-height: 1.2;
+}
+.theme-btn-sub {
+  font-size: 0.62rem;
+  color: var(--text-muted);
 }
 
 
