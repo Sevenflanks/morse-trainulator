@@ -89,7 +89,13 @@ const requiredCssSelectors = [
   '.k5-dock-container',
   '.k2-thumb-wing',
   '.settings-drawer',
-  '.drawer-backdrop'
+  '.drawer-backdrop',
+  '.workspace-view.ws-slide-in-right',
+  '.workspace-view.ws-slide-in-left',
+  'wsSlideInRight',
+  'wsSlideInLeft',
+  'wsModeSwitchGlow',
+  'wsBtnActivate'
 ];
 
 requiredCssSelectors.forEach(sel => {
@@ -122,6 +128,7 @@ console.log('\n5. Verifying Dynamic Controllers (setWpmFromStepper, setStageView
 global.window = global;
 const mockElements = {};
 function createMockEl(id) {
+  const listeners = {};
   return {
     id,
     style: {},
@@ -140,6 +147,17 @@ function createMockEl(id) {
       },
       contains(cls) { return this._classes.has(cls); }
     },
+    addEventListener(ev, cb) {
+      if (!listeners[ev]) listeners[ev] = [];
+      listeners[ev].push(cb);
+    },
+    removeEventListener(ev, cb) {
+      if (!listeners[ev]) return;
+      listeners[ev] = listeners[ev].filter(fn => fn !== cb);
+    },
+    click() {
+      if (listeners['click']) listeners['click'].forEach(cb => cb());
+    },
     value: '',
     textContent: '',
     innerHTML: '',
@@ -152,7 +170,9 @@ const mockIds = [
   'focus-hud-stage', 'col-hardware', 'meter-panel',
   'k5-wpm-val', 'topbar-wpm-val', 'state-wpm', 'readout-wpm', 'meter-wpm-badge',
   'param-unit-t', 'tag-unit-t', 'param-threshold', 'tag-threshold',
-  'param-gap', 'tag-gap', 'param-word-gap', 'tag-word-gap'
+  'param-gap', 'tag-gap', 'param-word-gap', 'tag-word-gap',
+  'ws-tab-tx', 'ws-tab-rx', 'ws-tab-qso',
+  'ws-container-tx', 'ws-container-rx', 'ws-container-qso'
 ];
 mockIds.forEach(id => {
   mockElements[id] = createMockEl(id);
@@ -162,6 +182,7 @@ global.document = {
   readyState: 'loading',
   addEventListener: () => {},
   getElementById: (id) => mockElements[id] || null,
+  querySelector: () => null,
   querySelectorAll: () => []
 };
 
@@ -175,7 +196,7 @@ global.KeybindingManager = require('../js/core/keybinding-manager').KeybindingMa
 global.KochManager = require('../js/core/koch-manager').KochManager;
 
 const app = require('../js/app');
-const { setWpmFromStepper, setStageView, updateTopbarWpm, engine } = app;
+const { setWpmFromStepper, setStageView, updateTopbarWpm, setupWorkspaceNavigation, engine } = app;
 
 // 5a. Test setWpmFromStepper boundary clamping & timing calculations
 setWpmFromStepper(5); // Below 10 min -> clamped to 10
@@ -232,6 +253,35 @@ updateTopbarWpm(28);
 assert.strictEqual(mockElements['topbar-wpm-val'].textContent, 28);
 assert.strictEqual(mockElements['k5-wpm-val'].textContent, '28 WPM');
 console.log('   -> updateTopbarWpm(28) synchronized topbar and K5 dock!');
+
+// 5d. Test setupWorkspaceNavigation directional transitions (Tx -> Rx -> Tx)
+console.log('\n5d. Verifying Workspace Switching with Directional Animations...');
+// Initialize navigation
+setupWorkspaceNavigation();
+// Set initial active state on Tx
+mockElements['ws-tab-tx'].classList.add('active');
+mockElements['ws-container-tx'].style.display = 'flex';
+mockElements['ws-container-tx'].classList.add('active');
+
+// Click Rx (Forward transition: index 0 -> index 1)
+mockElements['ws-tab-rx'].click();
+assert.ok(mockElements['ws-tab-rx'].classList.contains('active'), 'Rx tab should become active');
+assert.ok(!mockElements['ws-tab-tx'].classList.contains('active'), 'Tx tab should lose active');
+assert.strictEqual(mockElements['ws-container-rx'].style.display, 'flex');
+assert.ok(mockElements['ws-container-rx'].classList.contains('active'));
+assert.ok(mockElements['ws-container-rx'].classList.contains('ws-slide-in-right'), 'Forward switch Tx->Rx must apply ws-slide-in-right');
+assert.strictEqual(mockElements['ws-container-tx'].style.display, 'none');
+
+// Click Tx (Backward transition: index 1 -> index 0)
+mockElements['ws-tab-tx'].click();
+assert.ok(mockElements['ws-tab-tx'].classList.contains('active'), 'Tx tab should become active');
+assert.ok(!mockElements['ws-tab-rx'].classList.contains('active'), 'Rx tab should lose active');
+assert.strictEqual(mockElements['ws-container-tx'].style.display, 'flex');
+assert.ok(mockElements['ws-container-tx'].classList.contains('active'));
+assert.ok(mockElements['ws-container-tx'].classList.contains('ws-slide-in-left'), 'Backward switch Rx->Tx must apply ws-slide-in-left');
+assert.strictEqual(mockElements['ws-container-rx'].style.display, 'none');
+
+console.log('   -> Directional workspace animations (ws-slide-in-right & ws-slide-in-left) verified!');
 
 console.log('\n====================================================');
 console.log('ALL WORKSTATION ARCHITECTURE TESTS PASSED!');

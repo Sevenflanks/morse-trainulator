@@ -2004,6 +2004,19 @@ function setupWorkspaceNavigation() {
     const btn = document.getElementById(item.btnId);
     if (!btn) return;
     btn.addEventListener('click', () => {
+      // Determine navigation direction
+      const currentIndex = wsTabs.findIndex(t => {
+        const b = document.getElementById(t.btnId);
+        return b && b.classList.contains('active');
+      });
+      const targetIndex = wsTabs.findIndex(t => t.btnId === item.btnId);
+
+      // If clicking already active tab, avoid redundant reset
+      if (currentIndex === targetIndex && currentIndex !== -1) return;
+
+      const isForward = (targetIndex >= currentIndex);
+      const animClass = isForward ? 'ws-slide-in-right' : 'ws-slide-in-left';
+
       // Stop CWPlayer audio playback if switching away
       if (typeof window !== 'undefined' && window.cwPlayer && window.cwPlayer.isPlaying) {
         window.cwPlayer.stop();
@@ -2018,7 +2031,7 @@ function setupWorkspaceNavigation() {
         if (b) b.classList.remove('active');
         if (v) {
           v.style.display = 'none';
-          v.classList.remove('active');
+          ['active', 'ws-slide-in-right', 'ws-slide-in-left'].forEach(c => v.classList.remove(c));
         }
       });
       btn.classList.add('active');
@@ -2026,12 +2039,28 @@ function setupWorkspaceNavigation() {
       if (targetView) {
         targetView.style.display = 'flex';
         targetView.classList.add('active');
+        targetView.classList.add(animClass);
+
+        // Remove animation class after transition completes to restore native coordinate space
+        const handleAnimEnd = () => {
+          targetView.classList.remove('ws-slide-in-right');
+          targetView.classList.remove('ws-slide-in-left');
+          if (typeof targetView.removeEventListener === 'function') {
+            targetView.removeEventListener('animationend', handleAnimEnd);
+          }
+        };
+        if (typeof targetView.addEventListener === 'function') {
+          targetView.addEventListener('animationend', handleAnimEnd);
+        }
+        setTimeout(handleAnimEnd, 350);
       }
 
       // If returning to TX, guarantee PCB tree is pristine and ribbon is visible
       if (item.viewId === 'ws-container-tx') {
-        const pcb = document.querySelector('.pcb-card');
-        if (pcb) pcb.classList.remove('pcb-blind-mode');
+        if (typeof document !== 'undefined' && typeof document.querySelector === 'function') {
+          const pcb = document.querySelector('.pcb-card');
+          if (pcb) pcb.classList.remove('pcb-blind-mode');
+        }
         const ribbon = document.getElementById('cockpit-top-ribbon');
         if (ribbon) ribbon.classList.remove('ribbon-blind-mode');
       }

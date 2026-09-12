@@ -330,6 +330,20 @@ h1 {
   background: #1e2430;
   color: var(--neon-blue);
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+  animation: wsBtnActivate 0.22s ease;
+}
+@keyframes wsBtnActivate {
+  0% {
+    transform: scale(0.95);
+  }
+  50% {
+    transform: scale(1.04);
+    box-shadow: 0 0 10px rgba(0, 229, 255, 0.45);
+  }
+  100% {
+    transform: scale(1);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+  }
 }
 .va-topbar-right {
   display: flex;
@@ -501,6 +515,90 @@ h1 {
   flex-direction: column;
   align-items: center;
   overflow: hidden;
+  position: relative;
+}
+
+/* Workspace Switch Transition & Tactical Beam Sweep */
+.workspace-view::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 2px;
+  opacity: 0;
+  pointer-events: none;
+  z-index: 99;
+}
+
+.workspace-view.ws-slide-in-right {
+  animation: wsSlideInRight 0.24s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+.workspace-view.ws-slide-in-left {
+  animation: wsSlideInLeft 0.24s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+.workspace-view.ws-slide-in-right::before,
+.workspace-view.ws-slide-in-left::before {
+  animation: wsModeSwitchGlow 0.28s ease-out;
+}
+
+@keyframes wsSlideInRight {
+  0% {
+    opacity: 0;
+    transform: translate3d(24px, 0, 0);
+  }
+  100% {
+    opacity: 1;
+    transform: translate3d(0, 0, 0);
+  }
+}
+
+@keyframes wsSlideInLeft {
+  0% {
+    opacity: 0;
+    transform: translate3d(-24px, 0, 0);
+  }
+  100% {
+    opacity: 1;
+    transform: translate3d(0, 0, 0);
+  }
+}
+
+@keyframes wsModeSwitchGlow {
+  0% {
+    opacity: 0;
+    background: linear-gradient(90deg, transparent, var(--neon-blue), transparent);
+    transform: scaleX(0.1);
+  }
+  40% {
+    opacity: 0.9;
+    transform: scaleX(1);
+  }
+  100% {
+    opacity: 0;
+    transform: scaleX(1);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .workspace-view.ws-slide-in-right,
+  .workspace-view.ws-slide-in-left {
+    animation: wsFadeInOnly 0.15s ease both;
+  }
+  .workspace-view.ws-slide-in-right::before,
+  .workspace-view.ws-slide-in-left::before {
+    display: none;
+  }
+  .va-ws-btn.active {
+    animation: none;
+  }
+}
+
+@keyframes wsFadeInOnly {
+  0% { opacity: 0; }
+  100% { opacity: 1; }
 }
 .placeholder-workspace {
   padding: 60px 20px;
