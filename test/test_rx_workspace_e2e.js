@@ -27,11 +27,17 @@ const requiredElements = [
   'class="rx-cockpit-card"',
   'id="rx-progress-badge"',
   'id="rx-wpm-badge"',
+  'id="chk-rx-auto-advance"',
   'id="chk-rx-blind-mode"',
+  'id="rx-visual-cue"',
   'id="rx-audio-indicator"',
   'id="rx-audio-status-text"',
+  'id="btn-rx-start"',
+  'id="btn-rx-stop"',
   'id="btn-rx-replay"',
   'id="btn-rx-skip"',
+  'id="btn-rx-next"',
+  'id="btn-rx-restart"',
   'id="rx-input-display"',
   'id="rx-input-buffer"',
   'class="rx-cursor"',
@@ -162,9 +168,14 @@ const mdiCheckPatterns = [
   'mdi-card-account-details-outline',
   'mdi-numeric',
   'mdi-radio-tower',
-  'mdi-volume-high',
+  'mdi-headphones',
+  'mdi-play',
+  'mdi-stop',
   'mdi-repeat',
   'mdi-skip-next',
+  'mdi-arrow-right',
+  'mdi-restart',
+  'mdi-fast-forward',
   'mdi-backspace-outline',
   'mdi-check-bold',
   'mdi-trophy-outline',
@@ -176,6 +187,15 @@ mdiCheckPatterns.forEach(mdi => {
   assert.ok(protoRxMarkup.includes(mdi), `prototype_morse_card.html Rx markup must use MDI icon: ${mdi}`);
 });
 console.log('   -> 100% Zero-Emoji verified! Professional Material Design Icons (MDI) strictly employed!');
+
+// E. TX Mode PCB Binary Tree Protection Audit
+console.log('\n   Verifying TX Mode PCB Card & Binary Tree Protection against blind mode pollution...');
+assert.ok(!indexHtml.includes('class="pcb-card pcb-blind-mode"'), 'index.html PCB card must never have pcb-blind-mode statically');
+assert.ok(!protoHtml.includes('class="pcb-card pcb-blind-mode"'), 'prototype_morse_card.html PCB card must never have pcb-blind-mode statically');
+assert.ok(rxCss.includes('.pcb-blind-mode {') && rxCss.includes('filter: none !important;'), 'css/rx-mode.css must explicitly protect against filter pollution');
+assert.ok(protoHtml.includes('.pcb-blind-mode {') && protoHtml.includes('filter: none !important;'), 'prototype_morse_card.html must explicitly protect against filter pollution');
+assert.ok(rxJs.includes('onLeaveRx') && rxJs.includes('pcbCard.classList.remove(\'pcb-blind-mode\')'), 'rx-mode.js must explicitly clear pcb-blind-mode onLeaveRx');
+console.log('   -> TX Mode PCB Binary Tree fully protected from blind mode style pollution!');
 
 // 6. Top Ribbon Layout Architecture Verification
 console.log('\n6. Verifying Top Ribbon layout position (Shared across workspaces)...');

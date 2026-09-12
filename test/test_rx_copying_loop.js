@@ -60,10 +60,11 @@ const rx = new RxMode({ cwPlayer: player, submode: 'koch' });
 assert.strictEqual(rx.state, 'IDLE', 'Initial state should be IDLE');
 assert.strictEqual(rx.submode, 'koch', 'Initial submode should be koch');
 assert.strictEqual(rx.blindMode, true, 'Blind mode should default to true');
+assert.strictEqual(rx.autoAdvance, false, 'Auto-advance should default to false');
 assert.strictEqual(rx.currentTrialIndex, 0);
 console.log('   -> Instantiation and defaults verified!');
 
-// 2. Session Start and Target Generation
+// 2. Session Start and Target Generation (Non-autoplay, enters READY)
 console.log('\n2. Verifying Session Start & Submode Target Generation...');
 assert.ok(typeof rx.generateTargetForSubmode('koch') === 'string', 'Koch target must be string');
 assert.ok(typeof rx.generateTargetForSubmode('callsign') === 'string', 'Callsign target must be string');
@@ -72,18 +73,32 @@ assert.ok(typeof rx.generateTargetForSubmode('qcodes') === 'string', 'Q-codes ta
 
 rx.startSession('koch', ['K', 'M']);
 assert.strictEqual(rx.totalTrials, 2, 'Custom queue should set total trials');
-assert.strictEqual(rx.state, 'PLAYING', 'Starting session should move state to PLAYING');
+assert.strictEqual(rx.state, 'READY', 'Starting session should move state to READY (not auto-playing)');
 assert.strictEqual(rx.currentTrial.target, 'K', 'First target should be K');
-assert.strictEqual(player.playedText, 'K', 'CWPlayer should play target K');
-console.log('   -> Session start and custom target queue verified!');
+assert.strictEqual(player.isPlaying, false, 'CWPlayer must not auto-play on session start');
+console.log('   -> Session start and READY state verified (Non-autoplay)!');
 
-// 3. Audio Playback Completion & Waiting Input State
-console.log('\n3. Verifying Audio Completion and Waiting Input State...');
-assert.strictEqual(rx.state, 'PLAYING');
+// 3. Audio Transport Controls (Start, Stop, Replay, Audio Completion)
+console.log('\n3. Verifying Audio Transport Controls (Start, Stop, Replay, Audio Completion)...');
+rx.startAudio();
+assert.strictEqual(rx.state, 'PLAYING', 'startAudio should move state to PLAYING');
+assert.strictEqual(player.playedText, 'K', 'CWPlayer should play target K');
+assert.strictEqual(player.isPlaying, true, 'CWPlayer should be playing');
+
+// Test Stop
+rx.stopAudio();
+assert.strictEqual(rx.state, 'WAITING_INPUT', 'stopAudio should move state to WAITING_INPUT');
+assert.strictEqual(player.isPlaying, false, 'CWPlayer should stop playing');
+
+// Test Replay
+rx.replayAudio();
+assert.strictEqual(rx.state, 'PLAYING', 'replayAudio should move state back to PLAYING');
+
+// Complete playback
 player.complete();
 assert.strictEqual(rx.state, 'WAITING_INPUT', 'State should transition to WAITING_INPUT on playbackComplete');
 assert.ok(rx.currentTrial.audioEndTime > 0, 'audioEndTime must be recorded');
-console.log('   -> Audio completion and WAITING_INPUT transition verified!');
+console.log('   -> Audio transport controls and WAITING_INPUT transition verified!');
 
 // 4. Keystroke Handling, Input Buffer & Reflex Latency
 console.log('\n4. Verifying Keystroke Handling, Input Buffer & Reflex Latency...');
@@ -109,11 +124,12 @@ assert.strictEqual(rx.currentTrial.reflexLatency, 350, 'Reflex latency should be
 assert.strictEqual(rx.trials.length, 1, 'Trials array should contain 1 completed trial');
 console.log('   -> Keystroke input and reflex latency calculated accurately (350 ms)!');
 
-// 5. Acoustic Confusion Matrix Tracking
-console.log('\n5. Verifying Acoustic Confusion Matrix Tracking on Error...');
+// 5. Advance To Next Trial & Acoustic Confusion Matrix Tracking
+console.log('\n5. Verifying Advance To Next Trial & Confusion Matrix on Error...');
 // Advance to next trial (Trial 2: 'M')
-rx.nextTrial();
+rx.advanceToNextTrial();
 assert.strictEqual(rx.currentTrial.target, 'M');
+assert.strictEqual(rx.state, 'PLAYING', 'advanceToNextTrial should start playing audio for next trial');
 player.complete();
 rx.currentTrial.audioEndTime = 2000;
 

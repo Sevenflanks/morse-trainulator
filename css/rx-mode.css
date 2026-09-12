@@ -323,16 +323,70 @@
   padding: 4px;
 }
 
-/* Blind Mode Masking on PCB */
-.pcb-blind-mode #wires-layer,
-.pcb-blind-mode #nodes-layer,
-.pcb-blind-mode #digits-bus-layer,
-.pcb-blind-mode .tree-path,
-.pcb-blind-mode .node-group {
-  opacity: 0.12;
-  filter: blur(2px) grayscale(0.8);
-  pointer-events: none;
-  transition: all 0.3s ease;
+/* Rx Blind Mode Visual Cue & PCB Safety */
+.rx-blind-mode #rx-visual-cue,
+.rx-blind-active #rx-visual-cue {
+  display: none !important;
+}
+
+.pcb-blind-mode {
+  /* Legacy safety reset - guarantee PCB elements remain 100% visible */
+  opacity: 1 !important;
+  filter: none !important;
+}
+
+/* Enhanced Rx Control Buttons */
+.rx-btn-start {
+  background: rgba(0, 230, 118, 0.15) !important;
+  border-color: #00e676 !important;
+  color: #00e676 !important;
+}
+.rx-btn-start:hover:not(:disabled) {
+  background: #00e676 !important;
+  color: #000 !important;
+  box-shadow: 0 0 10px rgba(0, 230, 118, 0.4);
+}
+
+.rx-btn-stop {
+  background: rgba(255, 82, 82, 0.15) !important;
+  border-color: #ff5252 !important;
+  color: #ff5252 !important;
+}
+.rx-btn-stop:hover:not(:disabled) {
+  background: #ff5252 !important;
+  color: #fff !important;
+  box-shadow: 0 0 10px rgba(255, 82, 82, 0.4);
+}
+
+.rx-btn-next {
+  background: rgba(0, 229, 255, 0.15) !important;
+  border-color: var(--neon-blue) !important;
+  color: #fff !important;
+}
+.rx-btn-next:hover:not(:disabled) {
+  background: var(--neon-blue) !important;
+  color: #000 !important;
+  box-shadow: 0 0 12px rgba(0, 229, 255, 0.5);
+}
+.rx-btn-next.highlight-next {
+  animation: rx-next-pulse 1.2s infinite alternate;
+}
+
+@keyframes rx-next-pulse {
+  0% { box-shadow: 0 0 4px var(--neon-blue); border-color: var(--neon-blue); }
+  100% { box-shadow: 0 0 14px var(--neon-blue); border-color: #fff; }
+}
+
+.rx-visual-cue {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 8px;
+  min-height: 24px;
+  font-family: monospace;
+  font-size: 0.95rem;
+  letter-spacing: 4px;
+  color: var(--gold);
 }
 
 /* Keypad Active Press Animation */

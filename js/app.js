@@ -2008,6 +2008,9 @@ function setupWorkspaceNavigation() {
       if (typeof window !== 'undefined' && window.cwPlayer && window.cwPlayer.isPlaying) {
         window.cwPlayer.stop();
       }
+      if (typeof window !== 'undefined' && window.rxMode) {
+        window.rxMode.onLeaveRx();
+      }
 
       wsTabs.forEach(t => {
         const b = document.getElementById(t.btnId);
@@ -2025,7 +2028,13 @@ function setupWorkspaceNavigation() {
         targetView.classList.add('active');
       }
 
-      // Auto start Rx session on first entry if IDLE
+      // If returning to TX, guarantee PCB tree is pristine
+      if (item.viewId === 'ws-container-tx') {
+        const pcb = document.querySelector('.pcb-card');
+        if (pcb) pcb.classList.remove('pcb-blind-mode');
+      }
+
+      // Auto prepare Rx session on first entry if IDLE
       if (item.viewId === 'ws-container-rx' && typeof window !== 'undefined' && window.rxMode) {
         if (window.rxMode.state === 'IDLE') {
           window.rxMode.startSession();

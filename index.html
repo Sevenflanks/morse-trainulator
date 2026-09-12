@@ -932,27 +932,49 @@
             <span id="rx-wpm-badge" style="font-size:0.75rem; color:#888;">速度: 20 WPM</span>
           </div>
 
-          <label style="display:flex; align-items:center; gap:8px; cursor:pointer; font-size:0.8rem; color:#ccc;">
-            <input type="checkbox" id="chk-rx-blind-mode" class="switch-input switch-gold" checked>
-            <span><i class="mdi mdi-eye-off"></i> 純盲聽模式 (遮蔽二元樹)</span>
-          </label>
+          <div style="display:flex; align-items:center; gap:16px; flex-wrap:wrap;">
+            <label style="display:flex; align-items:center; gap:6px; cursor:pointer; font-size:0.8rem; color:#ccc;" title="送出答案後是否自動播報下一題">
+              <input type="checkbox" id="chk-rx-auto-advance" class="switch-input switch-gold">
+              <span><i class="mdi mdi-fast-forward"></i> 作答後自動前進</span>
+            </label>
+
+            <label style="display:flex; align-items:center; gap:6px; cursor:pointer; font-size:0.8rem; color:#ccc;" title="隱藏電碼提示進行純聽覺反射訓練">
+              <input type="checkbox" id="chk-rx-blind-mode" class="switch-input switch-gold" checked>
+              <span><i class="mdi mdi-eye-off"></i> 純盲聽模式 (隱藏提示)</span>
+            </label>
+          </div>
         </div>
 
-        <!-- Audio Indicator & Primary Controls -->
+        <!-- Audio Indicator & Primary Transport Controls -->
         <div class="rx-audio-box">
           <div class="rx-audio-indicator" id="rx-audio-indicator">
-            <i class="mdi mdi-volume-high"></i> <span id="rx-audio-status-text">點擊開始或發音</span>
+            <i class="mdi mdi-headphones"></i> <span id="rx-audio-status-text">準備就緒 · 請點擊開始</span>
           </div>
 
-          <div style="display:flex; gap:8px;">
-            <button type="button" id="btn-rx-replay" class="rx-control-btn" title="快捷鍵: 空白鍵 (Space)">
-              <i class="mdi mdi-repeat"></i> 重播音訊 (Space)
+          <div style="display:flex; gap:8px; flex-wrap:wrap; align-items:center;">
+            <button type="button" id="btn-rx-start" class="rx-control-btn rx-btn-start" title="開始播放題目音訊 (快捷鍵: Space)">
+              <i class="mdi mdi-play"></i> 開始 (Space)
             </button>
-            <button type="button" id="btn-rx-skip" class="rx-control-btn" title="快捷鍵: Esc">
-              <i class="mdi mdi-skip-next"></i> 放棄跳題
+            <button type="button" id="btn-rx-stop" class="rx-control-btn rx-btn-stop" title="停止播放音訊 (快捷鍵: Esc)" disabled>
+              <i class="mdi mdi-stop"></i> 停止
+            </button>
+            <button type="button" id="btn-rx-replay" class="rx-control-btn" title="重新播放題目音訊 (快捷鍵: R)" disabled>
+              <i class="mdi mdi-repeat"></i> 重播 (R)
+            </button>
+            <button type="button" id="btn-rx-skip" class="rx-control-btn" title="跳過此題並揭曉答案">
+              <i class="mdi mdi-skip-next"></i> 跳過
+            </button>
+            <button type="button" id="btn-rx-next" class="rx-control-btn rx-btn-next" title="前進至下一題 (快捷鍵: Enter)" disabled>
+              <i class="mdi mdi-arrow-right"></i> 下一題 (Enter)
+            </button>
+            <button type="button" id="btn-rx-restart" class="rx-control-btn" title="重置本輪進度回到第 1 題">
+              <i class="mdi mdi-restart"></i> 重設
             </button>
           </div>
         </div>
+
+        <!-- Visual Aid Cue (Shown only when blind mode is off) -->
+        <div class="rx-visual-cue" id="rx-visual-cue"></div>
 
         <!-- Telegraph Input Display Line -->
         <div class="rx-input-display has-focus" id="rx-input-display" tabindex="0">
@@ -1076,10 +1098,10 @@
           </div>
         </div>
         <div class="desktop-hotkey-strip">
-          <span><i class="mdi mdi-keyboard"></i> 桌面實體鍵盤直接輸入</span>
-          <span>· [Space] 重播</span>
-          <span>· [Enter] 送出</span>
-          <span>· [Esc] 跳過</span>
+          <span><i class="mdi mdi-keyboard"></i> 鍵盤直接輸入</span>
+          <span>· [Space] 開始/重播</span>
+          <span>· [Enter] 送出/下一題</span>
+          <span>· [Esc] 停止/跳過</span>
         </div>
       </div>
     </footer>
