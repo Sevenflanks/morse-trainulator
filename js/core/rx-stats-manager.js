@@ -8,14 +8,22 @@ class RxStatsManager {
   constructor(storage = null, options = {}) {
     this.storage = storage || (typeof localStorage !== 'undefined' ? localStorage : null);
     this.storageKey = options.storageKey || 'morse_rx_sessions';
+    this.profileKey = options.profileKey || 'morse_rx_confusion_profile';
     this.maxSessions = options.maxSessions || 50;
     this.sessions = [];
+    this.confusionProfile = {
+      confusionPairs: {},
+      charStats: {}
+    };
     this.load();
   }
 
   load() {
     this.sessions = [];
+    this.confusionProfile = { confusionPairs: {}, charStats: {} };
     if (!this.storage) return;
+
+    // 1. Sessions History
     try {
       const raw = this.storage.getItem(this.storageKey);
       if (raw) {
@@ -28,6 +36,23 @@ class RxStatsManager {
       console.warn('[RxStatsManager] Failed to load sessions from storage:', e);
       this.sessions = [];
     }
+
+    // 2. Confusion Profile
+    try {
+      const profileRaw = this.storage.getItem(this.profileKey);
+      if (profileRaw) {
+        const parsedProfile = JSON.parse(profileRaw);
+        if (parsedProfile && typeof parsedProfile === 'object') {
+          this.confusionProfile = {
+            confusionPairs: parsedProfile.confusionPairs || {},
+            charStats: parsedProfile.charStats || {}
+          };
+        }
+      }
+    } catch (e) {
+      console.warn('[RxStatsManager] Failed to load confusion profile:', e);
+      this.confusionProfile = { confusionPairs: {}, charStats: {} };
+    }
   }
 
   save() {
@@ -36,6 +61,11 @@ class RxStatsManager {
       this.storage.setItem(this.storageKey, JSON.stringify(this.sessions));
     } catch (e) {
       console.warn('[RxStatsManager] Failed to save sessions to storage:', e);
+    }
+    try {
+      this.storage.setItem(this.profileKey, JSON.stringify(this.confusionProfile));
+    } catch (e) {
+      console.warn('[RxStatsManager] Failed to save confusion profile to storage:', e);
     }
   }
 
@@ -53,12 +83,40 @@ class RxStatsManager {
       trials: Array.isArray(sessionData.trials) ? sessionData.trials : []
     };
 
-    // Prepend (newest first)
+    // Prepend session
     this.sessions.unshift(session);
-
-    // FIFO cap
     if (this.sessions.length > this.maxSessions) {
       this.sessions = this.sessions.slice(0, this.maxSessions);
+    }
+
+    // Update cumulative confusion profile
+    if (Array.isArray(session.confusions)) {
+      session.confusions.forEach(c => {
+        if (c.expected && c.actual) {
+          const pairKey = `${c.expected}->${c.actual}`;
+          const count = c.count || 1;
+          this.confusionProfile.confusionPairs[pairKey] =
+            (this.confusionProfile.confusionPairs[pairKey] || 0) + count;
+        }
+      });
+    }
+
+    // Update character-level statistics
+    if (Array.isArray(session.trials)) {
+      session.trials.forEach(t => {
+        const char = (t.target || '').toUpperCase().trim();
+        if (char && char.length === 1) {
+          if (!this.confusionProfile.charStats[char]) {
+            this.confusionProfile.charStats[char] = { attempts: 0, correct: 0, totalLatency: 0 };
+          }
+          const s = this.confusionProfile.charStats[char];
+          s.attempts++;
+          if (t.isCorrect) s.correct++;
+          if (typeof t.reflexLatency === 'number' && t.reflexLatency > 0) {
+            s.totalLatency += t.reflexLatency;
+          }
+        }
+      });
     }
 
     this.save();
@@ -101,8 +159,47 @@ class RxStatsManager {
     };
   }
 
+  getTopConfusions(limit = 3) {
+    if (!this.confusionProfile || !this.confusionProfile.confusionPairs) return [];
+    const pairs = Object.entries(this.confusionProfile.confusionPairs)
+      .map(([pair, count]) => {
+        const [expected, actual] = pair.split('->');
+        let severity = 'notice';
+        if (count >= 5) severity = 'critical';
+        else if (count >= 3) severity = 'warning';
+        return { pair, expected, actual, count, severity };
+      })
+      .sort((a, b) => b.count - a.count);
+    return pairs.slice(0, limit);
+  }
+
+  getWeakestCharacters(limit = 5) {
+    if (!this.confusionProfile || !this.confusionProfile.charStats) return [];
+    const chars = Object.entries(this.confusionProfile.charStats)
+      .map(([char, s]) => {
+        const accuracy = s.attempts > 0 ? Math.round((s.correct / s.attempts) * 100) : 100;
+        const avgLatency = s.attempts > 0 ? Math.round(s.totalLatency / s.attempts) : 0;
+        return {
+          char,
+          attempts: s.attempts,
+          correct: s.correct,
+          accuracy,
+          avgLatency
+        };
+      })
+      .sort((a, b) => {
+        if (a.accuracy !== b.accuracy) return a.accuracy - b.accuracy;
+        return b.attempts - a.attempts;
+      });
+    return chars.slice(0, limit);
+  }
+
   clearHistory() {
     this.sessions = [];
+    this.confusionProfile = {
+      confusionPairs: {},
+      charStats: {}
+    };
     this.save();
   }
 }

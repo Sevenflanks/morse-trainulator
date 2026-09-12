@@ -75,6 +75,12 @@ class RxMode {
       btnClearHistory: document.getElementById('btn-rx-clear-history'),
       btnRetryErrors: document.getElementById('btn-rx-retry-errors'),
       btnNextRound: document.getElementById('btn-rx-next-round'),
+      btnToggleAnalytics: document.getElementById('btn-rx-toggle-analytics'),
+      analyticsChevron: document.getElementById('rx-analytics-chevron'),
+      analyticsPanel: document.getElementById('rx-analytics-panel'),
+      topConfusionsGrid: document.getElementById('rx-top-confusions-grid'),
+      weakCharsList: document.getElementById('rx-weak-chars-list'),
+      latencyTrend: document.getElementById('rx-latency-trend'),
       softKeypad: document.getElementById('rx-soft-keypad'),
       kochStageBar: document.getElementById('rx-koch-stage-bar'),
       kochStageBadge: document.getElementById('rx-koch-stage-badge'),
@@ -89,11 +95,18 @@ class RxMode {
       btnStageAdvance: document.getElementById('btn-rx-stage-advance')
     };
 
+    if (this.el.btnToggleAnalytics) {
+      this.el.btnToggleAnalytics.addEventListener('click', () => {
+        this.toggleAnalyticsPanel();
+      });
+    }
+
     if (this.el.btnClearHistory) {
       this.el.btnClearHistory.addEventListener('click', () => {
         if (this.statsManager) {
           this.statsManager.clearHistory();
           this.updateHistoryBarUI();
+          this.renderAnalyticsPanel();
         }
       });
     }
@@ -993,7 +1006,21 @@ class RxMode {
           this.el.scConfusionBox.style.display = 'block';
           this.el.scConfusionList.innerHTML = confusions.map(([pair, count]) => {
             const [exp, act] = pair.split('->');
-            return `<div class="rx-confusion-item"><span class="confusion-exp">${exp}</span> <i class="mdi mdi-arrow-right"></i> <span class="confusion-act">${act}</span> (${count} 次)</div>`;
+            let severity = 'notice';
+            let severityText = '輕度';
+            if (count >= 5) {
+              severity = 'critical';
+              severityText = '高頻';
+            } else if (count >= 3) {
+              severity = 'warning';
+              severityText = '中度';
+            }
+            return `<div class="rx-confusion-item">
+              <span class="confusion-exp">${exp}</span>
+              <i class="mdi mdi-arrow-right"></i>
+              <span class="confusion-act">${act}</span>
+              <span class="rx-severity-badge ${severity}">${severityText} (${count} 次)</span>
+            </div>`;
           }).join('');
         } else {
           this.el.scConfusionBox.style.display = 'none';
@@ -1059,6 +1086,9 @@ class RxMode {
       }
     }
     this.updateHistoryBarUI();
+    if (this._analyticsOpen) {
+      this.renderAnalyticsPanel();
+    }
   }
 
   updateHistoryBarUI() {
@@ -1079,6 +1109,91 @@ class RxMode {
     if (this.el.scHistAvgLat) {
       const latText = (summary.totalSessions > 0 && summary.recentAvgLatency > 0) ? `${summary.recentAvgLatency} ms` : '-- ms';
       this.el.scHistAvgLat.innerHTML = `<i class="mdi mdi-timer-outline"></i> 近期反射: ${latText}`;
+    }
+  }
+
+  toggleAnalyticsPanel(forceOpen = null) {
+    if (!this.el || !this.el.analyticsPanel) return;
+    this._analyticsOpen = (forceOpen !== null) ? forceOpen : !this._analyticsOpen;
+    this.el.analyticsPanel.style.display = this._analyticsOpen ? 'block' : 'none';
+    if (this.el.analyticsChevron) {
+      this.el.analyticsChevron.className = this._analyticsOpen ? 'mdi mdi-chevron-up' : 'mdi mdi-chevron-down';
+    }
+    if (this._analyticsOpen) {
+      this.renderAnalyticsPanel();
+    }
+  }
+
+  renderAnalyticsPanel() {
+    if (!this.el || !this.statsManager) return;
+
+    // 1. Top 3 Confusions
+    if (this.el.topConfusionsGrid) {
+      const topPairs = this.statsManager.getTopConfusions(3);
+      if (topPairs.length === 0) {
+        this.el.topConfusionsGrid.innerHTML = '<span style="color:#778; font-size:0.75rem;">尚無混淆數據</span>';
+      } else {
+        this.el.topConfusionsGrid.innerHTML = topPairs.map(item => {
+          const badgeText = item.severity === 'critical' ? '高頻混淆' : (item.severity === 'warning' ? '中度混淆' : '輕度混淆');
+          return `
+            <div class="rx-confusion-card">
+              <div class="rx-confusion-pair-text">
+                <span style="color:#00e676;">${item.expected}</span>
+                <i class="mdi mdi-arrow-right" style="font-size:0.75rem; color:#778; margin:0 4px;"></i>
+                <span style="color:#ff5252;">${item.actual}</span>
+              </div>
+              <div style="display:flex; align-items:center; gap:6px;">
+                <span class="rx-severity-badge ${item.severity}">${badgeText}</span>
+                <span style="color:#889; font-size:0.72rem;">${item.count} 次</span>
+              </div>
+            </div>
+          `;
+        }).join('');
+      }
+    }
+
+    // 2. Weakest 5 Characters
+    if (this.el.weakCharsList) {
+      const weakest = this.statsManager.getWeakestCharacters(5);
+      if (weakest.length === 0) {
+        this.el.weakCharsList.innerHTML = '<span style="color:#778; font-size:0.75rem;">尚無統計數據</span>';
+      } else {
+        this.el.weakCharsList.innerHTML = weakest.map(item => {
+          const accColor = item.accuracy >= 90 ? '#00e676' : (item.accuracy >= 70 ? 'var(--gold)' : '#ff5252');
+          return `
+            <div class="rx-weak-char-chip">
+              <span class="rx-weak-char-letter">${item.char}</span>
+              <span style="color:${accColor}; font-weight:bold;">${item.accuracy}%</span>
+              <span style="color:#667; font-size:0.68rem;">(${item.attempts}題)</span>
+            </div>
+          `;
+        }).join('');
+      }
+    }
+
+    // 3. Latency & Speed Trend
+    if (this.el.latencyTrend) {
+      const summary = this.statsManager.getSummaryStats();
+      const recentSessions = this.statsManager.getHistory(5);
+      if (summary.totalSessions === 0) {
+        this.el.latencyTrend.innerHTML = '<span style="color:#778; font-size:0.75rem;">尚無反射數據</span>';
+      } else {
+        const trendHtml = recentSessions.map(s => {
+          const latText = s.avgLatency > 0 ? `${s.avgLatency}ms` : '--';
+          return `<span class="rx-trend-chip"><i class="mdi mdi-ray-vertex"></i> ${latText} (${s.accuracy}%)</span>`;
+        }).join('');
+        this.el.latencyTrend.innerHTML = `
+          <div style="display:flex; flex-direction:column; gap:6px;">
+            <div style="display:flex; justify-content:space-between; font-size:0.78rem; color:#cde;">
+              <span>近期均值: <b style="color:var(--gold);">${summary.recentAvgLatency} ms</b></span>
+              <span>均速: <b style="color:var(--neon-blue);">${recentSessions[0]?.charWpm || 20} WPM</b></span>
+            </div>
+            <div style="display:flex; flex-wrap:wrap; gap:4px; margin-top:2px;">
+              ${trendHtml}
+            </div>
+          </div>
+        `;
+      }
     }
   }
 

@@ -947,6 +947,40 @@
               <input type="checkbox" id="chk-rx-blind-mode" class="switch-input switch-gold" checked>
               <span><i class="mdi mdi-eye-off"></i> 純盲聽模式 (隱藏提示)</span>
             </label>
+
+            <button type="button" id="btn-rx-toggle-analytics" class="rx-btn-ghost" title="查看弱點戰情報告">
+              <i class="mdi mdi-radar"></i> 弱點戰情 <i class="mdi mdi-chevron-down" id="rx-analytics-chevron"></i>
+            </button>
+          </div>
+        </div>
+
+        <!-- Weakness Analytics Collapsible Panel -->
+        <div class="rx-analytics-panel" id="rx-analytics-panel" style="display:none;">
+          <div class="rx-analytics-header">
+            <div class="rx-analytics-title">
+              <i class="mdi mdi-radar"></i> 聽力弱點戰情報告
+            </div>
+            <span class="rx-analytics-subtitle">跨會話累計音形混淆與反應分析</span>
+          </div>
+          <div class="rx-analytics-body">
+            <div class="rx-analytics-col">
+              <div class="rx-analytics-col-title"><i class="mdi mdi-alert-decagram-outline"></i> 高頻混淆熱點 Top 3</div>
+              <div class="rx-top-confusions-grid" id="rx-top-confusions-grid">
+                <span style="color:#778; font-size:0.75rem;">尚無混淆數據</span>
+              </div>
+            </div>
+            <div class="rx-analytics-col">
+              <div class="rx-analytics-col-title"><i class="mdi mdi-target-variant"></i> 最脆弱字元 Top 5</div>
+              <div class="rx-weak-chars-list" id="rx-weak-chars-list">
+                <span style="color:#778; font-size:0.75rem;">尚無統計數據</span>
+              </div>
+            </div>
+            <div class="rx-analytics-col">
+              <div class="rx-analytics-col-title"><i class="mdi mdi-timer-outline"></i> 近期反射速度趨勢</div>
+              <div class="rx-latency-trend-box" id="rx-latency-trend">
+                <span style="color:#778; font-size:0.75rem;">尚無反射數據</span>
+              </div>
+            </div>
           </div>
         </div>
 
