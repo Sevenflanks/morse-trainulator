@@ -144,6 +144,73 @@
   100% { opacity: 1; filter: drop-shadow(0 0 6px var(--gold)); }
 }
 
+/* 5-Stage Signal Level Ladder (Signal S-Meter) */
+.rx-signal-ladder {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 10px;
+  background: rgba(13, 16, 23, 0.7);
+  border: 1px solid #283042;
+  border-radius: 4px;
+  box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.5);
+}
+
+.signal-ladder-label {
+  font-family: var(--font-mono);
+  font-size: 0.65rem;
+  font-weight: 800;
+  letter-spacing: 1.5px;
+  color: var(--text-dim);
+  text-transform: uppercase;
+}
+
+.signal-ladder-bars {
+  display: flex;
+  align-items: flex-end;
+  gap: 3px;
+  height: 14px;
+}
+
+.signal-bar {
+  width: 5px;
+  border-radius: 1px;
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  transition: background 0.06s ease, box-shadow 0.06s ease, border-color 0.06s ease;
+}
+
+.signal-bar.bar-1 { height: 4px; }
+.signal-bar.bar-2 { height: 6px; }
+.signal-bar.bar-3 { height: 9px; }
+.signal-bar.bar-4 { height: 11px; }
+.signal-bar.bar-5 { height: 14px; }
+
+.signal-bar.bar-1.active,
+.signal-bar.bar-2.active {
+  background: #00e676;
+  border-color: #00e676;
+  box-shadow: 0 0 6px rgba(0, 230, 118, 0.8);
+}
+
+.signal-bar.bar-3.active {
+  background: #ffd700;
+  border-color: #ffd700;
+  box-shadow: 0 0 6px rgba(255, 215, 0, 0.8);
+}
+
+.signal-bar.bar-4.active {
+  background: #ff9100;
+  border-color: #ff9100;
+  box-shadow: 0 0 7px rgba(255, 145, 0, 0.85);
+}
+
+.signal-bar.bar-5.active {
+  background: #ff3d00;
+  border-color: #ff3d00;
+  box-shadow: 0 0 8px rgba(255, 61, 0, 0.9);
+}
+
 .rx-control-btn {
   background: #1f2434;
   border: 1px solid #3c445c;
@@ -213,6 +280,45 @@
 @keyframes rx-blink {
   0%, 100% { opacity: 1; }
   50% { opacity: 0; }
+}
+
+/* Teletype Strike & Ink Impression on Immediate Submit (120ms) */
+.rx-input-display.teletype-strike {
+  animation: teletype-impression 0.12s cubic-bezier(0.2, 0.9, 0.3, 1);
+}
+.rx-input-display.teletype-strike #rx-input-buffer {
+  animation: teletype-afterglow 0.12s ease-out;
+}
+
+@keyframes teletype-impression {
+  0% {
+    transform: scale(0.985) translateY(1.5px);
+    border-color: var(--neon-blue);
+    box-shadow: 0 0 16px rgba(0, 229, 255, 0.45), inset 0 0 10px rgba(0, 229, 255, 0.25);
+  }
+  40% {
+    transform: scale(1.015) translateY(-0.8px);
+    box-shadow: 0 0 20px rgba(255, 215, 0, 0.5), inset 0 0 12px rgba(255, 215, 0, 0.3);
+  }
+  100% {
+    transform: scale(1) translateY(0);
+    box-shadow: 0 0 15px rgba(0, 229, 255, 0.25);
+  }
+}
+
+@keyframes teletype-afterglow {
+  0% {
+    text-shadow: 0 0 4px #fff, 0 0 12px var(--neon-blue), 0 0 24px rgba(0, 229, 255, 0.9);
+    filter: brightness(1.6);
+  }
+  50% {
+    text-shadow: 0 0 3px #fff, 0 0 10px var(--gold), 0 0 20px rgba(255, 215, 0, 0.8);
+    filter: brightness(1.3);
+  }
+  100% {
+    text-shadow: 0 0 10px rgba(255, 215, 0, 0.4);
+    filter: brightness(1);
+  }
 }
 
 /* Feedback message */
@@ -597,6 +703,103 @@
 .rx-blind-active #rx-koch-target-info,
 .rx-blind-active .rx-pool-preview-row {
   display: none !important;
+}
+
+/* Acoustic Sonar Pulse (Blind Mode Audio Radar Ripple) */
+.rx-sonar-pulse {
+  display: none;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  min-height: 38px;
+  margin: 2px 0;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.35s ease;
+}
+
+.rx-blind-active .rx-sonar-pulse,
+.rx-blind-mode .rx-sonar-pulse {
+  display: flex;
+}
+
+.rx-sonar-pulse.active {
+  opacity: 1;
+}
+
+.sonar-core {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: rgba(13, 22, 35, 0.85);
+  border: 1.5px solid rgba(0, 229, 255, 0.6);
+  box-shadow: 0 0 10px rgba(0, 229, 255, 0.4), inset 0 0 6px rgba(0, 229, 255, 0.2);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--neon-blue);
+  font-size: 1rem;
+  z-index: 2;
+  animation: sonar-core-pulse 1.4s infinite ease-in-out;
+}
+
+@keyframes sonar-core-pulse {
+  0%, 100% {
+    transform: scale(1);
+    box-shadow: 0 0 8px rgba(0, 229, 255, 0.3), inset 0 0 4px rgba(0, 229, 255, 0.2);
+  }
+  50% {
+    transform: scale(1.1);
+    box-shadow: 0 0 16px rgba(0, 229, 255, 0.7), inset 0 0 8px rgba(0, 229, 255, 0.4);
+    color: #fff;
+  }
+}
+
+.sonar-ring {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 26px;
+  height: 26px;
+  margin-top: -13px;
+  margin-left: -13px;
+  border-radius: 50%;
+  border: 1.5px solid rgba(0, 229, 255, 0.5);
+  box-shadow: 0 0 8px rgba(0, 229, 255, 0.3);
+  pointer-events: none;
+  opacity: 0;
+}
+
+.rx-sonar-pulse.active .sonar-ring.ring-1 {
+  animation: sonar-expand 1.8s infinite cubic-bezier(0.2, 0.75, 0.35, 1);
+  animation-delay: 0s;
+}
+
+.rx-sonar-pulse.active .sonar-ring.ring-2 {
+  animation: sonar-expand 1.8s infinite cubic-bezier(0.2, 0.75, 0.35, 1);
+  animation-delay: 0.6s;
+}
+
+.rx-sonar-pulse.active .sonar-ring.ring-3 {
+  animation: sonar-expand 1.8s infinite cubic-bezier(0.2, 0.75, 0.35, 1);
+  animation-delay: 1.2s;
+}
+
+@keyframes sonar-expand {
+  0% {
+    transform: scale(0.6);
+    opacity: 0.85;
+    border-color: rgba(0, 229, 255, 0.7);
+  }
+  60% {
+    opacity: 0.4;
+    border-color: rgba(0, 229, 255, 0.35);
+  }
+  100% {
+    transform: scale(4.4);
+    opacity: 0;
+    border-color: rgba(0, 229, 255, 0);
+  }
 }
 
 /* Blind Mode Top Oscilloscope Shutter & Privacy Shield (Preserves 75px height, strictly zero text) */
