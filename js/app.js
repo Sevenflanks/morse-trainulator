@@ -199,6 +199,8 @@ function initDomReferences() {
     tagWordGap: document.getElementById('tag-word-gap'),
     paramFreq: document.getElementById('param-freq'),
     tagFreq: document.getElementById('tag-freq'),
+    paramSidetoneVol: document.getElementById('param-sidetone-vol'),
+    tagSidetoneVol: document.getElementById('tag-sidetone-vol'),
 
     chkFarnsworth: document.getElementById('chk-farnsworth'),
     farnsworthControls: document.getElementById('farnsworth-controls'),
@@ -894,11 +896,17 @@ function applyLoadedSettings() {
     if (typeof updateTopbarWpm === 'function') updateTopbarWpm(currentWpm);
   }
 
-  // 2. CW Frequency
+  // 2. CW Frequency & Sidetone Volume
   if (s.freq && dom.paramFreq) {
     dom.paramFreq.value = s.freq;
     synth.setFrequency(s.freq);
     if (dom.tagFreq) dom.tagFreq.textContent = `${s.freq}Hz`;
+  }
+  const sidetoneVol = (s.sidetoneVolume !== undefined) ? s.sidetoneVolume : 70;
+  if (dom.paramSidetoneVol) {
+    dom.paramSidetoneVol.value = sidetoneVol;
+    synth.setMasterVolume(sidetoneVol / 100);
+    if (dom.tagSidetoneVol) dom.tagSidetoneVol.textContent = `${sidetoneVol}%`;
   }
 
   // 3. Farnsworth Timing
@@ -1287,6 +1295,16 @@ function setupEventListeners() {
     });
   }
 
+  if (dom.paramSidetoneVol) {
+    dom.paramSidetoneVol.addEventListener('input', (e) => {
+      const val = parseInt(e.target.value);
+      synth.setMasterVolume(val / 100);
+      if (dom.tagSidetoneVol) dom.tagSidetoneVol.textContent = `${val}%`;
+      settingsManager.settings.sidetoneVolume = val;
+      settingsManager.save();
+    });
+  }
+
   // Farnsworth Listeners
   if (dom.chkFarnsworth) {
     dom.chkFarnsworth.addEventListener('change', (e) => {
@@ -1542,6 +1560,24 @@ function initApp() {
   setupStageViewSwitching();
   ribbon = new CWRibbon('cw-ribbon', engine);
   window.ribbon = ribbon;
+
+  if (typeof CWPlayer !== 'undefined') {
+    window.cwPlayer = new CWPlayer({
+      synth,
+      unitT: engine ? engine.getEffectiveUnitT() : 80,
+      farnsworthEnabled: engine && engine.config ? engine.config.farnsworthEnabled : false,
+      charWpm: engine && engine.config ? engine.config.charWpm : 20,
+      getSequence: (char) => (engine ? engine.getSequenceForLetter(char) : '')
+    });
+  }
+
+  if (typeof RxMode !== 'undefined') {
+    window.rxMode = new RxMode({
+      cwPlayer: window.cwPlayer,
+      submode: 'koch'
+    });
+    window.rxMode.init();
+  }
 
   setupKeyerCallbacks();
   setupEventListeners();
@@ -1968,13 +2004,34 @@ function setupWorkspaceNavigation() {
     const btn = document.getElementById(item.btnId);
     if (!btn) return;
     btn.addEventListener('click', () => {
+      // Determine navigation direction
+      const currentIndex = wsTabs.findIndex(t => {
+        const b = document.getElementById(t.btnId);
+        return b && b.classList.contains('active');
+      });
+      const targetIndex = wsTabs.findIndex(t => t.btnId === item.btnId);
+
+      // If clicking already active tab, avoid redundant reset
+      if (currentIndex === targetIndex && currentIndex !== -1) return;
+
+      const isForward = (targetIndex >= currentIndex);
+      const animClass = isForward ? 'ws-slide-in-right' : 'ws-slide-in-left';
+
+      // Stop CWPlayer audio playback if switching away
+      if (typeof window !== 'undefined' && window.cwPlayer && window.cwPlayer.isPlaying) {
+        window.cwPlayer.stop();
+      }
+      if (typeof window !== 'undefined' && window.rxMode) {
+        window.rxMode.onLeaveRx();
+      }
+
       wsTabs.forEach(t => {
         const b = document.getElementById(t.btnId);
         const v = document.getElementById(t.viewId);
         if (b) b.classList.remove('active');
         if (v) {
           v.style.display = 'none';
-          v.classList.remove('active');
+          ['active', 'ws-slide-in-right', 'ws-slide-in-left'].forEach(c => v.classList.remove(c));
         }
       });
       btn.classList.add('active');
@@ -1982,6 +2039,40 @@ function setupWorkspaceNavigation() {
       if (targetView) {
         targetView.style.display = 'flex';
         targetView.classList.add('active');
+        targetView.classList.add(animClass);
+
+        // Remove animation class after transition completes to restore native coordinate space
+        const handleAnimEnd = () => {
+          targetView.classList.remove('ws-slide-in-right');
+          targetView.classList.remove('ws-slide-in-left');
+          if (typeof targetView.removeEventListener === 'function') {
+            targetView.removeEventListener('animationend', handleAnimEnd);
+          }
+        };
+        if (typeof targetView.addEventListener === 'function') {
+          targetView.addEventListener('animationend', handleAnimEnd);
+        }
+        setTimeout(handleAnimEnd, 350);
+      }
+
+      // If returning to TX, guarantee PCB tree is pristine and ribbon is visible
+      if (item.viewId === 'ws-container-tx') {
+        if (typeof document !== 'undefined' && typeof document.querySelector === 'function') {
+          const pcb = document.querySelector('.pcb-card');
+          if (pcb) pcb.classList.remove('pcb-blind-mode');
+        }
+        const ribbon = document.getElementById('cockpit-top-ribbon');
+        if (ribbon) ribbon.classList.remove('ribbon-blind-mode');
+      }
+
+      // Auto prepare Rx session on first entry if IDLE, and update blind mode ribbon
+      if (item.viewId === 'ws-container-rx' && typeof window !== 'undefined' && window.rxMode) {
+        if (typeof window.rxMode.updateBlindMode === 'function') {
+          window.rxMode.updateBlindMode(window.rxMode.blindMode);
+        }
+        if (window.rxMode.state === 'IDLE') {
+          window.rxMode.startSession();
+        }
       }
     });
   });

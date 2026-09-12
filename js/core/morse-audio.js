@@ -8,6 +8,8 @@ class MorseAudio {
     this.osc = null;
     this.gain = null;
     this.frequency = 650;
+    this.masterVolume = 0.7;
+    this.masterGain = null;
 
     // QRN Atmospheric Noise components
     this.noiseNode = null;
@@ -22,9 +24,13 @@ class MorseAudio {
       const AudioContext = window.AudioContext || window.webkitAudioContext;
       if (AudioContext) {
         this.ctx = new AudioContext();
+        this.masterGain = this.ctx.createGain();
+        this.masterGain.gain.value = this.masterVolume;
+        this.masterGain.connect(this.ctx.destination);
+
         this.gain = this.ctx.createGain();
         this.gain.gain.value = 0;
-        this.gain.connect(this.ctx.destination);
+        this.gain.connect(this.masterGain);
       }
     }
     if (this.ctx && this.ctx.state === 'suspended') {
@@ -68,6 +74,16 @@ class MorseAudio {
     }
     if (this.noiseFilter && this.ctx) {
       this.noiseFilter.frequency.setValueAtTime(f, this.ctx.currentTime);
+    }
+  }
+
+  setMasterVolume(vol) {
+    this.masterVolume = Math.max(0, Math.min(1, vol));
+    if (this.masterGain && this.ctx) {
+      const now = this.ctx.currentTime;
+      this.masterGain.gain.cancelScheduledValues(now);
+      this.masterGain.gain.setValueAtTime(this.masterGain.gain.value, now);
+      this.masterGain.gain.linearRampToValueAtTime(this.masterVolume, now + 0.01);
     }
   }
 

@@ -24,6 +24,7 @@
   <link rel="stylesheet" href="css/pcb-card.css?v=1.3.3">
   <link rel="stylesheet" href="css/controls.css?v=1.3.3">
   <link rel="stylesheet" href="css/modes.css?v=1.3.3">
+  <link rel="stylesheet" href="css/rx-mode.css?v=1.3.3">
 </head>
 <body>
 
@@ -58,16 +59,22 @@
     </div>
   </header>
 
+  <!-- Panoramic Top HUD Ribbon (75px) -->
+  <div class="p3b-top-ribbon" id="cockpit-top-ribbon">
+    <div class="scope-bezel-text">
+      <i class="mdi mdi-sine-wave"></i> PANORAMIC SPECTRUM HUD · 100% HORIZONTAL CARRIER MONITOR
+    </div>
+    <canvas id="cw-ribbon" class="scope-canvas" height="75"></canvas>
+    <div class="scope-graticule"></div>
+    <div class="ribbon-blind-shield" id="ribbon-blind-shield">
+      <div class="blind-shield-badge">
+        <i class="mdi mdi-eye-off"></i>
+      </div>
+    </div>
+  </div>
+
   <!-- Workspace 1: Tx (發報) -->
   <div id="ws-container-tx" class="workspace-view active">
-    <!-- Panoramic Top HUD Ribbon (75px) -->
-    <div class="p3b-top-ribbon" id="cockpit-top-ribbon">
-      <div class="scope-bezel-text">
-        <i class="mdi mdi-sine-wave"></i> PANORAMIC SPECTRUM HUD · 100% HORIZONTAL CARRIER MONITOR
-      </div>
-      <canvas id="cw-ribbon" class="scope-canvas" height="75"></canvas>
-      <div class="scope-graticule"></div>
-    </div>
 
     <div class="header-subbar noise-hidden" style="display:none;">
       <div class="subtitle">電報模擬與練習工具 · 支援直鍵 / 雙撥片 / 機械震報鍵 · PCB 二元樹尋路 · 節奏儀表</div>
@@ -902,13 +909,246 @@
 
   <!-- Workspace 2: Rx (抄收) -->
   <div id="ws-container-rx" class="workspace-view" style="display:none;">
-    <div class="placeholder-workspace">
-      <i class="mdi mdi-headphones placeholder-icon"></i>
-      <h2 style="color:#fff; margin-bottom:8px;">Rx (抄收工作台)</h2>
-      <p style="color:var(--text-muted); font-size:0.9rem;">盲聽電報呼號、隨機字母與聽寫解碼訓練 (CW Copy / Receive Challenge)</p>
-      <div class="placeholder-badge">即將推出 · Coming Soon</div>
-    </div>
+    <div class="rx-workspace-stage">
+      
+      <!-- Submode Navigation Bar -->
+      <div class="rx-mode-nav">
+        <button type="button" id="rx-submode-koch" class="rx-mode-pill active" data-submode="koch">
+          <i class="mdi mdi-school"></i> 科赫盲聽 (Koch Rx)
+        </button>
+        <button type="button" id="rx-submode-callsign" class="rx-mode-pill" data-submode="callsign">
+          <i class="mdi mdi-card-account-details-outline"></i> 呼號抄收 (Callsign)
+        </button>
+        <button type="button" id="rx-submode-groups" class="rx-mode-pill" data-submode="groups">
+          <i class="mdi mdi-numeric"></i> 五字電碼群 (5-Char)
+        </button>
+        <button type="button" id="rx-submode-qcodes" class="rx-mode-pill" data-submode="qcodes">
+          <i class="mdi mdi-radio-tower"></i> Q簡語與常用 (Q-Code)
+        </button>
+      </div>
+
+      <!-- Rx Main Cockpit Card -->
+      <div class="rx-cockpit-card">
+        
+        <!-- Toolbar: Progress & Options -->
+        <div class="rx-toolbar">
+          <div style="display:flex; align-items:center; gap:12px;">
+            <span class="rx-badge" id="rx-progress-badge">進度: 0/10 · 正確率: 100%</span>
+            <span id="rx-wpm-badge" style="font-size:0.75rem; color:#888;">速度: 20 WPM</span>
+          </div>
+
+          <div style="display:flex; align-items:center; gap:16px; flex-wrap:wrap;">
+            <label style="display:flex; align-items:center; gap:6px; cursor:pointer; font-size:0.8rem; color:#ccc;" title="送出答案後是否自動播報下一題">
+              <input type="checkbox" id="chk-rx-auto-advance" class="switch-input switch-gold" checked>
+              <span><i class="mdi mdi-fast-forward"></i> 作答後自動前進</span>
+            </label>
+
+            <label style="display:flex; align-items:center; gap:6px; cursor:pointer; font-size:0.8rem; color:#ccc;" title="隱藏電碼提示進行純聽覺反射訓練">
+              <input type="checkbox" id="chk-rx-blind-mode" class="switch-input switch-gold" checked>
+              <span><i class="mdi mdi-eye-off"></i> 純盲聽模式 (隱藏提示)</span>
+            </label>
+          </div>
+        </div>
+
+        <!-- Koch Rx Stage Control Bar (Shown only in Koch submode) -->
+        <div class="rx-koch-stage-bar" id="rx-koch-stage-bar" style="display:none;">
+          <div class="rx-koch-stage-header">
+            <div class="rx-koch-stage-left">
+              <span class="rx-badge rx-badge-cyan" id="rx-koch-stage-badge">
+                <i class="mdi mdi-school"></i> 第 1 關 / 共 35 關
+              </span>
+              <select id="rx-koch-stage-select" class="terminal-select" title="快速跳轉已解鎖關卡">
+                <!-- Dynamically populated with unlocked stages -->
+              </select>
+              <span class="rx-target-chip" id="rx-koch-target-info">
+                本關新字元: <strong id="rx-koch-target-char" style="color:var(--neon-blue);">K, M</strong>
+              </span>
+            </div>
+
+            <div class="rx-koch-stage-right">
+              <button type="button" id="btn-rx-toggle-matrix" class="rx-btn-ghost" title="展開/收合 35 關地圖">
+                <i class="mdi mdi-map-marker-path"></i> 關卡地圖 <i class="mdi mdi-chevron-down" id="rx-matrix-chevron"></i>
+              </button>
+            </div>
+          </div>
+
+          <!-- 解鎖字元池預覽列 -->
+          <div class="rx-pool-preview-row">
+            <span class="rx-pool-label"><i class="mdi mdi-format-list-checks"></i> 已解鎖字元池:</span>
+            <div class="rx-pool-chips" id="rx-koch-pool-chips"></div>
+          </div>
+
+          <!-- 可折疊 35 關地圖矩陣 -->
+          <div class="rx-koch-matrix-collapse" id="rx-koch-matrix-panel" style="display:none;">
+            <div class="koch-stage-grid" id="rx-koch-matrix-grid"></div>
+          </div>
+        </div>
+
+        <!-- Audio Indicator & Primary Transport Controls -->
+        <div class="rx-audio-box">
+          <div class="rx-audio-indicator" id="rx-audio-indicator">
+            <i class="mdi mdi-headphones"></i> <span id="rx-audio-status-text">準備就緒 · 請點擊開始</span>
+          </div>
+
+          <div style="display:flex; gap:8px; flex-wrap:wrap; align-items:center;">
+            <button type="button" id="btn-rx-start" class="rx-control-btn rx-btn-start" title="開始播放題目音訊 (快捷鍵: Space)">
+              <i class="mdi mdi-play"></i> 開始 (Space)
+            </button>
+            <button type="button" id="btn-rx-stop" class="rx-control-btn rx-btn-stop" title="停止播放音訊 (快捷鍵: Esc)" disabled>
+              <i class="mdi mdi-stop"></i> 停止
+            </button>
+            <button type="button" id="btn-rx-replay" class="rx-control-btn" title="重新播放題目音訊 (快捷鍵: R)" disabled>
+              <i class="mdi mdi-repeat"></i> 重播 (R)
+            </button>
+            <button type="button" id="btn-rx-skip" class="rx-control-btn" title="跳過此題並揭曉答案">
+              <i class="mdi mdi-skip-next"></i> 跳過
+            </button>
+            <button type="button" id="btn-rx-next" class="rx-control-btn rx-btn-next" title="前進至下一題 (快捷鍵: Enter)" disabled>
+              <i class="mdi mdi-arrow-right"></i> 下一題 (Enter)
+            </button>
+            <button type="button" id="btn-rx-restart" class="rx-control-btn" title="重置本輪進度回到第 1 題">
+              <i class="mdi mdi-restart"></i> 重設
+            </button>
+          </div>
+        </div>
+
+        <!-- Visual Aid Cue (Shown only when blind mode is off) -->
+        <div class="rx-visual-cue" id="rx-visual-cue"></div>
+
+        <!-- Telegraph Input Display Line -->
+        <div class="rx-input-display has-focus" id="rx-input-display" tabindex="0">
+          <span id="rx-input-buffer"></span><span class="rx-cursor"></span>
+        </div>
+
+        <!-- Live Feedback Message -->
+        <div class="rx-feedback-msg" id="rx-feedback-msg">
+          請仔細聆聽電報音訊，並使用鍵盤或下方電信按鈕輸入
+        </div>
+
+        <!-- History Log of Completed Targets -->
+        <div class="rx-history-log" id="rx-history-log">
+          <!-- Recent completed chips render here -->
+        </div>
+
+      </div> <!-- /rx-cockpit-card -->
+
+      <!-- Rx Scorecard (Hidden by default) -->
+      <div class="rx-scorecard" id="rx-scorecard" style="display:none;">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:14px;">
+          <h3 style="margin:0; color:var(--gold); font-size:1.1rem; display:flex; align-items:center; gap:6px;">
+            <i class="mdi mdi-trophy-outline"></i> 抄收測驗結算
+          </h3>
+          <span id="rx-sc-mode-tag" class="rx-badge">科赫盲聽</span>
+        </div>
+
+        <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(130px, 1fr)); gap:12px; margin-bottom:16px;">
+          <div style="background:#1a1c26; padding:10px; border-radius:6px; text-align:center;">
+            <div style="font-size:0.7rem; color:#888;">正確率</div>
+            <div id="rx-sc-accuracy" style="font-size:1.3rem; font-weight:bold; color:#00e676;">100%</div>
+          </div>
+          <div style="background:#1a1c26; padding:10px; border-radius:6px; text-align:center;">
+            <div style="font-size:0.7rem; color:#888;">抄收字速</div>
+            <div id="rx-sc-wpm" style="font-size:1.3rem; font-weight:bold; color:var(--gold);">20 WPM</div>
+          </div>
+          <div style="background:#1a1c26; padding:10px; border-radius:6px; text-align:center;">
+            <div style="font-size:0.7rem; color:#888;">平均反射時間</div>
+            <div id="rx-sc-latency" style="font-size:1.3rem; font-weight:bold; color:var(--neon-blue);">320 ms</div>
+          </div>
+          <div style="background:#1a1c26; padding:10px; border-radius:6px; text-align:center;">
+            <div style="font-size:0.7rem; color:#888;">題數</div>
+            <div id="rx-sc-total" style="font-size:1.3rem; font-weight:bold; color:#fff;">10 / 10</div>
+          </div>
+        </div>
+
+        <div id="rx-sc-confusion-box" style="display:none; background:#1e1a18; border:1px solid #ff9100; border-radius:6px; padding:10px; margin-bottom:16px; font-size:0.8rem; color:#ffb703;">
+          <div style="font-weight:bold; margin-bottom:4px;"><i class="mdi mdi-alert-circle-outline"></i> 易混淆音形診斷：</div>
+          <div id="rx-sc-confusion-list"></div>
+        </div>
+
+        <div style="display:flex; gap:10px; justify-content:flex-end; flex-wrap:wrap; align-items:center;">
+          <button type="button" id="btn-rx-stage-advance" class="rx-control-btn rx-btn-advance" style="display:none;">
+            <span><i class="mdi mdi-arrow-up-bold-circle"></i> 晉級至下一關 <i class="mdi mdi-arrow-right"></i></span>
+          </button>
+          <button type="button" id="btn-rx-retry-errors" class="rx-control-btn" style="display:none;">
+            <i class="mdi mdi-refresh"></i> 重試錯題
+          </button>
+          <button type="button" id="btn-rx-next-round" class="rx-control-btn" style="background:var(--gold); color:#000; border:none;">
+            <i class="mdi mdi-play"></i> 開始新一輪
+          </button>
+        </div>
+      </div> <!-- /rx-scorecard -->
+
+    </div> <!-- /rx-workspace-stage -->
+
+    <!-- Zone 3 Adaptive Rx Dock (Fixed Bottom Deck) -->
+    <footer class="rx-dock" id="rx-dock">
+      <div class="rx-dock-container">
+        <div class="telegraph-keypad" id="rx-soft-keypad">
+          <!-- Number Row -->
+          <div class="keypad-row">
+            <button type="button" class="keypad-key" data-key="1">1</button>
+            <button type="button" class="keypad-key" data-key="2">2</button>
+            <button type="button" class="keypad-key" data-key="3">3</button>
+            <button type="button" class="keypad-key" data-key="4">4</button>
+            <button type="button" class="keypad-key" data-key="5">5</button>
+            <button type="button" class="keypad-key" data-key="6">6</button>
+            <button type="button" class="keypad-key" data-key="7">7</button>
+            <button type="button" class="keypad-key" data-key="8">8</button>
+            <button type="button" class="keypad-key" data-key="9">9</button>
+            <button type="button" class="keypad-key" data-key="0">0</button>
+          </div>
+          <!-- Letter Row 1 -->
+          <div class="keypad-row">
+            <button type="button" class="keypad-key" data-key="Q">Q</button>
+            <button type="button" class="keypad-key" data-key="W">W</button>
+            <button type="button" class="keypad-key" data-key="E">E</button>
+            <button type="button" class="keypad-key" data-key="R">R</button>
+            <button type="button" class="keypad-key" data-key="T">T</button>
+            <button type="button" class="keypad-key" data-key="Y">Y</button>
+            <button type="button" class="keypad-key" data-key="Z">Z</button>
+            <button type="button" class="keypad-key" data-key="U">U</button>
+            <button type="button" class="keypad-key" data-key="I">I</button>
+            <button type="button" class="keypad-key" data-key="O">O</button>
+            <button type="button" class="keypad-key" data-key="P">P</button>
+          </div>
+          <!-- Letter Row 2 -->
+          <div class="keypad-row">
+            <button type="button" class="keypad-key" data-key="A">A</button>
+            <button type="button" class="keypad-key" data-key="S">S</button>
+            <button type="button" class="keypad-key" data-key="D">D</button>
+            <button type="button" class="keypad-key" data-key="F">F</button>
+            <button type="button" class="keypad-key" data-key="G">G</button>
+            <button type="button" class="keypad-key" data-key="H">H</button>
+            <button type="button" class="keypad-key" data-key="J">J</button>
+            <button type="button" class="keypad-key" data-key="K">K</button>
+            <button type="button" class="keypad-key" data-key="L">L</button>
+          </div>
+          <!-- Letter Row 3 with Backspace and Enter -->
+          <div class="keypad-row">
+            <button type="button" class="keypad-key key-wide" data-key="Backspace" title="退格刪除">
+              <i class="mdi mdi-backspace-outline"></i> 刪除
+            </button>
+            <button type="button" class="keypad-key" data-key="X">X</button>
+            <button type="button" class="keypad-key" data-key="C">C</button>
+            <button type="button" class="keypad-key" data-key="V">V</button>
+            <button type="button" class="keypad-key" data-key="B">B</button>
+            <button type="button" class="keypad-key" data-key="N">N</button>
+            <button type="button" class="keypad-key" data-key="M">M</button>
+            <button type="button" class="keypad-key key-wide key-action" data-key="Enter" title="確認送出">
+              <i class="mdi mdi-check-bold"></i> 確認
+            </button>
+          </div>
+        </div>
+        <div class="desktop-hotkey-strip">
+          <span><i class="mdi mdi-keyboard"></i> 鍵盤直接輸入</span>
+          <span>· [Space] 開始/重播</span>
+          <span>· [Enter] 送出/下一題</span>
+          <span>· [Esc] 停止/跳過</span>
+        </div>
+      </div>
+    </footer>
   </div>
+  <!-- /ws-container-rx -->
 
   <!-- Workspace 3: QSO (通聯) -->
   <div id="ws-container-qso" class="workspace-view" style="display:none;">
@@ -929,18 +1169,25 @@
     </div>
     <div class="drawer-body" id="drawer-settings-content">
 
-      <!-- Sidetone Frequency -->
+      <!-- Sidetone Frequency & Volume -->
       <div class="settings-card-section" style="background:#14161f; border:1px solid #282d3c; border-radius:8px; padding:12px;">
         <div style="font-size:0.8rem; font-weight:bold; color:var(--neon-blue); margin-bottom:10px; display:flex; justify-content:space-between; align-items:center;">
-          <span><i class="mdi mdi-sine-wave"></i> 側音頻率 (CW Sidetone)</span>
-          <span style="font-size:0.7rem; color:#888;">音調調整 (400–1000 Hz)</span>
+          <span><i class="mdi mdi-sine-wave"></i> 側音與音量 (CW Sidetone & Vol)</span>
+          <span style="font-size:0.7rem; color:#888;">耳機與音頻調校</span>
         </div>
-        <div class="settings-row" style="margin-bottom:0;">
+        <div class="settings-row">
           <label>側音頻率 (CW Sidetone)
             <span>正弦波側音頻率</span>
           </label>
           <input type="range" id="param-freq" min="400" max="1000" step="20" value="680">
           <div class="val-tag" id="tag-freq">680Hz</div>
+        </div>
+        <div class="settings-row" style="margin-bottom:0;">
+          <label>側音音量 (Sidetone Vol)
+            <span>發報與抄收耳機音量</span>
+          </label>
+          <input type="range" id="param-sidetone-vol" min="0" max="100" step="5" value="70">
+          <div class="val-tag" id="tag-sidetone-vol">70%</div>
         </div>
       </div>
 
@@ -1083,6 +1330,7 @@
   <script src="js/core/morse-data.js?v=1.3.3"></script>
   <script src="js/core/morse-engine.js?v=1.3.3"></script>
   <script src="js/core/morse-audio.js?v=1.3.3"></script>
+  <script src="js/core/cw-player.js?v=1.3.3"></script>
   <script src="js/core/iambic-keyer.js?v=1.3.3"></script>
   <script src="js/core/cw-ribbon.js?v=1.3.3"></script>
   <script src="js/core/koch-manager.js?v=1.3.3"></script>
@@ -1094,6 +1342,7 @@
   <script src="js/ui/free-mode.js?v=1.3.3"></script>
   <script src="js/ui/text-mode.js?v=1.3.3"></script>
   <script src="js/ui/koch-mode.js?v=1.3.3"></script>
+  <script src="js/ui/rx-mode.js?v=1.3.3"></script>
 
   <!-- Application Bootstrap -->
   <script src="js/app.js?v=1.3.3"></script>

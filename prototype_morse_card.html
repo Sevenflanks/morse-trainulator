@@ -60,8 +60,6 @@
 
     header {
       text-align: center;
-      margin-bottom: 12px;
-      max-width: 960px;
     }
 
     h1 {
@@ -1703,8 +1701,8 @@
        Three-Zone Shell: Top Bar, Workspaces, and Navigation
        ========================================================================== */
     .va-topbar {
-      width: 100%;
-      max-width: 1280px;
+      width: calc(100% - 24px);
+      max-width: 1650px;
       height: 52px;
       background: #13151c;
       border: 1px solid #282f3d;
@@ -1713,7 +1711,9 @@
       align-items: center;
       justify-content: space-between;
       padding: 0 16px;
-      margin-bottom: 12px;
+      margin: 6px auto 10px;
+      align-self: center;
+      box-sizing: border-box;
       flex-shrink: 0;
       box-shadow: 0 4px 16px rgba(0, 0, 0, 0.4);
     }
@@ -1770,6 +1770,20 @@
       background: #1e2430;
       color: var(--neon-blue);
       box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+      animation: wsBtnActivate 0.22s ease;
+    }
+    @keyframes wsBtnActivate {
+      0% {
+        transform: scale(0.95);
+      }
+      50% {
+        transform: scale(1.04);
+        box-shadow: 0 0 10px rgba(0, 229, 255, 0.45);
+      }
+      100% {
+        transform: scale(1);
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+      }
     }
     .va-topbar-right {
       display: flex;
@@ -1939,6 +1953,90 @@
       flex-direction: column;
       align-items: center;
       overflow: hidden;
+      position: relative;
+    }
+
+    /* Workspace Switch Transition & Tactical Beam Sweep */
+    .workspace-view::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 2px;
+      opacity: 0;
+      pointer-events: none;
+      z-index: 99;
+    }
+
+    .workspace-view.ws-slide-in-right {
+      animation: wsSlideInRight 0.24s cubic-bezier(0.16, 1, 0.3, 1) both;
+    }
+
+    .workspace-view.ws-slide-in-left {
+      animation: wsSlideInLeft 0.24s cubic-bezier(0.16, 1, 0.3, 1) both;
+    }
+
+    .workspace-view.ws-slide-in-right::before,
+    .workspace-view.ws-slide-in-left::before {
+      animation: wsModeSwitchGlow 0.28s ease-out;
+    }
+
+    @keyframes wsSlideInRight {
+      0% {
+        opacity: 0;
+        transform: translate3d(24px, 0, 0);
+      }
+      100% {
+        opacity: 1;
+        transform: translate3d(0, 0, 0);
+      }
+    }
+
+    @keyframes wsSlideInLeft {
+      0% {
+        opacity: 0;
+        transform: translate3d(-24px, 0, 0);
+      }
+      100% {
+        opacity: 1;
+        transform: translate3d(0, 0, 0);
+      }
+    }
+
+    @keyframes wsModeSwitchGlow {
+      0% {
+        opacity: 0;
+        background: linear-gradient(90deg, transparent, var(--neon-blue), transparent);
+        transform: scaleX(0.1);
+      }
+      40% {
+        opacity: 0.9;
+        transform: scaleX(1);
+      }
+      100% {
+        opacity: 0;
+        transform: scaleX(1);
+      }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      .workspace-view.ws-slide-in-right,
+      .workspace-view.ws-slide-in-left {
+        animation: wsFadeInOnly 0.15s ease both;
+      }
+      .workspace-view.ws-slide-in-right::before,
+      .workspace-view.ws-slide-in-left::before {
+        display: none;
+      }
+      .va-ws-btn.active {
+        animation: none;
+      }
+    }
+
+    @keyframes wsFadeInOnly {
+      0% { opacity: 0; }
+      100% { opacity: 1; }
     }
     .placeholder-workspace {
       padding: 60px 20px;
@@ -1965,6 +2063,599 @@
       border: 1px solid rgba(0, 229, 255, 0.3);
       padding: 4px 12px;
       border-radius: 20px;
+    }
+
+    /* ==========================================================================
+       Rx (Receive / 聽力抄收) Workspace Styles
+       ========================================================================== */
+    .rx-workspace-stage {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+      width: 100%;
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 12px 16px 140px;
+      box-sizing: border-box;
+    }
+
+    .rx-mode-nav {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      align-items: center;
+      background: #14161f;
+      padding: 8px;
+      border-radius: 8px;
+      border: 1px solid #282d3c;
+    }
+
+    .rx-mode-pill {
+      background: #1e2230;
+      border: 1px solid #363d52;
+      color: #aaa;
+      padding: 6px 14px;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 0.8rem;
+      font-weight: 500;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      transition: all 0.2s ease;
+    }
+
+    .rx-mode-pill:hover {
+      background: #282e42;
+      color: #fff;
+      border-color: #4b5573;
+    }
+
+    .rx-mode-pill.active {
+      background: linear-gradient(135deg, rgba(0, 229, 255, 0.15), rgba(0, 150, 255, 0.25));
+      border-color: var(--neon-blue);
+      color: #fff;
+      box-shadow: 0 0 10px rgba(0, 229, 255, 0.2);
+    }
+
+    .rx-cockpit-card {
+      background: #12141c;
+      border: 1.5px solid #282d3e;
+      border-radius: 10px;
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
+    }
+
+    .rx-toolbar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 10px;
+      padding-bottom: 12px;
+      border-bottom: 1px solid #202434;
+    }
+
+    .rx-badge {
+      font-size: 0.78rem;
+      font-weight: bold;
+      padding: 4px 10px;
+      border-radius: 4px;
+      background: #1a1e2b;
+      border: 1px solid #333a4f;
+      color: var(--gold);
+    }
+
+    .rx-audio-box {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      background: #161824;
+      border: 1px solid #2c3246;
+      border-radius: 8px;
+      padding: 12px 18px;
+      flex-wrap: wrap;
+      gap: 12px;
+    }
+
+    .rx-audio-indicator {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 0.88rem;
+      font-weight: bold;
+      color: #888;
+    }
+
+    .rx-audio-indicator.playing {
+      color: var(--gold);
+      animation: pulse-glow 1s infinite alternate;
+    }
+
+    .rx-control-btn {
+      background: #1f2434;
+      border: 1px solid #3c445c;
+      color: #eee;
+      padding: 8px 14px;
+      border-radius: 6px;
+      font-size: 0.82rem;
+      font-weight: bold;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      transition: all 0.15s ease;
+    }
+
+    .rx-control-btn:hover:not(:disabled) {
+      background: #2a3148;
+      border-color: var(--neon-blue);
+      color: #fff;
+    }
+
+    .rx-control-btn:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+
+    .rx-input-display {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 80px;
+      background: #0d0e14;
+      border: 2px solid #262c3e;
+      border-radius: 8px;
+      padding: 14px;
+      font-family: 'Courier New', Courier, monospace;
+      font-size: 2rem;
+      letter-spacing: 6px;
+      color: var(--gold);
+      text-shadow: 0 0 10px rgba(255, 215, 0, 0.4);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .rx-input-display.has-focus {
+      border-color: var(--neon-blue);
+      box-shadow: 0 0 15px rgba(0, 229, 255, 0.25);
+    }
+
+    .rx-cursor {
+      display: inline-block;
+      width: 14px;
+      height: 2px;
+      background: var(--neon-blue);
+      animation: rx-blink 0.8s infinite;
+      vertical-align: bottom;
+      margin-left: 2px;
+    }
+
+    .rx-feedback-msg {
+      font-size: 0.85rem;
+      text-align: center;
+      min-height: 22px;
+      color: #aaa;
+    }
+
+    .rx-history-log {
+      display: flex;
+      gap: 8px;
+      overflow-x: auto;
+      padding: 8px 4px;
+      min-height: 38px;
+      border-top: 1px solid #1c202e;
+    }
+
+    .rx-history-chip {
+      padding: 4px 10px;
+      border-radius: 4px;
+      font-family: monospace;
+      font-size: 0.78rem;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      white-space: nowrap;
+    }
+
+    .rx-history-chip.correct {
+      background: rgba(0, 230, 118, 0.15);
+      border: 1px solid #00e676;
+      color: #00e676;
+    }
+
+    .rx-history-chip.wrong {
+      background: rgba(255, 82, 82, 0.15);
+      border: 1px solid #ff5252;
+      color: #ff5252;
+    }
+
+    .rx-scorecard {
+      background: #141620;
+      border: 1.5px solid var(--gold);
+      border-radius: 10px;
+      padding: 20px;
+      box-shadow: 0 0 25px rgba(255, 215, 0, 0.2);
+    }
+
+    .rx-dock {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      background: #0f1118;
+      border-top: 1.5px solid #282d3e;
+      padding: 6px 12px 10px;
+      z-index: 100;
+      box-shadow: 0 -4px 15px rgba(0, 0, 0, 0.6);
+    }
+
+    .rx-dock-container {
+      max-width: 780px;
+      margin: 0 auto;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .telegraph-keypad {
+      display: flex;
+      flex-direction: column;
+      gap: 5px;
+      width: 100%;
+      user-select: none;
+      -webkit-user-select: none;
+    }
+
+    .keypad-row {
+      display: flex;
+      justify-content: center;
+      gap: 4px;
+      width: 100%;
+    }
+
+    .keypad-key {
+      flex: 1;
+      max-width: 60px;
+      height: 38px;
+      background: #1c202c;
+      border: 1px solid #363e52;
+      border-radius: 5px;
+      color: #eee;
+      font-family: monospace;
+      font-size: 0.95rem;
+      font-weight: bold;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.08s ease;
+      touch-action: manipulation;
+    }
+
+    .keypad-key:active {
+      background: var(--gold);
+      color: #000;
+      transform: translateY(2px);
+    }
+
+    .keypad-key.key-wide {
+      flex: 1.5;
+      max-width: 85px;
+      font-size: 0.78rem;
+      background: #252a3a;
+      border-color: #444c66;
+    }
+
+    .keypad-key.key-action {
+      background: linear-gradient(135deg, rgba(0, 229, 255, 0.2), rgba(0, 150, 255, 0.3));
+      border-color: var(--neon-blue);
+      color: #fff;
+    }
+
+    .desktop-hotkey-strip {
+      display: flex;
+      justify-content: center;
+      gap: 16px;
+      font-size: 0.72rem;
+      color: #888;
+      padding: 4px;
+    }
+
+    /* Rx Blind Mode Visual Cue, Target & Pool Concealment, and PCB Safety */
+    .rx-blind-mode #rx-visual-cue,
+    .rx-blind-active #rx-visual-cue,
+    .rx-blind-active #rx-koch-target-info,
+    .rx-blind-active .rx-pool-preview-row {
+      display: none !important;
+    }
+
+    /* Blind Mode Top Oscilloscope Shutter & Privacy Shield (Preserves 75px height, strictly zero text) */
+    .p3b-top-ribbon.ribbon-blind-mode {
+      display: flex !important;
+    }
+
+    .p3b-top-ribbon.ribbon-blind-mode .scope-canvas {
+      filter: grayscale(1) brightness(0.2) blur(1px);
+      opacity: 0.25;
+    }
+
+    .p3b-top-ribbon.ribbon-blind-mode .scope-graticule {
+      opacity: 0.1;
+    }
+
+    .p3b-top-ribbon.ribbon-blind-mode .scope-bezel-text {
+      opacity: 0.15;
+    }
+
+    .p3b-top-ribbon .ribbon-blind-shield {
+      display: none;
+      position: absolute;
+      inset: 0;
+      align-items: center;
+      justify-content: center;
+      pointer-events: none;
+      z-index: 5;
+      background: repeating-linear-gradient(
+        -45deg,
+        rgba(8, 11, 17, 0.88),
+        rgba(8, 11, 17, 0.88) 12px,
+        rgba(14, 18, 28, 0.88) 12px,
+        rgba(14, 18, 28, 0.88) 24px
+      );
+      border-bottom: 1px dashed rgba(255, 215, 0, 0.2);
+    }
+
+    .p3b-top-ribbon.ribbon-blind-mode .ribbon-blind-shield {
+      display: flex;
+    }
+
+    .ribbon-blind-shield .blind-shield-badge {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 44px;
+      height: 44px;
+      border-radius: 50%;
+      background: rgba(13, 17, 25, 0.92);
+      border: 1.5px solid rgba(255, 215, 0, 0.4);
+      box-shadow: 0 0 16px rgba(0, 0, 0, 0.8), 0 0 8px rgba(255, 215, 0, 0.2);
+      color: var(--gold);
+      font-size: 1.5rem;
+      animation: blindShieldPulse 2.4s ease-in-out infinite;
+    }
+
+    @keyframes blindShieldPulse {
+      0%, 100% {
+        transform: scale(1);
+        border-color: rgba(255, 215, 0, 0.3);
+        box-shadow: 0 0 12px rgba(0, 0, 0, 0.8), 0 0 6px rgba(255, 215, 0, 0.15);
+      }
+      50% {
+        transform: scale(1.06);
+        border-color: rgba(255, 215, 0, 0.6);
+        box-shadow: 0 0 18px rgba(0, 0, 0, 0.9), 0 0 12px rgba(255, 215, 0, 0.35);
+      }
+    }
+
+    .pcb-blind-mode {
+      /* Legacy safety reset - guarantee PCB elements remain 100% visible */
+      opacity: 1 !important;
+      filter: none !important;
+    }
+
+    /* Enhanced Rx Control Buttons */
+    .rx-btn-start {
+      background: rgba(0, 230, 118, 0.15) !important;
+      border-color: #00e676 !important;
+      color: #00e676 !important;
+    }
+    .rx-btn-start:hover:not(:disabled) {
+      background: #00e676 !important;
+      color: #000 !important;
+      box-shadow: 0 0 10px rgba(0, 230, 118, 0.4);
+    }
+
+    .rx-btn-stop {
+      background: rgba(255, 82, 82, 0.15) !important;
+      border-color: #ff5252 !important;
+      color: #ff5252 !important;
+    }
+    .rx-btn-stop:hover:not(:disabled) {
+      background: #ff5252 !important;
+      color: #fff !important;
+      box-shadow: 0 0 10px rgba(255, 82, 82, 0.4);
+    }
+
+    .rx-btn-next {
+      background: rgba(0, 229, 255, 0.15) !important;
+      border-color: var(--neon-blue) !important;
+      color: #fff !important;
+    }
+    .rx-btn-next:hover:not(:disabled) {
+      background: var(--neon-blue) !important;
+      color: #000 !important;
+      box-shadow: 0 0 12px rgba(0, 229, 255, 0.5);
+    }
+    .rx-btn-next.highlight-next {
+      animation: rx-next-pulse 1.2s infinite alternate;
+    }
+
+    @keyframes rx-next-pulse {
+      0% { box-shadow: 0 0 4px var(--neon-blue); border-color: var(--neon-blue); }
+      100% { box-shadow: 0 0 14px var(--neon-blue); border-color: #fff; }
+    }
+
+    .rx-visual-cue {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 8px;
+      min-height: 24px;
+      font-family: monospace;
+      font-size: 0.95rem;
+      letter-spacing: 4px;
+      color: var(--gold);
+    }
+
+    /* Keypad Active Press Animation */
+    .keypad-key.active-press {
+      background: var(--neon-blue) !important;
+      color: #000 !important;
+      transform: scale(0.95);
+      box-shadow: 0 0 10px rgba(0, 229, 255, 0.6);
+    }
+
+    /* Confusion Matrix List Styling */
+    .rx-confusion-item {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      padding: 3px 0;
+      font-family: monospace;
+    }
+    .rx-confusion-item .confusion-exp {
+      color: #00e676;
+      font-weight: bold;
+    }
+    .rx-confusion-item .confusion-act {
+      color: #ff5252;
+      font-weight: bold;
+    }
+
+    /* Koch Rx Stage Control Bar & Pool Display */
+    .rx-koch-stage-bar {
+      background: #0b141d;
+      border: 1px solid #1c2b3d;
+      border-radius: 8px;
+      padding: 10px 14px;
+      margin-bottom: 12px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.25);
+    }
+
+    .rx-koch-stage-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    .rx-koch-stage-left {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .rx-badge-cyan {
+      background: #002d3d;
+      color: var(--neon-blue);
+      border: 1px solid #005a78;
+    }
+
+    .rx-target-chip {
+      font-size: 0.78rem;
+      color: #aaa;
+      background: #141c26;
+      border: 1px solid #27374b;
+      padding: 3px 8px;
+      border-radius: 4px;
+    }
+
+    .rx-btn-ghost {
+      background: transparent;
+      border: 1px solid #2e3e52;
+      color: #9ab;
+      padding: 4px 10px;
+      border-radius: 5px;
+      font-size: 0.75rem;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      transition: all 0.2s ease;
+    }
+    .rx-btn-ghost:hover {
+      background: #1c2b3d;
+      color: #fff;
+      border-color: var(--neon-blue);
+    }
+
+    .rx-pool-preview-row {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-wrap: wrap;
+      padding-top: 6px;
+      border-top: 1px solid #152230;
+    }
+
+    .rx-pool-label {
+      font-size: 0.75rem;
+      color: #889;
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      white-space: nowrap;
+    }
+
+    .rx-pool-chips {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 5px;
+      align-items: center;
+    }
+
+    .rx-pool-chip {
+      display: inline-flex;
+      align-items: center;
+      background: #141d29;
+      border: 1px solid #27374b;
+      border-radius: 4px;
+      padding: 2px 7px;
+      font-size: 0.75rem;
+      font-weight: bold;
+      color: #cde;
+      cursor: pointer;
+      user-select: none;
+      transition: all 0.15s ease;
+    }
+    .rx-pool-chip:hover {
+      border-color: var(--neon-blue);
+      background: #1c2c40;
+      color: #fff;
+      box-shadow: 0 0 6px rgba(0, 229, 255, 0.3);
+    }
+    .rx-pool-chip.is-target {
+      border-color: var(--gold);
+      color: var(--gold-light);
+      background: #241e0b;
+    }
+
+    .rx-koch-matrix-collapse {
+      margin-top: 4px;
+      padding-top: 8px;
+      border-top: 1px solid #192433;
+    }
+
+    .rx-btn-advance {
+      background: linear-gradient(135deg, #00e5ff, #0088cc) !important;
+      color: #000 !important;
+      font-weight: bold !important;
+      border: none !important;
+      box-shadow: 0 0 12px rgba(0, 229, 255, 0.4) !important;
+      animation: pulseAdvance 1.5s infinite alternate ease-in-out;
+    }
+    @keyframes pulseAdvance {
+      from { box-shadow: 0 0 8px rgba(0, 229, 255, 0.3); transform: scale(1); }
+      to { box-shadow: 0 0 16px rgba(0, 229, 255, 0.7); transform: scale(1.03); }
     }
 
     /* Slide-up Settings Drawer */
@@ -2380,6 +3071,11 @@
 /* Mobile & Portrait Adaptation (375px - 768px) */
 @media (max-width: 768px) {
   .va-topbar {
+    width: 100%;
+    border-radius: 0;
+    margin: 0 0 6px 0;
+    border-left: none;
+    border-right: none;
     padding: 0 10px;
     height: 48px;
   }
@@ -2457,16 +3153,22 @@
     </div>
   </header>
 
+  <!-- Panoramic Top HUD Ribbon (75px) -->
+  <div class="p3b-top-ribbon" id="cockpit-top-ribbon">
+    <div class="scope-bezel-text">
+      <i class="mdi mdi-sine-wave"></i> PANORAMIC SPECTRUM HUD · 100% HORIZONTAL CARRIER MONITOR
+    </div>
+    <canvas id="cw-ribbon" class="scope-canvas" height="75"></canvas>
+    <div class="scope-graticule"></div>
+    <div class="ribbon-blind-shield" id="ribbon-blind-shield">
+      <div class="blind-shield-badge">
+        <i class="mdi mdi-eye-off"></i>
+      </div>
+    </div>
+  </div>
+
   <!-- Workspace 1: Tx (發報) -->
   <div id="ws-container-tx" class="workspace-view active">
-    <!-- Panoramic Top HUD Ribbon (75px) -->
-    <div class="p3b-top-ribbon" id="cockpit-top-ribbon">
-      <div class="scope-bezel-text">
-        <i class="mdi mdi-sine-wave"></i> PANORAMIC SPECTRUM HUD · 100% HORIZONTAL CARRIER MONITOR
-      </div>
-      <canvas id="cw-ribbon" class="scope-canvas" height="75"></canvas>
-      <div class="scope-graticule"></div>
-    </div>
 
     <div class="header-subbar noise-hidden" style="display:none;">
       <div class="subtitle">電報模擬與練習工具 · 支援直鍵 / 雙撥片 / 機械震報鍵 · PCB 二元樹尋路 · 節奏儀表</div>
@@ -3299,13 +4001,246 @@
 
   <!-- Workspace 2: Rx (抄收) -->
   <div id="ws-container-rx" class="workspace-view" style="display:none;">
-    <div class="placeholder-workspace">
-      <i class="mdi mdi-headphones placeholder-icon"></i>
-      <h2 style="color:#fff; margin-bottom:8px;">Rx (抄收工作台)</h2>
-      <p style="color:var(--text-muted); font-size:0.9rem;">盲聽電報呼號、隨機字母與聽寫解碼訓練 (CW Copy / Receive Challenge)</p>
-      <div class="placeholder-badge">即將推出 · Coming Soon</div>
-    </div>
+    <div class="rx-workspace-stage">
+      
+      <!-- Submode Navigation Bar -->
+      <div class="rx-mode-nav">
+        <button type="button" id="rx-submode-koch" class="rx-mode-pill active" data-submode="koch">
+          <i class="mdi mdi-school"></i> 科赫盲聽 (Koch Rx)
+        </button>
+        <button type="button" id="rx-submode-callsign" class="rx-mode-pill" data-submode="callsign">
+          <i class="mdi mdi-card-account-details-outline"></i> 呼號抄收 (Callsign)
+        </button>
+        <button type="button" id="rx-submode-groups" class="rx-mode-pill" data-submode="groups">
+          <i class="mdi mdi-numeric"></i> 五字電碼群 (5-Char)
+        </button>
+        <button type="button" id="rx-submode-qcodes" class="rx-mode-pill" data-submode="qcodes">
+          <i class="mdi mdi-radio-tower"></i> Q簡語與常用 (Q-Code)
+        </button>
+      </div>
+
+      <!-- Rx Main Cockpit Card -->
+      <div class="rx-cockpit-card">
+        
+        <!-- Toolbar: Progress & Options -->
+        <div class="rx-toolbar">
+          <div style="display:flex; align-items:center; gap:12px;">
+            <span class="rx-badge" id="rx-progress-badge">進度: 0/10 · 正確率: 100%</span>
+            <span id="rx-wpm-badge" style="font-size:0.75rem; color:#888;">速度: 20 WPM</span>
+          </div>
+
+          <div style="display:flex; align-items:center; gap:16px; flex-wrap:wrap;">
+            <label style="display:flex; align-items:center; gap:6px; cursor:pointer; font-size:0.8rem; color:#ccc;" title="送出答案後是否自動播報下一題">
+              <input type="checkbox" id="chk-rx-auto-advance" class="switch-input switch-gold" checked>
+              <span><i class="mdi mdi-fast-forward"></i> 作答後自動前進</span>
+            </label>
+
+            <label style="display:flex; align-items:center; gap:6px; cursor:pointer; font-size:0.8rem; color:#ccc;" title="隱藏電碼提示進行純聽覺反射訓練">
+              <input type="checkbox" id="chk-rx-blind-mode" class="switch-input switch-gold" checked>
+              <span><i class="mdi mdi-eye-off"></i> 純盲聽模式 (隱藏提示)</span>
+            </label>
+          </div>
+        </div>
+
+        <!-- Koch Rx Stage Control Bar (Shown only in Koch submode) -->
+        <div class="rx-koch-stage-bar" id="rx-koch-stage-bar" style="display:none;">
+          <div class="rx-koch-stage-header">
+            <div class="rx-koch-stage-left">
+              <span class="rx-badge rx-badge-cyan" id="rx-koch-stage-badge">
+                <i class="mdi mdi-school"></i> 第 1 關 / 共 35 關
+              </span>
+              <select id="rx-koch-stage-select" class="terminal-select" title="快速跳轉已解鎖關卡">
+                <!-- Dynamically populated with unlocked stages -->
+              </select>
+              <span class="rx-target-chip" id="rx-koch-target-info">
+                本關新字元: <strong id="rx-koch-target-char" style="color:var(--neon-blue);">K, M</strong>
+              </span>
+            </div>
+
+            <div class="rx-koch-stage-right">
+              <button type="button" id="btn-rx-toggle-matrix" class="rx-btn-ghost" title="展開/收合 35 關地圖">
+                <i class="mdi mdi-map-marker-path"></i> 關卡地圖 <i class="mdi mdi-chevron-down" id="rx-matrix-chevron"></i>
+              </button>
+            </div>
+          </div>
+
+          <!-- 解鎖字元池預覽列 -->
+          <div class="rx-pool-preview-row">
+            <span class="rx-pool-label"><i class="mdi mdi-format-list-checks"></i> 已解鎖字元池:</span>
+            <div class="rx-pool-chips" id="rx-koch-pool-chips"></div>
+          </div>
+
+          <!-- 可折疊 35 關地圖矩陣 -->
+          <div class="rx-koch-matrix-collapse" id="rx-koch-matrix-panel" style="display:none;">
+            <div class="koch-stage-grid" id="rx-koch-matrix-grid"></div>
+          </div>
+        </div>
+
+        <!-- Audio Indicator & Primary Transport Controls -->
+        <div class="rx-audio-box">
+          <div class="rx-audio-indicator" id="rx-audio-indicator">
+            <i class="mdi mdi-headphones"></i> <span id="rx-audio-status-text">準備就緒 · 請點擊開始</span>
+          </div>
+
+          <div style="display:flex; gap:8px; flex-wrap:wrap; align-items:center;">
+            <button type="button" id="btn-rx-start" class="rx-control-btn rx-btn-start" title="開始播放題目音訊 (快捷鍵: Space)">
+              <i class="mdi mdi-play"></i> 開始 (Space)
+            </button>
+            <button type="button" id="btn-rx-stop" class="rx-control-btn rx-btn-stop" title="停止播放音訊 (快捷鍵: Esc)" disabled>
+              <i class="mdi mdi-stop"></i> 停止
+            </button>
+            <button type="button" id="btn-rx-replay" class="rx-control-btn" title="重新播放題目音訊 (快捷鍵: R)" disabled>
+              <i class="mdi mdi-repeat"></i> 重播 (R)
+            </button>
+            <button type="button" id="btn-rx-skip" class="rx-control-btn" title="跳過此題並揭曉答案">
+              <i class="mdi mdi-skip-next"></i> 跳過
+            </button>
+            <button type="button" id="btn-rx-next" class="rx-control-btn rx-btn-next" title="前進至下一題 (快捷鍵: Enter)" disabled>
+              <i class="mdi mdi-arrow-right"></i> 下一題 (Enter)
+            </button>
+            <button type="button" id="btn-rx-restart" class="rx-control-btn" title="重置本輪進度回到第 1 題">
+              <i class="mdi mdi-restart"></i> 重設
+            </button>
+          </div>
+        </div>
+
+        <!-- Visual Aid Cue (Shown only when blind mode is off) -->
+        <div class="rx-visual-cue" id="rx-visual-cue"></div>
+
+        <!-- Telegraph Input Display Line -->
+        <div class="rx-input-display has-focus" id="rx-input-display" tabindex="0">
+          <span id="rx-input-buffer"></span><span class="rx-cursor"></span>
+        </div>
+
+        <!-- Live Feedback Message -->
+        <div class="rx-feedback-msg" id="rx-feedback-msg">
+          請仔細聆聽電報音訊，並使用鍵盤或下方電信按鈕輸入
+        </div>
+
+        <!-- History Log of Completed Targets -->
+        <div class="rx-history-log" id="rx-history-log">
+          <!-- Recent completed chips render here -->
+        </div>
+
+      </div> <!-- /rx-cockpit-card -->
+
+      <!-- Rx Scorecard (Hidden by default) -->
+      <div class="rx-scorecard" id="rx-scorecard" style="display:none;">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:14px;">
+          <h3 style="margin:0; color:var(--gold); font-size:1.1rem; display:flex; align-items:center; gap:6px;">
+            <i class="mdi mdi-trophy-outline"></i> 抄收測驗結算
+          </h3>
+          <span id="rx-sc-mode-tag" class="rx-badge">科赫盲聽</span>
+        </div>
+
+        <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(130px, 1fr)); gap:12px; margin-bottom:16px;">
+          <div style="background:#1a1c26; padding:10px; border-radius:6px; text-align:center;">
+            <div style="font-size:0.7rem; color:#888;">正確率</div>
+            <div id="rx-sc-accuracy" style="font-size:1.3rem; font-weight:bold; color:#00e676;">100%</div>
+          </div>
+          <div style="background:#1a1c26; padding:10px; border-radius:6px; text-align:center;">
+            <div style="font-size:0.7rem; color:#888;">抄收字速</div>
+            <div id="rx-sc-wpm" style="font-size:1.3rem; font-weight:bold; color:var(--gold);">20 WPM</div>
+          </div>
+          <div style="background:#1a1c26; padding:10px; border-radius:6px; text-align:center;">
+            <div style="font-size:0.7rem; color:#888;">平均反射時間</div>
+            <div id="rx-sc-latency" style="font-size:1.3rem; font-weight:bold; color:var(--neon-blue);">320 ms</div>
+          </div>
+          <div style="background:#1a1c26; padding:10px; border-radius:6px; text-align:center;">
+            <div style="font-size:0.7rem; color:#888;">題數</div>
+            <div id="rx-sc-total" style="font-size:1.3rem; font-weight:bold; color:#fff;">10 / 10</div>
+          </div>
+        </div>
+
+        <div id="rx-sc-confusion-box" style="display:none; background:#1e1a18; border:1px solid #ff9100; border-radius:6px; padding:10px; margin-bottom:16px; font-size:0.8rem; color:#ffb703;">
+          <div style="font-weight:bold; margin-bottom:4px;"><i class="mdi mdi-alert-circle-outline"></i> 易混淆音形診斷：</div>
+          <div id="rx-sc-confusion-list"></div>
+        </div>
+
+        <div style="display:flex; gap:10px; justify-content:flex-end; flex-wrap:wrap; align-items:center;">
+          <button type="button" id="btn-rx-stage-advance" class="rx-control-btn rx-btn-advance" style="display:none;">
+            <span><i class="mdi mdi-arrow-up-bold-circle"></i> 晉級至下一關 <i class="mdi mdi-arrow-right"></i></span>
+          </button>
+          <button type="button" id="btn-rx-retry-errors" class="rx-control-btn" style="display:none;">
+            <i class="mdi mdi-refresh"></i> 重試錯題
+          </button>
+          <button type="button" id="btn-rx-next-round" class="rx-control-btn" style="background:var(--gold); color:#000; border:none;">
+            <i class="mdi mdi-play"></i> 開始新一輪
+          </button>
+        </div>
+      </div> <!-- /rx-scorecard -->
+
+    </div> <!-- /rx-workspace-stage -->
+
+    <!-- Zone 3 Adaptive Rx Dock (Fixed Bottom Deck) -->
+    <footer class="rx-dock" id="rx-dock">
+      <div class="rx-dock-container">
+        <div class="telegraph-keypad" id="rx-soft-keypad">
+          <!-- Number Row -->
+          <div class="keypad-row">
+            <button type="button" class="keypad-key" data-key="1">1</button>
+            <button type="button" class="keypad-key" data-key="2">2</button>
+            <button type="button" class="keypad-key" data-key="3">3</button>
+            <button type="button" class="keypad-key" data-key="4">4</button>
+            <button type="button" class="keypad-key" data-key="5">5</button>
+            <button type="button" class="keypad-key" data-key="6">6</button>
+            <button type="button" class="keypad-key" data-key="7">7</button>
+            <button type="button" class="keypad-key" data-key="8">8</button>
+            <button type="button" class="keypad-key" data-key="9">9</button>
+            <button type="button" class="keypad-key" data-key="0">0</button>
+          </div>
+          <!-- Letter Row 1 -->
+          <div class="keypad-row">
+            <button type="button" class="keypad-key" data-key="Q">Q</button>
+            <button type="button" class="keypad-key" data-key="W">W</button>
+            <button type="button" class="keypad-key" data-key="E">E</button>
+            <button type="button" class="keypad-key" data-key="R">R</button>
+            <button type="button" class="keypad-key" data-key="T">T</button>
+            <button type="button" class="keypad-key" data-key="Y">Y</button>
+            <button type="button" class="keypad-key" data-key="Z">Z</button>
+            <button type="button" class="keypad-key" data-key="U">U</button>
+            <button type="button" class="keypad-key" data-key="I">I</button>
+            <button type="button" class="keypad-key" data-key="O">O</button>
+            <button type="button" class="keypad-key" data-key="P">P</button>
+          </div>
+          <!-- Letter Row 2 -->
+          <div class="keypad-row">
+            <button type="button" class="keypad-key" data-key="A">A</button>
+            <button type="button" class="keypad-key" data-key="S">S</button>
+            <button type="button" class="keypad-key" data-key="D">D</button>
+            <button type="button" class="keypad-key" data-key="F">F</button>
+            <button type="button" class="keypad-key" data-key="G">G</button>
+            <button type="button" class="keypad-key" data-key="H">H</button>
+            <button type="button" class="keypad-key" data-key="J">J</button>
+            <button type="button" class="keypad-key" data-key="K">K</button>
+            <button type="button" class="keypad-key" data-key="L">L</button>
+          </div>
+          <!-- Letter Row 3 with Backspace and Enter -->
+          <div class="keypad-row">
+            <button type="button" class="keypad-key key-wide" data-key="Backspace" title="退格刪除">
+              <i class="mdi mdi-backspace-outline"></i> 刪除
+            </button>
+            <button type="button" class="keypad-key" data-key="X">X</button>
+            <button type="button" class="keypad-key" data-key="C">C</button>
+            <button type="button" class="keypad-key" data-key="V">V</button>
+            <button type="button" class="keypad-key" data-key="B">B</button>
+            <button type="button" class="keypad-key" data-key="N">N</button>
+            <button type="button" class="keypad-key" data-key="M">M</button>
+            <button type="button" class="keypad-key key-wide key-action" data-key="Enter" title="確認送出">
+              <i class="mdi mdi-check-bold"></i> 確認
+            </button>
+          </div>
+        </div>
+        <div class="desktop-hotkey-strip">
+          <span><i class="mdi mdi-keyboard"></i> 鍵盤直接輸入</span>
+          <span>· [Space] 開始/重播</span>
+          <span>· [Enter] 送出/下一題</span>
+          <span>· [Esc] 停止/跳過</span>
+        </div>
+      </div>
+    </footer>
   </div>
+  <!-- /ws-container-rx -->
 
   <!-- Workspace 3: QSO (通聯) -->
   <div id="ws-container-qso" class="workspace-view" style="display:none;">
@@ -3326,18 +4261,25 @@
     </div>
     <div class="drawer-body" id="drawer-settings-content">
 
-      <!-- Sidetone Frequency -->
+      <!-- Sidetone Frequency & Volume -->
       <div class="settings-card-section" style="background:#14161f; border:1px solid #282d3c; border-radius:8px; padding:12px;">
         <div style="font-size:0.8rem; font-weight:bold; color:var(--neon-blue); margin-bottom:10px; display:flex; justify-content:space-between; align-items:center;">
-          <span><i class="mdi mdi-sine-wave"></i> 側音頻率 (CW Sidetone)</span>
-          <span style="font-size:0.7rem; color:#888;">音調調整 (400–1000 Hz)</span>
+          <span><i class="mdi mdi-sine-wave"></i> 側音與音量 (CW Sidetone & Vol)</span>
+          <span style="font-size:0.7rem; color:#888;">耳機與音頻調校</span>
         </div>
-        <div class="settings-row" style="margin-bottom:0;">
+        <div class="settings-row">
           <label>側音頻率 (CW Sidetone)
             <span>正弦波側音頻率</span>
           </label>
           <input type="range" id="param-freq" min="400" max="1000" step="20" value="680">
           <div class="val-tag" id="tag-freq">680Hz</div>
+        </div>
+        <div class="settings-row" style="margin-bottom:0;">
+          <label>側音音量 (Sidetone Vol)
+            <span>發報與抄收耳機音量</span>
+          </label>
+          <input type="range" id="param-sidetone-vol" min="0" max="100" step="5" value="70">
+          <div class="val-tag" id="tag-sidetone-vol">70%</div>
         </div>
       </div>
 
@@ -3775,6 +4717,8 @@
         this.osc = null;
         this.gain = null;
         this.frequency = 650;
+        this.masterVolume = 0.7;
+        this.masterGain = null;
 
         // QRN Atmospheric Noise components
         this.noiseNode = null;
@@ -3788,9 +4732,13 @@
         if (!this.ctx) {
           const AudioContext = window.AudioContext || window.webkitAudioContext;
           this.ctx = new AudioContext();
+          this.masterGain = this.ctx.createGain();
+          this.masterGain.gain.value = this.masterVolume;
+          this.masterGain.connect(this.ctx.destination);
+
           this.gain = this.ctx.createGain();
           this.gain.gain.value = 0;
-          this.gain.connect(this.ctx.destination);
+          this.gain.connect(this.masterGain);
         }
         if (this.ctx.state === 'suspended') {
           this.ctx.resume();
@@ -3807,6 +4755,16 @@
         }
         if (this.noiseFilter && this.ctx) {
           this.noiseFilter.frequency.setValueAtTime(f, this.ctx.currentTime);
+        }
+      }
+
+      setMasterVolume(vol) {
+        this.masterVolume = Math.max(0, Math.min(1, vol));
+        if (this.masterGain && this.ctx) {
+          const now = this.ctx.currentTime;
+          this.masterGain.gain.cancelScheduledValues(now);
+          this.masterGain.gain.setValueAtTime(this.masterGain.gain.value, now);
+          this.masterGain.gain.linearRampToValueAtTime(this.masterVolume, now + 0.01);
         }
       }
 
@@ -3915,6 +4873,1178 @@
           this.noiseGain = null;
         }
       }
+    }
+
+    /**
+     * CW PLAYER MODULE: CWPlayer
+     * 純邏輯 CW 音訊排程器與播放引擎 (Zero DOM Dependencies)
+     */
+    class CWPlayer {
+      constructor(options = {}) {
+        this.synth = options.synth || null;
+        this.unitT = options.unitT || 80;
+        this.charWpm = options.charWpm || 20;
+        this.farnsworthEnabled = !!options.farnsworthEnabled;
+        this.getSequence = options.getSequence || ((typeof window !== 'undefined' && window.engine) ? (c) => window.engine.getSequenceForLetter(c) : null);
+
+        this._listeners = {};
+        this._abort = false;
+        this._isPlaying = false;
+        this._currentTimeout = null;
+      }
+
+      on(event, callback) {
+        if (!this._listeners[event]) this._listeners[event] = [];
+        this._listeners[event].push(callback);
+        return this;
+      }
+
+      off(event, callback) {
+        if (!this._listeners[event]) return this;
+        this._listeners[event] = this._listeners[event].filter(cb => cb !== callback);
+        return this;
+      }
+
+      emit(event, ...args) {
+        const cbs = this._listeners[event];
+        if (cbs) {
+          cbs.forEach(cb => {
+            try { cb(...args); } catch (e) { console.error(e); }
+          });
+        }
+      }
+
+      get isPlaying() {
+        return this._isPlaying;
+      }
+
+      getUnitT() {
+        return this.unitT;
+      }
+
+      setUnitT(unitT) {
+        this.unitT = unitT;
+      }
+
+      setFarnsworth(enabled, charWpm) {
+        this.farnsworthEnabled = !!enabled;
+        if (charWpm) this.charWpm = charWpm;
+      }
+
+      calculateTimings(char) {
+        const charUnitT = (this.farnsworthEnabled && this.charWpm)
+          ? Math.round(1200 / this.charWpm)
+          : this.unitT;
+        const interElementGap = charUnitT;
+        const interCharGap = this.unitT * 3;
+        const wordGap = this.unitT * 7;
+        return {
+          charUnitT,
+          interElementGap,
+          interCharGap,
+          wordGap
+        };
+      }
+
+      async sleep(ms) {
+        if (ms <= 0) return;
+        return new Promise((resolve) => {
+          const tid = setTimeout(resolve, ms);
+          this._currentTimeout = tid;
+        });
+      }
+
+      stop() {
+        this._abort = true;
+        if (this._currentTimeout) {
+          clearTimeout(this._currentTimeout);
+          this._currentTimeout = null;
+        }
+        if (this.synth && typeof this.synth.stop === 'function') {
+          try { this.synth.stop(); } catch (e) {}
+        }
+        if (this._isPlaying) {
+          this._isPlaying = false;
+          this.emit('playbackAbort');
+        }
+      }
+
+      async playSequence(seq, timings) {
+        if (!seq || this._abort) return;
+        const t = timings || this.calculateTimings();
+        for (let i = 0; i < seq.length; i++) {
+          if (this._abort) break;
+          const sym = seq[i];
+          const dur = (sym === '.') ? t.charUnitT : (t.charUnitT * 3);
+
+          this.emit('pulseStart', sym, dur);
+          if (this.synth) this.synth.start();
+          await this.sleep(dur);
+
+          if (this.synth) this.synth.stop();
+          this.emit('pulseEnd', sym);
+
+          // Intra-character element gap (1T)
+          if (i < seq.length - 1 && !this._abort) {
+            await this.sleep(t.interElementGap);
+          }
+        }
+      }
+
+      async playText(text, options = {}) {
+        if (!text) return;
+        this.stop();
+        this._abort = false;
+        this._isPlaying = true;
+
+        const getSeq = options.getSequence || this.getSequence || ((c) => '');
+        const timings = options.timings || this.calculateTimings();
+
+        const chars = text.toUpperCase().split('');
+        for (let i = 0; i < chars.length; i++) {
+          if (this._abort) break;
+          const char = chars[i];
+
+          if (char === ' ') {
+            this.emit('wordGapStart', timings.wordGap);
+            await this.sleep(timings.wordGap);
+            this.emit('wordGapEnd');
+            continue;
+          }
+
+          const seq = getSeq(char);
+          this.emit('charStart', char, seq);
+          if (seq) {
+            await this.playSequence(seq, timings);
+          }
+          this.emit('charComplete', char, seq);
+
+          // Inter-character gap (3T)
+          const nextChar = chars[i + 1];
+          if (nextChar && nextChar !== ' ' && !this._abort) {
+            await this.sleep(timings.interCharGap);
+          }
+        }
+
+        if (!this._abort) {
+          this._isPlaying = false;
+          this.emit('playbackComplete');
+        }
+      }
+    }
+
+    /**
+     * RX COPYING WORKSPACE CONTROLLER: RxMode
+     * 聽力抄收工作台控制器、狀態機、評測模型與軟鍵盤交互
+     */
+    class RxMode {
+      constructor(options = {}) {
+        this.cwPlayer = options.cwPlayer || (typeof window !== 'undefined' ? window.cwPlayer : null);
+        this.kochManager = options.kochManager || (typeof window !== 'undefined' ? window.kochManager : null);
+        this.submode = options.submode || 'koch';
+        this.state = 'IDLE';
+        this.blindMode = (options.blindMode !== undefined) ? !!options.blindMode : true;
+        this.autoAdvance = (options.autoAdvance !== undefined) ? !!options.autoAdvance : true;
+        this.totalTrials = options.totalTrials || 10;
+        this.currentTrialIndex = 0;
+        this.trials = [];
+        this.currentTrial = null;
+        this.inputBuffer = '';
+        this.confusionMatrix = {};
+        this.customQueue = null;
+        this._matrixOpen = false;
+
+        this._boundKeyDown = null;
+        this._initialized = false;
+      }
+
+      now() {
+        return (typeof performance !== 'undefined' && typeof performance.now === 'function')
+          ? performance.now()
+          : Date.now();
+      }
+
+      getKochManager() {
+        return this.kochManager || (typeof window !== 'undefined' ? window.kochManager : null);
+      }
+
+      init() {
+        if (typeof document === 'undefined') return;
+
+        this.el = {
+          wsContainer: document.getElementById('ws-container-rx'),
+          navPills: document.querySelectorAll('.rx-mode-pill'),
+          progressBadge: document.getElementById('rx-progress-badge'),
+          wpmBadge: document.getElementById('rx-wpm-badge'),
+          chkAutoAdvance: document.getElementById('chk-rx-auto-advance'),
+          chkBlindMode: document.getElementById('chk-rx-blind-mode'),
+          visualCue: document.getElementById('rx-visual-cue'),
+          audioIndicator: document.getElementById('rx-audio-indicator'),
+          audioStatusText: document.getElementById('rx-audio-status-text'),
+          btnStart: document.getElementById('btn-rx-start'),
+          btnStop: document.getElementById('btn-rx-stop'),
+          btnReplay: document.getElementById('btn-rx-replay'),
+          btnSkip: document.getElementById('btn-rx-skip'),
+          btnNext: document.getElementById('btn-rx-next'),
+          btnRestart: document.getElementById('btn-rx-restart'),
+          inputDisplay: document.getElementById('rx-input-display'),
+          inputBuffer: document.getElementById('rx-input-buffer'),
+          feedbackMsg: document.getElementById('rx-feedback-msg'),
+          historyLog: document.getElementById('rx-history-log'),
+          scorecard: document.getElementById('rx-scorecard'),
+          scModeTag: document.getElementById('rx-sc-mode-tag'),
+          scAccuracy: document.getElementById('rx-sc-accuracy'),
+          scWpm: document.getElementById('rx-sc-wpm'),
+          scLatency: document.getElementById('rx-sc-latency'),
+          scTotal: document.getElementById('rx-sc-total'),
+          scConfusionBox: document.getElementById('rx-sc-confusion-box'),
+          scConfusionList: document.getElementById('rx-sc-confusion-list'),
+          btnRetryErrors: document.getElementById('btn-rx-retry-errors'),
+          btnNextRound: document.getElementById('btn-rx-next-round'),
+          softKeypad: document.getElementById('rx-soft-keypad'),
+          kochStageBar: document.getElementById('rx-koch-stage-bar'),
+          kochStageBadge: document.getElementById('rx-koch-stage-badge'),
+          kochStageSelect: document.getElementById('rx-koch-stage-select'),
+          kochTargetInfo: document.getElementById('rx-koch-target-info'),
+          kochTargetChar: document.getElementById('rx-koch-target-char'),
+          kochPoolChips: document.getElementById('rx-koch-pool-chips'),
+          btnToggleMatrix: document.getElementById('btn-rx-toggle-matrix'),
+          matrixChevron: document.getElementById('rx-matrix-chevron'),
+          kochMatrixPanel: document.getElementById('rx-koch-matrix-panel'),
+          kochMatrixGrid: document.getElementById('rx-koch-matrix-grid'),
+          btnStageAdvance: document.getElementById('btn-rx-stage-advance')
+        };
+
+        if (this.el.navPills) {
+          this.el.navPills.forEach(pill => {
+            pill.addEventListener('click', () => {
+              const submode = pill.dataset.submode || 'koch';
+              this.setSubmode(submode);
+              this.startSession(submode);
+            });
+          });
+        }
+
+        if (this.el.btnStart) {
+          this.el.btnStart.addEventListener('click', () => this.startAudio());
+        }
+        if (this.el.btnStop) {
+          this.el.btnStop.addEventListener('click', () => this.stopAudio());
+        }
+        if (this.el.btnReplay) {
+          this.el.btnReplay.addEventListener('click', () => this.replayAudio());
+        }
+        if (this.el.btnSkip) {
+          this.el.btnSkip.addEventListener('click', () => this.skipTrial());
+        }
+        if (this.el.btnNext) {
+          this.el.btnNext.addEventListener('click', () => this.advanceToNextTrial());
+        }
+        if (this.el.btnRestart) {
+          this.el.btnRestart.addEventListener('click', () => this.restartSession());
+        }
+        if (this.el.btnRetryErrors) {
+          this.el.btnRetryErrors.addEventListener('click', () => this.retryErrors());
+        }
+        if (this.el.btnNextRound) {
+          this.el.btnNextRound.addEventListener('click', () => this.startSession(this.submode));
+        }
+
+        // Koch Stage Controls
+        if (this.el.btnToggleMatrix) {
+          this.el.btnToggleMatrix.addEventListener('click', () => {
+            this.toggleMatrixPanel();
+          });
+        }
+        if (this.el.kochStageSelect) {
+          this.el.kochStageSelect.addEventListener('change', (e) => {
+            const lvl = parseInt(e.target.value, 10);
+            if (!isNaN(lvl)) {
+              this.setKochLevel(lvl);
+            }
+          });
+        }
+        if (this.el.btnStageAdvance) {
+          this.el.btnStageAdvance.addEventListener('click', () => {
+            this.advanceToNextStage();
+          });
+        }
+
+        if (this.el.chkAutoAdvance) {
+          this.el.chkAutoAdvance.addEventListener('change', (e) => {
+            this.autoAdvance = e.target.checked;
+          });
+          this.autoAdvance = this.el.chkAutoAdvance.checked;
+        }
+        if (this.el.chkBlindMode) {
+          this.el.chkBlindMode.addEventListener('change', (e) => {
+            this.updateBlindMode(e.target.checked);
+          });
+          this.updateBlindMode(this.el.chkBlindMode.checked);
+        }
+
+        if (this.el.softKeypad) {
+          this.el.softKeypad.addEventListener('click', (e) => {
+            const btn = e.target.closest('.keypad-key');
+            if (!btn) return;
+            const key = btn.dataset.key;
+            if (key) {
+              this.handleKey(key);
+            }
+          });
+        }
+
+        if (!this._keyboardListenerAttached && typeof window !== 'undefined') {
+          this._boundKeyDown = (e) => {
+            if (!this.isWorkspaceActive()) return;
+
+            if (e.code === 'Space' || e.key === ' ') {
+              e.preventDefault();
+              if (this.state === 'READY') {
+                this.startAudio();
+              } else if (this.state === 'PLAYING' || this.state === 'WAITING_INPUT' || this.state === 'EVALUATED') {
+                this.replayAudio();
+              }
+              return;
+            }
+
+            if (e.key === 'Escape') {
+              e.preventDefault();
+              if (this.state === 'PLAYING') {
+                this.stopAudio();
+              } else if (this.state === 'WAITING_INPUT') {
+                this.skipTrial();
+              }
+              return;
+            }
+
+            if (e.key === 'Backspace') {
+              e.preventDefault();
+              this.handleKey('Backspace');
+              return;
+            }
+
+            if (e.key === 'Enter') {
+              e.preventDefault();
+              if (this.state === 'EVALUATED') {
+                this.advanceToNextTrial();
+              } else if (this.state === 'WAITING_INPUT' || this.state === 'PLAYING') {
+                this.submitAnswer();
+              }
+              return;
+            }
+
+            if (/^[a-zA-Z0-9]$/.test(e.key)) {
+              e.preventDefault();
+              this.handleKey(e.key.toUpperCase());
+            }
+          };
+
+          window.addEventListener('keydown', this._boundKeyDown);
+          this._keyboardListenerAttached = true;
+        }
+
+        if (this.cwPlayer) {
+          this.attachPlayerHooks(this.cwPlayer);
+        }
+
+        this._initialized = true;
+        this.updateButtonsState();
+      }
+
+      attachPlayerHooks(player) {
+        if (!player || typeof player.on !== 'function') return;
+        player.on('pulseStart', (sym) => {
+          if (this.isWorkspaceActive() && this.blindMode) return;
+          if (typeof window !== 'undefined' && window.ribbon) {
+            window.ribbon.startPulse(performance.now(), sym);
+          }
+        });
+        player.on('pulseEnd', (sym) => {
+          if (this.isWorkspaceActive() && this.blindMode) return;
+          if (typeof window !== 'undefined' && window.ribbon) {
+            window.ribbon.endPulse(performance.now(), sym);
+          }
+        });
+      }
+
+      isWorkspaceActive() {
+        if (!this.el || !this.el.wsContainer) return false;
+        return this.el.wsContainer.classList.contains('active') ||
+          this.el.wsContainer.style.display === 'flex' ||
+          this.el.wsContainer.style.display === 'block';
+      }
+
+      setSubmode(submode) {
+        this.submode = submode;
+        if (this.el && this.el.navPills) {
+          this.el.navPills.forEach(pill => {
+            pill.classList.toggle('active', pill.dataset.submode === submode);
+          });
+        }
+
+        // Toggle Koch stage bar display
+        if (this.el && this.el.kochStageBar) {
+          if (submode === 'koch') {
+            this.el.kochStageBar.style.display = 'flex';
+            this.updateKochStageUI();
+          } else {
+            this.el.kochStageBar.style.display = 'none';
+            if (this.el.kochMatrixPanel) {
+              this.el.kochMatrixPanel.style.display = 'none';
+              this._matrixOpen = false;
+              if (this.el.matrixChevron) {
+                this.el.matrixChevron.className = 'mdi mdi-chevron-down';
+              }
+            }
+          }
+        }
+      }
+
+      toggleMatrixPanel(forceState = null) {
+        this._matrixOpen = (forceState !== null) ? !!forceState : !this._matrixOpen;
+        if (this.el && this.el.kochMatrixPanel) {
+          this.el.kochMatrixPanel.style.display = this._matrixOpen ? 'block' : 'none';
+        }
+        if (this.el && this.el.matrixChevron) {
+          this.el.matrixChevron.className = this._matrixOpen ? 'mdi mdi-chevron-up' : 'mdi mdi-chevron-down';
+        }
+        if (this._matrixOpen) {
+          this.renderStageMatrix();
+        }
+      }
+
+      setKochLevel(lvl) {
+        const km = this.getKochManager();
+        if (!km) return;
+        lvl = Math.max(1, Math.min(km.maxUnlockedLevel || 1, lvl));
+        km.currentLevel = lvl;
+
+        // Synchronize TX mode UI if present
+        if (typeof window !== 'undefined') {
+          if (typeof window.updateKochUI === 'function') {
+            try { window.updateKochUI(); } catch (_) {}
+          }
+          if (typeof window.updatePcbKochVisuals === 'function') {
+            try { window.updatePcbKochVisuals(); } catch (_) {}
+          }
+        }
+
+        this.updateKochStageUI();
+        this.startSession('koch');
+      }
+
+      advanceToNextStage() {
+        const km = this.getKochManager();
+        if (!km) return;
+        const curLvl = km.currentLevel || 1;
+        if (curLvl < 35) {
+          const nextLvl = curLvl + 1;
+          if (nextLvl > (km.maxUnlockedLevel || 1)) {
+            km.maxUnlockedLevel = nextLvl;
+            if (typeof km.saveProgress === 'function') {
+              km.saveProgress();
+            }
+          }
+          this.setKochLevel(nextLvl);
+        }
+      }
+
+      updateKochStageUI() {
+        if (!this.el || !this.el.kochStageBar) return;
+        const km = this.getKochManager();
+        const curLvl = km ? (km.currentLevel || 1) : 1;
+        const maxLvl = km ? (km.maxUnlockedLevel || 1) : 1;
+
+        // 1. Stage Badge
+        if (this.el.kochStageBadge) {
+          this.el.kochStageBadge.innerHTML = `<i class="mdi mdi-school"></i> 第 ${curLvl} 關 / 共 35 關`;
+        }
+
+        // 2. Stage Select Dropdown
+        if (this.el.kochStageSelect) {
+          this.el.kochStageSelect.innerHTML = '';
+          const seqList = (typeof KOCH_SEQUENCE !== 'undefined') ? KOCH_SEQUENCE : [
+            'K', 'M', 'R', 'S', 'U', 'A', 'P', 'T', 'L', 'O',
+            'W', 'I', 'N', 'J', 'E', 'F', '0', 'Y', 'V', 'G',
+            '5', 'Q', '9', 'Z', 'H', '3', '8', 'B', '4', '2',
+            '7', 'C', '1', 'D', '6', 'X'
+          ];
+          for (let i = 1; i <= maxLvl; i++) {
+            const opt = document.createElement('option');
+            opt.value = i;
+            const charLabel = (i === 1) ? 'K, M' : (seqList[i] || (km && typeof km.getTargetChar === 'function' ? km.getTargetChar(i) : i));
+            opt.textContent = `第 ${i} 關 (${charLabel})`;
+            if (i === curLvl) opt.selected = true;
+            this.el.kochStageSelect.appendChild(opt);
+          }
+        }
+
+        // 3. Target Char Display
+        if (this.el.kochTargetChar) {
+          if (curLvl === 1) {
+            this.el.kochTargetChar.textContent = 'K, M';
+          } else {
+            const targetChar = (km && typeof km.getTargetChar === 'function') ? km.getTargetChar(curLvl) : 'K';
+            this.el.kochTargetChar.textContent = targetChar;
+          }
+        }
+
+        // 4. Pool Chips with Sound Preview
+        if (this.el.kochPoolChips) {
+          this.el.kochPoolChips.innerHTML = '';
+          const pool = (km && typeof km.getUnlockedPool === 'function') ? km.getUnlockedPool(curLvl) : ['K', 'M'];
+          const targetChars = (curLvl === 1) ? ['K', 'M'] : [(km && typeof km.getTargetChar === 'function') ? km.getTargetChar(curLvl) : 'K'];
+          const engine = (typeof window !== 'undefined') ? window.engine : null;
+
+          pool.forEach(c => {
+            const chip = document.createElement('span');
+            chip.className = 'rx-pool-chip' + (targetChars.includes(c) ? ' is-target' : '');
+            const seq = (engine && typeof engine.getSequenceForLetter === 'function')
+              ? (engine.getSequenceForLetter(c) || '')
+              : '';
+            chip.innerHTML = `${c}${seq ? ` <span style="font-family:monospace; color:var(--gold); font-size:0.7rem; margin-left:3px;">${seq}</span>` : ''}`;
+            chip.title = `點擊試聽 ${c} (${seq})`;
+
+            chip.addEventListener('click', (e) => {
+              e.stopPropagation();
+              if (this.cwPlayer && typeof this.cwPlayer.playText === 'function') {
+                this.cwPlayer.playText(c);
+              }
+            });
+
+            this.el.kochPoolChips.appendChild(chip);
+          });
+        }
+
+        // 5. If matrix is open, re-render
+        if (this._matrixOpen) {
+          this.renderStageMatrix();
+        }
+      }
+
+      renderStageMatrix() {
+        if (!this.el || !this.el.kochMatrixGrid) return;
+        const km = this.getKochManager();
+        const curLvl = km ? (km.currentLevel || 1) : 1;
+        const maxLvl = km ? (km.maxUnlockedLevel || 1) : 1;
+        const seqList = (typeof KOCH_SEQUENCE !== 'undefined') ? KOCH_SEQUENCE : [
+          'K', 'M', 'R', 'S', 'U', 'A', 'P', 'T', 'L', 'O',
+          'W', 'I', 'N', 'J', 'E', 'F', '0', 'Y', 'V', 'G',
+          '5', 'Q', '9', 'Z', 'H', '3', '8', 'B', '4', '2',
+          '7', 'C', '1', 'D', '6', 'X'
+        ];
+
+        this.el.kochMatrixGrid.innerHTML = '';
+
+        for (let i = 1; i <= 35; i++) {
+          const isUnlocked = (i <= maxLvl);
+          const clearInfo = (km && typeof km.getStageClear === 'function') ? km.getStageClear(i) : null;
+          const charLabel = (i === 1) ? 'K,M' : (seqList[i] || i);
+
+          const btn = document.createElement('button');
+          btn.type = 'button';
+          btn.className = 'stage-cell';
+          btn.dataset.level = i;
+
+          let medalIcon = '';
+          if (!isUnlocked) {
+            btn.classList.add('cell-locked');
+            btn.disabled = true;
+            btn.title = `第 ${i} 關 (${charLabel}) - 尚未解鎖`;
+            medalIcon = '<i class="mdi mdi-lock"></i>';
+          } else {
+            if (i === curLvl) {
+              btn.classList.add('active-stage');
+            }
+            if (clearInfo && clearInfo.highest) {
+              if (clearInfo.highest === 'challenge') {
+                btn.classList.add('cell-cleared-challenge');
+                btn.title = `第 ${i} 關 (${charLabel}) · 極限挑戰征服`;
+                medalIcon = '<i class="mdi mdi-crown"></i>';
+              } else if (clearInfo.highest === 'standard') {
+                btn.classList.add('cell-cleared-standard');
+                btn.title = `第 ${i} 關 (${charLabel}) · 正規考核合格`;
+                medalIcon = '<i class="mdi mdi-trophy"></i>';
+              } else if (clearInfo.highest === 'quick') {
+                btn.classList.add('cell-cleared-quick');
+                btn.title = `第 ${i} 關 (${charLabel}) · 基礎練習通過`;
+                medalIcon = '<i class="mdi mdi-check-circle"></i>';
+              }
+            } else {
+              btn.classList.add('cell-unlocked');
+              btn.title = `第 ${i} 關 (${charLabel}) · 已解鎖 (未通關)`;
+            }
+
+            btn.addEventListener('click', (e) => {
+              e.stopPropagation();
+              this.setKochLevel(i);
+            });
+          }
+
+          btn.innerHTML = `
+            <div class="stage-cell-top">
+              <span class="stage-num">${i}</span>
+              <span class="stage-medal">${medalIcon}</span>
+            </div>
+            <span class="stage-char">${charLabel}</span>
+          `;
+
+          this.el.kochMatrixGrid.appendChild(btn);
+        }
+      }
+
+      updateBlindMode(enabled) {
+        this.blindMode = !!enabled;
+        if (this.el && this.el.wsContainer) {
+          this.el.wsContainer.classList.toggle('rx-blind-active', this.blindMode);
+        }
+
+        if (typeof document !== 'undefined') {
+          const pcbCard = document.querySelector('.pcb-card');
+          if (pcbCard) {
+            pcbCard.classList.remove('pcb-blind-mode');
+          }
+
+          // Hide/Show top oscilloscope ribbon in blind mode
+          const topRibbon = document.getElementById('cockpit-top-ribbon');
+          if (topRibbon) {
+            if (this.isWorkspaceActive() && this.blindMode) {
+              topRibbon.classList.add('ribbon-blind-mode');
+            } else {
+              topRibbon.classList.remove('ribbon-blind-mode');
+            }
+          }
+        }
+
+        this.updateVisualCue();
+        if (this.submode === 'koch') {
+          this.updateKochStageUI();
+        }
+      }
+
+      onLeaveRx() {
+        if (this.cwPlayer && this.cwPlayer.isPlaying) {
+          this.cwPlayer.stop();
+        }
+        if (typeof document !== 'undefined') {
+          const pcbCard = document.querySelector('.pcb-card');
+          if (pcbCard) {
+            pcbCard.classList.remove('pcb-blind-mode');
+          }
+          const topRibbon = document.getElementById('cockpit-top-ribbon');
+          if (topRibbon) {
+            topRibbon.classList.remove('ribbon-blind-mode');
+          }
+        }
+      }
+
+      updateVisualCue() {
+        if (!this.el || !this.el.visualCue) return;
+        if (this.blindMode || !this.currentTrial) {
+          this.el.visualCue.innerHTML = '';
+          return;
+        }
+
+        const seqs = this.currentTrial.target.split('').map(c => {
+          if (typeof window !== 'undefined' && window.engine) {
+            return window.engine.getSequenceForLetter(c) || '';
+          }
+          return '';
+        }).filter(Boolean);
+
+        if (seqs.length > 0) {
+          this.el.visualCue.innerHTML = `<span style="color:#888; font-size:0.75rem;"><i class="mdi mdi-eye"></i> 視覺提示：</span> ${seqs.join('  ')}`;
+        } else {
+          this.el.visualCue.innerHTML = '';
+        }
+      }
+
+      generateTargetForSubmode(submode) {
+        if (this.customQueue && this.customQueue.length > 0) {
+          return this.customQueue.shift();
+        }
+
+        switch (submode) {
+          case 'koch': {
+            const km = this.getKochManager();
+            const lvl = km ? (km.currentLevel || 1) : 1;
+            if (typeof generateKochRxTargets === 'function') {
+              const arr = generateKochRxTargets(lvl, 1);
+              return arr[0] || 'K';
+            }
+            const pool = (km && typeof km.getUnlockedPool === 'function') ? km.getUnlockedPool(lvl) : ['K', 'M'];
+            return pool[Math.floor(Math.random() * pool.length)] || 'K';
+          }
+          case 'callsign': {
+            if (typeof generateCallsign === 'function') {
+              return generateCallsign();
+            }
+            return 'BV2A';
+          }
+          case 'groups': {
+            if (typeof generateCodeGroup === 'function') {
+              return generateCodeGroup(5);
+            }
+            return '5X9KM';
+          }
+          case 'qcodes': {
+            if (typeof generateQSignalOrAbbreviation === 'function') {
+              const item = generateQSignalOrAbbreviation();
+              return (item && item.text) ? item.text : (typeof item === 'string' ? item : 'QTH');
+            }
+            return 'QTH';
+          }
+          default:
+            return 'CQ';
+        }
+      }
+
+      startSession(submode = this.submode, customTargets = null) {
+        if (this.cwPlayer && this.cwPlayer.isPlaying) {
+          this.cwPlayer.stop();
+        }
+
+        this.setSubmode(submode);
+        this.trials = [];
+        this.currentTrialIndex = 0;
+        this.confusionMatrix = {};
+
+        if (Array.isArray(customTargets) && customTargets.length > 0) {
+          this.customQueue = [...customTargets];
+          this.totalTrials = customTargets.length;
+        } else {
+          this.customQueue = null;
+          this.totalTrials = 10;
+        }
+
+        if (this.el) {
+          if (this.el.scorecard) this.el.scorecard.style.display = 'none';
+          if (this.el.historyLog) this.el.historyLog.innerHTML = '';
+          if (this.el.inputBuffer) this.el.inputBuffer.textContent = '';
+          if (this.el.btnStageAdvance) this.el.btnStageAdvance.style.display = 'none';
+          if (this.el.wpmBadge && this.cwPlayer) {
+            this.el.wpmBadge.textContent = `速度: ${this.cwPlayer.charWpm || 20} WPM`;
+          }
+        }
+
+        this.prepareTrial();
+      }
+
+      restartSession() {
+        this.startSession(this.submode);
+      }
+
+      prepareTrial() {
+        if (this.currentTrialIndex >= this.totalTrials) {
+          this.completeSession();
+          return;
+        }
+
+        const target = this.generateTargetForSubmode(this.submode);
+        this.currentTrial = {
+          index: this.currentTrialIndex + 1,
+          target: target.toUpperCase().trim(),
+          userInput: '',
+          isCorrect: false,
+          audioStartTime: 0,
+          audioEndTime: 0,
+          firstKeyTime: 0,
+          reflexLatency: 0,
+          confusions: []
+        };
+
+        this.state = 'READY';
+        this.inputBuffer = '';
+        this.updateProgressBadge();
+        this.updateVisualCue();
+
+        if (this.el) {
+          if (this.el.inputBuffer) this.el.inputBuffer.textContent = '';
+          if (this.el.audioIndicator) this.el.audioIndicator.classList.remove('playing');
+          if (this.el.audioStatusText) {
+            this.el.audioStatusText.innerHTML = '<i class="mdi mdi-headphones"></i> 準備就緒 · 請點擊【開始播報】或按 [Space]';
+          }
+          if (this.el.feedbackMsg) {
+            this.el.feedbackMsg.innerHTML = '<span style="color:#aaa;">題目已準備，請點擊【開始】或按空白鍵聆聽電碼</span>';
+          }
+        }
+
+        this.updateButtonsState();
+      }
+
+      updateProgressBadge() {
+        if (!this.el || !this.el.progressBadge) return;
+        const answeredCount = this.trials.length;
+        const correctCount = this.trials.filter(t => t.isCorrect).length;
+        const acc = answeredCount > 0 ? Math.round((correctCount / answeredCount) * 100) : 100;
+        this.el.progressBadge.textContent = `進度: ${this.currentTrialIndex + 1}/${this.totalTrials} · 正確率: ${acc}%`;
+      }
+
+      startAudio() {
+        if (this.state !== 'READY' && this.state !== 'WAITING_INPUT') return;
+        this.playCurrentAudio();
+      }
+
+      playCurrentAudio() {
+        if (!this.cwPlayer || !this.currentTrial) return;
+
+        this.state = 'PLAYING';
+        if (this.el) {
+          if (this.el.audioIndicator) this.el.audioIndicator.classList.add('playing');
+          if (this.el.audioStatusText) {
+            this.el.audioStatusText.innerHTML = '<i class="mdi mdi-volume-high"></i> 正在播放電報信號...';
+          }
+          if (this.el.feedbackMsg) {
+            this.el.feedbackMsg.innerHTML = '<span style="color:#aaa;">正在播放電報音訊，請專注聆聽...</span>';
+          }
+        }
+        this.updateButtonsState();
+
+        this.currentTrial.audioStartTime = this.now();
+
+        if (this.cwPlayer.synth && typeof this.cwPlayer.synth.initAudio === 'function') {
+          try { this.cwPlayer.synth.initAudio(); } catch (e) {}
+        }
+
+        const onComplete = () => {
+          this.cwPlayer.off('playbackComplete', onComplete);
+          if (this.state !== 'PLAYING') return;
+
+          this.state = 'WAITING_INPUT';
+          this.currentTrial.audioEndTime = this.now();
+
+          if (this.el) {
+            if (this.el.audioIndicator) this.el.audioIndicator.classList.remove('playing');
+            if (this.el.audioStatusText) {
+              this.el.audioStatusText.innerHTML = '<i class="mdi mdi-keyboard-outline"></i> 播放完畢，請鍵入抄收電文';
+            }
+            if (this.el.feedbackMsg) {
+              this.el.feedbackMsg.innerHTML = '<span style="color:#ccc;">請使用鍵盤或下方電信按鈕輸入，按 [Enter] 送出</span>';
+            }
+          }
+          this.updateButtonsState();
+        };
+
+        this.cwPlayer.on('playbackComplete', onComplete);
+        this.cwPlayer.playText(this.currentTrial.target);
+      }
+
+      stopAudio() {
+        if (this.cwPlayer && this.cwPlayer.isPlaying) {
+          this.cwPlayer.stop();
+        }
+        if (this.state === 'PLAYING') {
+          this.state = 'WAITING_INPUT';
+          if (this.el) {
+            if (this.el.audioIndicator) this.el.audioIndicator.classList.remove('playing');
+            if (this.el.audioStatusText) {
+              this.el.audioStatusText.innerHTML = '<i class="mdi mdi-pause-circle-outline"></i> 播報已停止，可按 [Space] 重播或鍵入電文';
+            }
+          }
+          this.updateButtonsState();
+        }
+      }
+
+      replayAudio() {
+        if (this.state === 'PLAYING' || this.state === 'COMPLETED' || !this.currentTrial) return;
+        this.playCurrentAudio();
+      }
+
+      handleKey(key) {
+        if (this.state === 'COMPLETED') return;
+
+        if (typeof document !== 'undefined') {
+          const softBtn = document.querySelector(`.keypad-key[data-key="${key}"]`);
+          if (softBtn) {
+            softBtn.classList.add('active-press');
+            setTimeout(() => softBtn.classList.remove('active-press'), 120);
+          }
+        }
+
+        if (key === 'Backspace') {
+          if (this.inputBuffer.length > 0) {
+            this.inputBuffer = this.inputBuffer.slice(0, -1);
+            if (this.el && this.el.inputBuffer) {
+              this.el.inputBuffer.textContent = this.inputBuffer;
+            }
+          }
+          return;
+        }
+
+        if (key === 'Enter') {
+          if (this.state === 'EVALUATED') {
+            this.advanceToNextTrial();
+          } else {
+            this.submitAnswer();
+          }
+          return;
+        }
+
+        if (this.currentTrial && !this.currentTrial.firstKeyTime) {
+          this.currentTrial.firstKeyTime = this.now();
+        }
+
+        const maxLen = this.currentTrial ? (this.currentTrial.target.length + 3) : 10;
+        if (this.inputBuffer.length < maxLen) {
+          this.inputBuffer += key.toUpperCase();
+          if (this.el && this.el.inputBuffer) {
+            this.el.inputBuffer.textContent = this.inputBuffer;
+          }
+        }
+      }
+
+      submitAnswer() {
+        if (this.state !== 'PLAYING' && this.state !== 'WAITING_INPUT' && this.state !== 'READY') return;
+        if (!this.currentTrial) return;
+
+        if (this.cwPlayer && this.cwPlayer.isPlaying) {
+          this.cwPlayer.stop();
+        }
+
+        this.state = 'EVALUATED';
+        const target = this.currentTrial.target;
+        const input = this.inputBuffer.toUpperCase().trim();
+        this.currentTrial.userInput = input;
+
+        if (this.currentTrial.firstKeyTime && this.currentTrial.audioEndTime) {
+          this.currentTrial.reflexLatency = Math.max(0, Math.round(this.currentTrial.firstKeyTime - this.currentTrial.audioEndTime));
+        } else {
+          this.currentTrial.reflexLatency = 0;
+        }
+
+        const isCorrect = (target === input);
+        this.currentTrial.isCorrect = isCorrect;
+
+        if (!isCorrect) {
+          const maxLen = Math.max(target.length, input.length);
+          for (let i = 0; i < maxLen; i++) {
+            const exp = target[i] || 'Ø';
+            const act = input[i] || 'Ø';
+            if (exp !== act) {
+              const pairKey = `${exp}->${act}`;
+              this.confusionMatrix[pairKey] = (this.confusionMatrix[pairKey] || 0) + 1;
+              this.currentTrial.confusions.push({ expected: exp, actual: act });
+            }
+          }
+        }
+
+        this.trials.push({ ...this.currentTrial });
+        this.updateButtonsState();
+
+        if (this.el) {
+          if (this.el.audioIndicator) this.el.audioIndicator.classList.remove('playing');
+          if (this.el.audioStatusText) {
+            this.el.audioStatusText.innerHTML = isCorrect
+              ? '<i class="mdi mdi-check-circle" style="color:#00e676;"></i> 抄收正確！'
+              : '<i class="mdi mdi-close-circle" style="color:#ff5252;"></i> 抄收不合';
+          }
+
+          if (this.el.feedbackMsg) {
+            if (isCorrect) {
+              this.el.feedbackMsg.innerHTML = `<span style="color:#00e676;"><i class="mdi mdi-check-circle"></i> 正確！答案為 ${target} (反射: ${this.currentTrial.reflexLatency} ms)</span>`;
+            } else {
+              this.el.feedbackMsg.innerHTML = `<span style="color:#ff5252;"><i class="mdi mdi-close-circle"></i> 錯誤：目標為 ${target}，抄收為 ${input || '(空白)'}</span>`;
+            }
+          }
+
+          if (this.el.historyLog) {
+            const chip = document.createElement('span');
+            chip.className = `rx-history-chip ${isCorrect ? 'correct' : 'wrong'}`;
+            chip.innerHTML = `<i class="mdi ${isCorrect ? 'mdi-check' : 'mdi-close'}"></i> ${target}${isCorrect ? '' : ' (' + (input || '—') + ')'}`;
+            this.el.historyLog.appendChild(chip);
+            this.el.historyLog.scrollLeft = this.el.historyLog.scrollWidth;
+          }
+        }
+
+        if (this.autoAdvance) {
+          setTimeout(() => {
+            this.advanceToNextTrial();
+          }, 1200);
+        }
+      }
+
+      advanceToNextTrial() {
+        if (this.state !== 'EVALUATED') return;
+
+        this.currentTrialIndex++;
+        if (this.currentTrialIndex >= this.totalTrials) {
+          this.completeSession();
+        } else {
+          this.prepareTrial();
+          this.playCurrentAudio();
+        }
+      }
+
+      nextTrial() {
+        return this.advanceToNextTrial();
+      }
+
+      skipTrial() {
+        if (this.state !== 'PLAYING' && this.state !== 'WAITING_INPUT' && this.state !== 'READY') return;
+        if (this.cwPlayer && this.cwPlayer.isPlaying) {
+          this.cwPlayer.stop();
+        }
+        this.inputBuffer = '';
+        this.submitAnswer();
+      }
+
+      updateButtonsState() {
+        if (!this.el) return;
+        const { btnStart, btnStop, btnReplay, btnSkip, btnNext, btnRestart } = this.el;
+
+        switch (this.state) {
+          case 'READY':
+            if (btnStart) btnStart.disabled = false;
+            if (btnStop) btnStop.disabled = true;
+            if (btnReplay) btnReplay.disabled = true;
+            if (btnSkip) btnSkip.disabled = false;
+            if (btnNext) {
+              btnNext.disabled = true;
+              btnNext.classList.remove('highlight-next');
+            }
+            if (btnRestart) btnRestart.disabled = false;
+            break;
+          case 'PLAYING':
+            if (btnStart) btnStart.disabled = true;
+            if (btnStop) btnStop.disabled = false;
+            if (btnReplay) btnReplay.disabled = true;
+            if (btnSkip) btnSkip.disabled = false;
+            if (btnNext) {
+              btnNext.disabled = true;
+              btnNext.classList.remove('highlight-next');
+            }
+            if (btnRestart) btnRestart.disabled = false;
+            break;
+          case 'WAITING_INPUT':
+            if (btnStart) btnStart.disabled = true;
+            if (btnStop) btnStop.disabled = true;
+            if (btnReplay) btnReplay.disabled = false;
+            if (btnSkip) btnSkip.disabled = false;
+            if (btnNext) {
+              btnNext.disabled = true;
+              btnNext.classList.remove('highlight-next');
+            }
+            if (btnRestart) btnRestart.disabled = false;
+            break;
+          case 'EVALUATED':
+            if (btnStart) btnStart.disabled = true;
+            if (btnStop) btnStop.disabled = true;
+            if (btnReplay) btnReplay.disabled = false;
+            if (btnSkip) btnSkip.disabled = true;
+            if (btnNext) {
+              btnNext.disabled = false;
+              btnNext.classList.add('highlight-next');
+            }
+            if (btnRestart) btnRestart.disabled = false;
+            break;
+          case 'COMPLETED':
+            if (btnStart) btnStart.disabled = true;
+            if (btnStop) btnStop.disabled = true;
+            if (btnReplay) btnReplay.disabled = true;
+            if (btnSkip) btnSkip.disabled = true;
+            if (btnNext) {
+              btnNext.disabled = true;
+              btnNext.classList.remove('highlight-next');
+            }
+            if (btnRestart) btnRestart.disabled = false;
+            break;
+          default:
+            break;
+        }
+      }
+
+      completeSession() {
+        this.state = 'COMPLETED';
+        this.updateButtonsState();
+
+        const total = this.trials.length;
+        const correctCount = this.trials.filter(t => t.isCorrect).length;
+        const accuracy = total > 0 ? Math.round((correctCount / total) * 100) : 0;
+
+        const answeredTrials = this.trials.filter(t => t.reflexLatency > 0);
+        const avgLatency = answeredTrials.length > 0
+          ? Math.round(answeredTrials.reduce((acc, t) => acc + t.reflexLatency, 0) / answeredTrials.length)
+          : 0;
+
+        const wpm = this.cwPlayer ? (this.cwPlayer.charWpm || 20) : 20;
+
+        if (this.el) {
+          if (this.el.scorecard) this.el.scorecard.style.display = 'block';
+          if (this.el.scModeTag) this.el.scModeTag.textContent = this.getSubmodeDisplayName(this.submode);
+          if (this.el.scAccuracy) {
+            this.el.scAccuracy.textContent = `${accuracy}%`;
+            this.el.scAccuracy.style.color = accuracy >= 90 ? '#00e676' : (accuracy >= 70 ? 'var(--gold)' : '#ff5252');
+          }
+          if (this.el.scWpm) this.el.scWpm.textContent = `${wpm} WPM`;
+          if (this.el.scLatency) this.el.scLatency.textContent = `${avgLatency} ms`;
+          if (this.el.scTotal) this.el.scTotal.textContent = `${correctCount} / ${total} (正確率 ${accuracy}%)`;
+
+          if (this.el.scConfusionBox && this.el.scConfusionList) {
+            const confusions = Object.entries(this.confusionMatrix).sort((a, b) => b[1] - a[1]);
+            if (confusions.length > 0) {
+              this.el.scConfusionBox.style.display = 'block';
+              this.el.scConfusionList.innerHTML = confusions.map(([pair, count]) => {
+                const [exp, act] = pair.split('->');
+                return `<div class="rx-confusion-item"><span class="confusion-exp">${exp}</span> <i class="mdi mdi-arrow-right"></i> <span class="confusion-act">${act}</span> (${count} 次)</div>`;
+              }).join('');
+            } else {
+              this.el.scConfusionBox.style.display = 'none';
+            }
+          }
+
+          if (this.el.btnRetryErrors) {
+            this.el.btnRetryErrors.style.display = (correctCount < total) ? 'inline-flex' : 'none';
+          }
+
+          // Koch Stage Advance handling
+          if (this.submode === 'koch') {
+            const km = this.getKochManager();
+            if (km && accuracy >= 90) {
+              if (typeof km.recordClear === 'function') {
+                try { km.recordClear(km.currentLevel || 1, 'quick', accuracy); } catch (_) {}
+              }
+              const curLvl = km.currentLevel || 1;
+              if (curLvl < 35 && this.el && this.el.btnStageAdvance) {
+                this.el.btnStageAdvance.style.display = 'inline-flex';
+                this.el.btnStageAdvance.innerHTML = `<span><i class="mdi mdi-arrow-up-bold-circle"></i> 晉級第 ${curLvl + 1} 關 <i class="mdi mdi-arrow-right"></i></span>`;
+              }
+            } else {
+              if (this.el && this.el.btnStageAdvance) {
+                this.el.btnStageAdvance.style.display = 'none';
+              }
+            }
+          } else {
+            if (this.el && this.el.btnStageAdvance) {
+              this.el.btnStageAdvance.style.display = 'none';
+            }
+          }
+
+          if (this.el.feedbackMsg) {
+            this.el.feedbackMsg.innerHTML = '<span style="color:var(--gold);"><i class="mdi mdi-trophy"></i> 測驗結束！請檢視成績看板</span>';
+          }
+        }
+      }
+
+      retryErrors() {
+        const errorTargets = this.trials.filter(t => !t.isCorrect).map(t => t.target);
+        if (errorTargets.length === 0) return;
+        this.startSession(this.submode, errorTargets);
+      }
+
+      getSubmodeDisplayName(submode) {
+        switch (submode) {
+          case 'koch': return '科赫盲聽';
+          case 'callsign': return '呼號抄收';
+          case 'groups': return '五字電碼群';
+          case 'qcodes': return 'Q簡語與常用';
+          default: return '聽力抄收';
+        }
+      }
+    }
+
+    if (typeof window !== 'undefined') {
+      window.RxMode = RxMode;
     }
 
     /**
@@ -4612,6 +6742,7 @@
       letterGap: 240,
       wordGap: 560,
       freq: 680,
+      sidetoneVolume: 70,
       farnsworthEnabled: false,
       farnsworthWpm: 18,
       qrnEnabled: false,
@@ -4686,6 +6817,24 @@
     const synth = new MorseAudio();
     const keyer = new IambicKeyer(engine, synth);
     const ribbon = new CWRibbon('cw-ribbon');
+    window.ribbon = ribbon;
+
+    const cwPlayer = new CWPlayer({
+      synth,
+      unitT: engine ? engine.getEffectiveUnitT() : 80,
+      farnsworthEnabled: engine && engine.config ? engine.config.farnsworthEnabled : false,
+      charWpm: engine && engine.config ? engine.config.charWpm : 20,
+      getSequence: (char) => (engine ? engine.getSequenceForLetter(char) : '')
+    });
+    window.cwPlayer = cwPlayer;
+
+    const rxMode = new RxMode({
+      cwPlayer,
+      submode: 'koch'
+    });
+    window.rxMode = rxMode;
+    rxMode.init();
+
     let currentKeyerDevice = 'straight'; // 'straight' | 'paddle' | 'bug'
 
     // DOM Elements
@@ -4743,11 +6892,13 @@
     const paramGap = document.getElementById('param-gap');
     const paramWordGap = document.getElementById('param-word-gap');
     const paramFreq = document.getElementById('param-freq');
+    const paramSidetoneVol = document.getElementById('param-sidetone-vol');
     const tagUnitT = document.getElementById('tag-unit-t');
     const tagThreshold = document.getElementById('tag-threshold');
     const tagGap = document.getElementById('tag-gap');
     const tagWordGap = document.getElementById('tag-word-gap');
     const tagFreq = document.getElementById('tag-freq');
+    const tagSidetoneVol = document.getElementById('tag-sidetone-vol');
     const wordTotalReadout = document.getElementById('word-total-readout');
     const presetDescBox = document.getElementById('preset-desc-box');
 
@@ -5075,6 +7226,88 @@
         desc: '極限 (50+ WPM)：短音 24ms · 長音 72ms · 字母間隔 72ms · 單字間隔 168ms'
       }
     };
+
+    // ==========================================
+    // TELEGRAPHY RX DICTIONARIES & GENERATORS (Issue #31)
+    // ==========================================
+    const CALLSIGN_PREFIXES = [
+      'BV', 'BX', 'BM', 'BN', 'BO', 'BP', // Taiwan
+      'JA', 'JH', 'JR', 'JE', 'JF', 'JG', '7N', '7M', // Japan
+      'W', 'K', 'N', 'AA', 'AB', 'AC', 'WA', 'WB', // USA
+      'DL', 'G', 'F', 'I', 'EA', 'VE', 'VK', 'ZL', 'VR2' // Global
+    ];
+
+    const CW_Q_CODES = [
+      { code: 'QTH', desc: '你的位置 / 所在地' },
+      { code: 'QSL', desc: '確認收悉 / 收據' },
+      { code: 'QRM', desc: '人為干擾' },
+      { code: 'QRN', desc: '天候底噪 / 大氣干擾' },
+      { code: 'QSO', desc: '通聯 / 互相通報' },
+      { code: 'QSY', desc: '轉變頻率' },
+      { code: 'QRZ', desc: '誰在呼叫我？' },
+      { code: 'QRS', desc: '請發慢一點' },
+      { code: 'QRQ', desc: '請發快一點' },
+      { code: 'QRT', desc: '停止發報 / 關機' }
+    ];
+
+    const CW_ABBREVIATIONS = [
+      { word: 'CQ', desc: '普遍呼叫所有電台' },
+      { word: 'DE', desc: '這裡是 (This is)' },
+      { word: 'RST', desc: '信號報告 (可辨度/強度/音質)' },
+      { word: '73', desc: '祝美好安好 (Best regards)' },
+      { word: '88', desc: '熱愛問候 (Love and kisses)' },
+      { word: 'SK', desc: '結束通聯 (End of contact)' },
+      { word: 'BK', desc: '插話 / 中斷 (Break)' },
+      { word: 'UR', desc: '你的 (Your / You are)' },
+      { word: 'NAME', desc: '姓名 / 台長名字' },
+      { word: 'RIG', desc: '電台發射器材' },
+      { word: 'ANT', desc: '天線 (Antenna)' },
+      { word: 'WX', desc: '天氣 (Weather)' },
+      { word: 'HW', desc: '如何？(How copy?)' }
+    ];
+
+    function generateKochRxTargets(maxLevel, count = 10) {
+      const maxIdx = Math.max(2, Math.min(36, maxLevel + 1));
+      const pool = KOCH_SEQUENCE.slice(0, maxIdx);
+      const result = [];
+      for (let i = 0; i < count; i++) {
+        const rIdx = Math.floor(Math.random() * pool.length);
+        result.push(pool[rIdx]);
+      }
+      return result;
+    }
+
+    function generateCallsign() {
+      const prefix = CALLSIGN_PREFIXES[Math.floor(Math.random() * CALLSIGN_PREFIXES.length)];
+      const digit = Math.floor(Math.random() * 10);
+      const suffixLen = Math.floor(Math.random() * 3) + 1; // 1 to 3 letters
+      let suffix = '';
+      for (let i = 0; i < suffixLen; i++) {
+        suffix += String.fromCharCode(65 + Math.floor(Math.random() * 26));
+      }
+      return `${prefix}${digit}${suffix}`;
+    }
+
+    function generateCodeGroup(length = 5, charSet = null) {
+      const defaultChars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+      const pool = charSet || defaultChars;
+      let res = '';
+      for (let i = 0; i < length; i++) {
+        res += pool[Math.floor(Math.random() * pool.length)];
+      }
+      return res;
+    }
+
+    function generateQSignalOrAbbreviation() {
+      const isQ = Math.random() < 0.5;
+      if (isQ) {
+        const item = CW_Q_CODES[Math.floor(Math.random() * CW_Q_CODES.length)];
+        return { text: item.code, desc: item.desc, type: 'qcode' };
+      } else {
+        const item = CW_ABBREVIATIONS[Math.floor(Math.random() * CW_ABBREVIATIONS.length)];
+        return { text: item.word, desc: item.desc, type: 'abbreviation' };
+      }
+    }
 
     function applySpeedPreset(key, saveToSettings = true) {
       const p = speedPresets[key];
@@ -7871,6 +10104,18 @@
       }
     });
 
+    if (paramSidetoneVol) {
+      paramSidetoneVol.addEventListener('input', (e) => {
+        const val = parseInt(e.target.value);
+        synth.setMasterVolume(val / 100);
+        if (tagSidetoneVol) tagSidetoneVol.textContent = `${val}%`;
+        if (typeof settingsManager !== 'undefined') {
+          settingsManager.settings.sidetoneVolume = val;
+          settingsManager.save();
+        }
+      });
+    }
+
     // Farnsworth Timing listeners
     chkFarnsworth.addEventListener('change', (e) => {
       const enabled = e.target.checked;
@@ -8230,11 +10475,17 @@
         if (typeof updateTopbarWpm === 'function') updateTopbarWpm(currentWpm);
       }
 
-      // 2. CW Sidetone Frequency
+      // 2. CW Sidetone Frequency & Volume
       if (s.freq) {
         paramFreq.value = s.freq;
         synth.setFrequency(s.freq);
         tagFreq.textContent = `${s.freq}Hz`;
+      }
+      const sidetoneVol = (s.sidetoneVolume !== undefined) ? s.sidetoneVolume : 70;
+      if (paramSidetoneVol) {
+        paramSidetoneVol.value = sidetoneVol;
+        synth.setMasterVolume(sidetoneVol / 100);
+        if (tagSidetoneVol) tagSidetoneVol.textContent = `${sidetoneVol}%`;
       }
 
       // 3. Farnsworth Timing
@@ -8659,13 +10910,34 @@ function setStageView(view) {
         const btn = document.getElementById(item.btnId);
         if (!btn) return;
         btn.addEventListener('click', () => {
+          // Determine navigation direction
+          const currentIndex = wsTabs.findIndex(t => {
+            const b = document.getElementById(t.btnId);
+            return b && b.classList.contains('active');
+          });
+          const targetIndex = wsTabs.findIndex(t => t.btnId === item.btnId);
+
+          // If clicking already active tab, avoid redundant reset
+          if (currentIndex === targetIndex && currentIndex !== -1) return;
+
+          const isForward = (targetIndex >= currentIndex);
+          const animClass = isForward ? 'ws-slide-in-right' : 'ws-slide-in-left';
+
+          // Stop CWPlayer audio playback if switching away
+          if (typeof window !== 'undefined' && window.cwPlayer && window.cwPlayer.isPlaying) {
+            window.cwPlayer.stop();
+          }
+          if (typeof window !== 'undefined' && window.rxMode) {
+            window.rxMode.onLeaveRx();
+          }
+
           wsTabs.forEach(t => {
             const b = document.getElementById(t.btnId);
             const v = document.getElementById(t.viewId);
             if (b) b.classList.remove('active');
             if (v) {
               v.style.display = 'none';
-              v.classList.remove('active');
+              ['active', 'ws-slide-in-right', 'ws-slide-in-left'].forEach(c => v.classList.remove(c));
             }
           });
           btn.classList.add('active');
@@ -8673,6 +10945,40 @@ function setStageView(view) {
           if (targetView) {
             targetView.style.display = 'flex';
             targetView.classList.add('active');
+            targetView.classList.add(animClass);
+
+            // Remove animation class after transition completes to restore native coordinate space
+            const handleAnimEnd = () => {
+              targetView.classList.remove('ws-slide-in-right');
+              targetView.classList.remove('ws-slide-in-left');
+              if (typeof targetView.removeEventListener === 'function') {
+                targetView.removeEventListener('animationend', handleAnimEnd);
+              }
+            };
+            if (typeof targetView.addEventListener === 'function') {
+              targetView.addEventListener('animationend', handleAnimEnd);
+            }
+            setTimeout(handleAnimEnd, 350);
+          }
+
+          // If returning to TX, guarantee PCB tree is pristine and ribbon is visible
+          if (item.viewId === 'ws-container-tx') {
+            if (typeof document !== 'undefined' && typeof document.querySelector === 'function') {
+              const pcb = document.querySelector('.pcb-card');
+              if (pcb) pcb.classList.remove('pcb-blind-mode');
+            }
+            const ribbon = document.getElementById('cockpit-top-ribbon');
+            if (ribbon) ribbon.classList.remove('ribbon-blind-mode');
+          }
+
+          // Auto prepare Rx session on first entry if IDLE, and update blind mode ribbon
+          if (item.viewId === 'ws-container-rx' && typeof window !== 'undefined' && window.rxMode) {
+            if (typeof window.rxMode.updateBlindMode === 'function') {
+              window.rxMode.updateBlindMode(window.rxMode.blindMode);
+            }
+            if (window.rxMode.state === 'IDLE') {
+              window.rxMode.startSession();
+            }
           }
         });
       });
