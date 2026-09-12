@@ -551,6 +551,50 @@
   font-size: 0.88rem;
 }
 
+/* Morse Diff Rhythm Comparison Badge */
+.rx-morse-diff-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 2px 7px;
+  background: rgba(10, 14, 22, 0.75);
+  border: 1px solid #283348;
+  border-radius: 4px;
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+}
+.diff-token {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+}
+.diff-token.exp .diff-char {
+  color: #00e676;
+}
+.diff-token.act .diff-char {
+  color: #ff5252;
+}
+.diff-divider {
+  color: #556;
+}
+.rhythm-sym {
+  display: inline-block;
+  font-weight: bold;
+}
+.rhythm-sym.match {
+  color: #7b869e;
+}
+.rhythm-sym.diff.exp {
+  color: #00e676;
+  text-shadow: 0 0 6px rgba(0, 230, 118, 0.85);
+  font-weight: 900;
+}
+.rhythm-sym.diff.act {
+  color: #ff5252;
+  text-shadow: 0 0 6px rgba(255, 82, 82, 0.85);
+  font-weight: 900;
+}
+
 .rx-severity-badge {
   padding: 1px 6px;
   border-radius: 3px;
@@ -610,6 +654,70 @@
   padding: 2px 6px;
   font-size: 0.7rem;
   color: #aab;
+}
+
+/* Native SVG Reflex Latency Sparkline */
+.rx-sparkline-container {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  background: rgba(10, 13, 20, 0.6);
+  border: 1px solid #22293a;
+  border-radius: 6px;
+  padding: 8px 10px;
+}
+.rx-sparkline-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 0.76rem;
+  color: #aab;
+}
+.rx-sparkline-svg {
+  width: 100%;
+  height: 56px;
+  overflow: visible;
+}
+.rx-sparkline-grid {
+  stroke: rgba(255, 255, 255, 0.07);
+  stroke-dasharray: 3 3;
+}
+.rx-sparkline-path {
+  fill: none;
+  stroke: var(--neon-blue);
+  stroke-width: 2.2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  filter: drop-shadow(0 0 4px rgba(0, 229, 255, 0.5));
+}
+.rx-sparkline-area {
+  fill: url(#rx-spark-grad);
+}
+.rx-sparkline-point {
+  fill: #00e5ff;
+  transition: r 0.15s ease;
+}
+.rx-sparkline-point.latest {
+  fill: var(--gold);
+  stroke: #fff;
+  stroke-width: 1.5;
+  filter: drop-shadow(0 0 6px rgba(255, 215, 0, 0.8));
+}
+.rx-sparkline-empty {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 12px;
+  color: #778;
+  font-size: 0.75rem;
+}
+.rx-sparkline-labels {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.68rem;
+  font-family: var(--font-mono);
+  color: #667899;
 }
 
 /* Zone 3 Adaptive Rx Dock & Telegraph Soft Keypad */

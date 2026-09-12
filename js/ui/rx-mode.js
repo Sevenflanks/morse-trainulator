@@ -1283,6 +1283,146 @@ class RxMode {
     }
   }
 
+  getMorseSequence(char) {
+    if (!char) return '';
+    const upper = char.toUpperCase().trim();
+    if (this.engine && typeof this.engine.getSequenceForLetter === 'function') {
+      const s = this.engine.getSequenceForLetter(upper);
+      if (s) return s;
+    }
+    if (typeof window !== 'undefined' && window.engine && typeof window.engine.getSequenceForLetter === 'function') {
+      const s = window.engine.getSequenceForLetter(upper);
+      if (s) return s;
+    }
+    const fallback = {
+      'A': '.-', 'B': '-...', 'C': '-.-.', 'D': '-..', 'E': '.', 'F': '..-.',
+      'G': '--.', 'H': '....', 'I': '..', 'J': '.---', 'K': '-.-', 'L': '.-..',
+      'M': '--', 'N': '-.', 'O': '---', 'P': '.--.', 'Q': '--.-', 'R': '.-.',
+      'S': '...', 'T': '-', 'U': '..-', 'V': '...-', 'W': '.--', 'X': '-..-',
+      'Y': '-.--', 'Z': '--..',
+      '1': '.----', '2': '..---', '3': '...--', '4': '....-', '5': '.....',
+      '6': '-....', '7': '--...', '8': '---..', '9': '----.', '0': '-----'
+    };
+    return fallback[upper] || '';
+  }
+
+  renderMorseDiffBadge(expected, actual) {
+    const seqExp = this.getMorseSequence(expected);
+    const seqAct = this.getMorseSequence(actual);
+    if (!seqExp && !seqAct) return '';
+
+    const expHtml = seqExp.split('').map((sym, idx) => {
+      const isMatch = (idx < seqAct.length && sym === seqAct[idx]);
+      const cls = isMatch ? 'match' : 'diff exp';
+      const displayChar = (sym === '.') ? '·' : '—';
+      return `<span class="rhythm-sym ${cls}">${displayChar}</span>`;
+    }).join('');
+
+    const actHtml = seqAct.split('').map((sym, idx) => {
+      const isMatch = (idx < seqExp.length && sym === seqExp[idx]);
+      const cls = isMatch ? 'match' : 'diff act';
+      const displayChar = (sym === '.') ? '·' : '—';
+      return `<span class="rhythm-sym ${cls}">${displayChar}</span>`;
+    }).join('');
+
+    return `
+      <div class="rx-morse-diff-badge" title="摩斯點劃音形對照: ${expected} vs ${actual}">
+        <span class="diff-token exp">
+          <strong class="diff-char">${expected}:</strong>
+          <span class="diff-rhythm">${expHtml || '—'}</span>
+        </span>
+        <span class="diff-divider">/</span>
+        <span class="diff-token act">
+          <strong class="diff-char">${actual}:</strong>
+          <span class="diff-rhythm">${actHtml || '—'}</span>
+        </span>
+      </div>
+    `;
+  }
+
+  renderLatencySparkline(recentSessions, summary) {
+    const validSessions = (recentSessions || []).filter(s => typeof s.avgLatency === 'number' && s.avgLatency > 0);
+    if (validSessions.length === 0) {
+      return '<div class="rx-sparkline-empty"><i class="mdi mdi-chart-line"></i> 尚無反射數據</div>';
+    }
+
+    if (validSessions.length < 2) {
+      const s = validSessions[0];
+      return `
+        <div class="rx-sparkline-container">
+          <div class="rx-sparkline-header">
+            <span>單場紀錄: <b style="color:var(--gold);">${s.avgLatency} ms</b></span>
+            <span>正確率: <b style="color:#00e676;">${s.accuracy}%</b></span>
+          </div>
+          <div class="rx-sparkline-empty" style="padding:8px 0;">
+            <i class="mdi mdi-chart-timeline-variant"></i> 需至少 2 場測驗以繪製趨勢微線圖
+          </div>
+        </div>
+      `;
+    }
+
+    // Chronological order: oldest to newest (left to right)
+    const pts = validSessions.slice(0, 10).reverse();
+    const lats = pts.map(p => p.avgLatency);
+    const minLat = Math.min(...lats);
+    const maxLat = Math.max(...lats);
+    const range = (maxLat === minLat) ? (minLat * 0.2 || 20) : (maxLat - minLat);
+    const yMin = Math.max(0, minLat - range * 0.15);
+    const yMax = maxLat + range * 0.15;
+
+    const W = 280, H = 56;
+    const padX = 14, padTop = 8, padBottom = 10;
+    const plotW = W - padX * 2;
+    const plotH = H - padTop - padBottom;
+
+    const coords = pts.map((p, idx) => {
+      const x = Math.round(padX + (idx / (pts.length - 1)) * plotW);
+      const norm = (p.avgLatency - yMin) / (yMax - yMin);
+      const y = Math.round(padTop + (1 - norm) * plotH);
+      return { x, y, lat: p.avgLatency, acc: p.accuracy, wpm: p.charWpm || 20 };
+    });
+
+    const pathD = coords.map((c, i) => `${i === 0 ? 'M' : 'L'} ${c.x} ${c.y}`).join(' ');
+    const areaD = `${pathD} L ${coords[coords.length - 1].x} ${H - 2} L ${coords[0].x} ${H - 2} Z`;
+
+    const circles = coords.map((c, i) => {
+      const isLatest = (i === coords.length - 1);
+      const r = isLatest ? 4 : 2.5;
+      const cls = isLatest ? 'rx-sparkline-point latest' : 'rx-sparkline-point';
+      return `<circle class="${cls}" cx="${c.x}" cy="${c.y}" r="${r}" data-lat="${c.lat}"><title>${c.lat}ms (${c.acc}%)</title></circle>`;
+    }).join('');
+
+    const latest = coords[coords.length - 1];
+    const first = coords[0];
+    const avgWpm = pts[pts.length - 1].wpm;
+
+    return `
+      <div class="rx-sparkline-container">
+        <div class="rx-sparkline-header">
+          <span>均值: <b style="color:var(--gold);">${summary.recentAvgLatency || latest.lat} ms</b></span>
+          <span>最新: <b style="color:var(--neon-blue);">${latest.lat} ms</b> (${latest.acc}%)</span>
+          <span>均速: <b style="color:#cde;">${avgWpm} WPM</b></span>
+        </div>
+        <svg class="rx-sparkline-svg" viewBox="0 0 ${W} ${H}">
+          <defs>
+            <linearGradient id="rx-spark-grad" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0%" stop-color="#00e5ff" stop-opacity="0.32" />
+              <stop offset="100%" stop-color="#00e5ff" stop-opacity="0.0" />
+            </linearGradient>
+          </defs>
+          <line class="rx-sparkline-grid" x1="${padX}" y1="${latest.y}" x2="${W - padX}" y2="${latest.y}" />
+          <path class="rx-sparkline-area" d="${areaD}" />
+          <path class="rx-sparkline-path" d="${pathD}" />
+          ${circles}
+        </svg>
+        <div class="rx-sparkline-labels">
+          <span>前 ${pts.length} 場: ${first.lat}ms</span>
+          <span>最新: ${latest.lat}ms</span>
+        </div>
+      </div>
+    `;
+  }
+
   renderAnalyticsPanel() {
     if (!this.el || !this.statsManager) return;
 
@@ -1294,12 +1434,16 @@ class RxMode {
       } else {
         this.el.topConfusionsGrid.innerHTML = topPairs.map(item => {
           const badgeText = item.severity === 'critical' ? '高頻混淆' : (item.severity === 'warning' ? '中度混淆' : '輕度混淆');
+          const diffBadge = this.renderMorseDiffBadge(item.expected, item.actual);
           return `
             <div class="rx-confusion-card">
-              <div class="rx-confusion-pair-text">
-                <span style="color:#00e676;">${item.expected}</span>
-                <i class="mdi mdi-arrow-right" style="font-size:0.75rem; color:#778; margin:0 4px;"></i>
-                <span style="color:#ff5252;">${item.actual}</span>
+              <div style="display:flex; align-items:center; gap:8px; flex-wrap:wrap;">
+                <div class="rx-confusion-pair-text">
+                  <span style="color:#00e676;">${item.expected}</span>
+                  <i class="mdi mdi-arrow-right" style="font-size:0.75rem; color:#778; margin:0 4px;"></i>
+                  <span style="color:#ff5252;">${item.actual}</span>
+                </div>
+                ${diffBadge}
               </div>
               <div style="display:flex; align-items:center; gap:6px;">
                 <span class="rx-severity-badge ${item.severity}">${badgeText}</span>
@@ -1333,29 +1477,11 @@ class RxMode {
       }
     }
 
-    // 3. Latency & Speed Trend
+    // 3. Latency & Speed Trend Sparkline
     if (this.el.latencyTrend) {
       const summary = this.statsManager.getSummaryStats();
-      const recentSessions = this.statsManager.getHistory(5);
-      if (summary.totalSessions === 0) {
-        this.el.latencyTrend.innerHTML = '<span style="color:#778; font-size:0.75rem;">尚無反射數據</span>';
-      } else {
-        const trendHtml = recentSessions.map(s => {
-          const latText = s.avgLatency > 0 ? `${s.avgLatency}ms` : '--';
-          return `<span class="rx-trend-chip"><i class="mdi mdi-ray-vertex"></i> ${latText} (${s.accuracy}%)</span>`;
-        }).join('');
-        this.el.latencyTrend.innerHTML = `
-          <div style="display:flex; flex-direction:column; gap:6px;">
-            <div style="display:flex; justify-content:space-between; font-size:0.78rem; color:#cde;">
-              <span>近期均值: <b style="color:var(--gold);">${summary.recentAvgLatency} ms</b></span>
-              <span>均速: <b style="color:var(--neon-blue);">${recentSessions[0]?.charWpm || 20} WPM</b></span>
-            </div>
-            <div style="display:flex; flex-wrap:wrap; gap:4px; margin-top:2px;">
-              ${trendHtml}
-            </div>
-          </div>
-        `;
-      }
+      const recentSessions = this.statsManager.getHistory(10);
+      this.el.latencyTrend.innerHTML = this.renderLatencySparkline(recentSessions, summary);
     }
   }
 
