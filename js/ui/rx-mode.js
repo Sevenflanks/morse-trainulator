@@ -12,6 +12,7 @@ class RxMode {
     this.state = 'IDLE'; // 'IDLE' | 'READY' | 'PLAYING' | 'WAITING_INPUT' | 'EVALUATED' | 'COMPLETED'
     this.blindMode = (options.blindMode !== undefined) ? !!options.blindMode : true;
     this.autoAdvance = (options.autoAdvance !== undefined) ? !!options.autoAdvance : true;
+    this.statsManager = options.statsManager || (typeof window !== 'undefined' && window.rxStatsManager ? window.rxStatsManager : (typeof RxStatsManager !== 'undefined' ? new RxStatsManager() : null));
     this.totalTrials = options.totalTrials || 10;
     this.currentTrialIndex = 0;
     this.trials = [];
@@ -64,11 +65,25 @@ class RxMode {
       scAccuracy: document.getElementById('rx-sc-accuracy'),
       scWpm: document.getElementById('rx-sc-wpm'),
       scLatency: document.getElementById('rx-sc-latency'),
+      scMedianLatency: document.getElementById('rx-sc-median-latency'),
+      scLow25Latency: document.getElementById('rx-sc-low25-latency'),
       scTotal: document.getElementById('rx-sc-total'),
       scConfusionBox: document.getElementById('rx-sc-confusion-box'),
       scConfusionList: document.getElementById('rx-sc-confusion-list'),
+      scHistoryBar: document.getElementById('rx-sc-history-bar'),
+      scHistCount: document.getElementById('rx-sc-hist-count'),
+      scHistAvgAcc: document.getElementById('rx-sc-hist-avg-acc'),
+      scHistAvgLat: document.getElementById('rx-sc-hist-avg-lat'),
+      btnClearHistory: document.getElementById('btn-rx-clear-history'),
       btnRetryErrors: document.getElementById('btn-rx-retry-errors'),
       btnNextRound: document.getElementById('btn-rx-next-round'),
+      btnToggleAnalytics: document.getElementById('btn-rx-toggle-analytics'),
+      analyticsChevron: document.getElementById('rx-analytics-chevron'),
+      analyticsPanel: document.getElementById('rx-analytics-panel'),
+      topConfusionsGrid: document.getElementById('rx-top-confusions-grid'),
+      weakCharsList: document.getElementById('rx-weak-chars-list'),
+      latencyTrend: document.getElementById('rx-latency-trend'),
+      scBreakthroughBox: document.getElementById('rx-sc-breakthrough-box'),
       softKeypad: document.getElementById('rx-soft-keypad'),
       kochStageBar: document.getElementById('rx-koch-stage-bar'),
       kochStageBadge: document.getElementById('rx-koch-stage-badge'),
@@ -82,6 +97,35 @@ class RxMode {
       kochMatrixGrid: document.getElementById('rx-koch-matrix-grid'),
       btnStageAdvance: document.getElementById('btn-rx-stage-advance')
     };
+
+    if (this.el.wsContainer) {
+      this.el.wsContainer.addEventListener('click', (e) => {
+        const drillBtn = e.target.closest('.rx-btn-drill-pair');
+        if (drillBtn) {
+          const pair = drillBtn.dataset.pair;
+          if (pair) {
+            const [exp, act] = pair.split('->');
+            this.startTargetedDrill(exp, act);
+          }
+        }
+      });
+    }
+
+    if (this.el.btnToggleAnalytics) {
+      this.el.btnToggleAnalytics.addEventListener('click', () => {
+        this.toggleAnalyticsPanel();
+      });
+    }
+
+    if (this.el.btnClearHistory) {
+      this.el.btnClearHistory.addEventListener('click', () => {
+        if (this.statsManager) {
+          this.statsManager.clearHistory();
+          this.updateHistoryBarUI();
+          this.renderAnalyticsPanel();
+        }
+      });
+    }
 
     // 1. Submode Navigation Pills
     if (this.el.navPills) {
@@ -256,6 +300,13 @@ class RxMode {
 
   setSubmode(submode) {
     this.submode = submode;
+    if (submode !== 'drill') {
+      this.drillTarget = null;
+      if (this.el && this.el.scBreakthroughBox) {
+        this.el.scBreakthroughBox.style.display = 'none';
+        this.el.scBreakthroughBox.innerHTML = '';
+      }
+    }
     if (this.el && this.el.navPills) {
       this.el.navPills.forEach(pill => {
         pill.classList.toggle('active', pill.dataset.submode === submode);
@@ -575,6 +626,16 @@ class RxMode {
         }
         return 'QTH';
       }
+      case 'drill': {
+        if (this.drillTarget) {
+          if (typeof generateWeaknessTargets === 'function') {
+            const arr = generateWeaknessTargets([this.drillTarget.expected, this.drillTarget.actual], 1);
+            return arr[0] || this.drillTarget.expected;
+          }
+          return Math.random() < 0.5 ? this.drillTarget.expected : this.drillTarget.actual;
+        }
+        return 'B';
+      }
       default:
         return 'CQ';
     }
@@ -660,7 +721,11 @@ class RxMode {
     const answeredCount = this.trials.length;
     const correctCount = this.trials.filter(t => t.isCorrect).length;
     const acc = answeredCount > 0 ? Math.round((correctCount / answeredCount) * 100) : 100;
-    this.el.progressBadge.textContent = `進度: ${this.currentTrialIndex + 1}/${this.totalTrials} · 正確率: ${acc}%`;
+    if (this.submode === 'drill' && this.drillTarget) {
+      this.el.progressBadge.innerHTML = `<i class="mdi mdi-sword-cross"></i> 弱點專攻: ${this.drillTarget.expected} <i class="mdi mdi-sword-cross"></i> ${this.drillTarget.actual} (${this.currentTrialIndex + 1}/${this.totalTrials})`;
+    } else {
+      this.el.progressBadge.textContent = `進度: ${this.currentTrialIndex + 1}/${this.totalTrials} · 正確率: ${acc}%`;
+    }
   }
 
   startAudio() {
@@ -746,6 +811,13 @@ class RxMode {
       }
     }
 
+    if (this.state === 'EVALUATED') {
+      if (key === 'Enter') {
+        this.advanceToNextTrial();
+      }
+      return;
+    }
+
     if (key === 'Backspace') {
       if (this.inputBuffer.length > 0) {
         this.inputBuffer = this.inputBuffer.slice(0, -1);
@@ -757,11 +829,7 @@ class RxMode {
     }
 
     if (key === 'Enter') {
-      if (this.state === 'EVALUATED') {
-        this.advanceToNextTrial();
-      } else {
-        this.submitAnswer();
-      }
+      this.submitAnswer();
       return;
     }
 
@@ -776,6 +844,12 @@ class RxMode {
       if (this.el && this.el.inputBuffer) {
         this.el.inputBuffer.textContent = this.inputBuffer;
       }
+    }
+
+    // 科赫盲聽 (Koch Rx) 或單字元題目：按下答案即自動送出，無需按下 enter
+    const isSingleCharTrial = (this.submode === 'koch' || this.submode === 'drill' || (this.currentTrial && this.currentTrial.target && this.currentTrial.target.length === 1));
+    if (isSingleCharTrial && (this.state === 'PLAYING' || this.state === 'WAITING_INPUT' || this.state === 'READY')) {
+      this.submitAnswer();
     }
   }
 
@@ -958,18 +1032,76 @@ class RxMode {
       ? Math.round(answeredTrials.reduce((acc, t) => acc + t.reflexLatency, 0) / answeredTrials.length)
       : 0;
 
+    // 反射時間序列分析 (中位數與 25% Low 遲疑反射)
+    const latencies = answeredTrials.map(t => t.reflexLatency).sort((a, b) => a - b);
+    let medianLatency = 0;
+    let low25Latency = 0;
+
+    if (latencies.length > 0) {
+      const mid = Math.floor(latencies.length / 2);
+      medianLatency = (latencies.length % 2 !== 0)
+        ? latencies[mid]
+        : Math.round((latencies[mid - 1] + latencies[mid]) / 2);
+
+      const count25 = Math.max(1, Math.round(latencies.length * 0.25));
+      const slowestTrials = latencies.slice(-count25);
+      low25Latency = Math.round(slowestTrials.reduce((sum, v) => sum + v, 0) / slowestTrials.length);
+    }
+
     const wpm = this.cwPlayer ? (this.cwPlayer.charWpm || 20) : 20;
 
     if (this.el) {
       if (this.el.scorecard) this.el.scorecard.style.display = 'block';
-      if (this.el.scModeTag) this.el.scModeTag.textContent = this.getSubmodeDisplayName(this.submode);
+      if (this.el.scModeTag) {
+        if (this.submode === 'drill' && this.drillTarget) {
+          this.el.scModeTag.innerHTML = `<i class="mdi mdi-sword-cross"></i> 弱點專攻 (${this.drillTarget.expected} <i class="mdi mdi-sword-cross"></i> ${this.drillTarget.actual})`;
+        } else {
+          this.el.scModeTag.textContent = this.getSubmodeDisplayName(this.submode);
+        }
+      }
       if (this.el.scAccuracy) {
         this.el.scAccuracy.textContent = `${accuracy}%`;
         this.el.scAccuracy.style.color = accuracy >= 90 ? '#00e676' : (accuracy >= 70 ? 'var(--gold)' : '#ff5252');
       }
       if (this.el.scWpm) this.el.scWpm.textContent = `${wpm} WPM`;
       if (this.el.scLatency) this.el.scLatency.textContent = `${avgLatency} ms`;
+      if (this.el.scMedianLatency) this.el.scMedianLatency.textContent = medianLatency > 0 ? `${medianLatency} ms` : '-- ms';
+      if (this.el.scLow25Latency) this.el.scLow25Latency.textContent = low25Latency > 0 ? `${low25Latency} ms` : '-- ms';
       if (this.el.scTotal) this.el.scTotal.textContent = `${correctCount} / ${total} (正確率 ${accuracy}%)`;
+
+      // Breakthrough Box in Drill Mode
+      if (this.submode === 'drill' && this.drillTarget) {
+        if (this.el.scBreakthroughBox) {
+          this.el.scBreakthroughBox.style.display = 'block';
+          if (accuracy >= 90) {
+            if (this.statsManager && typeof this.statsManager.demoteConfusion === 'function') {
+              this.statsManager.demoteConfusion(this.drillTarget.pairKey);
+            }
+            this.el.scBreakthroughBox.innerHTML = `
+              <div class="rx-sc-breakthrough success">
+                <i class="mdi mdi-trophy-variant"></i> 突破成功！已成功調降 ${this.drillTarget.expected} <i class="mdi mdi-sword-cross"></i> ${this.drillTarget.actual} 混淆權重
+              </div>
+            `;
+            if (this.el.feedbackMsg) {
+              this.el.feedbackMsg.innerHTML = '<span style="color:#00e676;"><i class="mdi mdi-check-decagram"></i> 特訓合格！混淆對已成功降權</span>';
+            }
+          } else {
+            this.el.scBreakthroughBox.innerHTML = `
+              <div class="rx-sc-breakthrough warning">
+                <i class="mdi mdi-shield-alert"></i> 特訓未達 90% 門檻，建議再次特訓以鞏固節奏反射
+              </div>
+            `;
+            if (this.el.feedbackMsg) {
+              this.el.feedbackMsg.innerHTML = '<span style="color:var(--gold);"><i class="mdi mdi-alert-circle"></i> 正確率未達 90%，請再接再厲</span>';
+            }
+          }
+        }
+      } else {
+        if (this.el.scBreakthroughBox) {
+          this.el.scBreakthroughBox.style.display = 'none';
+          this.el.scBreakthroughBox.innerHTML = '';
+        }
+      }
 
       // Confusion List
       if (this.el.scConfusionBox && this.el.scConfusionList) {
@@ -978,7 +1110,26 @@ class RxMode {
           this.el.scConfusionBox.style.display = 'block';
           this.el.scConfusionList.innerHTML = confusions.map(([pair, count]) => {
             const [exp, act] = pair.split('->');
-            return `<div class="rx-confusion-item"><span class="confusion-exp">${exp}</span> <i class="mdi mdi-arrow-right"></i> <span class="confusion-act">${act}</span> (${count} 次)</div>`;
+            let severity = 'notice';
+            let severityText = '輕度';
+            if (count >= 5) {
+              severity = 'critical';
+              severityText = '高頻';
+            } else if (count >= 3) {
+              severity = 'warning';
+              severityText = '中度';
+            }
+            return `<div class="rx-confusion-item">
+              <div style="display:flex; align-items:center; gap:6px;">
+                <span class="confusion-exp">${exp}</span>
+                <i class="mdi mdi-arrow-right"></i>
+                <span class="confusion-act">${act}</span>
+                <span class="rx-severity-badge ${severity}">${severityText} (${count} 次)</span>
+              </div>
+              <button type="button" class="rx-btn-drill-pair rx-btn-ghost" data-pair="${pair}" title="特訓此配對">
+                <i class="mdi mdi-sword-cross"></i> 特訓
+              </button>
+            </div>`;
           }).join('');
         } else {
           this.el.scConfusionBox.style.display = 'none';
@@ -1017,6 +1168,175 @@ class RxMode {
         this.el.feedbackMsg.innerHTML = '<span style="color:var(--gold);"><i class="mdi mdi-trophy"></i> 測驗結束！請檢視成績看板</span>';
       }
     }
+
+    // Record to statsManager and update history bar
+    if (this.statsManager) {
+      try {
+        this.statsManager.recordSession({
+          submode: this.submode,
+          charWpm: wpm,
+          totalTrials: total,
+          correctCount: correctCount,
+          accuracy: accuracy,
+          avgLatency: avgLatency,
+          medianLatency: medianLatency,
+          low25Latency: low25Latency,
+          confusions: Object.entries(this.confusionMatrix).map(([pair, count]) => {
+            const [exp, act] = pair.split('->');
+            return { expected: exp, actual: act, count };
+          }),
+          trials: this.trials.map(t => ({
+            target: t.target,
+            userInput: t.userInput,
+            isCorrect: t.isCorrect,
+            reflexLatency: t.reflexLatency
+          }))
+        });
+      } catch (err) {
+        console.warn('[RxMode] Failed to record session to statsManager:', err);
+      }
+    }
+    this.updateHistoryBarUI();
+    if (this._analyticsOpen) {
+      this.renderAnalyticsPanel();
+    }
+  }
+
+  updateHistoryBarUI() {
+    if (!this.el) return;
+    if (!this.statsManager) {
+      if (this.el.scHistoryBar) this.el.scHistoryBar.style.display = 'none';
+      return;
+    }
+    const summary = this.statsManager.getSummaryStats();
+    if (this.el.scHistoryBar) this.el.scHistoryBar.style.display = 'flex';
+    if (this.el.scHistCount) {
+      this.el.scHistCount.innerHTML = `<i class="mdi mdi-history"></i> 累計: ${summary.totalSessions} 場`;
+    }
+    if (this.el.scHistAvgAcc) {
+      const accText = summary.totalSessions > 0 ? `${summary.recentAccuracy}%` : '--%';
+      this.el.scHistAvgAcc.innerHTML = `<i class="mdi mdi-chart-line"></i> 近期均準: ${accText}`;
+    }
+    if (this.el.scHistAvgLat) {
+      const latText = (summary.totalSessions > 0 && summary.recentAvgLatency > 0) ? `${summary.recentAvgLatency} ms` : '-- ms';
+      this.el.scHistAvgLat.innerHTML = `<i class="mdi mdi-timer-outline"></i> 近期反射: ${latText}`;
+    }
+  }
+
+  toggleAnalyticsPanel(forceOpen = null) {
+    if (!this.el || !this.el.analyticsPanel) return;
+    this._analyticsOpen = (forceOpen !== null) ? forceOpen : !this._analyticsOpen;
+    this.el.analyticsPanel.style.display = this._analyticsOpen ? 'block' : 'none';
+    if (this.el.analyticsChevron) {
+      this.el.analyticsChevron.className = this._analyticsOpen ? 'mdi mdi-chevron-up' : 'mdi mdi-chevron-down';
+    }
+    if (this._analyticsOpen) {
+      this.renderAnalyticsPanel();
+    }
+  }
+
+  renderAnalyticsPanel() {
+    if (!this.el || !this.statsManager) return;
+
+    // 1. Top 3 Confusions
+    if (this.el.topConfusionsGrid) {
+      const topPairs = this.statsManager.getTopConfusions(3);
+      if (topPairs.length === 0) {
+        this.el.topConfusionsGrid.innerHTML = '<span style="color:#778; font-size:0.75rem;">尚無混淆數據</span>';
+      } else {
+        this.el.topConfusionsGrid.innerHTML = topPairs.map(item => {
+          const badgeText = item.severity === 'critical' ? '高頻混淆' : (item.severity === 'warning' ? '中度混淆' : '輕度混淆');
+          return `
+            <div class="rx-confusion-card">
+              <div class="rx-confusion-pair-text">
+                <span style="color:#00e676;">${item.expected}</span>
+                <i class="mdi mdi-arrow-right" style="font-size:0.75rem; color:#778; margin:0 4px;"></i>
+                <span style="color:#ff5252;">${item.actual}</span>
+              </div>
+              <div style="display:flex; align-items:center; gap:6px;">
+                <span class="rx-severity-badge ${item.severity}">${badgeText}</span>
+                <span style="color:#889; font-size:0.72rem;">${item.count} 次</span>
+                <button type="button" class="rx-btn-drill-pair rx-btn-ghost" data-pair="${item.pair}" title="特訓此配對">
+                  <i class="mdi mdi-sword-cross"></i> 特訓
+                </button>
+              </div>
+            </div>
+          `;
+        }).join('');
+      }
+    }
+
+    // 2. Weakest 5 Characters
+    if (this.el.weakCharsList) {
+      const weakest = this.statsManager.getWeakestCharacters(5);
+      if (weakest.length === 0) {
+        this.el.weakCharsList.innerHTML = '<span style="color:#778; font-size:0.75rem;">尚無統計數據</span>';
+      } else {
+        this.el.weakCharsList.innerHTML = weakest.map(item => {
+          const accColor = item.accuracy >= 90 ? '#00e676' : (item.accuracy >= 70 ? 'var(--gold)' : '#ff5252');
+          return `
+            <div class="rx-weak-char-chip">
+              <span class="rx-weak-char-letter">${item.char}</span>
+              <span style="color:${accColor}; font-weight:bold;">${item.accuracy}%</span>
+              <span style="color:#667; font-size:0.68rem;">(${item.attempts}題)</span>
+            </div>
+          `;
+        }).join('');
+      }
+    }
+
+    // 3. Latency & Speed Trend
+    if (this.el.latencyTrend) {
+      const summary = this.statsManager.getSummaryStats();
+      const recentSessions = this.statsManager.getHistory(5);
+      if (summary.totalSessions === 0) {
+        this.el.latencyTrend.innerHTML = '<span style="color:#778; font-size:0.75rem;">尚無反射數據</span>';
+      } else {
+        const trendHtml = recentSessions.map(s => {
+          const latText = s.avgLatency > 0 ? `${s.avgLatency}ms` : '--';
+          return `<span class="rx-trend-chip"><i class="mdi mdi-ray-vertex"></i> ${latText} (${s.accuracy}%)</span>`;
+        }).join('');
+        this.el.latencyTrend.innerHTML = `
+          <div style="display:flex; flex-direction:column; gap:6px;">
+            <div style="display:flex; justify-content:space-between; font-size:0.78rem; color:#cde;">
+              <span>近期均值: <b style="color:var(--gold);">${summary.recentAvgLatency} ms</b></span>
+              <span>均速: <b style="color:var(--neon-blue);">${recentSessions[0]?.charWpm || 20} WPM</b></span>
+            </div>
+            <div style="display:flex; flex-wrap:wrap; gap:4px; margin-top:2px;">
+              ${trendHtml}
+            </div>
+          </div>
+        `;
+      }
+    }
+  }
+
+  startTargetedDrill(expected, actual) {
+    const exp = (expected || 'B').toUpperCase().trim();
+    const act = (actual || 'D').toUpperCase().trim();
+    this.drillTarget = { expected: exp, actual: act, pairKey: `${exp}->${act}` };
+    this.submode = 'drill';
+
+    if (this.el && this.el.scorecard) {
+      this.el.scorecard.style.display = 'none';
+    }
+    if (this.el && this.el.kochStageBar) {
+      this.el.kochStageBar.style.display = 'none';
+    }
+
+    let drillTargets = [];
+    if (typeof generateWeaknessTargets === 'function') {
+      drillTargets = generateWeaknessTargets([exp, act], 10);
+    } else if (typeof window !== 'undefined' && typeof window.generateWeaknessTargets === 'function') {
+      drillTargets = window.generateWeaknessTargets([exp, act], 10);
+    } else {
+      drillTargets = [exp, act, exp, act, exp, act, 'E', 'T', 'A', 'N'];
+    }
+
+    this.startSession('drill', drillTargets);
+    if (this.el && this.el.feedbackMsg) {
+      this.el.feedbackMsg.innerHTML = `<span style="color:var(--gold);"><i class="mdi mdi-sword-cross"></i> 弱點專攻：${exp} <i class="mdi mdi-sword-cross"></i> ${act}（60% 針對混淆出題）</span>`;
+    }
   }
 
   retryErrors() {
@@ -1031,6 +1351,7 @@ class RxMode {
       case 'callsign': return '呼號抄收';
       case 'groups': return '五字電碼群';
       case 'qcodes': return 'Q簡語與常用';
+      case 'drill': return this.drillTarget ? `弱點專攻 (${this.drillTarget.expected} vs ${this.drillTarget.actual})` : '弱點專攻';
       default: return '聽力抄收';
     }
   }

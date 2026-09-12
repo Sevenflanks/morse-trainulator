@@ -101,29 +101,32 @@ assert.strictEqual(rx.state, 'WAITING_INPUT', 'State should transition to WAITIN
 assert.ok(rx.currentTrial.audioEndTime > 0, 'audioEndTime must be recorded');
 console.log('   -> Audio transport controls and WAITING_INPUT transition verified!');
 
-// 4. Keystroke Handling, Input Buffer & Reflex Latency
-console.log('\n4. Verifying Keystroke Handling, Input Buffer & Reflex Latency...');
+// 4. Keystroke Handling, Instant Submit & Reflex Latency
+console.log('\n4. Verifying Keystroke Handling, Instant Submit & Reflex Latency...');
 rx.currentTrial.audioEndTime = 1000;
 // Simulate key press at timestamp 1350ms
 rx.now = () => 1350;
 rx.handleKey('K');
 
+// In Koch Rx mode (科赫盲聽), pressing an answer immediately submits without Enter!
 assert.strictEqual(rx.inputBuffer, 'K', 'Input buffer should record key K');
 assert.strictEqual(rx.currentTrial.firstKeyTime, 1350, 'firstKeyTime should be recorded on first key');
-
-// Backspace test
-rx.handleKey('A');
-assert.strictEqual(rx.inputBuffer, 'KA');
-rx.handleKey('Backspace');
-assert.strictEqual(rx.inputBuffer, 'K', 'Backspace should delete last char');
-
-// Submit answer
-rx.submitAnswer();
-assert.strictEqual(rx.state, 'EVALUATED', 'State should become EVALUATED after submit');
+assert.strictEqual(rx.state, 'EVALUATED', 'State should become EVALUATED immediately on keypress without enter');
 assert.strictEqual(rx.currentTrial.isCorrect, true, 'K should be marked correct');
 assert.strictEqual(rx.currentTrial.reflexLatency, 350, 'Reflex latency should be 1350 - 1000 = 350 ms');
 assert.strictEqual(rx.trials.length, 1, 'Trials array should contain 1 completed trial');
-console.log('   -> Keystroke input and reflex latency calculated accurately (350 ms)!');
+console.log('   -> Instant submit without enter verified for Koch Rx mode!');
+
+// Multi-character submode: verify input buffer and Backspace
+const rxMulti = new RxMode({ submode: 'callsign' });
+rxMulti.state = 'WAITING_INPUT';
+rxMulti.currentTrial = { target: 'BV2AB', confusions: [] };
+rxMulti.handleKey('B');
+rxMulti.handleKey('V');
+assert.strictEqual(rxMulti.inputBuffer, 'BV', 'Multi-char submode should buffer letters');
+rxMulti.handleKey('Backspace');
+assert.strictEqual(rxMulti.inputBuffer, 'B', 'Backspace should delete last char in multi-char submode');
+console.log('   -> Multi-char buffering and Backspace verified!');
 
 // 5. Advance To Next Trial & Acoustic Confusion Matrix Tracking
 console.log('\n5. Verifying Advance To Next Trial & Confusion Matrix on Error...');

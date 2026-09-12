@@ -238,6 +238,192 @@
   box-shadow: 0 0 25px rgba(255, 215, 0, 0.2);
 }
 
+.rx-sc-history-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: #10121a;
+  border: 1px solid #292e42;
+  border-radius: 6px;
+  padding: 8px 14px;
+  margin-bottom: 16px;
+  font-size: 0.8rem;
+  color: #a0a8c0;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.rx-sc-hist-item {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.rx-sc-hist-item i {
+  color: var(--neon-blue);
+  font-size: 0.95rem;
+}
+
+.rx-sc-clear-btn {
+  background: transparent;
+  border: 1px solid #3d4560;
+  color: #8892b0;
+  border-radius: 4px;
+  padding: 2px 8px;
+  font-size: 0.85rem;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.15s ease;
+}
+
+.rx-sc-clear-btn:hover {
+  background: rgba(255, 82, 82, 0.2);
+  border-color: #ff5252;
+  color: #ff5252;
+}
+
+/* Weakness Analytics Panel */
+.rx-analytics-panel {
+  background: #12141e;
+  border: 1.5px solid #2d364f;
+  border-radius: 8px;
+  padding: 12px 16px;
+  margin-bottom: 14px;
+  animation: rxFadeIn 0.2s ease;
+}
+
+.rx-analytics-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 10px;
+  padding-bottom: 8px;
+  border-bottom: 1px solid #1f2538;
+}
+
+.rx-analytics-title {
+  font-size: 0.9rem;
+  font-weight: bold;
+  color: var(--gold);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.rx-analytics-subtitle {
+  font-size: 0.72rem;
+  color: #7e8baf;
+}
+
+.rx-analytics-body {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 14px;
+}
+
+.rx-analytics-col {
+  background: #171a26;
+  border: 1px solid #252c42;
+  border-radius: 6px;
+  padding: 10px;
+}
+
+.rx-analytics-col-title {
+  font-size: 0.78rem;
+  font-weight: bold;
+  color: #a0aed4;
+  margin-bottom: 8px;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.rx-top-confusions-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.rx-confusion-card {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: #11131c;
+  border: 1px solid #252c40;
+  border-radius: 5px;
+  padding: 5px 10px;
+  font-size: 0.78rem;
+}
+
+.rx-confusion-pair-text {
+  font-family: monospace;
+  font-weight: bold;
+  font-size: 0.88rem;
+}
+
+.rx-severity-badge {
+  padding: 1px 6px;
+  border-radius: 3px;
+  font-size: 0.68rem;
+  font-weight: bold;
+}
+
+.rx-severity-badge.critical {
+  background: rgba(255, 82, 82, 0.2);
+  color: #ff5252;
+  border: 1px solid #ff5252;
+}
+
+.rx-severity-badge.warning {
+  background: rgba(255, 183, 3, 0.2);
+  color: var(--gold);
+  border: 1px solid var(--gold);
+}
+
+.rx-severity-badge.notice {
+  background: rgba(0, 229, 255, 0.2);
+  color: var(--neon-blue);
+  border: 1px solid var(--neon-blue);
+}
+
+.rx-weak-chars-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.rx-weak-char-chip {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  background: #10121a;
+  border: 1px solid #2a3148;
+  border-radius: 4px;
+  padding: 4px 8px;
+  font-size: 0.75rem;
+}
+
+.rx-weak-char-letter {
+  font-family: monospace;
+  font-weight: bold;
+  color: #fff;
+  font-size: 0.85rem;
+}
+
+.rx-trend-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  background: #11131c;
+  border: 1px solid #252c40;
+  border-radius: 4px;
+  padding: 2px 6px;
+  font-size: 0.7rem;
+  color: #aab;
+}
+
 /* Zone 3 Adaptive Rx Dock & Telegraph Soft Keypad */
 .rx-dock {
   position: fixed;
@@ -471,6 +657,7 @@
 .rx-confusion-item {
   display: flex;
   align-items: center;
+  justify-content: space-between;
   gap: 6px;
   padding: 3px 0;
   font-family: monospace;
@@ -482,6 +669,47 @@
 .rx-confusion-item .confusion-act {
   color: #ff5252;
   font-weight: bold;
+}
+
+.rx-btn-drill-pair {
+  padding: 2px 7px;
+  font-size: 0.72rem;
+  color: var(--gold);
+  border-color: rgba(255, 183, 3, 0.4);
+  background: rgba(255, 183, 3, 0.08);
+  border-radius: 4px;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  transition: all 0.2s ease;
+}
+.rx-btn-drill-pair:hover {
+  background: rgba(255, 183, 3, 0.25);
+  border-color: var(--gold);
+  color: #fff;
+  box-shadow: 0 0 8px rgba(255, 183, 3, 0.4);
+}
+
+.rx-sc-breakthrough {
+  margin-top: 10px;
+  padding: 8px 12px;
+  border-radius: 6px;
+  font-size: 0.8rem;
+  font-weight: bold;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.rx-sc-breakthrough.success {
+  background: rgba(0, 230, 118, 0.15);
+  border: 1px solid #00e676;
+  color: #00e676;
+}
+.rx-sc-breakthrough.warning {
+  background: rgba(255, 183, 3, 0.15);
+  border: 1px solid var(--gold);
+  color: var(--gold);
 }
 
 /* Koch Rx Stage Control Bar & Pool Display */

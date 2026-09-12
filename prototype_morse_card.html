@@ -2281,6 +2281,192 @@
       box-shadow: 0 0 25px rgba(255, 215, 0, 0.2);
     }
 
+    .rx-sc-history-bar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      background: #10121a;
+      border: 1px solid #292e42;
+      border-radius: 6px;
+      padding: 8px 14px;
+      margin-bottom: 16px;
+      font-size: 0.8rem;
+      color: #a0a8c0;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+
+    .rx-sc-hist-item {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .rx-sc-hist-item i {
+      color: var(--neon-blue);
+      font-size: 0.95rem;
+    }
+
+    .rx-sc-clear-btn {
+      background: transparent;
+      border: 1px solid #3d4560;
+      color: #8892b0;
+      border-radius: 4px;
+      padding: 2px 8px;
+      font-size: 0.85rem;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.15s ease;
+    }
+
+    .rx-sc-clear-btn:hover {
+      background: rgba(255, 82, 82, 0.2);
+      border-color: #ff5252;
+      color: #ff5252;
+    }
+
+    /* Weakness Analytics Panel */
+    .rx-analytics-panel {
+      background: #12141e;
+      border: 1.5px solid #2d364f;
+      border-radius: 8px;
+      padding: 12px 16px;
+      margin-bottom: 14px;
+      animation: rxFadeIn 0.2s ease;
+    }
+
+    .rx-analytics-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 10px;
+      padding-bottom: 8px;
+      border-bottom: 1px solid #1f2538;
+    }
+
+    .rx-analytics-title {
+      font-size: 0.9rem;
+      font-weight: bold;
+      color: var(--gold);
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .rx-analytics-subtitle {
+      font-size: 0.72rem;
+      color: #7e8baf;
+    }
+
+    .rx-analytics-body {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+      gap: 14px;
+    }
+
+    .rx-analytics-col {
+      background: #171a26;
+      border: 1px solid #252c42;
+      border-radius: 6px;
+      padding: 10px;
+    }
+
+    .rx-analytics-col-title {
+      font-size: 0.78rem;
+      font-weight: bold;
+      color: #a0aed4;
+      margin-bottom: 8px;
+      display: flex;
+      align-items: center;
+      gap: 5px;
+    }
+
+    .rx-top-confusions-grid {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .rx-confusion-card {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      background: #11131c;
+      border: 1px solid #252c40;
+      border-radius: 5px;
+      padding: 5px 10px;
+      font-size: 0.78rem;
+    }
+
+    .rx-confusion-pair-text {
+      font-family: monospace;
+      font-weight: bold;
+      font-size: 0.88rem;
+    }
+
+    .rx-severity-badge {
+      padding: 1px 6px;
+      border-radius: 3px;
+      font-size: 0.68rem;
+      font-weight: bold;
+    }
+
+    .rx-severity-badge.critical {
+      background: rgba(255, 82, 82, 0.2);
+      color: #ff5252;
+      border: 1px solid #ff5252;
+    }
+
+    .rx-severity-badge.warning {
+      background: rgba(255, 183, 3, 0.2);
+      color: var(--gold);
+      border: 1px solid var(--gold);
+    }
+
+    .rx-severity-badge.notice {
+      background: rgba(0, 229, 255, 0.2);
+      color: var(--neon-blue);
+      border: 1px solid var(--neon-blue);
+    }
+
+    .rx-weak-chars-list {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+    }
+
+    .rx-weak-char-chip {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      background: #10121a;
+      border: 1px solid #2a3148;
+      border-radius: 4px;
+      padding: 4px 8px;
+      font-size: 0.75rem;
+    }
+
+    .rx-weak-char-letter {
+      font-family: monospace;
+      font-weight: bold;
+      color: #fff;
+      font-size: 0.85rem;
+    }
+
+    .rx-trend-chip {
+      display: inline-flex;
+      align-items: center;
+      gap: 3px;
+      background: #11131c;
+      border: 1px solid #252c40;
+      border-radius: 4px;
+      padding: 2px 6px;
+      font-size: 0.7rem;
+      color: #aab;
+    }
+
     .rx-dock {
       position: fixed;
       bottom: 0;
@@ -2513,6 +2699,7 @@
     .rx-confusion-item {
       display: flex;
       align-items: center;
+      justify-content: space-between;
       gap: 6px;
       padding: 3px 0;
       font-family: monospace;
@@ -2524,6 +2711,47 @@
     .rx-confusion-item .confusion-act {
       color: #ff5252;
       font-weight: bold;
+    }
+
+    .rx-btn-drill-pair {
+      padding: 2px 7px;
+      font-size: 0.72rem;
+      color: var(--gold);
+      border-color: rgba(255, 183, 3, 0.4);
+      background: rgba(255, 183, 3, 0.08);
+      border-radius: 4px;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 3px;
+      transition: all 0.2s ease;
+    }
+    .rx-btn-drill-pair:hover {
+      background: rgba(255, 183, 3, 0.25);
+      border-color: var(--gold);
+      color: #fff;
+      box-shadow: 0 0 8px rgba(255, 183, 3, 0.4);
+    }
+
+    .rx-sc-breakthrough {
+      margin-top: 10px;
+      padding: 8px 12px;
+      border-radius: 6px;
+      font-size: 0.8rem;
+      font-weight: bold;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .rx-sc-breakthrough.success {
+      background: rgba(0, 230, 118, 0.15);
+      border: 1px solid #00e676;
+      color: #00e676;
+    }
+    .rx-sc-breakthrough.warning {
+      background: rgba(255, 183, 3, 0.15);
+      border: 1px solid var(--gold);
+      color: var(--gold);
     }
 
     /* Koch Rx Stage Control Bar & Pool Display */
@@ -4039,6 +4267,40 @@
               <input type="checkbox" id="chk-rx-blind-mode" class="switch-input switch-gold" checked>
               <span><i class="mdi mdi-eye-off"></i> 純盲聽模式 (隱藏提示)</span>
             </label>
+
+            <button type="button" id="btn-rx-toggle-analytics" class="rx-btn-ghost" title="查看弱點戰情報告">
+              <i class="mdi mdi-radar"></i> 弱點戰情 <i class="mdi mdi-chevron-down" id="rx-analytics-chevron"></i>
+            </button>
+          </div>
+        </div>
+
+        <!-- Weakness Analytics Collapsible Panel -->
+        <div class="rx-analytics-panel" id="rx-analytics-panel" style="display:none;">
+          <div class="rx-analytics-header">
+            <div class="rx-analytics-title">
+              <i class="mdi mdi-radar"></i> 聽力弱點戰情報告
+            </div>
+            <span class="rx-analytics-subtitle">跨會話累計音形混淆與反應分析</span>
+          </div>
+          <div class="rx-analytics-body">
+            <div class="rx-analytics-col">
+              <div class="rx-analytics-col-title"><i class="mdi mdi-alert-decagram-outline"></i> 高頻混淆熱點 Top 3</div>
+              <div class="rx-top-confusions-grid" id="rx-top-confusions-grid">
+                <span style="color:#778; font-size:0.75rem;">尚無混淆數據</span>
+              </div>
+            </div>
+            <div class="rx-analytics-col">
+              <div class="rx-analytics-col-title"><i class="mdi mdi-target-variant"></i> 最脆弱字元 Top 5</div>
+              <div class="rx-weak-chars-list" id="rx-weak-chars-list">
+                <span style="color:#778; font-size:0.75rem;">尚無統計數據</span>
+              </div>
+            </div>
+            <div class="rx-analytics-col">
+              <div class="rx-analytics-col-title"><i class="mdi mdi-timer-outline"></i> 近期反射速度趨勢</div>
+              <div class="rx-latency-trend-box" id="rx-latency-trend">
+                <span style="color:#778; font-size:0.75rem;">尚無反射數據</span>
+              </div>
+            </div>
           </div>
         </div>
 
@@ -4147,10 +4409,27 @@
             <div id="rx-sc-latency" style="font-size:1.3rem; font-weight:bold; color:var(--neon-blue);">320 ms</div>
           </div>
           <div style="background:#1a1c26; padding:10px; border-radius:6px; text-align:center;">
+            <div style="font-size:0.7rem; color:#888;">反射中位數</div>
+            <div id="rx-sc-median-latency" style="font-size:1.3rem; font-weight:bold; color:#00e5ff;">-- ms</div>
+          </div>
+          <div style="background:#1a1c26; padding:10px; border-radius:6px; text-align:center;">
+            <div style="font-size:0.7rem; color:#888;">25% Low (遲疑反射)</div>
+            <div id="rx-sc-low25-latency" style="font-size:1.3rem; font-weight:bold; color:#ffb703;">-- ms</div>
+          </div>
+          <div style="background:#1a1c26; padding:10px; border-radius:6px; text-align:center;">
             <div style="font-size:0.7rem; color:#888;">題數</div>
             <div id="rx-sc-total" style="font-size:1.3rem; font-weight:bold; color:#fff;">10 / 10</div>
           </div>
         </div>
+
+        <div class="rx-sc-history-bar" id="rx-sc-history-bar">
+          <span class="rx-sc-hist-item" id="rx-sc-hist-count"><i class="mdi mdi-history"></i> 累計: 0 場</span>
+          <span class="rx-sc-hist-item" id="rx-sc-hist-avg-acc"><i class="mdi mdi-chart-line"></i> 近期均準: --%</span>
+          <span class="rx-sc-hist-item" id="rx-sc-hist-avg-lat"><i class="mdi mdi-timer-outline"></i> 近期反射: -- ms</span>
+          <button type="button" class="rx-sc-clear-btn" id="btn-rx-clear-history" title="清除歷史紀錄"><i class="mdi mdi-delete-sweep-outline"></i></button>
+        </div>
+
+        <div id="rx-sc-breakthrough-box" style="display:none; margin-bottom:14px;"></div>
 
         <div id="rx-sc-confusion-box" style="display:none; background:#1e1a18; border:1px solid #ff9100; border-radius:6px; padding:10px; margin-bottom:16px; font-size:0.8rem; color:#ffb703;">
           <div style="font-weight:bold; margin-bottom:4px;"><i class="mdi mdi-alert-circle-outline"></i> 易混淆音形診斷：</div>
@@ -5034,6 +5313,256 @@
     }
 
     /**
+     * RX STATS & HISTORY PERSISTENCE MANAGER: RxStatsManager
+     * 聽力抄收歷史紀錄持久化、跨會話評測指標彙總與弱點資料庫
+     * (100% Zero-Emoji, Material Design Icons, Decoupled Domain Model)
+     */
+    class RxStatsManager {
+      constructor(storage = null, options = {}) {
+        this.storage = storage || (typeof localStorage !== 'undefined' ? localStorage : null);
+        this.storageKey = options.storageKey || 'morse_rx_sessions';
+        this.profileKey = options.profileKey || 'morse_rx_confusion_profile';
+        this.maxSessions = options.maxSessions || 50;
+        this.sessions = [];
+        this.confusionProfile = {
+          confusionPairs: {},
+          charStats: {}
+        };
+        this.load();
+      }
+
+      load() {
+        this.sessions = [];
+        this.confusionProfile = { confusionPairs: {}, charStats: {} };
+        if (!this.storage) return;
+
+        // 1. Sessions History
+        try {
+          const raw = this.storage.getItem(this.storageKey);
+          if (raw) {
+            const parsed = JSON.parse(raw);
+            if (Array.isArray(parsed)) {
+              this.sessions = parsed;
+            }
+          }
+        } catch (e) {
+          console.warn('[RxStatsManager] Failed to load sessions from storage:', e);
+          this.sessions = [];
+        }
+
+        // 2. Confusion Profile
+        try {
+          const profileRaw = this.storage.getItem(this.profileKey);
+          if (profileRaw) {
+            const parsedProfile = JSON.parse(profileRaw);
+            if (parsedProfile && typeof parsedProfile === 'object') {
+              this.confusionProfile = {
+                confusionPairs: parsedProfile.confusionPairs || {},
+                charStats: parsedProfile.charStats || {}
+              };
+            }
+          }
+        } catch (e) {
+          console.warn('[RxStatsManager] Failed to load confusion profile:', e);
+          this.confusionProfile = { confusionPairs: {}, charStats: {} };
+        }
+      }
+
+      save() {
+        if (!this.storage) return;
+        try {
+          this.storage.setItem(this.storageKey, JSON.stringify(this.sessions));
+        } catch (e) {
+          console.warn('[RxStatsManager] Failed to save sessions to storage:', e);
+        }
+        try {
+          this.storage.setItem(this.profileKey, JSON.stringify(this.confusionProfile));
+        } catch (e) {
+          console.warn('[RxStatsManager] Failed to save confusion profile to storage:', e);
+        }
+      }
+
+      recordSession(sessionData = {}) {
+        const session = {
+          id: 'rx_' + Date.now() + '_' + Math.random().toString(36).substring(2, 6),
+          timestamp: sessionData.timestamp || Date.now(),
+          submode: sessionData.submode || 'koch',
+          charWpm: sessionData.charWpm || 20,
+          totalTrials: sessionData.totalTrials || 0,
+          correctCount: sessionData.correctCount || 0,
+          accuracy: (typeof sessionData.accuracy === 'number') ? sessionData.accuracy : 0,
+          avgLatency: (typeof sessionData.avgLatency === 'number') ? sessionData.avgLatency : 0,
+          medianLatency: (typeof sessionData.medianLatency === 'number') ? sessionData.medianLatency : 0,
+          low25Latency: (typeof sessionData.low25Latency === 'number') ? sessionData.low25Latency : 0,
+          confusions: Array.isArray(sessionData.confusions) ? sessionData.confusions : [],
+          trials: Array.isArray(sessionData.trials) ? sessionData.trials : []
+        };
+
+        // Prepend session
+        this.sessions.unshift(session);
+        if (this.sessions.length > this.maxSessions) {
+          this.sessions = this.sessions.slice(0, this.maxSessions);
+        }
+
+        // Update cumulative confusion profile
+        if (Array.isArray(session.confusions)) {
+          session.confusions.forEach(c => {
+            if (c.expected && c.actual) {
+              const pairKey = `${c.expected}->${c.actual}`;
+              const count = c.count || 1;
+              this.confusionProfile.confusionPairs[pairKey] =
+                (this.confusionProfile.confusionPairs[pairKey] || 0) + count;
+            }
+          });
+        }
+
+        // Update character-level statistics
+        if (Array.isArray(session.trials)) {
+          session.trials.forEach(t => {
+            const char = (t.target || '').toUpperCase().trim();
+            if (char && char.length === 1) {
+              if (!this.confusionProfile.charStats[char]) {
+                this.confusionProfile.charStats[char] = { attempts: 0, correct: 0, totalLatency: 0 };
+              }
+              const s = this.confusionProfile.charStats[char];
+              s.attempts++;
+              if (t.isCorrect) s.correct++;
+              if (typeof t.reflexLatency === 'number' && t.reflexLatency > 0) {
+                s.totalLatency += t.reflexLatency;
+              }
+            }
+          });
+        }
+
+        this.save();
+        return session;
+      }
+
+      getHistory(limit = 50) {
+        return this.sessions.slice(0, limit);
+      }
+
+      getSummaryStats() {
+        const total = this.sessions.length;
+        if (total === 0) {
+          return {
+            totalSessions: 0,
+            recentAccuracy: 0,
+            recentAvgLatency: 0,
+            bestAccuracy: 0,
+            latestSession: null
+          };
+        }
+
+        const recent = this.sessions.slice(0, 5);
+        const recentAccSum = recent.reduce((sum, s) => sum + (s.accuracy || 0), 0);
+        const recentAccuracy = Math.round(recentAccSum / recent.length);
+
+        const validLatencySessions = recent.filter(s => typeof s.avgLatency === 'number' && s.avgLatency > 0);
+        const recentAvgLatency = validLatencySessions.length > 0
+          ? Math.round(validLatencySessions.reduce((sum, s) => sum + s.avgLatency, 0) / validLatencySessions.length)
+          : (recent[0].avgLatency || 0);
+
+        const bestAccuracy = this.sessions.reduce((max, s) => Math.max(max, s.accuracy || 0), 0);
+
+        return {
+          totalSessions: total,
+          recentAccuracy,
+          recentAvgLatency,
+          bestAccuracy,
+          latestSession: this.sessions[0] || null
+        };
+      }
+
+      getTopConfusions(limit = 3) {
+        if (!this.confusionProfile || !this.confusionProfile.confusionPairs) return [];
+        const pairs = Object.entries(this.confusionProfile.confusionPairs)
+          .map(([pair, count]) => {
+            const [expected, actual] = pair.split('->');
+            let severity = 'notice';
+            if (count >= 5) severity = 'critical';
+            else if (count >= 3) severity = 'warning';
+            return { pair, expected, actual, count, severity };
+          })
+          .sort((a, b) => b.count - a.count);
+        return pairs.slice(0, limit);
+      }
+
+      getWeakestCharacters(limit = 5) {
+        if (!this.confusionProfile || !this.confusionProfile.charStats) return [];
+        const chars = Object.entries(this.confusionProfile.charStats)
+          .map(([char, s]) => {
+            const accuracy = s.attempts > 0 ? Math.round((s.correct / s.attempts) * 100) : 100;
+            const avgLatency = s.attempts > 0 ? Math.round(s.totalLatency / s.attempts) : 0;
+            return {
+              char,
+              attempts: s.attempts,
+              correct: s.correct,
+              accuracy,
+              avgLatency
+            };
+          })
+          .sort((a, b) => {
+            if (a.accuracy !== b.accuracy) return a.accuracy - b.accuracy;
+            return b.attempts - a.attempts;
+          });
+        return chars.slice(0, limit);
+      }
+
+      demoteConfusion(pairOrExpected, actual = null) {
+        if (!this.confusionProfile || !this.confusionProfile.confusionPairs) {
+          return { pairKey: '', previousCount: 0, newCount: 0, resolved: true };
+        }
+
+        let pairKey = '';
+        if (actual) {
+          pairKey = `${pairOrExpected}->${actual}`;
+        } else if (typeof pairOrExpected === 'string') {
+          pairKey = pairOrExpected;
+        }
+
+        const previousCount = this.confusionProfile.confusionPairs[pairKey] || 0;
+        if (previousCount <= 0) {
+          return { pairKey, previousCount: 0, newCount: 0, resolved: true };
+        }
+
+        let newCount = Math.floor(previousCount / 2);
+        if (newCount <= 1 && previousCount > 1) {
+          newCount = 1;
+        } else if (previousCount <= 1) {
+          newCount = 0;
+        }
+
+        if (newCount <= 0) {
+          delete this.confusionProfile.confusionPairs[pairKey];
+        } else {
+          this.confusionProfile.confusionPairs[pairKey] = newCount;
+        }
+
+        this.save();
+        return {
+          pairKey,
+          previousCount,
+          newCount,
+          resolved: newCount === 0
+        };
+      }
+
+      clearHistory() {
+        this.sessions = [];
+        this.confusionProfile = {
+          confusionPairs: {},
+          charStats: {}
+        };
+        this.save();
+      }
+    }
+
+    if (typeof window !== 'undefined') {
+      window.RxStatsManager = RxStatsManager;
+    }
+
+    /**
      * RX COPYING WORKSPACE CONTROLLER: RxMode
      * 聽力抄收工作台控制器、狀態機、評測模型與軟鍵盤交互
      */
@@ -5045,6 +5574,7 @@
         this.state = 'IDLE';
         this.blindMode = (options.blindMode !== undefined) ? !!options.blindMode : true;
         this.autoAdvance = (options.autoAdvance !== undefined) ? !!options.autoAdvance : true;
+        this.statsManager = options.statsManager || (typeof window !== 'undefined' && window.rxStatsManager ? window.rxStatsManager : (typeof RxStatsManager !== 'undefined' ? new RxStatsManager() : null));
         this.totalTrials = options.totalTrials || 10;
         this.currentTrialIndex = 0;
         this.trials = [];
@@ -5096,11 +5626,25 @@
           scAccuracy: document.getElementById('rx-sc-accuracy'),
           scWpm: document.getElementById('rx-sc-wpm'),
           scLatency: document.getElementById('rx-sc-latency'),
+          scMedianLatency: document.getElementById('rx-sc-median-latency'),
+          scLow25Latency: document.getElementById('rx-sc-low25-latency'),
           scTotal: document.getElementById('rx-sc-total'),
           scConfusionBox: document.getElementById('rx-sc-confusion-box'),
           scConfusionList: document.getElementById('rx-sc-confusion-list'),
+          scHistoryBar: document.getElementById('rx-sc-history-bar'),
+          scHistCount: document.getElementById('rx-sc-hist-count'),
+          scHistAvgAcc: document.getElementById('rx-sc-hist-avg-acc'),
+          scHistAvgLat: document.getElementById('rx-sc-hist-avg-lat'),
+          btnClearHistory: document.getElementById('btn-rx-clear-history'),
           btnRetryErrors: document.getElementById('btn-rx-retry-errors'),
           btnNextRound: document.getElementById('btn-rx-next-round'),
+          btnToggleAnalytics: document.getElementById('btn-rx-toggle-analytics'),
+          analyticsChevron: document.getElementById('rx-analytics-chevron'),
+          analyticsPanel: document.getElementById('rx-analytics-panel'),
+          topConfusionsGrid: document.getElementById('rx-top-confusions-grid'),
+          weakCharsList: document.getElementById('rx-weak-chars-list'),
+          latencyTrend: document.getElementById('rx-latency-trend'),
+          scBreakthroughBox: document.getElementById('rx-sc-breakthrough-box'),
           softKeypad: document.getElementById('rx-soft-keypad'),
           kochStageBar: document.getElementById('rx-koch-stage-bar'),
           kochStageBadge: document.getElementById('rx-koch-stage-badge'),
@@ -5114,6 +5658,35 @@
           kochMatrixGrid: document.getElementById('rx-koch-matrix-grid'),
           btnStageAdvance: document.getElementById('btn-rx-stage-advance')
         };
+
+        if (this.el.wsContainer) {
+          this.el.wsContainer.addEventListener('click', (e) => {
+            const drillBtn = e.target.closest('.rx-btn-drill-pair');
+            if (drillBtn) {
+              const pair = drillBtn.dataset.pair;
+              if (pair) {
+                const [exp, act] = pair.split('->');
+                this.startTargetedDrill(exp, act);
+              }
+            }
+          });
+        }
+
+        if (this.el.btnToggleAnalytics) {
+          this.el.btnToggleAnalytics.addEventListener('click', () => {
+            this.toggleAnalyticsPanel();
+          });
+        }
+
+        if (this.el.btnClearHistory) {
+          this.el.btnClearHistory.addEventListener('click', () => {
+            if (this.statsManager) {
+              this.statsManager.clearHistory();
+              this.updateHistoryBarUI();
+              this.renderAnalyticsPanel();
+            }
+          });
+        }
 
         if (this.el.navPills) {
           this.el.navPills.forEach(pill => {
@@ -5277,6 +5850,13 @@
 
       setSubmode(submode) {
         this.submode = submode;
+        if (submode !== 'drill') {
+          this.drillTarget = null;
+          if (this.el && this.el.scBreakthroughBox) {
+            this.el.scBreakthroughBox.style.display = 'none';
+            this.el.scBreakthroughBox.innerHTML = '';
+          }
+        }
         if (this.el && this.el.navPills) {
           this.el.navPills.forEach(pill => {
             pill.classList.toggle('active', pill.dataset.submode === submode);
@@ -5595,6 +6175,16 @@
             }
             return 'QTH';
           }
+          case 'drill': {
+            if (this.drillTarget) {
+              if (typeof generateWeaknessTargets === 'function') {
+                const arr = generateWeaknessTargets([this.drillTarget.expected, this.drillTarget.actual], 1);
+                return arr[0] || this.drillTarget.expected;
+              }
+              return Math.random() < 0.5 ? this.drillTarget.expected : this.drillTarget.actual;
+            }
+            return 'B';
+          }
           default:
             return 'CQ';
         }
@@ -5678,7 +6268,11 @@
         const answeredCount = this.trials.length;
         const correctCount = this.trials.filter(t => t.isCorrect).length;
         const acc = answeredCount > 0 ? Math.round((correctCount / answeredCount) * 100) : 100;
-        this.el.progressBadge.textContent = `進度: ${this.currentTrialIndex + 1}/${this.totalTrials} · 正確率: ${acc}%`;
+        if (this.submode === 'drill' && this.drillTarget) {
+          this.el.progressBadge.innerHTML = `<i class="mdi mdi-sword-cross"></i> 弱點專攻: ${this.drillTarget.expected} <i class="mdi mdi-sword-cross"></i> ${this.drillTarget.actual} (${this.currentTrialIndex + 1}/${this.totalTrials})`;
+        } else {
+          this.el.progressBadge.textContent = `進度: ${this.currentTrialIndex + 1}/${this.totalTrials} · 正確率: ${acc}%`;
+        }
       }
 
       startAudio() {
@@ -5762,6 +6356,13 @@
           }
         }
 
+        if (this.state === 'EVALUATED') {
+          if (key === 'Enter') {
+            this.advanceToNextTrial();
+          }
+          return;
+        }
+
         if (key === 'Backspace') {
           if (this.inputBuffer.length > 0) {
             this.inputBuffer = this.inputBuffer.slice(0, -1);
@@ -5773,11 +6374,7 @@
         }
 
         if (key === 'Enter') {
-          if (this.state === 'EVALUATED') {
-            this.advanceToNextTrial();
-          } else {
-            this.submitAnswer();
-          }
+          this.submitAnswer();
           return;
         }
 
@@ -5791,6 +6388,12 @@
           if (this.el && this.el.inputBuffer) {
             this.el.inputBuffer.textContent = this.inputBuffer;
           }
+        }
+
+        // 科赫盲聽 (Koch Rx) 或單字元題目：按下答案即自動送出，無需按下 enter
+        const isSingleCharTrial = (this.submode === 'koch' || this.submode === 'drill' || (this.currentTrial && this.currentTrial.target && this.currentTrial.target.length === 1));
+        if (isSingleCharTrial && (this.state === 'PLAYING' || this.state === 'WAITING_INPUT' || this.state === 'READY')) {
+          this.submitAnswer();
         }
       }
 
@@ -5967,18 +6570,76 @@
           ? Math.round(answeredTrials.reduce((acc, t) => acc + t.reflexLatency, 0) / answeredTrials.length)
           : 0;
 
+        // 反射時間序列分析 (中位數與 25% Low 遲疑反射)
+        const latencies = answeredTrials.map(t => t.reflexLatency).sort((a, b) => a - b);
+        let medianLatency = 0;
+        let low25Latency = 0;
+
+        if (latencies.length > 0) {
+          const mid = Math.floor(latencies.length / 2);
+          medianLatency = (latencies.length % 2 !== 0)
+            ? latencies[mid]
+            : Math.round((latencies[mid - 1] + latencies[mid]) / 2);
+
+          const count25 = Math.max(1, Math.round(latencies.length * 0.25));
+          const slowestTrials = latencies.slice(-count25);
+          low25Latency = Math.round(slowestTrials.reduce((sum, v) => sum + v, 0) / slowestTrials.length);
+        }
+
         const wpm = this.cwPlayer ? (this.cwPlayer.charWpm || 20) : 20;
 
         if (this.el) {
           if (this.el.scorecard) this.el.scorecard.style.display = 'block';
-          if (this.el.scModeTag) this.el.scModeTag.textContent = this.getSubmodeDisplayName(this.submode);
+          if (this.el.scModeTag) {
+            if (this.submode === 'drill' && this.drillTarget) {
+              this.el.scModeTag.innerHTML = `<i class="mdi mdi-sword-cross"></i> 弱點專攻 (${this.drillTarget.expected} <i class="mdi mdi-sword-cross"></i> ${this.drillTarget.actual})`;
+            } else {
+              this.el.scModeTag.textContent = this.getSubmodeDisplayName(this.submode);
+            }
+          }
           if (this.el.scAccuracy) {
             this.el.scAccuracy.textContent = `${accuracy}%`;
             this.el.scAccuracy.style.color = accuracy >= 90 ? '#00e676' : (accuracy >= 70 ? 'var(--gold)' : '#ff5252');
           }
           if (this.el.scWpm) this.el.scWpm.textContent = `${wpm} WPM`;
           if (this.el.scLatency) this.el.scLatency.textContent = `${avgLatency} ms`;
+          if (this.el.scMedianLatency) this.el.scMedianLatency.textContent = medianLatency > 0 ? `${medianLatency} ms` : '-- ms';
+          if (this.el.scLow25Latency) this.el.scLow25Latency.textContent = low25Latency > 0 ? `${low25Latency} ms` : '-- ms';
           if (this.el.scTotal) this.el.scTotal.textContent = `${correctCount} / ${total} (正確率 ${accuracy}%)`;
+
+          // Breakthrough Box in Drill Mode
+          if (this.submode === 'drill' && this.drillTarget) {
+            if (this.el.scBreakthroughBox) {
+              this.el.scBreakthroughBox.style.display = 'block';
+              if (accuracy >= 90) {
+                if (this.statsManager && typeof this.statsManager.demoteConfusion === 'function') {
+                  this.statsManager.demoteConfusion(this.drillTarget.pairKey);
+                }
+                this.el.scBreakthroughBox.innerHTML = `
+                  <div class="rx-sc-breakthrough success">
+                    <i class="mdi mdi-trophy-variant"></i> 突破成功！已成功調降 ${this.drillTarget.expected} <i class="mdi mdi-sword-cross"></i> ${this.drillTarget.actual} 混淆權重
+                  </div>
+                `;
+                if (this.el.feedbackMsg) {
+                  this.el.feedbackMsg.innerHTML = '<span style="color:#00e676;"><i class="mdi mdi-check-decagram"></i> 特訓合格！混淆對已成功降權</span>';
+                }
+              } else {
+                this.el.scBreakthroughBox.innerHTML = `
+                  <div class="rx-sc-breakthrough warning">
+                    <i class="mdi mdi-shield-alert"></i> 特訓未達 90% 門檻，建議再次特訓以鞏固節奏反射
+                  </div>
+                `;
+                if (this.el.feedbackMsg) {
+                  this.el.feedbackMsg.innerHTML = '<span style="color:var(--gold);"><i class="mdi mdi-alert-circle"></i> 正確率未達 90%，請再接再厲</span>';
+                }
+              }
+            }
+          } else {
+            if (this.el.scBreakthroughBox) {
+              this.el.scBreakthroughBox.style.display = 'none';
+              this.el.scBreakthroughBox.innerHTML = '';
+            }
+          }
 
           if (this.el.scConfusionBox && this.el.scConfusionList) {
             const confusions = Object.entries(this.confusionMatrix).sort((a, b) => b[1] - a[1]);
@@ -5986,7 +6647,26 @@
               this.el.scConfusionBox.style.display = 'block';
               this.el.scConfusionList.innerHTML = confusions.map(([pair, count]) => {
                 const [exp, act] = pair.split('->');
-                return `<div class="rx-confusion-item"><span class="confusion-exp">${exp}</span> <i class="mdi mdi-arrow-right"></i> <span class="confusion-act">${act}</span> (${count} 次)</div>`;
+                let severity = 'notice';
+                let severityText = '輕度';
+                if (count >= 5) {
+                  severity = 'critical';
+                  severityText = '高頻';
+                } else if (count >= 3) {
+                  severity = 'warning';
+                  severityText = '中度';
+                }
+                return `<div class="rx-confusion-item">
+                  <div style="display:flex; align-items:center; gap:6px;">
+                    <span class="confusion-exp">${exp}</span>
+                    <i class="mdi mdi-arrow-right"></i>
+                    <span class="confusion-act">${act}</span>
+                    <span class="rx-severity-badge ${severity}">${severityText} (${count} 次)</span>
+                  </div>
+                  <button type="button" class="rx-btn-drill-pair rx-btn-ghost" data-pair="${pair}" title="特訓此配對">
+                    <i class="mdi mdi-sword-cross"></i> 特訓
+                  </button>
+                </div>`;
               }).join('');
             } else {
               this.el.scConfusionBox.style.display = 'none';
@@ -6024,6 +6704,175 @@
             this.el.feedbackMsg.innerHTML = '<span style="color:var(--gold);"><i class="mdi mdi-trophy"></i> 測驗結束！請檢視成績看板</span>';
           }
         }
+
+        // Record to statsManager and update history bar
+        if (this.statsManager) {
+          try {
+            this.statsManager.recordSession({
+              submode: this.submode,
+              charWpm: wpm,
+              totalTrials: total,
+              correctCount: correctCount,
+              accuracy: accuracy,
+              avgLatency: avgLatency,
+              medianLatency: medianLatency,
+              low25Latency: low25Latency,
+              confusions: Object.entries(this.confusionMatrix).map(([pair, count]) => {
+                const [exp, act] = pair.split('->');
+                return { expected: exp, actual: act, count };
+              }),
+              trials: this.trials.map(t => ({
+                target: t.target,
+                userInput: t.userInput,
+                isCorrect: t.isCorrect,
+                reflexLatency: t.reflexLatency
+              }))
+            });
+          } catch (err) {
+            console.warn('[RxMode] Failed to record session to statsManager:', err);
+          }
+        }
+        this.updateHistoryBarUI();
+        if (this._analyticsOpen) {
+          this.renderAnalyticsPanel();
+        }
+      }
+
+      updateHistoryBarUI() {
+        if (!this.el) return;
+        if (!this.statsManager) {
+          if (this.el.scHistoryBar) this.el.scHistoryBar.style.display = 'none';
+          return;
+        }
+        const summary = this.statsManager.getSummaryStats();
+        if (this.el.scHistoryBar) this.el.scHistoryBar.style.display = 'flex';
+        if (this.el.scHistCount) {
+          this.el.scHistCount.innerHTML = `<i class="mdi mdi-history"></i> 累計: ${summary.totalSessions} 場`;
+        }
+        if (this.el.scHistAvgAcc) {
+          const accText = summary.totalSessions > 0 ? `${summary.recentAccuracy}%` : '--%';
+          this.el.scHistAvgAcc.innerHTML = `<i class="mdi mdi-chart-line"></i> 近期均準: ${accText}`;
+        }
+        if (this.el.scHistAvgLat) {
+          const latText = (summary.totalSessions > 0 && summary.recentAvgLatency > 0) ? `${summary.recentAvgLatency} ms` : '-- ms';
+          this.el.scHistAvgLat.innerHTML = `<i class="mdi mdi-timer-outline"></i> 近期反射: ${latText}`;
+        }
+      }
+
+      toggleAnalyticsPanel(forceOpen = null) {
+        if (!this.el || !this.el.analyticsPanel) return;
+        this._analyticsOpen = (forceOpen !== null) ? forceOpen : !this._analyticsOpen;
+        this.el.analyticsPanel.style.display = this._analyticsOpen ? 'block' : 'none';
+        if (this.el.analyticsChevron) {
+          this.el.analyticsChevron.className = this._analyticsOpen ? 'mdi mdi-chevron-up' : 'mdi mdi-chevron-down';
+        }
+        if (this._analyticsOpen) {
+          this.renderAnalyticsPanel();
+        }
+      }
+
+      renderAnalyticsPanel() {
+        if (!this.el || !this.statsManager) return;
+
+        // 1. Top 3 Confusions
+        if (this.el.topConfusionsGrid) {
+          const topPairs = this.statsManager.getTopConfusions(3);
+          if (topPairs.length === 0) {
+            this.el.topConfusionsGrid.innerHTML = '<span style="color:#778; font-size:0.75rem;">尚無混淆數據</span>';
+          } else {
+            this.el.topConfusionsGrid.innerHTML = topPairs.map(item => {
+              const badgeText = item.severity === 'critical' ? '高頻混淆' : (item.severity === 'warning' ? '中度混淆' : '輕度混淆');
+              return `
+                <div class="rx-confusion-card">
+                  <div class="rx-confusion-pair-text">
+                    <span style="color:#00e676;">${item.expected}</span>
+                    <i class="mdi mdi-arrow-right" style="font-size:0.75rem; color:#778; margin:0 4px;"></i>
+                    <span style="color:#ff5252;">${item.actual}</span>
+                  </div>
+                  <div style="display:flex; align-items:center; gap:6px;">
+                    <span class="rx-severity-badge ${item.severity}">${badgeText}</span>
+                    <span style="color:#889; font-size:0.72rem;">${item.count} 次</span>
+                    <button type="button" class="rx-btn-drill-pair rx-btn-ghost" data-pair="${item.pair}" title="特訓此配對">
+                      <i class="mdi mdi-sword-cross"></i> 特訓
+                    </button>
+                  </div>
+                </div>
+              `;
+            }).join('');
+          }
+        }
+
+        // 2. Weakest 5 Characters
+        if (this.el.weakCharsList) {
+          const weakest = this.statsManager.getWeakestCharacters(5);
+          if (weakest.length === 0) {
+            this.el.weakCharsList.innerHTML = '<span style="color:#778; font-size:0.75rem;">尚無統計數據</span>';
+          } else {
+            this.el.weakCharsList.innerHTML = weakest.map(item => {
+              const accColor = item.accuracy >= 90 ? '#00e676' : (item.accuracy >= 70 ? 'var(--gold)' : '#ff5252');
+              return `
+                <div class="rx-weak-char-chip">
+                  <span class="rx-weak-char-letter">${item.char}</span>
+                  <span style="color:${accColor}; font-weight:bold;">${item.accuracy}%</span>
+                  <span style="color:#667; font-size:0.68rem;">(${item.attempts}題)</span>
+                </div>
+              `;
+            }).join('');
+          }
+        }
+
+        // 3. Latency & Speed Trend
+        if (this.el.latencyTrend) {
+          const summary = this.statsManager.getSummaryStats();
+          const recentSessions = this.statsManager.getHistory(5);
+          if (summary.totalSessions === 0) {
+            this.el.latencyTrend.innerHTML = '<span style="color:#778; font-size:0.75rem;">尚無反射數據</span>';
+          } else {
+            const trendHtml = recentSessions.map(s => {
+              const latText = s.avgLatency > 0 ? `${s.avgLatency}ms` : '--';
+              return `<span class="rx-trend-chip"><i class="mdi mdi-ray-vertex"></i> ${latText} (${s.accuracy}%)</span>`;
+            }).join('');
+            this.el.latencyTrend.innerHTML = `
+              <div style="display:flex; flex-direction:column; gap:6px;">
+                <div style="display:flex; justify-content:space-between; font-size:0.78rem; color:#cde;">
+                  <span>近期均值: <b style="color:var(--gold);">${summary.recentAvgLatency} ms</b></span>
+                  <span>均速: <b style="color:var(--neon-blue);">${recentSessions[0]?.charWpm || 20} WPM</b></span>
+                </div>
+                <div style="display:flex; flex-wrap:wrap; gap:4px; margin-top:2px;">
+                  ${trendHtml}
+                </div>
+              </div>
+            `;
+          }
+        }
+      }
+
+      startTargetedDrill(expected, actual) {
+        const exp = (expected || 'B').toUpperCase().trim();
+        const act = (actual || 'D').toUpperCase().trim();
+        this.drillTarget = { expected: exp, actual: act, pairKey: `${exp}->${act}` };
+        this.submode = 'drill';
+
+        if (this.el && this.el.scorecard) {
+          this.el.scorecard.style.display = 'none';
+        }
+        if (this.el && this.el.kochStageBar) {
+          this.el.kochStageBar.style.display = 'none';
+        }
+
+        let drillTargets = [];
+        if (typeof generateWeaknessTargets === 'function') {
+          drillTargets = generateWeaknessTargets([exp, act], 10);
+        } else if (typeof window !== 'undefined' && typeof window.generateWeaknessTargets === 'function') {
+          drillTargets = window.generateWeaknessTargets([exp, act], 10);
+        } else {
+          drillTargets = [exp, act, exp, act, exp, act, 'E', 'T', 'A', 'N'];
+        }
+
+        this.startSession('drill', drillTargets);
+        if (this.el && this.el.feedbackMsg) {
+          this.el.feedbackMsg.innerHTML = `<span style="color:var(--gold);"><i class="mdi mdi-sword-cross"></i> 弱點專攻：${exp} <i class="mdi mdi-sword-cross"></i> ${act}（60% 針對混淆出題）</span>`;
+        }
       }
 
       retryErrors() {
@@ -6038,6 +6887,7 @@
           case 'callsign': return '呼號抄收';
           case 'groups': return '五字電碼群';
           case 'qcodes': return 'Q簡語與常用';
+          case 'drill': return this.drillTarget ? `弱點專攻 (${this.drillTarget.expected} vs ${this.drillTarget.actual})` : '弱點專攻';
           default: return '聽力抄收';
         }
       }
@@ -6828,8 +7678,12 @@
     });
     window.cwPlayer = cwPlayer;
 
+    const rxStatsManager = new RxStatsManager();
+    window.rxStatsManager = rxStatsManager;
+
     const rxMode = new RxMode({
       cwPlayer,
+      statsManager: rxStatsManager,
       submode: 'koch'
     });
     window.rxMode = rxMode;
@@ -7307,6 +8161,57 @@
         const item = CW_ABBREVIATIONS[Math.floor(Math.random() * CW_ABBREVIATIONS.length)];
         return { text: item.word, desc: item.desc, type: 'abbreviation' };
       }
+    }
+
+    function generateWeaknessTargets(pairOrChars, totalTrials = 10, distractorPool = null) {
+      let targets = [];
+      if (typeof pairOrChars === 'string') {
+        if (pairOrChars.includes('->')) {
+          targets = pairOrChars.split('->').map(s => s.trim().toUpperCase());
+        } else if (pairOrChars.includes(',')) {
+          targets = pairOrChars.split(',').map(s => s.trim().toUpperCase());
+        } else {
+          targets = pairOrChars.trim().toUpperCase().split('');
+        }
+      } else if (Array.isArray(pairOrChars)) {
+        targets = pairOrChars.map(s => String(s).trim().toUpperCase());
+      }
+
+      targets = targets.filter(c => c && c.length === 1);
+      if (targets.length === 0) {
+        targets = ['B', 'D'];
+      }
+
+      const defaultDistractors = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789'
+        .split('')
+        .filter(c => !targets.includes(c));
+      const pool = distractorPool || defaultDistractors;
+
+      const targetCount = Math.max(Math.ceil(totalTrials * 0.6), targets.length);
+      const distractorCount = Math.max(0, totalTrials - targetCount);
+
+      const result = [];
+      for (let i = 0; i < targetCount; i++) {
+        const char = targets[i % targets.length];
+        result.push(char);
+      }
+
+      for (let i = 0; i < distractorCount; i++) {
+        const randChar = pool[Math.floor(Math.random() * pool.length)];
+        result.push(randChar);
+      }
+
+      // Fisher-Yates Shuffle
+      for (let i = result.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [result[i], result[j]] = [result[j], result[i]];
+      }
+
+      return result;
+    }
+
+    if (typeof window !== 'undefined') {
+      window.generateWeaknessTargets = generateWeaknessTargets;
     }
 
     function applySpeedPreset(key, saveToSettings = true) {
@@ -9949,6 +10854,18 @@
       if (e.repeat) return;
       if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return;
 
+      // 當處於 RX 聽力抄收工作台時，發報快捷鍵 (電鍵、雙槳、重設發報等) 絕不觸發發報
+      const isRxActive = (typeof window !== 'undefined' && window.rxMode && typeof window.rxMode.isWorkspaceActive === 'function')
+        ? window.rxMode.isWorkspaceActive()
+        : (() => {
+            const wsRx = typeof document !== 'undefined' ? document.getElementById('ws-container-rx') : null;
+            return !!(wsRx && (wsRx.classList?.contains?.('active') || wsRx.style?.display === 'flex' || wsRx.style?.display === 'block'));
+          })();
+
+      if (isRxActive) {
+        return;
+      }
+
       // Keybinding Custom Recorder Intercept
       if (keybindingManager.recordingTarget) {
         e.preventDefault();
@@ -10008,6 +10925,18 @@
 
     window.addEventListener('keyup', (e) => {
       if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return;
+
+      // 當處於 RX 聽力抄收工作台時，忽略發報抬鍵
+      const isRxActive = (typeof window !== 'undefined' && window.rxMode && typeof window.rxMode.isWorkspaceActive === 'function')
+        ? window.rxMode.isWorkspaceActive()
+        : (() => {
+            const wsRx = typeof document !== 'undefined' ? document.getElementById('ws-container-rx') : null;
+            return !!(wsRx && (wsRx.classList?.contains?.('active') || wsRx.style?.display === 'flex' || wsRx.style?.display === 'block'));
+          })();
+
+      if (isRxActive) {
+        return;
+      }
 
       if (currentKeyerDevice === 'straight') {
         if (keybindingManager.isStraight(e)) {
@@ -10929,6 +11858,14 @@ function setStageView(view) {
           }
           if (typeof window !== 'undefined' && window.rxMode) {
             window.rxMode.onLeaveRx();
+          }
+
+          // Release any physical keyer contacts when switching workspaces
+          if (typeof currentKeyerDevice !== 'undefined' && currentKeyerDevice === 'straight') {
+            if (typeof handleKeyUp === 'function') handleKeyUp();
+          } else if (typeof keyer !== 'undefined' && keyer && typeof keyer.setPhysicalContact === 'function') {
+            keyer.setPhysicalContact('left', false);
+            keyer.setPhysicalContact('right', false);
           }
 
           wsTabs.forEach(t => {
