@@ -84,6 +84,10 @@ class QsoLogManager {
     return entry;
   }
 
+  getLogs() {
+    return this.logs ? [...this.logs] : [];
+  }
+
   getLog(id) {
     return this.logs.find(item => item.id === id) || null;
   }

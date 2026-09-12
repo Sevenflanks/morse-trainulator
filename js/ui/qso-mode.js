@@ -8,6 +8,7 @@ class QsoMode {
   constructor(options = {}) {
     this.qsoManager = options.qsoManager || (typeof window !== 'undefined' ? window.qsoManager : null);
     this.qsoLogManager = options.qsoLogManager || (typeof window !== 'undefined' ? window.qsoLogManager : null);
+    this.qslRenderer = options.qslRenderer || (typeof window !== 'undefined' ? (window.qslCardRenderer || (window.QslCardRenderer ? new window.QslCardRenderer() : null)) : null);
     this.cwPlayer = options.cwPlayer || (typeof window !== 'undefined' ? window.cwPlayer : null);
     this.synth = options.synth || (typeof window !== 'undefined' ? window.synth : null);
     this.engine = options.engine || (typeof window !== 'undefined' ? window.engine : null);
@@ -15,6 +16,9 @@ class QsoMode {
     this.qrnEnabled = false;
     this.qsbEnabled = true;
     this.bfoPitch = 660;
+
+    this.currentQslTheme = 'cyber-brass';
+    this.activeQslData = null;
 
     this._boundCwPulseStart = null;
     this._boundCwPulseEnd = null;
@@ -87,7 +91,17 @@ class QsoMode {
       btnExportAdif: document.getElementById('btn-qso-export-adif'),
       btnExportCsv: document.getElementById('btn-qso-export-csv'),
       btnClearLogs: document.getElementById('btn-qso-clear-logs'),
-      btnBackCockpit: document.getElementById('btn-qso-back-cockpit')
+      btnBackCockpit: document.getElementById('btn-qso-back-cockpit'),
+
+      // QSL Modal
+      qslModal: document.getElementById('qsl-modal'),
+      qslModalBackdrop: document.getElementById('qsl-modal-backdrop'),
+      btnCloseQsl: document.getElementById('btn-close-qsl'),
+      qslCanvas: document.getElementById('qsl-card-canvas'),
+      qslThemePills: document.querySelectorAll('.qsl-theme-pill'),
+      btnQslDownload: document.getElementById('btn-qsl-download'),
+      btnQslCopy: document.getElementById('btn-qsl-copy'),
+      qslMetaHint: document.getElementById('qsl-modal-meta-hint')
     };
 
     this.bindEvents();
@@ -259,6 +273,40 @@ class QsoMode {
         }
       });
     }
+
+    // 9. QSL Confirmation Modal Controls
+    if (this.el.btnCloseQsl) {
+      this.el.btnCloseQsl.addEventListener('click', () => {
+        this.closeQslModal();
+      });
+    }
+
+    if (this.el.qslModalBackdrop) {
+      this.el.qslModalBackdrop.addEventListener('click', () => {
+        this.closeQslModal();
+      });
+    }
+
+    if (this.el.qslThemePills) {
+      this.el.qslThemePills.forEach(pill => {
+        pill.addEventListener('click', () => {
+          const theme = pill.getAttribute('data-qsl-theme');
+          this.setQslTheme(theme);
+        });
+      });
+    }
+
+    if (this.el.btnQslDownload) {
+      this.el.btnQslDownload.addEventListener('click', () => {
+        this.downloadQslCard();
+      });
+    }
+
+    if (this.el.btnQslCopy) {
+      this.el.btnQslCopy.addEventListener('click', () => {
+        this.copyQslCard();
+      });
+    }
   }
 
   bindManagerEvents() {
@@ -275,12 +323,19 @@ class QsoMode {
     });
 
     this.qsoManager.on('qsoComplete', (logEntry) => {
+      let savedLog = logEntry;
       if (this.qsoLogManager && logEntry) {
-        this.qsoLogManager.addLog(logEntry);
+        savedLog = this.qsoLogManager.addLog(logEntry);
       }
       this.printFeed('SYS', `73! 通聯圓滿完成！日誌已記錄 [${logEntry ? logEntry.dxCall : 'DX'}]`);
       if (this.el.lastAck) {
-        this.el.lastAck.textContent = '通聯完成！已自動記錄至電台日誌 (可切換至日誌頁檢視)';
+        this.el.lastAck.innerHTML = `通聯完成！已自動記錄至電台日誌 · <button type="button" class="btn-xs-util" id="btn-quick-qsl" style="margin-left:6px; cursor:pointer;"><i class="mdi mdi-card-account-details"></i> 簽發 QSL 卡</button>`;
+        const btnQuick = document.getElementById('btn-quick-qsl');
+        if (btnQuick) {
+          btnQuick.addEventListener('click', () => {
+            this.openQslModal(savedLog || logEntry);
+          });
+        }
       }
     });
 
@@ -676,8 +731,41 @@ class QsoMode {
         <td>${log.qth || '—'}</td>
         <td>${log.grid || '—'}</td>
         <td style="color:#00e676;"><i class="mdi mdi-check-circle-outline"></i> 確認</td>
+        <td>
+          <div style="display:flex; gap:4px; align-items:center;">
+            <button type="button" class="btn-xs-util btn-view-qsl" data-id="${log.id}" title="檢視與下載 QSL 卡片">
+              <i class="mdi mdi-card-account-details"></i> QSL
+            </button>
+            <button type="button" class="btn-xs-util btn-del-log" data-id="${log.id}" title="刪除通聯記錄" style="color:#ff5252;">
+              <i class="mdi mdi-delete-outline"></i>
+            </button>
+          </div>
+        </td>
       `;
       this.el.logbookTbody.appendChild(tr);
+    });
+
+    // Bind row action buttons
+    const qslBtns = this.el.logbookTbody.querySelectorAll('.btn-view-qsl');
+    qslBtns.forEach(btn => {
+      btn.addEventListener('click', () => {
+        const id = btn.getAttribute('data-id');
+        const targetLog = logs.find(l => String(l.id) === String(id));
+        if (targetLog) {
+          this.openQslModal(targetLog);
+        }
+      });
+    });
+
+    const delBtns = this.el.logbookTbody.querySelectorAll('.btn-del-log');
+    delBtns.forEach(btn => {
+      btn.addEventListener('click', () => {
+        const id = btn.getAttribute('data-id');
+        if (confirm('確定要刪除這筆通聯記錄嗎？')) {
+          this.qsoLogManager.deleteLog(id);
+          this.renderLogbook();
+        }
+      });
     });
   }
 
@@ -706,6 +794,107 @@ class QsoMode {
       document.body.removeChild(a);
       URL.revokeObjectURL(url);
     }, 100);
+  }
+
+  // ==========================================
+  // QSL CONFIRMATION CARD MODAL & EXPORT
+  // ==========================================
+  _buildCurrentQsoData() {
+    const my = (this.qsoManager && this.qsoManager.myStation) ? this.qsoManager.myStation : {};
+    const dx = (this.qsoManager && this.qsoManager.remoteStation) ? this.qsoManager.remoteStation : {};
+    const now = new Date();
+    return {
+      myCall: my.call || 'BV2TT',
+      dxCall: dx.call || 'JA1ABC',
+      dateDisplay: now.toISOString().slice(0, 10),
+      timeDisplay: now.toISOString().slice(11, 16) + ' UTC',
+      band: (this.qsoManager && this.qsoManager.band) || '20M',
+      freq: (this.qsoManager && this.qsoManager.freq) || '14.025',
+      mode: 'CW',
+      rstSent: dx.rstSent || '599',
+      rstRcvd: dx.rstRcvd || '599',
+      myName: my.name || 'EDDIE',
+      dxName: dx.name || 'KEN',
+      myQth: my.qth || 'TAIPEI, TAIWAN',
+      dxQth: dx.qth ? `${dx.qth}, ${dx.country || ''}`.trim() : 'TOKYO, JAPAN',
+      myGrid: my.grid || 'PL05',
+      dxGrid: dx.grid || 'PM95',
+      rig: my.rig || '100W',
+      ant: my.ant || 'DIPOLE',
+      notes: 'TNX FER FB CW QSO! 73 ES GL'
+    };
+  }
+
+  openQslModal(qsoData = null) {
+    this.activeQslData = qsoData || this._buildCurrentQsoData();
+
+    if (this.el.qslModal) this.el.qslModal.style.display = 'flex';
+    if (this.el.qslModalBackdrop) this.el.qslModalBackdrop.style.display = 'block';
+
+    this.renderCurrentQslCard();
+  }
+
+  closeQslModal() {
+    if (this.el.qslModal) this.el.qslModal.style.display = 'none';
+    if (this.el.qslModalBackdrop) this.el.qslModalBackdrop.style.display = 'none';
+  }
+
+  setQslTheme(theme) {
+    if (!theme) return;
+    this.currentQslTheme = theme;
+
+    if (this.el.qslThemePills) {
+      this.el.qslThemePills.forEach(pill => {
+        pill.classList.toggle('active', pill.getAttribute('data-qsl-theme') === theme);
+      });
+    }
+
+    this.renderCurrentQslCard();
+  }
+
+  renderCurrentQslCard() {
+    if (!this.qslRenderer) {
+      if (typeof window !== 'undefined' && window.QslCardRenderer) {
+        this.qslRenderer = new window.QslCardRenderer();
+      } else if (typeof QslCardRenderer !== 'undefined') {
+        this.qslRenderer = new QslCardRenderer();
+      }
+    }
+
+    if (!this.qslRenderer || !this.el.qslCanvas) return;
+
+    const data = this.activeQslData || this._buildCurrentQsoData();
+    this.qslRenderer.render(this.el.qslCanvas, data, this.currentQslTheme);
+  }
+
+  downloadQslCard() {
+    if (!this.qslRenderer || !this.el.qslCanvas) return;
+    const data = this.activeQslData || this._buildCurrentQsoData();
+    const dateStr = (data.dateDisplay || '').replace(/[^0-9]/g, '') || new Date().toISOString().slice(0, 10).replace(/-/g, '');
+    const filename = `QSL_${data.myCall || 'BV2TT'}_${data.dxCall || 'STATION'}_${dateStr}.png`;
+    this.qslRenderer.downloadCard(this.el.qslCanvas, filename);
+  }
+
+  async copyQslCard() {
+    if (!this.qslRenderer || !this.el.qslCanvas) return;
+    const ok = await this.qslRenderer.copyToClipboard(this.el.qslCanvas);
+    if (this.el.btnQslCopy) {
+      const originalHTML = this.el.btnQslCopy.innerHTML;
+      if (ok) {
+        this.el.btnQslCopy.innerHTML = '<i class="mdi mdi-check"></i> 已複製卡片圖片';
+        this.el.btnQslCopy.style.color = '#00e676';
+        this.el.btnQslCopy.style.borderColor = '#00e676';
+      } else {
+        this.el.btnQslCopy.innerHTML = '<i class="mdi mdi-alert-circle-outline"></i> 請直接點擊下載';
+      }
+      setTimeout(() => {
+        if (this.el.btnQslCopy) {
+          this.el.btnQslCopy.innerHTML = originalHTML;
+          this.el.btnQslCopy.style.color = '';
+          this.el.btnQslCopy.style.borderColor = '';
+        }
+      }, 2000);
+    }
   }
 }
 

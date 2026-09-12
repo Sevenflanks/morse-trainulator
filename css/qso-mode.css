@@ -913,3 +913,145 @@
     padding: 10px 12px;
   }
 }
+
+/* ==========================================================================
+   10. QSL Card Modal Preview & Actions
+   ========================================================================== */
+.qsl-modal-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.75);
+  backdrop-filter: blur(4px);
+  z-index: 1000;
+}
+
+.qsl-modal {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 90%;
+  max-width: 920px;
+  max-height: 90vh;
+  overflow-y: auto;
+  background: #11141c;
+  border: 1.5px solid var(--gold);
+  border-radius: 12px;
+  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.8), 0 0 25px rgba(255, 215, 0, 0.2);
+  z-index: 1001;
+  display: flex;
+  flex-direction: column;
+}
+
+.qsl-modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px 16px;
+  background: #161a25;
+  border-bottom: 1px solid #252e40;
+}
+
+.qsl-modal-title {
+  font-size: 1rem;
+  font-weight: 800;
+  color: var(--gold);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.qsl-modal-body {
+  padding: 14px 18px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.qsl-theme-bar {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.qsl-bar-label {
+  font-size: 0.75rem;
+  color: #8c9cb0;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.qsl-theme-pill {
+  background: #171b26;
+  border: 1px solid #293245;
+  color: #9aa8bc;
+  padding: 6px 12px;
+  border-radius: 6px;
+  font-size: 0.76rem;
+  font-weight: 600;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  transition: all 0.15s ease;
+}
+
+.qsl-theme-pill:hover {
+  border-color: var(--neon-blue);
+  color: #fff;
+}
+
+.qsl-theme-pill.active {
+  background: rgba(0, 229, 255, 0.15);
+  border-color: var(--neon-blue);
+  color: var(--neon-blue);
+  box-shadow: 0 0 8px rgba(0, 229, 255, 0.25);
+}
+
+.qsl-canvas-wrapper {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background: #090a0f;
+  border: 1px solid #1c2230;
+  border-radius: 8px;
+  padding: 10px;
+  box-sizing: border-box;
+}
+
+#qsl-card-canvas {
+  width: 100%;
+  max-width: 840px;
+  height: auto;
+  aspect-ratio: 3 / 2;
+  border-radius: 6px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.7);
+  display: block;
+}
+
+.qsl-modal-actions {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px;
+  padding-top: 4px;
+}
+
+.qsl-meta-hint {
+  font-size: 0.74rem;
+  color: #6e7e96;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.qsl-action-buttons {
+  display: flex;
+  gap: 8px;
+}
+
