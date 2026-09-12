@@ -79,6 +79,8 @@ class RxStatsManager {
       correctCount: sessionData.correctCount || 0,
       accuracy: (typeof sessionData.accuracy === 'number') ? sessionData.accuracy : 0,
       avgLatency: (typeof sessionData.avgLatency === 'number') ? sessionData.avgLatency : 0,
+      medianLatency: (typeof sessionData.medianLatency === 'number') ? sessionData.medianLatency : 0,
+      low25Latency: (typeof sessionData.low25Latency === 'number') ? sessionData.low25Latency : 0,
       confusions: Array.isArray(sessionData.confusions) ? sessionData.confusions : [],
       trials: Array.isArray(sessionData.trials) ? sessionData.trials : []
     };

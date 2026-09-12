@@ -65,6 +65,8 @@ class RxMode {
       scAccuracy: document.getElementById('rx-sc-accuracy'),
       scWpm: document.getElementById('rx-sc-wpm'),
       scLatency: document.getElementById('rx-sc-latency'),
+      scMedianLatency: document.getElementById('rx-sc-median-latency'),
+      scLow25Latency: document.getElementById('rx-sc-low25-latency'),
       scTotal: document.getElementById('rx-sc-total'),
       scConfusionBox: document.getElementById('rx-sc-confusion-box'),
       scConfusionList: document.getElementById('rx-sc-confusion-list'),
@@ -809,6 +811,13 @@ class RxMode {
       }
     }
 
+    if (this.state === 'EVALUATED') {
+      if (key === 'Enter') {
+        this.advanceToNextTrial();
+      }
+      return;
+    }
+
     if (key === 'Backspace') {
       if (this.inputBuffer.length > 0) {
         this.inputBuffer = this.inputBuffer.slice(0, -1);
@@ -820,11 +829,7 @@ class RxMode {
     }
 
     if (key === 'Enter') {
-      if (this.state === 'EVALUATED') {
-        this.advanceToNextTrial();
-      } else {
-        this.submitAnswer();
-      }
+      this.submitAnswer();
       return;
     }
 
@@ -839,6 +844,12 @@ class RxMode {
       if (this.el && this.el.inputBuffer) {
         this.el.inputBuffer.textContent = this.inputBuffer;
       }
+    }
+
+    // 科赫盲聽 (Koch Rx) 或單字元題目：按下答案即自動送出，無需按下 enter
+    const isSingleCharTrial = (this.submode === 'koch' || this.submode === 'drill' || (this.currentTrial && this.currentTrial.target && this.currentTrial.target.length === 1));
+    if (isSingleCharTrial && (this.state === 'PLAYING' || this.state === 'WAITING_INPUT' || this.state === 'READY')) {
+      this.submitAnswer();
     }
   }
 
@@ -1021,6 +1032,22 @@ class RxMode {
       ? Math.round(answeredTrials.reduce((acc, t) => acc + t.reflexLatency, 0) / answeredTrials.length)
       : 0;
 
+    // 反射時間序列分析 (中位數與 25% Low 遲疑反射)
+    const latencies = answeredTrials.map(t => t.reflexLatency).sort((a, b) => a - b);
+    let medianLatency = 0;
+    let low25Latency = 0;
+
+    if (latencies.length > 0) {
+      const mid = Math.floor(latencies.length / 2);
+      medianLatency = (latencies.length % 2 !== 0)
+        ? latencies[mid]
+        : Math.round((latencies[mid - 1] + latencies[mid]) / 2);
+
+      const count25 = Math.max(1, Math.round(latencies.length * 0.25));
+      const slowestTrials = latencies.slice(-count25);
+      low25Latency = Math.round(slowestTrials.reduce((sum, v) => sum + v, 0) / slowestTrials.length);
+    }
+
     const wpm = this.cwPlayer ? (this.cwPlayer.charWpm || 20) : 20;
 
     if (this.el) {
@@ -1038,6 +1065,8 @@ class RxMode {
       }
       if (this.el.scWpm) this.el.scWpm.textContent = `${wpm} WPM`;
       if (this.el.scLatency) this.el.scLatency.textContent = `${avgLatency} ms`;
+      if (this.el.scMedianLatency) this.el.scMedianLatency.textContent = medianLatency > 0 ? `${medianLatency} ms` : '-- ms';
+      if (this.el.scLow25Latency) this.el.scLow25Latency.textContent = low25Latency > 0 ? `${low25Latency} ms` : '-- ms';
       if (this.el.scTotal) this.el.scTotal.textContent = `${correctCount} / ${total} (正確率 ${accuracy}%)`;
 
       // Breakthrough Box in Drill Mode
@@ -1150,6 +1179,8 @@ class RxMode {
           correctCount: correctCount,
           accuracy: accuracy,
           avgLatency: avgLatency,
+          medianLatency: medianLatency,
+          low25Latency: low25Latency,
           confusions: Object.entries(this.confusionMatrix).map(([pair, count]) => {
             const [exp, act] = pair.split('->');
             return { expected: exp, actual: act, count };
