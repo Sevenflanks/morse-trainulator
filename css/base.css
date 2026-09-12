@@ -208,22 +208,155 @@ h1 {
   }
 }
 
-/* Generic Panel */
+/* Generic Panel & Eurorack Chassis Inset */
 .panel {
-  background: #191b20;
-  border: 1px solid #2d3039;
+  background: linear-gradient(180deg, #181a24 0%, #12141c 100%);
+  border: 1px solid #282f42;
+  border-top-color: #3d4660;
+  border-bottom-color: #171b26;
   border-radius: 10px;
   padding: 13px 15px;
+  box-shadow: 
+    inset 0 1px 1px rgba(255, 255, 255, 0.06),
+    inset 0 -1px 2px rgba(0, 0, 0, 0.5),
+    0 4px 16px rgba(0, 0, 0, 0.45);
+  position: relative;
+}
+
+/* Eurorack Corner Rivets / Hex Screws */
+.panel::before,
+.panel::after {
+  content: '';
+  position: absolute;
+  width: 4px;
+  height: 4px;
+  border-radius: 50%;
+  background: #252c3d;
+  border: 1px solid #141822;
+  box-shadow: inset 0 1px 1px rgba(255, 255, 255, 0.2), 0 1px 2px rgba(0, 0, 0, 0.7);
+  pointer-events: none;
+  opacity: 0.55;
+  top: 6px;
+}
+.panel::before {
+  left: 7px;
+}
+.panel::after {
+  right: 7px;
 }
 
 .panel-title {
-  font-size: 0.9rem;
-  font-weight: bold;
+  font-size: 0.86rem;
+  font-weight: 700;
   color: var(--gold);
+  text-transform: uppercase;
+  letter-spacing: 1px;
   margin-bottom: 10px;
   display: flex;
   justify-content: space-between;
   align-items: center;
+}
+
+/* Radio Nomenclature Micro-labels */
+.radio-label,
+.telem-label,
+.state-label,
+.meter-track-header,
+.rx-sc-item-label,
+.scope-bezel-text,
+.control-group-title {
+  text-transform: uppercase;
+  letter-spacing: 1.5px;
+  font-size: 0.72rem;
+  font-weight: 600;
+  color: var(--text-dim);
+}
+
+/* Tabular Numbers for rock-solid dynamic instrumentation without horizontal jitter */
+.tabular-nums,
+.wpm-badge,
+.topbar-wpm-pill,
+.state-val,
+.telem-value,
+.telem-unit,
+.meter-readout strong,
+.meter-readout span,
+.val-tag,
+.settings-row .val-tag,
+.rx-score-val,
+.rx-stat-num,
+.rx-badge,
+.rx-progress-label,
+.rx-char-pct,
+.rx-hist-val,
+.rx-sc-metric-val,
+.rx-latency-val,
+.rx-stat-badge,
+.preset-btn span,
+.k5-step-val,
+.hud-char-large,
+.hud-seq-code,
+.hud-committed-stream,
+.trophy-pill strong,
+#topbar-wpm-val,
+#k5-wpm-val,
+#state-duration,
+#state-wpm,
+#state-seq,
+#readout-time,
+#readout-wpm,
+#readout-threshold-tag,
+#readout-max,
+#gap-time-readout,
+#gap-countdown-readout,
+#gap-max-readout,
+#telem-unit-t,
+#telem-jitter,
+#telem-ratio-text,
+#tag-unit-t,
+#tag-threshold,
+#tag-gap,
+#tag-word-gap,
+#wpm-display,
+#farns-wpm-display,
+#tone-val,
+#farnsworth-gap-val,
+#farnsworth-word-val,
+#weight-ratio-val,
+#qrn-val,
+#rx-wpm-val,
+#rx-fwpm-val,
+#rx-volume-val,
+#rx-sc-accuracy,
+#rx-sc-wpm,
+#rx-sc-latency,
+#rx-sc-median-latency,
+#rx-sc-low25-latency,
+#rx-sc-total,
+#rx-sc-hist-sessions,
+#rx-sc-hist-accuracy,
+#rx-sc-hist-latency,
+#rx-sc-hist-best,
+#rx-stat-total-sessions,
+#rx-stat-rolling-accuracy,
+#rx-stat-rolling-latency,
+#rx-stat-best-accuracy,
+#sc-total,
+#sc-correct,
+#sc-errors,
+#sc-accuracy,
+#koch-sc-total,
+#koch-sc-correct,
+#koch-sc-errors,
+#koch-sc-accuracy,
+#koch-mastery-text,
+#trophy-cnt-challenge,
+#trophy-cnt-standard,
+#trophy-cnt-quick,
+#trophy-cnt-total,
+#radar-halo-text {
+  font-variant-numeric: tabular-nums;
+  font-feature-settings: "tnum" 1;
 }
 
 /* Material Design Icons (MDI) Base Standards */
@@ -256,8 +389,10 @@ h1 {
   width: calc(100% - 24px);
   max-width: 1650px;
   height: 52px;
-  background: #13151c;
-  border: 1px solid #282f3d;
+  background: linear-gradient(180deg, #161924 0%, #11131a 100%);
+  border: 1px solid #282f42;
+  border-top-color: #3d4660;
+  border-bottom-color: #171b26;
   border-radius: 10px;
   display: flex;
   align-items: center;
@@ -267,7 +402,10 @@ h1 {
   align-self: center;
   box-sizing: border-box;
   flex-shrink: 0;
-  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.4);
+  box-shadow: 
+    inset 0 1px 1px rgba(255, 255, 255, 0.06),
+    inset 0 -1px 2px rgba(0, 0, 0, 0.5),
+    0 4px 16px rgba(0, 0, 0, 0.45);
 }
 .va-brand {
   display: flex;
