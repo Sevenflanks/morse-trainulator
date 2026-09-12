@@ -1571,9 +1571,14 @@ function initApp() {
     });
   }
 
+  if (typeof RxStatsManager !== 'undefined') {
+    window.rxStatsManager = new RxStatsManager();
+  }
+
   if (typeof RxMode !== 'undefined') {
     window.rxMode = new RxMode({
       cwPlayer: window.cwPlayer,
+      statsManager: window.rxStatsManager,
       submode: 'koch'
     });
     window.rxMode.init();

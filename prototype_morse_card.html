@@ -2281,6 +2281,52 @@
       box-shadow: 0 0 25px rgba(255, 215, 0, 0.2);
     }
 
+    .rx-sc-history-bar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      background: #10121a;
+      border: 1px solid #292e42;
+      border-radius: 6px;
+      padding: 8px 14px;
+      margin-bottom: 16px;
+      font-size: 0.8rem;
+      color: #a0a8c0;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+
+    .rx-sc-hist-item {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .rx-sc-hist-item i {
+      color: var(--neon-blue);
+      font-size: 0.95rem;
+    }
+
+    .rx-sc-clear-btn {
+      background: transparent;
+      border: 1px solid #3d4560;
+      color: #8892b0;
+      border-radius: 4px;
+      padding: 2px 8px;
+      font-size: 0.85rem;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.15s ease;
+    }
+
+    .rx-sc-clear-btn:hover {
+      background: rgba(255, 82, 82, 0.2);
+      border-color: #ff5252;
+      color: #ff5252;
+    }
+
     .rx-dock {
       position: fixed;
       bottom: 0;
@@ -4152,6 +4198,13 @@
           </div>
         </div>
 
+        <div class="rx-sc-history-bar" id="rx-sc-history-bar">
+          <span class="rx-sc-hist-item" id="rx-sc-hist-count"><i class="mdi mdi-history"></i> 累計: 0 場</span>
+          <span class="rx-sc-hist-item" id="rx-sc-hist-avg-acc"><i class="mdi mdi-chart-line"></i> 近期均準: --%</span>
+          <span class="rx-sc-hist-item" id="rx-sc-hist-avg-lat"><i class="mdi mdi-timer-outline"></i> 近期反射: -- ms</span>
+          <button type="button" class="rx-sc-clear-btn" id="btn-rx-clear-history" title="清除歷史紀錄"><i class="mdi mdi-delete-sweep-outline"></i></button>
+        </div>
+
         <div id="rx-sc-confusion-box" style="display:none; background:#1e1a18; border:1px solid #ff9100; border-radius:6px; padding:10px; margin-bottom:16px; font-size:0.8rem; color:#ffb703;">
           <div style="font-weight:bold; margin-bottom:4px;"><i class="mdi mdi-alert-circle-outline"></i> 易混淆音形診斷：</div>
           <div id="rx-sc-confusion-list"></div>
@@ -5034,6 +5087,114 @@
     }
 
     /**
+     * RX STATS & HISTORY PERSISTENCE MANAGER: RxStatsManager
+     * 聽力抄收歷史紀錄持久化、跨會話評測指標彙總與弱點資料庫
+     * (100% Zero-Emoji, Material Design Icons, Decoupled Domain Model)
+     */
+    class RxStatsManager {
+      constructor(storage = null, options = {}) {
+        this.storage = storage || (typeof localStorage !== 'undefined' ? localStorage : null);
+        this.storageKey = options.storageKey || 'morse_rx_sessions';
+        this.maxSessions = options.maxSessions || 50;
+        this.sessions = [];
+        this.load();
+      }
+
+      load() {
+        this.sessions = [];
+        if (!this.storage) return;
+        try {
+          const raw = this.storage.getItem(this.storageKey);
+          if (raw) {
+            const parsed = JSON.parse(raw);
+            if (Array.isArray(parsed)) {
+              this.sessions = parsed;
+            }
+          }
+        } catch (e) {
+          console.warn('[RxStatsManager] Failed to load sessions from storage:', e);
+          this.sessions = [];
+        }
+      }
+
+      save() {
+        if (!this.storage) return;
+        try {
+          this.storage.setItem(this.storageKey, JSON.stringify(this.sessions));
+        } catch (e) {
+          console.warn('[RxStatsManager] Failed to save sessions to storage:', e);
+        }
+      }
+
+      recordSession(sessionData = {}) {
+        const session = {
+          id: 'rx_' + Date.now() + '_' + Math.random().toString(36).substring(2, 6),
+          timestamp: sessionData.timestamp || Date.now(),
+          submode: sessionData.submode || 'koch',
+          charWpm: sessionData.charWpm || 20,
+          totalTrials: sessionData.totalTrials || 0,
+          correctCount: sessionData.correctCount || 0,
+          accuracy: (typeof sessionData.accuracy === 'number') ? sessionData.accuracy : 0,
+          avgLatency: (typeof sessionData.avgLatency === 'number') ? sessionData.avgLatency : 0,
+          confusions: Array.isArray(sessionData.confusions) ? sessionData.confusions : [],
+          trials: Array.isArray(sessionData.trials) ? sessionData.trials : []
+        };
+
+        this.sessions.unshift(session);
+        if (this.sessions.length > this.maxSessions) {
+          this.sessions = this.sessions.slice(0, this.maxSessions);
+        }
+        this.save();
+        return session;
+      }
+
+      getHistory(limit = 50) {
+        return this.sessions.slice(0, limit);
+      }
+
+      getSummaryStats() {
+        const total = this.sessions.length;
+        if (total === 0) {
+          return {
+            totalSessions: 0,
+            recentAccuracy: 0,
+            recentAvgLatency: 0,
+            bestAccuracy: 0,
+            latestSession: null
+          };
+        }
+
+        const recent = this.sessions.slice(0, 5);
+        const recentAccSum = recent.reduce((sum, s) => sum + (s.accuracy || 0), 0);
+        const recentAccuracy = Math.round(recentAccSum / recent.length);
+
+        const validLatencySessions = recent.filter(s => typeof s.avgLatency === 'number' && s.avgLatency > 0);
+        const recentAvgLatency = validLatencySessions.length > 0
+          ? Math.round(validLatencySessions.reduce((sum, s) => sum + s.avgLatency, 0) / validLatencySessions.length)
+          : (recent[0].avgLatency || 0);
+
+        const bestAccuracy = this.sessions.reduce((max, s) => Math.max(max, s.accuracy || 0), 0);
+
+        return {
+          totalSessions: total,
+          recentAccuracy,
+          recentAvgLatency,
+          bestAccuracy,
+          latestSession: this.sessions[0] || null
+        };
+      }
+
+      clearHistory() {
+        this.sessions = [];
+        this.save();
+      }
+    }
+
+    if (typeof window !== 'undefined') {
+      window.RxStatsManager = RxStatsManager;
+    }
+
+    /**
      * RX COPYING WORKSPACE CONTROLLER: RxMode
      * 聽力抄收工作台控制器、狀態機、評測模型與軟鍵盤交互
      */
@@ -5045,6 +5206,7 @@
         this.state = 'IDLE';
         this.blindMode = (options.blindMode !== undefined) ? !!options.blindMode : true;
         this.autoAdvance = (options.autoAdvance !== undefined) ? !!options.autoAdvance : true;
+        this.statsManager = options.statsManager || (typeof window !== 'undefined' && window.rxStatsManager ? window.rxStatsManager : (typeof RxStatsManager !== 'undefined' ? new RxStatsManager() : null));
         this.totalTrials = options.totalTrials || 10;
         this.currentTrialIndex = 0;
         this.trials = [];
@@ -5099,6 +5261,11 @@
           scTotal: document.getElementById('rx-sc-total'),
           scConfusionBox: document.getElementById('rx-sc-confusion-box'),
           scConfusionList: document.getElementById('rx-sc-confusion-list'),
+          scHistoryBar: document.getElementById('rx-sc-history-bar'),
+          scHistCount: document.getElementById('rx-sc-hist-count'),
+          scHistAvgAcc: document.getElementById('rx-sc-hist-avg-acc'),
+          scHistAvgLat: document.getElementById('rx-sc-hist-avg-lat'),
+          btnClearHistory: document.getElementById('btn-rx-clear-history'),
           btnRetryErrors: document.getElementById('btn-rx-retry-errors'),
           btnNextRound: document.getElementById('btn-rx-next-round'),
           softKeypad: document.getElementById('rx-soft-keypad'),
@@ -5114,6 +5281,15 @@
           kochMatrixGrid: document.getElementById('rx-koch-matrix-grid'),
           btnStageAdvance: document.getElementById('btn-rx-stage-advance')
         };
+
+        if (this.el.btnClearHistory) {
+          this.el.btnClearHistory.addEventListener('click', () => {
+            if (this.statsManager) {
+              this.statsManager.clearHistory();
+              this.updateHistoryBarUI();
+            }
+          });
+        }
 
         if (this.el.navPills) {
           this.el.navPills.forEach(pill => {
@@ -6024,6 +6200,54 @@
             this.el.feedbackMsg.innerHTML = '<span style="color:var(--gold);"><i class="mdi mdi-trophy"></i> 測驗結束！請檢視成績看板</span>';
           }
         }
+
+        // Record to statsManager and update history bar
+        if (this.statsManager) {
+          try {
+            this.statsManager.recordSession({
+              submode: this.submode,
+              charWpm: wpm,
+              totalTrials: total,
+              correctCount: correctCount,
+              accuracy: accuracy,
+              avgLatency: avgLatency,
+              confusions: Object.entries(this.confusionMatrix).map(([pair, count]) => {
+                const [exp, act] = pair.split('->');
+                return { expected: exp, actual: act, count };
+              }),
+              trials: this.trials.map(t => ({
+                target: t.target,
+                userInput: t.userInput,
+                isCorrect: t.isCorrect,
+                reflexLatency: t.reflexLatency
+              }))
+            });
+          } catch (err) {
+            console.warn('[RxMode] Failed to record session to statsManager:', err);
+          }
+        }
+        this.updateHistoryBarUI();
+      }
+
+      updateHistoryBarUI() {
+        if (!this.el) return;
+        if (!this.statsManager) {
+          if (this.el.scHistoryBar) this.el.scHistoryBar.style.display = 'none';
+          return;
+        }
+        const summary = this.statsManager.getSummaryStats();
+        if (this.el.scHistoryBar) this.el.scHistoryBar.style.display = 'flex';
+        if (this.el.scHistCount) {
+          this.el.scHistCount.innerHTML = `<i class="mdi mdi-history"></i> 累計: ${summary.totalSessions} 場`;
+        }
+        if (this.el.scHistAvgAcc) {
+          const accText = summary.totalSessions > 0 ? `${summary.recentAccuracy}%` : '--%';
+          this.el.scHistAvgAcc.innerHTML = `<i class="mdi mdi-chart-line"></i> 近期均準: ${accText}`;
+        }
+        if (this.el.scHistAvgLat) {
+          const latText = (summary.totalSessions > 0 && summary.recentAvgLatency > 0) ? `${summary.recentAvgLatency} ms` : '-- ms';
+          this.el.scHistAvgLat.innerHTML = `<i class="mdi mdi-timer-outline"></i> 近期反射: ${latText}`;
+        }
       }
 
       retryErrors() {
@@ -6828,8 +7052,12 @@
     });
     window.cwPlayer = cwPlayer;
 
+    const rxStatsManager = new RxStatsManager();
+    window.rxStatsManager = rxStatsManager;
+
     const rxMode = new RxMode({
       cwPlayer,
+      statsManager: rxStatsManager,
       submode: 'koch'
     });
     window.rxMode = rxMode;

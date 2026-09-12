@@ -12,6 +12,7 @@ class RxMode {
     this.state = 'IDLE'; // 'IDLE' | 'READY' | 'PLAYING' | 'WAITING_INPUT' | 'EVALUATED' | 'COMPLETED'
     this.blindMode = (options.blindMode !== undefined) ? !!options.blindMode : true;
     this.autoAdvance = (options.autoAdvance !== undefined) ? !!options.autoAdvance : true;
+    this.statsManager = options.statsManager || (typeof window !== 'undefined' && window.rxStatsManager ? window.rxStatsManager : (typeof RxStatsManager !== 'undefined' ? new RxStatsManager() : null));
     this.totalTrials = options.totalTrials || 10;
     this.currentTrialIndex = 0;
     this.trials = [];
@@ -67,6 +68,11 @@ class RxMode {
       scTotal: document.getElementById('rx-sc-total'),
       scConfusionBox: document.getElementById('rx-sc-confusion-box'),
       scConfusionList: document.getElementById('rx-sc-confusion-list'),
+      scHistoryBar: document.getElementById('rx-sc-history-bar'),
+      scHistCount: document.getElementById('rx-sc-hist-count'),
+      scHistAvgAcc: document.getElementById('rx-sc-hist-avg-acc'),
+      scHistAvgLat: document.getElementById('rx-sc-hist-avg-lat'),
+      btnClearHistory: document.getElementById('btn-rx-clear-history'),
       btnRetryErrors: document.getElementById('btn-rx-retry-errors'),
       btnNextRound: document.getElementById('btn-rx-next-round'),
       softKeypad: document.getElementById('rx-soft-keypad'),
@@ -82,6 +88,15 @@ class RxMode {
       kochMatrixGrid: document.getElementById('rx-koch-matrix-grid'),
       btnStageAdvance: document.getElementById('btn-rx-stage-advance')
     };
+
+    if (this.el.btnClearHistory) {
+      this.el.btnClearHistory.addEventListener('click', () => {
+        if (this.statsManager) {
+          this.statsManager.clearHistory();
+          this.updateHistoryBarUI();
+        }
+      });
+    }
 
     // 1. Submode Navigation Pills
     if (this.el.navPills) {
@@ -1016,6 +1031,54 @@ class RxMode {
       if (this.el.feedbackMsg) {
         this.el.feedbackMsg.innerHTML = '<span style="color:var(--gold);"><i class="mdi mdi-trophy"></i> 測驗結束！請檢視成績看板</span>';
       }
+    }
+
+    // Record to statsManager and update history bar
+    if (this.statsManager) {
+      try {
+        this.statsManager.recordSession({
+          submode: this.submode,
+          charWpm: wpm,
+          totalTrials: total,
+          correctCount: correctCount,
+          accuracy: accuracy,
+          avgLatency: avgLatency,
+          confusions: Object.entries(this.confusionMatrix).map(([pair, count]) => {
+            const [exp, act] = pair.split('->');
+            return { expected: exp, actual: act, count };
+          }),
+          trials: this.trials.map(t => ({
+            target: t.target,
+            userInput: t.userInput,
+            isCorrect: t.isCorrect,
+            reflexLatency: t.reflexLatency
+          }))
+        });
+      } catch (err) {
+        console.warn('[RxMode] Failed to record session to statsManager:', err);
+      }
+    }
+    this.updateHistoryBarUI();
+  }
+
+  updateHistoryBarUI() {
+    if (!this.el) return;
+    if (!this.statsManager) {
+      if (this.el.scHistoryBar) this.el.scHistoryBar.style.display = 'none';
+      return;
+    }
+    const summary = this.statsManager.getSummaryStats();
+    if (this.el.scHistoryBar) this.el.scHistoryBar.style.display = 'flex';
+    if (this.el.scHistCount) {
+      this.el.scHistCount.innerHTML = `<i class="mdi mdi-history"></i> 累計: ${summary.totalSessions} 場`;
+    }
+    if (this.el.scHistAvgAcc) {
+      const accText = summary.totalSessions > 0 ? `${summary.recentAccuracy}%` : '--%';
+      this.el.scHistAvgAcc.innerHTML = `<i class="mdi mdi-chart-line"></i> 近期均準: ${accText}`;
+    }
+    if (this.el.scHistAvgLat) {
+      const latText = (summary.totalSessions > 0 && summary.recentAvgLatency > 0) ? `${summary.recentAvgLatency} ms` : '-- ms';
+      this.el.scHistAvgLat.innerHTML = `<i class="mdi mdi-timer-outline"></i> 近期反射: ${latText}`;
     }
   }
 

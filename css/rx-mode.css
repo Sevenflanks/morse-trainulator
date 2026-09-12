@@ -238,6 +238,52 @@
   box-shadow: 0 0 25px rgba(255, 215, 0, 0.2);
 }
 
+.rx-sc-history-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: #10121a;
+  border: 1px solid #292e42;
+  border-radius: 6px;
+  padding: 8px 14px;
+  margin-bottom: 16px;
+  font-size: 0.8rem;
+  color: #a0a8c0;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.rx-sc-hist-item {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.rx-sc-hist-item i {
+  color: var(--neon-blue);
+  font-size: 0.95rem;
+}
+
+.rx-sc-clear-btn {
+  background: transparent;
+  border: 1px solid #3d4560;
+  color: #8892b0;
+  border-radius: 4px;
+  padding: 2px 8px;
+  font-size: 0.85rem;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.15s ease;
+}
+
+.rx-sc-clear-btn:hover {
+  background: rgba(255, 82, 82, 0.2);
+  border-color: #ff5252;
+  color: #ff5252;
+}
+
 /* Zone 3 Adaptive Rx Dock & Telegraph Soft Keypad */
 .rx-dock {
   position: fixed;
