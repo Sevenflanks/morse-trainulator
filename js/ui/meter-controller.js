@@ -224,6 +224,8 @@ function updateTelemetryGauges(engine) {
 function stopGapCountdown() {
   const haloGapArc = document.getElementById('halo-gap-arc');
   if (haloGapArc) haloGapArc.style.strokeDashoffset = '534';
+  const qsoGapBar = document.getElementById('qso-gap-bar');
+  if (qsoGapBar) qsoGapBar.style.width = '0%';
   if (gapAnimFrame) {
     cancelAnimationFrame(gapAnimFrame);
     gapAnimFrame = null;

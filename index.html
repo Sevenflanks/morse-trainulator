@@ -1112,30 +1112,31 @@
           <span id="rx-sc-mode-tag" class="rx-badge">科赫盲聽</span>
         </div>
 
-        <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(130px, 1fr)); gap:12px; margin-bottom:16px;">
-          <div style="background:#1a1c26; padding:10px; border-radius:6px; text-align:center;">
-            <div style="font-size:0.7rem; color:#888;">正確率</div>
-            <div id="rx-sc-accuracy" style="font-size:1.3rem; font-weight:bold; color:#00e676;">100%</div>
+        <div class="rx-sc-grid">
+          <div class="rx-sc-card">
+            <div class="rx-sc-card-label">正確率</div>
+            <div id="rx-sc-accuracy" class="rx-sc-card-val" style="color:#00e676;">100%</div>
           </div>
-          <div style="background:#1a1c26; padding:10px; border-radius:6px; text-align:center;">
-            <div style="font-size:0.7rem; color:#888;">抄收字速</div>
-            <div id="rx-sc-wpm" style="font-size:1.3rem; font-weight:bold; color:var(--gold);">20 WPM</div>
+          <div class="rx-sc-card">
+            <div class="rx-sc-card-label">抄收字速</div>
+            <div id="rx-sc-wpm" class="rx-sc-card-val" style="color:var(--gold);">20 WPM</div>
           </div>
-          <div style="background:#1a1c26; padding:10px; border-radius:6px; text-align:center;">
-            <div style="font-size:0.7rem; color:#888;">平均反射時間</div>
-            <div id="rx-sc-latency" style="font-size:1.3rem; font-weight:bold; color:var(--neon-blue);">320 ms</div>
+          <div class="rx-sc-card">
+            <div class="rx-sc-card-label">平均反射時間</div>
+            <div id="rx-sc-latency" class="rx-sc-card-val" style="color:var(--neon-blue);">320 ms</div>
           </div>
-          <div style="background:#1a1c26; padding:10px; border-radius:6px; text-align:center;">
-            <div style="font-size:0.7rem; color:#888;">反射中位數</div>
-            <div id="rx-sc-median-latency" style="font-size:1.3rem; font-weight:bold; color:#00e5ff;">-- ms</div>
+          <div class="rx-sc-card">
+            <div class="rx-sc-card-label">反射中位數</div>
+            <div id="rx-sc-median-latency" class="rx-sc-card-val" style="color:#00e5ff;">-- ms</div>
           </div>
-          <div style="background:#1a1c26; padding:10px; border-radius:6px; text-align:center;">
-            <div style="font-size:0.7rem; color:#888;">25% Low (遲疑反射)</div>
-            <div id="rx-sc-low25-latency" style="font-size:1.3rem; font-weight:bold; color:#ffb703;">-- ms</div>
+          <div class="rx-sc-card">
+            <div class="rx-sc-card-label">25% Low (遲疑反射)</div>
+            <div id="rx-sc-low25-latency" class="rx-sc-card-val" style="color:#ffb703;">-- ms</div>
           </div>
-          <div style="background:#1a1c26; padding:10px; border-radius:6px; text-align:center;">
-            <div style="font-size:0.7rem; color:#888;">題數</div>
-            <div id="rx-sc-total" style="font-size:1.3rem; font-weight:bold; color:#fff;">10 / 10</div>
+          <div class="rx-sc-card">
+            <div class="rx-sc-card-label">題數</div>
+            <div id="rx-sc-total" class="rx-sc-card-val" style="color:#fff;">10 / 10</div>
+            <div id="rx-sc-total-sub" class="rx-sc-card-sub">共 10 題</div>
           </div>
         </div>
 
@@ -1308,7 +1309,7 @@
                 <text x="175" y="78" class="qso-meter-text red">+30</text>
 
                 <!-- Rotating Pointer Needle Pivot at (100, 80) -->
-                <g id="qso-smeter-needle-group" transform="rotate(-40, 100, 80)">
+                <g id="qso-smeter-needle-group">
                   <line x1="100" y1="80" x2="100" y2="15" stroke="#ffd700" stroke-width="2" stroke-linecap="round" />
                   <circle cx="100" cy="80" r="5" fill="#ffd700" />
                 </g>
@@ -1344,7 +1345,7 @@
                 <label class="qso-rf-label" for="chk-qso-qrn">
                   <i class="mdi mdi-weather-lightning"></i> 天電雜音 QRN
                 </label>
-                <input type="checkbox" id="chk-qso-qrn" class="qso-checkbox">
+                <input type="checkbox" id="chk-qso-qrn" class="switch-input switch-neon">
               </div>
 
               <!-- QSB Ionospheric Fading Toggle -->
@@ -1352,7 +1353,7 @@
                 <label class="qso-rf-label" for="chk-qso-qsb">
                   <i class="mdi mdi-waves"></i> 電離層衰落 QSB
                 </label>
-                <input type="checkbox" id="chk-qso-qsb" class="qso-checkbox" checked>
+                <input type="checkbox" id="chk-qso-qsb" class="switch-input switch-neon" checked>
               </div>
 
               <!-- BFO Pitch Selector -->
@@ -1386,8 +1387,8 @@
             <div class="qso-guide-hint-box">
               <span class="qso-hint-title">建議發報格式：</span>
               <code class="qso-hint-code" id="qso-guide-hint">CQ CQ CQ DE BV2TT BV2TT K</code>
-              <button type="button" class="btn-xs-util" id="btn-qso-use-hint" title="將建議填入發報框">
-                <i class="mdi mdi-content-copy"></i> 填入
+              <button type="button" class="btn-xs-util" id="btn-qso-play-demo" title="示範播放此建議電文 (包含發報音、示波光帶與電傳打字)">
+                <i class="mdi mdi-play"></i> 示範播放
               </button>
             </div>
           </div>
@@ -1414,6 +1415,36 @@
 
           <div class="qso-terminal-feed" id="qso-terminal-feed">
             <!-- Dynamic teletype entries will be inserted here -->
+          </div>
+        </div>
+
+        <!-- Live Keying Telemetry Deck (輔助儀表板) -->
+        <div class="qso-telemetry-deck" id="qso-telemetry-deck">
+          <div class="qso-telem-card">
+            <span class="qso-telem-label"><i class="mdi mdi-ray-vertex"></i> 點劃序列</span>
+            <span class="qso-telem-val highlight-cyan" id="qso-telem-seq">—</span>
+          </div>
+          <div class="qso-telem-card">
+            <span class="qso-telem-label"><i class="mdi mdi-alphabetical-variant"></i> 即時解析</span>
+            <span class="qso-telem-val highlight-gold" id="qso-telem-char">—</span>
+          </div>
+          <div class="qso-telem-card">
+            <span class="qso-telem-label"><i class="mdi mdi-speedometer"></i> 時長與速度</span>
+            <span class="qso-telem-val" id="qso-telem-wpm">— ms (20 WPM)</span>
+          </div>
+          <div class="qso-telem-card telem-gap-card">
+            <span class="qso-telem-label"><i class="mdi mdi-timer-sand"></i> 字元間隔結算 (3T / 7T)</span>
+            <div class="qso-gap-track">
+              <div class="qso-gap-bar" id="qso-gap-bar"></div>
+            </div>
+          </div>
+          <div class="qso-telem-actions">
+            <button type="button" class="btn-qso-over" id="btn-qso-tx-over" title="結束當前電文發射 (發送 Over / K)">
+              <i class="mdi mdi-check"></i> 發送完畢 (Over)
+            </button>
+            <button type="button" class="btn-qso-clear-feed" id="btn-qso-clear-feed" title="清空終端記錄">
+              <i class="mdi mdi-delete-sweep-outline"></i>
+            </button>
           </div>
         </div>
 
@@ -1445,19 +1476,8 @@
           </button>
         </div>
 
-        <!-- Transmitter Input Cockpit -->
-        <div class="qso-tx-strip">
-          <div class="qso-tx-input-wrapper">
-            <input type="text" id="qso-tx-buffer" class="qso-tx-input" placeholder="透過電鍵發報或直接鍵入電文 (例如: CQ CQ DE BV2TT K)..." autocomplete="off" spellcheck="false">
-            <button type="button" id="btn-qso-tx-clear" class="btn-qso-icon" title="清空輸入"><i class="mdi mdi-backspace-outline"></i></button>
-          </div>
-          <button type="button" id="btn-qso-tx-send" class="btn-qso-send">
-            <i class="mdi mdi-send"></i> 發射電文 (TX)
-          </button>
-        </div>
-
         <div class="qso-tx-status-bar">
-          <span id="qso-tx-hint"><i class="mdi mdi-information-outline"></i> 提示：可直接於下方 K5 電鍵操作發報，解碼字元將自動即時加入發射緩衝區</span>
+          <span id="qso-tx-hint"><i class="mdi mdi-information-outline"></i> 提示：可直接操作下方 K5 電鍵發報，解碼字母將即時逐字印於電傳終端；亦可點擊宏按鈕或示範播放</span>
           <span id="qso-last-ack" class="qso-ack-text"></span>
         </div>
 

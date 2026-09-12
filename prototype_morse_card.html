@@ -951,6 +951,19 @@
       align-items: center;
       line-height: 1;
     }
+    .passage-box::-webkit-scrollbar {
+      width: 6px;
+    }
+    .passage-box::-webkit-scrollbar-track {
+      background: transparent;
+    }
+    .passage-box::-webkit-scrollbar-thumb {
+      background: #232b3b;
+      border-radius: 3px;
+    }
+    .passage-box::-webkit-scrollbar-thumb:hover {
+      background: #333e54;
+    }
 
     .char-chip {
       display: inline-flex;
@@ -2701,6 +2714,48 @@
       right: 7px;
     }
 
+    .rx-sc-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+      gap: 12px;
+      margin-bottom: 16px;
+    }
+
+    .rx-sc-card {
+      background: #1a1c26;
+      padding: 10px;
+      border-radius: 6px;
+      text-align: center;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+    }
+
+    .rx-sc-card-label {
+      font-size: 0.7rem;
+      color: #888;
+      margin-bottom: 2px;
+      white-space: nowrap;
+    }
+
+    .rx-sc-card-val {
+      font-size: 1.3rem;
+      font-weight: bold;
+      font-variant-numeric: tabular-nums;
+      font-feature-settings: "tnum" 1;
+      white-space: nowrap;
+    }
+
+    .rx-sc-card-sub {
+      font-size: 0.68rem;
+      color: #8c9bb0;
+      margin-top: 2px;
+      white-space: nowrap;
+      font-variant-numeric: tabular-nums;
+      font-feature-settings: "tnum" 1;
+    }
+
     .rx-sc-history-bar {
       display: flex;
       align-items: center;
@@ -3635,6 +3690,19 @@
       padding: 16px 18px;
       overflow-y: auto;
     }
+    .drawer-body::-webkit-scrollbar {
+      width: 6px;
+    }
+    .drawer-body::-webkit-scrollbar-track {
+      background: transparent;
+    }
+    .drawer-body::-webkit-scrollbar-thumb {
+      background: #232b3b;
+      border-radius: 3px;
+    }
+    .drawer-body::-webkit-scrollbar-thumb:hover {
+      background: #333e54;
+    }
 
     /* Theme Preset Selector Grid */
     .theme-preset-grid {
@@ -4362,6 +4430,9 @@
   font-variant-numeric: tabular-nums;
   font-feature-settings: "tnum" 1;
   text-shadow: 0 0 6px rgba(0, 229, 255, 0.4);
+  min-width: 90px;
+  text-align: right;
+  display: inline-block;
 }
 
 .qso-smeter-bezel {
@@ -4397,8 +4468,9 @@
 }
 
 #qso-smeter-needle-group {
-  transform-origin: 100px 80px;
-  transition: transform 0.12s cubic-bezier(0.2, 0.8, 0.3, 1);
+  transform-box: view-box;
+  transform-origin: 50% 100%;
+  transition: transform 0.15s cubic-bezier(0.2, 0.8, 0.3, 1);
 }
 
 /* 11-Segment Dynamic S-Meter LED Ladder */
@@ -4695,12 +4767,48 @@
   box-sizing: border-box;
 }
 
+.qso-terminal-feed::-webkit-scrollbar {
+  width: 6px;
+}
+.qso-terminal-feed::-webkit-scrollbar-track {
+  background: transparent;
+}
+.qso-terminal-feed::-webkit-scrollbar-thumb {
+  background: #232b3b;
+  border-radius: 3px;
+}
+.qso-terminal-feed::-webkit-scrollbar-thumb:hover {
+  background: #333e54;
+}
+
 /* Terminal Feed Rows */
 .qso-feed-line {
   display: flex;
   align-items: baseline;
   gap: 8px;
   word-break: break-all;
+}
+
+.qso-feed-line.live {
+  background: rgba(0, 229, 255, 0.06);
+  border-left: 2px solid var(--neon-blue);
+  padding: 2px 6px;
+  border-radius: 4px;
+}
+
+.qso-cursor {
+  display: inline-block;
+  width: 8px;
+  height: 13px;
+  background: var(--gold);
+  margin-left: 3px;
+  vertical-align: -1px;
+  animation: qsoCursorBlink 0.8s infinite;
+}
+
+@keyframes qsoCursorBlink {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0; }
 }
 
 .qso-feed-time {
@@ -4816,84 +4924,118 @@
 }
 
 /* ==========================================================================
-   7. Transmitter Input Cockpit
+   7. Live Keying Telemetry & Streaming Assistance Deck
    ========================================================================== */
-.qso-tx-strip {
-  display: flex;
+.qso-telemetry-deck {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1.2fr 1.6fr auto;
   gap: 8px;
+  background: #0a0c12;
+  border: 1.5px solid #1c2434;
+  border-radius: 8px;
+  padding: 8px 12px;
   align-items: center;
+  box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.6);
 }
 
-.qso-tx-input-wrapper {
-  position: relative;
-  flex: 1;
+.qso-telem-card {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.qso-telem-label {
+  font-size: 0.65rem;
+  color: #6e7d94;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
   display: flex;
   align-items: center;
+  gap: 4px;
+  white-space: nowrap;
 }
 
-.qso-tx-input {
-  width: 100%;
-  background: #090b10;
-  border: 1.5px solid #232c3d;
-  border-radius: 8px;
-  padding: 10px 42px 10px 12px;
-  color: #fff;
+.qso-telem-val {
   font-family: 'SF Mono', Consolas, monospace;
   font-size: 0.95rem;
-  font-weight: 700;
-  letter-spacing: 1px;
-  outline: none;
-  transition: border-color 0.2s ease, box-shadow 0.2s ease;
-  box-sizing: border-box;
-}
-
-.qso-tx-input:focus {
-  border-color: var(--gold);
-  box-shadow: 0 0 10px rgba(255, 215, 0, 0.25);
-}
-
-.btn-qso-icon {
-  position: absolute;
-  right: 8px;
-  background: none;
-  border: none;
-  color: #6a788e;
-  cursor: pointer;
-  font-size: 1.1rem;
-  padding: 4px;
-  display: flex;
-  align-items: center;
-  transition: color 0.15s ease;
-}
-
-.btn-qso-icon:hover {
-  color: #ff5252;
-}
-
-.btn-qso-send {
-  background: linear-gradient(135deg, #e6a817 0%, #b8860b 100%);
-  border: 1px solid #ffe082;
-  border-radius: 8px;
-  color: #0b0c10;
-  font-weight: 800;
-  font-size: 0.85rem;
-  padding: 10px 18px;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  gap: 6px;
+  font-weight: bold;
+  color: #cbd5e1;
+  font-variant-numeric: tabular-nums;
+  font-feature-settings: "tnum" 1;
   white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.qso-telem-val.highlight-gold {
+  color: var(--gold);
+}
+
+.qso-telem-val.highlight-cyan {
+  color: var(--neon-blue);
+}
+
+.qso-gap-track {
+  width: 100%;
+  height: 5px;
+  background: #141a26;
+  border-radius: 2px;
+  overflow: hidden;
+  margin-top: 4px;
+}
+
+.qso-gap-bar {
+  height: 100%;
+  width: 0%;
+  background: linear-gradient(90deg, #00e5ff, #ffd700);
+  transition: width 0.05s linear;
+}
+
+.qso-telem-actions {
+  display: flex;
+  gap: 6px;
+  align-items: center;
+}
+
+.btn-qso-over {
+  background: #152233;
+  border: 1px solid #233b58;
+  color: var(--neon-blue);
+  font-size: 0.72rem;
+  font-weight: 700;
+  padding: 6px 10px;
+  border-radius: 5px;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
   transition: all 0.15s ease;
-  box-shadow: 0 2px 8px rgba(184, 134, 11, 0.3);
+  white-space: nowrap;
 }
 
-.btn-qso-send:hover {
-  filter: brightness(1.1);
-  box-shadow: 0 4px 12px rgba(255, 215, 0, 0.4);
+.btn-qso-over:hover {
+  background: #1a2f4a;
+  border-color: var(--neon-blue);
+  color: #fff;
+  box-shadow: 0 0 8px rgba(0, 229, 255, 0.3);
 }
 
-.btn-qso-send:active {
-  transform: translateY(1px);
+.btn-qso-clear-feed {
+  background: transparent;
+  border: 1px solid #283142;
+  color: #728299;
+  font-size: 0.72rem;
+  padding: 6px 8px;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.btn-qso-clear-feed:hover {
+  border-color: #ff5252;
+  color: #ff5252;
 }
 
 .qso-tx-status-bar {
@@ -4968,9 +5110,29 @@
 .qso-logbook-table-wrapper {
   max-height: 480px;
   overflow-y: auto;
+  overflow-x: auto;
   border: 1px solid #1a212e;
   border-radius: 8px;
   background: #080a0f;
+}
+
+.qso-logbook-table-wrapper::-webkit-scrollbar,
+.qsl-modal::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+.qso-logbook-table-wrapper::-webkit-scrollbar-track,
+.qsl-modal::-webkit-scrollbar-track {
+  background: transparent;
+}
+.qso-logbook-table-wrapper::-webkit-scrollbar-thumb,
+.qsl-modal::-webkit-scrollbar-thumb {
+  background: #232b3b;
+  border-radius: 3px;
+}
+.qso-logbook-table-wrapper::-webkit-scrollbar-thumb:hover,
+.qsl-modal::-webkit-scrollbar-thumb:hover {
+  background: #333e54;
 }
 
 .qso-logbook-table {
@@ -4978,6 +5140,11 @@
   border-collapse: collapse;
   font-size: 0.78rem;
   text-align: left;
+}
+
+.qso-logbook-table th,
+.qso-logbook-table td {
+  white-space: nowrap;
 }
 
 .qso-logbook-table th {
@@ -5056,8 +5223,16 @@
     align-items: flex-start;
   }
 
-  .btn-qso-send {
-    padding: 10px 12px;
+  .qso-telemetry-deck {
+    grid-template-columns: 1fr 1fr;
+    gap: 6px;
+  }
+  .qso-telem-card.telem-gap-card {
+    grid-column: span 2;
+  }
+  .qso-telem-actions {
+    grid-column: span 2;
+    justify-content: flex-end;
   }
 }
 
@@ -5201,6 +5376,16 @@
   display: flex;
   gap: 8px;
 }
+
+
+
+
+
+
+
+
+
+
 
   </style>
 </head>
@@ -6271,30 +6456,31 @@
           <span id="rx-sc-mode-tag" class="rx-badge">科赫盲聽</span>
         </div>
 
-        <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(130px, 1fr)); gap:12px; margin-bottom:16px;">
-          <div style="background:#1a1c26; padding:10px; border-radius:6px; text-align:center;">
-            <div style="font-size:0.7rem; color:#888;">正確率</div>
-            <div id="rx-sc-accuracy" style="font-size:1.3rem; font-weight:bold; color:#00e676;">100%</div>
+        <div class="rx-sc-grid">
+          <div class="rx-sc-card">
+            <div class="rx-sc-card-label">正確率</div>
+            <div id="rx-sc-accuracy" class="rx-sc-card-val" style="color:#00e676;">100%</div>
           </div>
-          <div style="background:#1a1c26; padding:10px; border-radius:6px; text-align:center;">
-            <div style="font-size:0.7rem; color:#888;">抄收字速</div>
-            <div id="rx-sc-wpm" style="font-size:1.3rem; font-weight:bold; color:var(--gold);">20 WPM</div>
+          <div class="rx-sc-card">
+            <div class="rx-sc-card-label">抄收字速</div>
+            <div id="rx-sc-wpm" class="rx-sc-card-val" style="color:var(--gold);">20 WPM</div>
           </div>
-          <div style="background:#1a1c26; padding:10px; border-radius:6px; text-align:center;">
-            <div style="font-size:0.7rem; color:#888;">平均反射時間</div>
-            <div id="rx-sc-latency" style="font-size:1.3rem; font-weight:bold; color:var(--neon-blue);">320 ms</div>
+          <div class="rx-sc-card">
+            <div class="rx-sc-card-label">平均反射時間</div>
+            <div id="rx-sc-latency" class="rx-sc-card-val" style="color:var(--neon-blue);">320 ms</div>
           </div>
-          <div style="background:#1a1c26; padding:10px; border-radius:6px; text-align:center;">
-            <div style="font-size:0.7rem; color:#888;">反射中位數</div>
-            <div id="rx-sc-median-latency" style="font-size:1.3rem; font-weight:bold; color:#00e5ff;">-- ms</div>
+          <div class="rx-sc-card">
+            <div class="rx-sc-card-label">反射中位數</div>
+            <div id="rx-sc-median-latency" class="rx-sc-card-val" style="color:#00e5ff;">-- ms</div>
           </div>
-          <div style="background:#1a1c26; padding:10px; border-radius:6px; text-align:center;">
-            <div style="font-size:0.7rem; color:#888;">25% Low (遲疑反射)</div>
-            <div id="rx-sc-low25-latency" style="font-size:1.3rem; font-weight:bold; color:#ffb703;">-- ms</div>
+          <div class="rx-sc-card">
+            <div class="rx-sc-card-label">25% Low (遲疑反射)</div>
+            <div id="rx-sc-low25-latency" class="rx-sc-card-val" style="color:#ffb703;">-- ms</div>
           </div>
-          <div style="background:#1a1c26; padding:10px; border-radius:6px; text-align:center;">
-            <div style="font-size:0.7rem; color:#888;">題數</div>
-            <div id="rx-sc-total" style="font-size:1.3rem; font-weight:bold; color:#fff;">10 / 10</div>
+          <div class="rx-sc-card">
+            <div class="rx-sc-card-label">題數</div>
+            <div id="rx-sc-total" class="rx-sc-card-val" style="color:#fff;">10 / 10</div>
+            <div id="rx-sc-total-sub" class="rx-sc-card-sub">共 10 題</div>
           </div>
         </div>
 
@@ -6467,7 +6653,7 @@
                 <text x="175" y="78" class="qso-meter-text red">+30</text>
 
                 <!-- Rotating Pointer Needle Pivot at (100, 80) -->
-                <g id="qso-smeter-needle-group" transform="rotate(-40, 100, 80)">
+                <g id="qso-smeter-needle-group">
                   <line x1="100" y1="80" x2="100" y2="15" stroke="#ffd700" stroke-width="2" stroke-linecap="round" />
                   <circle cx="100" cy="80" r="5" fill="#ffd700" />
                 </g>
@@ -6503,7 +6689,7 @@
                 <label class="qso-rf-label" for="chk-qso-qrn">
                   <i class="mdi mdi-weather-lightning"></i> 天電雜音 QRN
                 </label>
-                <input type="checkbox" id="chk-qso-qrn" class="qso-checkbox">
+                <input type="checkbox" id="chk-qso-qrn" class="switch-input switch-neon">
               </div>
 
               <!-- QSB Ionospheric Fading Toggle -->
@@ -6511,7 +6697,7 @@
                 <label class="qso-rf-label" for="chk-qso-qsb">
                   <i class="mdi mdi-waves"></i> 電離層衰落 QSB
                 </label>
-                <input type="checkbox" id="chk-qso-qsb" class="qso-checkbox" checked>
+                <input type="checkbox" id="chk-qso-qsb" class="switch-input switch-neon" checked>
               </div>
 
               <!-- BFO Pitch Selector -->
@@ -6545,8 +6731,8 @@
             <div class="qso-guide-hint-box">
               <span class="qso-hint-title">建議發報格式：</span>
               <code class="qso-hint-code" id="qso-guide-hint">CQ CQ CQ DE BV2TT BV2TT K</code>
-              <button type="button" class="btn-xs-util" id="btn-qso-use-hint" title="將建議填入發報框">
-                <i class="mdi mdi-content-copy"></i> 填入
+              <button type="button" class="btn-xs-util" id="btn-qso-play-demo" title="示範播放此建議電文 (包含發報音、示波光帶與電傳打字)">
+                <i class="mdi mdi-play"></i> 示範播放
               </button>
             </div>
           </div>
@@ -6573,6 +6759,36 @@
 
           <div class="qso-terminal-feed" id="qso-terminal-feed">
             <!-- Dynamic teletype entries will be inserted here -->
+          </div>
+        </div>
+
+        <!-- Live Keying Telemetry Deck (輔助儀表板) -->
+        <div class="qso-telemetry-deck" id="qso-telemetry-deck">
+          <div class="qso-telem-card">
+            <span class="qso-telem-label"><i class="mdi mdi-ray-vertex"></i> 點劃序列</span>
+            <span class="qso-telem-val highlight-cyan" id="qso-telem-seq">—</span>
+          </div>
+          <div class="qso-telem-card">
+            <span class="qso-telem-label"><i class="mdi mdi-alphabetical-variant"></i> 即時解析</span>
+            <span class="qso-telem-val highlight-gold" id="qso-telem-char">—</span>
+          </div>
+          <div class="qso-telem-card">
+            <span class="qso-telem-label"><i class="mdi mdi-speedometer"></i> 時長與速度</span>
+            <span class="qso-telem-val" id="qso-telem-wpm">— ms (20 WPM)</span>
+          </div>
+          <div class="qso-telem-card telem-gap-card">
+            <span class="qso-telem-label"><i class="mdi mdi-timer-sand"></i> 字元間隔結算 (3T / 7T)</span>
+            <div class="qso-gap-track">
+              <div class="qso-gap-bar" id="qso-gap-bar"></div>
+            </div>
+          </div>
+          <div class="qso-telem-actions">
+            <button type="button" class="btn-qso-over" id="btn-qso-tx-over" title="結束當前電文發射 (發送 Over / K)">
+              <i class="mdi mdi-check"></i> 發送完畢 (Over)
+            </button>
+            <button type="button" class="btn-qso-clear-feed" id="btn-qso-clear-feed" title="清空終端記錄">
+              <i class="mdi mdi-delete-sweep-outline"></i>
+            </button>
           </div>
         </div>
 
@@ -6604,19 +6820,8 @@
           </button>
         </div>
 
-        <!-- Transmitter Input Cockpit -->
-        <div class="qso-tx-strip">
-          <div class="qso-tx-input-wrapper">
-            <input type="text" id="qso-tx-buffer" class="qso-tx-input" placeholder="透過電鍵發報或直接鍵入電文 (例如: CQ CQ DE BV2TT K)..." autocomplete="off" spellcheck="false">
-            <button type="button" id="btn-qso-tx-clear" class="btn-qso-icon" title="清空輸入"><i class="mdi mdi-backspace-outline"></i></button>
-          </div>
-          <button type="button" id="btn-qso-tx-send" class="btn-qso-send">
-            <i class="mdi mdi-send"></i> 發射電文 (TX)
-          </button>
-        </div>
-
         <div class="qso-tx-status-bar">
-          <span id="qso-tx-hint"><i class="mdi mdi-information-outline"></i> 提示：可直接於下方 K5 電鍵操作發報，解碼字元將自動即時加入發射緩衝區</span>
+          <span id="qso-tx-hint"><i class="mdi mdi-information-outline"></i> 提示：可直接操作下方 K5 電鍵發報，解碼字母將即時逐字印於電傳終端；亦可點擊宏按鈕或示範播放</span>
           <span id="qso-last-ack" class="qso-ack-text"></span>
         </div>
 
@@ -8526,7 +8731,8 @@
           rxDock: document.getElementById('rx-dock'),
           btnToggleDock: document.getElementById('btn-rx-toggle-dock'),
           dockToggleText: document.getElementById('rx-dock-toggle-text'),
-          dockChevron: document.getElementById('rx-dock-chevron')
+          dockChevron: document.getElementById('rx-dock-chevron'),
+          scTotalSub: document.getElementById('rx-sc-total-sub')
         };
     
         if (this.el.wsContainer) {
@@ -9574,7 +9780,8 @@
           if (this.el.scLatency) this.el.scLatency.textContent = `${avgLatency} ms`;
           if (this.el.scMedianLatency) this.el.scMedianLatency.textContent = medianLatency > 0 ? `${medianLatency} ms` : '-- ms';
           if (this.el.scLow25Latency) this.el.scLow25Latency.textContent = low25Latency > 0 ? `${low25Latency} ms` : '-- ms';
-          if (this.el.scTotal) this.el.scTotal.textContent = `${correctCount} / ${total} (正確率 ${accuracy}%)`;
+          if (this.el.scTotal) this.el.scTotal.textContent = `${correctCount} / ${total}`;
+      if (this.el.scTotalSub) this.el.scTotalSub.textContent = `共 ${total} 題 · 正確率 ${accuracy}%`;
     
           // Breakthrough Box in Drill Mode
           if (this.submode === 'drill' && this.drillTarget) {
@@ -10685,918 +10892,1182 @@
      * (100% Zero-Emoji, Material Design Icons, Dual-Track Architecture)
      */
     
-    class QsoMode {
-      constructor(options = {}) {
-        this.qsoManager = options.qsoManager || (typeof window !== 'undefined' ? window.qsoManager : null);
-        this.qsoLogManager = options.qsoLogManager || (typeof window !== 'undefined' ? window.qsoLogManager : null);
-        this.qslRenderer = options.qslRenderer || (typeof window !== 'undefined' ? (window.qslCardRenderer || (window.QslCardRenderer ? new window.QslCardRenderer() : null)) : null);
-        this.cwPlayer = options.cwPlayer || (typeof window !== 'undefined' ? window.cwPlayer : null);
-        this.synth = options.synth || (typeof window !== 'undefined' ? window.synth : null);
-        this.engine = options.engine || (typeof window !== 'undefined' ? window.engine : null);
-    
-        this.qrnEnabled = false;
-        this.qsbEnabled = true;
-        this.bfoPitch = 660;
-    
-        this.currentQslTheme = 'cyber-brass';
-        this.activeQslData = null;
-    
-        this._boundCwPulseStart = null;
-        this._boundCwPulseEnd = null;
-        this._boundCwPlaybackComplete = null;
-        this._isRemotePlaying = false;
-        this._qsbTimer = null;
-        this._initialized = false;
-      }
-    
-      isWorkspaceActive() {
-        if (typeof document === 'undefined') return false;
-        const ws = document.getElementById('ws-container-qso');
-        return !!(ws && (ws.classList.contains('active') || ws.style.display === 'flex' || ws.style.display === 'block'));
-      }
-    
-      init() {
-        if (typeof document === 'undefined') return;
-    
-        // Cache elements
-        this.el = {
-          wsContainer: document.getElementById('ws-container-qso'),
-          submodePills: document.querySelectorAll('.qso-mode-pill'),
-          cockpitStage: document.getElementById('qso-cockpit-stage'),
-          logbookStage: document.getElementById('qso-logbook-stage'),
-    
-          // VFO & SDR Bar
-          bandButtons: document.querySelectorAll('.qso-band-btn'),
-          vfoFreq: document.getElementById('qso-vfo-freq'),
-    
-          // S-Meter & Carrier
-          smeterNeedle: document.getElementById('qso-smeter-needle-group'),
-          smeterReadout: document.getElementById('qso-smeter-readout'),
-          smeterLadder: document.getElementById('qso-smeter-ladder'),
-          carrierDot: document.getElementById('qso-carrier-dot'),
-          carrierText: document.getElementById('qso-carrier-text'),
-    
-          // RF Controls
-          chkQrn: document.getElementById('chk-qso-qrn'),
-          chkQsb: document.getElementById('chk-qso-qsb'),
-          selBfo: document.getElementById('sel-qso-bfo'),
-    
-          // Guided Step Info
-          stageGuide: document.getElementById('qso-stage-guide'),
-          stepBadges: document.querySelectorAll('.qso-step-badge'),
-          guidePrompt: document.getElementById('qso-guide-prompt'),
-          guideHint: document.getElementById('qso-guide-hint'),
-          btnUseHint: document.getElementById('btn-qso-use-hint'),
-    
-          // Terminal
-          terminalFeed: document.getElementById('qso-terminal-feed'),
-          remoteCall: document.getElementById('qso-remote-call'),
-          remoteDetails: document.getElementById('qso-remote-details'),
-          myCall: document.getElementById('qso-my-call'),
-          myDetails: document.getElementById('qso-my-details'),
-          btnReplayRx: document.getElementById('btn-qso-replay-rx'),
-          btnNewStation: document.getElementById('btn-qso-new-station'),
-    
-          // Macros
-          macroButtons: document.querySelectorAll('.qso-macro-btn'),
-    
-          // TX Cockpit
-          txBuffer: document.getElementById('qso-tx-buffer'),
-          btnClearTx: document.getElementById('btn-qso-tx-clear'),
-          btnSendTx: document.getElementById('btn-qso-tx-send'),
-          lastAck: document.getElementById('qso-last-ack'),
-    
-          // Logbook
-          logbookTbody: document.getElementById('qso-logbook-tbody'),
-          logbookEmpty: document.getElementById('qso-logbook-empty'),
-          btnExportAdif: document.getElementById('btn-qso-export-adif'),
-          btnExportCsv: document.getElementById('btn-qso-export-csv'),
-          btnClearLogs: document.getElementById('btn-qso-clear-logs'),
-          btnBackCockpit: document.getElementById('btn-qso-back-cockpit'),
-    
-          // QSL Modal
-          qslModal: document.getElementById('qsl-modal'),
-          qslModalBackdrop: document.getElementById('qsl-modal-backdrop'),
-          btnCloseQsl: document.getElementById('btn-close-qsl'),
-          qslCanvas: document.getElementById('qsl-card-canvas'),
-          qslThemePills: document.querySelectorAll('.qsl-theme-pill'),
-          btnQslDownload: document.getElementById('btn-qsl-download'),
-          btnQslCopy: document.getElementById('btn-qsl-copy'),
-          qslMetaHint: document.getElementById('qsl-modal-meta-hint')
-        };
-    
-        this.bindEvents();
-        this.bindManagerEvents();
-        this.syncOperatorSettings();
-        this.updateStationMeta();
-        this.updateGuidedUI();
-        this.setSmeterLevel(1, false);
-    
-        // Initial system print
-        this.printFeed('SYS', 'SDR 接收機就緒 · VFO 鎖定於 14.025.00 MHz (20M)');
-        if (this.qsoManager && this.qsoManager.remoteStation) {
-          this.printFeed('SYS', `偵測到遠端電台呼叫訊號 [${this.qsoManager.remoteStation.call}]，等待建立通聯...`);
-        }
-    
-        this._initialized = true;
-      }
-    
-      // ==========================================
-      // EVENT BINDINGS
-      // ==========================================
-      bindEvents() {
-        // 1. Submode Navigation
-        if (this.el.submodePills) {
-          this.el.submodePills.forEach(pill => {
-            pill.addEventListener('click', () => {
-              const submode = pill.getAttribute('data-submode');
-              this.switchSubmode(submode);
-            });
-          });
-        }
-    
-        // 2. Band Switcher
-        if (this.el.bandButtons) {
-          this.el.bandButtons.forEach(btn => {
-            btn.addEventListener('click', () => {
-              const band = btn.getAttribute('data-band');
-              this.setBand(band);
-            });
-          });
-        }
-    
-        // 3. RF Atmosphere Controls
-        if (this.el.chkQrn) {
-          this.el.chkQrn.addEventListener('change', (e) => {
-            this.qrnEnabled = e.target.checked;
-            if (this.isWorkspaceActive()) {
-              if (this.qrnEnabled) {
-                if (this.synth && typeof this.synth.startNoise === 'function') this.synth.startNoise();
-              } else {
-                if (this.synth && typeof this.synth.stopNoise === 'function') this.synth.stopNoise();
-              }
-            }
-          });
-        }
-    
-        if (this.el.chkQsb) {
-          this.el.chkQsb.addEventListener('change', (e) => {
-            this.qsbEnabled = e.target.checked;
-          });
-        }
-    
-        if (this.el.selBfo) {
-          this.el.selBfo.addEventListener('change', (e) => {
-            this.bfoPitch = parseInt(e.target.value, 10) || 660;
-            if (this.synth) this.synth.frequency = this.bfoPitch;
-          });
-        }
-    
-        // 4. Guided Hint Button
-        if (this.el.btnUseHint) {
-          this.el.btnUseHint.addEventListener('click', () => {
-            if (!this.qsoManager) return;
-            const step = this.qsoManager.getGuidedStepInfo();
-            if (step && step.hint && this.el.txBuffer) {
-              this.el.txBuffer.value = step.hint;
-              this.el.txBuffer.focus();
-            }
-          });
-        }
-    
-        // 5. Terminal Actions
-        if (this.el.btnReplayRx) {
-          this.el.btnReplayRx.addEventListener('click', () => {
-            if (this.qsoManager && this.qsoManager.lastRemoteMessage) {
-              this.playRemoteCw(this.qsoManager.lastRemoteMessage, 200);
-            }
-          });
-        }
-    
-        if (this.el.btnNewStation) {
-          this.el.btnNewStation.addEventListener('click', () => {
-            if (this.qsoManager) {
-              this.qsoManager.resetQso();
-              this.updateStationMeta();
-              this.updateGuidedUI();
-              this.printFeed('SYS', `已切換至新遠端電台呼號: ${this.qsoManager.remoteStation ? this.qsoManager.remoteStation.call : 'DX'}`);
-            }
-          });
-        }
-    
-        // 6. Macro Buttons Deck
-        if (this.el.macroButtons) {
-          this.el.macroButtons.forEach(btn => {
-            btn.addEventListener('click', () => {
-              const macro = btn.getAttribute('data-macro');
-              if (this.qsoManager) {
-                const text = this.qsoManager.generateMacroText(macro);
-                if (text && this.el.txBuffer) {
-                  this.el.txBuffer.value = text;
-                  this.el.txBuffer.focus();
-                }
-              }
-            });
-          });
-        }
-    
-        // 7. TX Input & Send
-        if (this.el.btnSendTx) {
-          this.el.btnSendTx.addEventListener('click', () => {
-            this.transmitCurrentBuffer();
-          });
-        }
-    
-        if (this.el.btnClearTx) {
-          this.el.btnClearTx.addEventListener('click', () => {
-            if (this.el.txBuffer) {
-              this.el.txBuffer.value = '';
-              this.el.txBuffer.focus();
-            }
-          });
-        }
-    
-        if (this.el.txBuffer) {
-          this.el.txBuffer.addEventListener('keydown', (e) => {
-            if (e.key === 'Enter') {
-              e.preventDefault();
-              this.transmitCurrentBuffer();
-            }
-          });
-        }
-    
-        // 8. Logbook Action Buttons
-        if (this.el.btnBackCockpit) {
-          this.el.btnBackCockpit.addEventListener('click', () => {
-            this.switchSubmode('guided');
-          });
-        }
-    
-        if (this.el.btnExportAdif) {
-          this.el.btnExportAdif.addEventListener('click', () => {
-            this.exportADIF();
-          });
-        }
-    
-        if (this.el.btnExportCsv) {
-          this.el.btnExportCsv.addEventListener('click', () => {
-            this.exportCSV();
-          });
-        }
-    
-        if (this.el.btnClearLogs) {
-          this.el.btnClearLogs.addEventListener('click', () => {
-            if (confirm('確定要清空所有電台通聯日誌嗎？此動作無法復原。')) {
-              if (this.qsoLogManager) {
-                this.qsoLogManager.clearLogs();
-                this.renderLogbook();
-              }
-            }
-          });
-        }
-    
-        // 9. QSL Confirmation Modal Controls
-        if (this.el.btnCloseQsl) {
-          this.el.btnCloseQsl.addEventListener('click', () => {
-            this.closeQslModal();
-          });
-        }
-    
-        if (this.el.qslModalBackdrop) {
-          this.el.qslModalBackdrop.addEventListener('click', () => {
-            this.closeQslModal();
-          });
-        }
-    
-        if (this.el.qslThemePills) {
-          this.el.qslThemePills.forEach(pill => {
-            pill.addEventListener('click', () => {
-              const theme = pill.getAttribute('data-qsl-theme');
-              this.setQslTheme(theme);
-            });
-          });
-        }
-    
-        if (this.el.btnQslDownload) {
-          this.el.btnQslDownload.addEventListener('click', () => {
-            this.downloadQslCard();
-          });
-        }
-    
-        if (this.el.btnQslCopy) {
-          this.el.btnQslCopy.addEventListener('click', () => {
-            this.copyQslCard();
-          });
-        }
-      }
-    
-      bindManagerEvents() {
-        if (!this.qsoManager) return;
-    
-        this.qsoManager.on('phaseChanged', () => {
-          this.updateGuidedUI();
-        });
-    
-        this.qsoManager.on('botResponseReady', (data) => {
-          if (data && data.text) {
-            this.playRemoteCw(data.text, data.delay || 800);
-          }
-        });
-    
-        this.qsoManager.on('qsoComplete', (logEntry) => {
-          let savedLog = logEntry;
-          if (this.qsoLogManager && logEntry) {
-            savedLog = this.qsoLogManager.addLog(logEntry);
-          }
-          this.printFeed('SYS', `73! 通聯圓滿完成！日誌已記錄 [${logEntry ? logEntry.dxCall : 'DX'}]`);
-          if (this.el.lastAck) {
-            this.el.lastAck.innerHTML = `通聯完成！已自動記錄至電台日誌 · <button type="button" class="btn-xs-util" id="btn-quick-qsl" style="margin-left:6px; cursor:pointer;"><i class="mdi mdi-card-account-details"></i> 簽發 QSL 卡</button>`;
-            const btnQuick = document.getElementById('btn-quick-qsl');
-            if (btnQuick) {
-              btnQuick.addEventListener('click', () => {
-                this.openQslModal(savedLog || logEntry);
-              });
-            }
-          }
-        });
-    
-        this.qsoManager.on('validationWarning', (data) => {
-          if (data && data.feedback) {
-            this.printFeed('SYS', `[發報提示] ${data.feedback}`);
-          }
-        });
-    
-        this.qsoManager.on('bandChanged', (data) => {
-          if (this.el.vfoFreq && data) {
-            this.el.vfoFreq.textContent = `${data.freq}.00`;
-          }
-          this.printFeed('SYS', `VFO 已切換至 ${data.band} 頻段 (${data.freq}.00 MHz)`);
-        });
-      }
-    
-      syncOperatorSettings() {
-        const settings = (typeof window !== 'undefined' && window.settingsManager) ? window.settingsManager.settings : null;
-        if (settings && this.qsoManager) {
-          this.qsoManager.setMyStation({
-            call: settings.operatorCallsign || 'BV2TT',
-            name: settings.operatorName || 'EDDIE',
-            qth: settings.operatorQth || 'TAIPEI',
-            grid: settings.operatorGrid || 'PL05',
-            rig: settings.operatorRig || '100W',
-            ant: settings.operatorAnt || 'DIPOLE'
-          });
-        }
-      }
-    
-      // ==========================================
-      // WORKSPACE LIFECYCLE & K5 DOCK REPARENTING
-      // ==========================================
-      onEnterQso() {
-        this.syncOperatorSettings();
-        this.updateStationMeta();
-        this.updateGuidedUI();
-    
-        // Dynamically reparent K5 Dock into ws-container-qso so keyer is immediately available
-        const k5Dock = document.getElementById('k5-dock');
-        const wsQso = document.getElementById('ws-container-qso');
-        if (k5Dock && wsQso && k5Dock.parentElement !== wsQso) {
-          wsQso.appendChild(k5Dock);
-        }
-    
-        // Start QRN noise if enabled
-        if (this.qrnEnabled && this.synth && typeof this.synth.startNoise === 'function') {
-          this.synth.startNoise();
-        }
-    
-        // Scroll terminal to latest
-        if (this.el.terminalFeed) {
-          this.el.terminalFeed.scrollTop = this.el.terminalFeed.scrollHeight;
-        }
-      }
-    
-      onLeaveQso() {
-        // Reparent K5 Dock back into ws-container-tx
-        const k5Dock = document.getElementById('k5-dock');
-        const wsTx = document.getElementById('ws-container-tx');
-        if (k5Dock && wsTx && k5Dock.parentElement !== wsTx) {
-          wsTx.appendChild(k5Dock);
-        }
-    
-        // Stop remote audio playback if in progress
-        if (this.cwPlayer && this.cwPlayer.isPlaying) {
-          this.cwPlayer.stop();
-        }
-    
-        // Stop QRN noise
-        if (this.synth && typeof this.synth.stopNoise === 'function') {
-          this.synth.stopNoise();
-        }
-    
-        // Reset S-meter
-        this.setSmeterLevel(0, false);
-        this.setCarrierState('IDLE');
-      }
-    
-      // ==========================================
-      // SUBMODE & BAND SWITCHING
-      // ==========================================
-      switchSubmode(submode) {
-        if (!submode) return;
-    
-        if (this.el.submodePills) {
-          this.el.submodePills.forEach(pill => {
-            const pSub = pill.getAttribute('data-submode');
-            pill.classList.toggle('active', pSub === submode);
-          });
-        }
-    
-        if (submode === 'logbook') {
-          if (this.el.cockpitStage) this.el.cockpitStage.style.display = 'none';
-          if (this.el.logbookStage) this.el.logbookStage.style.display = 'flex';
-          this.renderLogbook();
-        } else {
-          if (this.el.cockpitStage) this.el.cockpitStage.style.display = 'flex';
-          if (this.el.logbookStage) this.el.logbookStage.style.display = 'none';
-    
-          if (this.el.stageGuide) {
-            this.el.stageGuide.style.display = (submode === 'guided') ? 'flex' : 'none';
-          }
-    
-          if (this.qsoManager) {
-            this.qsoManager.setSubmode(submode);
-            this.updateStationMeta();
-            this.updateGuidedUI();
-          }
-    
-          const labelMap = { guided: '標準引導模式 (Guided)', free: '空中自由頻段 (Free)', contest: '競賽連珠模式 (Contest)' };
-          this.printFeed('SYS', `工作台子模式切換為: ${labelMap[submode] || submode}`);
-        }
-      }
-    
-      setBand(bandId) {
-        if (!bandId) return;
-    
-        if (this.el.bandButtons) {
-          this.el.bandButtons.forEach(btn => {
-            btn.classList.toggle('active', btn.getAttribute('data-band') === bandId);
-          });
-        }
-    
-        if (this.qsoManager) {
-          this.qsoManager.setBand(bandId);
-        }
-      }
-    
-      // ==========================================
-      // TRANSMISSION & TELETYPE TERMINAL
-      // ==========================================
-      handleLetterDecoded(char) {
-        if (!this.isWorkspaceActive()) return;
-        if (!this.el.txBuffer) return;
-    
-        if (char === '<HH>') {
-          // Erase last word
-          const val = this.el.txBuffer.value.trimEnd();
-          const lastSpace = val.lastIndexOf(' ');
-          this.el.txBuffer.value = (lastSpace !== -1) ? val.slice(0, lastSpace + 1) : '';
-          return;
-        }
-    
-        this.el.txBuffer.value += char;
-        this.el.txBuffer.scrollLeft = this.el.txBuffer.scrollWidth;
-    
-        // Carrier TX blip
-        this.setCarrierState('TX');
-        clearTimeout(this._txBlipTimer);
-        this._txBlipTimer = setTimeout(() => {
-          if (!this._isRemotePlaying) this.setCarrierState('IDLE');
-        }, 300);
-      }
-    
-      transmitCurrentBuffer() {
-        if (!this.el.txBuffer) return;
-        const text = this.el.txBuffer.value.trim();
-        if (!text) return;
-    
-        if (!this.qsoManager) return;
-    
-        // Send to domain state machine
-        const res = this.qsoManager.handleUserTransmit(text);
-    
-        // Print to terminal feed
-        const myCall = (this.qsoManager.myStation && this.qsoManager.myStation.call) ? this.qsoManager.myStation.call : 'BV2TT';
-        this.printFeed('TX', text, myCall);
-    
-        // Clear input buffer
-        this.el.txBuffer.value = '';
-    
-        if (this.el.lastAck) {
-          this.el.lastAck.textContent = res.feedback || '電文已發射';
-        }
-      }
-    
-      printFeed(sender, text, callsign = '') {
-        if (!this.el.terminalFeed || !text) return;
-    
-        const line = document.createElement('div');
-        line.className = 'qso-feed-line';
-    
-        const now = new Date();
-        const timeStr = `${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}:${String(now.getSeconds()).padStart(2, '0')}`;
-    
-        const timeSpan = document.createElement('span');
-        timeSpan.className = 'qso-feed-time';
-        timeSpan.textContent = timeStr;
-        line.appendChild(timeSpan);
-    
-        const tagSpan = document.createElement('span');
-        tagSpan.className = `qso-feed-tag ${sender.toLowerCase()}`;
-        tagSpan.textContent = callsign ? `${sender} ${callsign}` : sender;
-        line.appendChild(tagSpan);
-    
-        const textSpan = document.createElement('span');
-        textSpan.className = `qso-feed-text ${sender.toLowerCase()}`;
-        textSpan.textContent = text;
-        line.appendChild(textSpan);
-    
-        this.el.terminalFeed.appendChild(line);
-        this.el.terminalFeed.scrollTop = this.el.terminalFeed.scrollHeight;
-      }
-    
-      // ==========================================
-      // REMOTE CW PLAYBACK & S-METER
-      // ==========================================
-      async playRemoteCw(text, delayMs = 600) {
-        if (!text) return;
-    
-        if (delayMs > 0) {
-          await new Promise(r => setTimeout(r, delayMs));
-        }
-    
-        if (!this.isWorkspaceActive()) return;
-    
-        this._isRemotePlaying = true;
-        this.setCarrierState('RX');
-    
-        // Calculate target S-meter level (S7 to S9+20dB with QSB)
-        let targetS = 9;
-        if (this.qsbEnabled) {
-          targetS = Math.floor(Math.random() * 5) + 6; // S6 ~ S10 (S9+10dB)
-        }
-    
-        // Attach transient CWPlayer pulse listeners to drive S-Meter
-        const onPulseStart = () => {
-          const flutter = this.qsbEnabled ? (Math.random() * 2 - 1) : 0;
-          this.setSmeterLevel(targetS + flutter, true);
-        };
-    
-        const onPulseEnd = () => {
-          this.setSmeterLevel(1, false);
-        };
-    
-        if (this.cwPlayer) {
-          this.cwPlayer.on('pulseStart', onPulseStart);
-          this.cwPlayer.on('pulseEnd', onPulseEnd);
-        }
-    
-        try {
-          if (this.cwPlayer) {
-            // Adjust tone to remote station pitch if available
-            const originalFreq = this.synth ? this.synth.frequency : 650;
-            if (this.synth && this.qsoManager && this.qsoManager.remoteStation && this.qsoManager.remoteStation.pitchHz) {
-              this.synth.frequency = this.qsoManager.remoteStation.pitchHz;
-            }
-    
-            await this.cwPlayer.playText(text);
-    
-            // Restore BFO pitch
-            if (this.synth) this.synth.frequency = this.bfoPitch;
-          }
-        } catch (e) {
-          console.error('[QsoMode] Audio playback error:', e);
-        } finally {
-          if (this.cwPlayer) {
-            this.cwPlayer.off('pulseStart', onPulseStart);
-            this.cwPlayer.off('pulseEnd', onPulseEnd);
-          }
-    
-          this._isRemotePlaying = false;
-          this.setCarrierState('IDLE');
-          this.setSmeterLevel(1, false);
-    
-          // Print received message into terminal feed
-          const remoteCall = (this.qsoManager && this.qsoManager.remoteStation) ? this.qsoManager.remoteStation.call : 'DX';
-          this.printFeed('RX', text, remoteCall);
-        }
-      }
-    
-      setCarrierState(state) {
-        if (!this.el.carrierDot || !this.el.carrierText) return;
-    
-        this.el.carrierDot.className = 'qso-carrier-dot';
-        if (state === 'RX') {
-          this.el.carrierDot.classList.add('active-rx');
-          this.el.carrierText.textContent = 'CARRIER ACTIVE (RX)';
-          this.el.carrierText.style.color = '#00e676';
-        } else if (state === 'TX') {
-          this.el.carrierDot.classList.add('active-tx');
-          this.el.carrierText.textContent = 'CARRIER ACTIVE (TX)';
-          this.el.carrierText.style.color = 'var(--gold)';
-        } else {
-          this.el.carrierText.textContent = 'CARRIER IDLE';
-          this.el.carrierText.style.color = '#6e7d94';
-        }
-      }
-    
-      setSmeterLevel(level, active = true) {
-        const clampedLevel = Math.max(0, Math.min(11, level));
-    
-        // Map level 0~11 to rotation angle: -45deg (S0) to +45deg (S9+30dB)
-        // S0: -45deg, S5: -10deg, S9: +18deg, S9+30dB: +45deg
-        const angle = -45 + (clampedLevel / 11) * 90;
-    
-        if (this.el.smeterNeedle) {
-          this.el.smeterNeedle.setAttribute('transform', `rotate(${angle.toFixed(1)}, 100, 80)`);
-        }
-    
-        // Readout badge text
-        if (this.el.smeterReadout) {
-          if (!active || clampedLevel <= 1) {
-            this.el.smeterReadout.textContent = 'S1 (NOISE)';
-            this.el.smeterReadout.style.color = '#6e7d94';
-          } else if (clampedLevel <= 9) {
-            this.el.smeterReadout.textContent = `S${Math.round(clampedLevel)}`;
-            this.el.smeterReadout.style.color = '#00e676';
-          } else if (clampedLevel <= 10) {
-            this.el.smeterReadout.textContent = 'S9 +10dB';
-            this.el.smeterReadout.style.color = 'var(--gold)';
-          } else {
-            this.el.smeterReadout.textContent = 'S9 +30dB';
-            this.el.smeterReadout.style.color = '#ff3d00';
-          }
-        }
-    
-        // LED ladder segments
-        if (this.el.smeterLadder) {
-          const leds = this.el.smeterLadder.querySelectorAll('.smeter-led');
-          leds.forEach(led => {
-            const segLevel = parseInt(led.getAttribute('data-level'), 10);
-            led.classList.toggle('active', active && segLevel <= clampedLevel);
-          });
-        }
-      }
-    
-      // ==========================================
-      // METADATA & GUIDED UI UPDATES
-      // ==========================================
-      updateStationMeta() {
-        if (!this.qsoManager) return;
-    
-        const my = this.qsoManager.myStation;
-        if (this.el.myCall) this.el.myCall.textContent = my.call;
-        if (this.el.myDetails) this.el.myDetails.textContent = `(${my.name} · ${my.qth} · ${my.rig})`;
-    
-        const dx = this.qsoManager.remoteStation;
-        if (dx) {
-          if (this.el.remoteCall) this.el.remoteCall.textContent = dx.call;
-          if (this.el.remoteDetails) this.el.remoteDetails.textContent = `(${dx.name} · ${dx.qth}, ${dx.country} · RST ${dx.rstRcvd} · ${dx.speedWpm} WPM)`;
-        } else {
-          if (this.el.remoteCall) this.el.remoteCall.textContent = 'FREE AIRWAVES';
-          if (this.el.remoteDetails) this.el.remoteDetails.textContent = '(尚未建立呼叫)';
-        }
-      }
-    
-      updateGuidedUI() {
-        if (!this.qsoManager) return;
-        const stepInfo = this.qsoManager.getGuidedStepInfo();
-        if (!stepInfo) return;
-    
-        if (this.el.guidePrompt) this.el.guidePrompt.textContent = stepInfo.prompt;
-        if (this.el.guideHint) this.el.guideHint.textContent = stepInfo.hint;
-    
-        if (this.el.stepBadges) {
-          this.el.stepBadges.forEach(badge => {
-            const bStep = parseInt(badge.getAttribute('data-step'), 10);
-            badge.classList.toggle('active', bStep === stepInfo.step);
-            badge.classList.toggle('completed', bStep < stepInfo.step || this.qsoManager.guidedCompleted);
-          });
-        }
-      }
-    
-      // ==========================================
-      // LOGBOOK VIEW & EXPORTS
-      // ==========================================
-      renderLogbook() {
-        if (!this.qsoLogManager || !this.el.logbookTbody) return;
-    
-        const logs = this.qsoLogManager.getLogs();
-        this.el.logbookTbody.innerHTML = '';
-    
-        if (logs.length === 0) {
-          if (this.el.logbookEmpty) this.el.logbookEmpty.style.display = 'flex';
-          return;
-        }
-    
-        if (this.el.logbookEmpty) this.el.logbookEmpty.style.display = 'none';
-    
-        logs.forEach(log => {
-          const tr = document.createElement('tr');
-          tr.innerHTML = `
-            <td>${log.dateDisplay} ${log.timeDisplay}</td>
-            <td style="color:var(--gold); font-weight:700;">${log.dxCall}</td>
-            <td>${log.band}</td>
-            <td>${log.freq}</td>
-            <td>${log.mode}</td>
-            <td>${log.rstSent} / ${log.rstRcvd}</td>
-            <td>${log.name || '—'}</td>
-            <td>${log.qth || '—'}</td>
-            <td>${log.grid || '—'}</td>
-            <td style="color:#00e676;"><i class="mdi mdi-check-circle-outline"></i> 確認</td>
-            <td>
-              <div style="display:flex; gap:4px; align-items:center;">
-                <button type="button" class="btn-xs-util btn-view-qsl" data-id="${log.id}" title="檢視與下載 QSL 卡片">
-                  <i class="mdi mdi-card-account-details"></i> QSL
-                </button>
-                <button type="button" class="btn-xs-util btn-del-log" data-id="${log.id}" title="刪除通聯記錄" style="color:#ff5252;">
-                  <i class="mdi mdi-delete-outline"></i>
-                </button>
-              </div>
-            </td>
-          `;
-          this.el.logbookTbody.appendChild(tr);
-        });
-    
-        // Bind row action buttons
-        const qslBtns = this.el.logbookTbody.querySelectorAll('.btn-view-qsl');
-        qslBtns.forEach(btn => {
-          btn.addEventListener('click', () => {
-            const id = btn.getAttribute('data-id');
-            const targetLog = logs.find(l => String(l.id) === String(id));
-            if (targetLog) {
-              this.openQslModal(targetLog);
-            }
-          });
-        });
-    
-        const delBtns = this.el.logbookTbody.querySelectorAll('.btn-del-log');
-        delBtns.forEach(btn => {
-          btn.addEventListener('click', () => {
-            const id = btn.getAttribute('data-id');
-            if (confirm('確定要刪除這筆通聯記錄嗎？')) {
-              this.qsoLogManager.deleteLog(id);
-              this.renderLogbook();
-            }
-          });
-        });
-      }
-    
-      exportADIF() {
-        if (!this.qsoLogManager) return;
-        const adif = this.qsoLogManager.exportADIF();
-        this._downloadFile(adif, `morse_qso_log_${new Date().toISOString().slice(0, 10)}.adi`, 'text/plain');
-      }
-    
-      exportCSV() {
-        if (!this.qsoLogManager) return;
-        const csv = this.qsoLogManager.exportCSV();
-        this._downloadFile(csv, `morse_qso_log_${new Date().toISOString().slice(0, 10)}.csv`, 'text/csv');
-      }
-    
-      _downloadFile(content, fileName, mimeType) {
-        if (typeof document === 'undefined') return;
-        const blob = new Blob([content], { type: mimeType });
-        const url = URL.createObjectURL(blob);
-        const a = document.createElement('a');
-        a.href = url;
-        a.download = fileName;
-        document.body.appendChild(a);
-        a.click();
-        setTimeout(() => {
-          document.body.removeChild(a);
-          URL.revokeObjectURL(url);
-        }, 100);
-      }
-    
-      // ==========================================
-      // QSL CONFIRMATION CARD MODAL & EXPORT
-      // ==========================================
-      _buildCurrentQsoData() {
-        const my = (this.qsoManager && this.qsoManager.myStation) ? this.qsoManager.myStation : {};
-        const dx = (this.qsoManager && this.qsoManager.remoteStation) ? this.qsoManager.remoteStation : {};
-        const now = new Date();
-        return {
-          myCall: my.call || 'BV2TT',
-          dxCall: dx.call || 'JA1ABC',
-          dateDisplay: now.toISOString().slice(0, 10),
-          timeDisplay: now.toISOString().slice(11, 16) + ' UTC',
-          band: (this.qsoManager && this.qsoManager.band) || '20M',
-          freq: (this.qsoManager && this.qsoManager.freq) || '14.025',
-          mode: 'CW',
-          rstSent: dx.rstSent || '599',
-          rstRcvd: dx.rstRcvd || '599',
-          myName: my.name || 'EDDIE',
-          dxName: dx.name || 'KEN',
-          myQth: my.qth || 'TAIPEI, TAIWAN',
-          dxQth: dx.qth ? `${dx.qth}, ${dx.country || ''}`.trim() : 'TOKYO, JAPAN',
-          myGrid: my.grid || 'PL05',
-          dxGrid: dx.grid || 'PM95',
-          rig: my.rig || '100W',
-          ant: my.ant || 'DIPOLE',
-          notes: 'TNX FER FB CW QSO! 73 ES GL'
-        };
-      }
-    
-      openQslModal(qsoData = null) {
-        this.activeQslData = qsoData || this._buildCurrentQsoData();
-    
-        if (this.el.qslModal) this.el.qslModal.style.display = 'flex';
-        if (this.el.qslModalBackdrop) this.el.qslModalBackdrop.style.display = 'block';
-    
-        this.renderCurrentQslCard();
-      }
-    
-      closeQslModal() {
-        if (this.el.qslModal) this.el.qslModal.style.display = 'none';
-        if (this.el.qslModalBackdrop) this.el.qslModalBackdrop.style.display = 'none';
-      }
-    
-      setQslTheme(theme) {
-        if (!theme) return;
-        this.currentQslTheme = theme;
-    
-        if (this.el.qslThemePills) {
-          this.el.qslThemePills.forEach(pill => {
-            pill.classList.toggle('active', pill.getAttribute('data-qsl-theme') === theme);
-          });
-        }
-    
-        this.renderCurrentQslCard();
-      }
-    
-      renderCurrentQslCard() {
-        if (!this.qslRenderer) {
-          if (typeof window !== 'undefined' && window.QslCardRenderer) {
-            this.qslRenderer = new window.QslCardRenderer();
-          } else if (typeof QslCardRenderer !== 'undefined') {
-            this.qslRenderer = new QslCardRenderer();
-          }
-        }
-    
-        if (!this.qslRenderer || !this.el.qslCanvas) return;
-    
-        const data = this.activeQslData || this._buildCurrentQsoData();
-        this.qslRenderer.render(this.el.qslCanvas, data, this.currentQslTheme);
-      }
-    
-      downloadQslCard() {
-        if (!this.qslRenderer || !this.el.qslCanvas) return;
-        const data = this.activeQslData || this._buildCurrentQsoData();
-        const dateStr = (data.dateDisplay || '').replace(/[^0-9]/g, '') || new Date().toISOString().slice(0, 10).replace(/-/g, '');
-        const filename = `QSL_${data.myCall || 'BV2TT'}_${data.dxCall || 'STATION'}_${dateStr}.png`;
-        this.qslRenderer.downloadCard(this.el.qslCanvas, filename);
-      }
-    
-      async copyQslCard() {
-        if (!this.qslRenderer || !this.el.qslCanvas) return;
-        const ok = await this.qslRenderer.copyToClipboard(this.el.qslCanvas);
-        if (this.el.btnQslCopy) {
-          const originalHTML = this.el.btnQslCopy.innerHTML;
-          if (ok) {
-            this.el.btnQslCopy.innerHTML = '<i class="mdi mdi-check"></i> 已複製卡片圖片';
-            this.el.btnQslCopy.style.color = '#00e676';
-            this.el.btnQslCopy.style.borderColor = '#00e676';
-          } else {
-            this.el.btnQslCopy.innerHTML = '<i class="mdi mdi-alert-circle-outline"></i> 請直接點擊下載';
-          }
-          setTimeout(() => {
-            if (this.el.btnQslCopy) {
-              this.el.btnQslCopy.innerHTML = originalHTML;
-              this.el.btnQslCopy.style.color = '';
-              this.el.btnQslCopy.style.borderColor = '';
-            }
-          }, 2000);
-        }
-      }
-    }
-    
-    // Global window registration
-    if (typeof window !== 'undefined') {
-      window.QsoMode = QsoMode;
-    }
-    
-    // Export for Node.js test environment
-    if (typeof module !== 'undefined' && module.exports) {
-      module.exports = { QsoMode };
-    }
-    
-
+        /**
+ * UI CONTROLLER: QsoMode
+ * Workspace 3: 擬真電台 CW QSO 通聯工作台控制器
+ * (100% Zero-Emoji, Material Design Icons, Dual-Track Architecture)
+ */
 
     /**
-     * IAMBIC KEYER MODULE (Curtis 8044 / Winkeyer Standard)
-     * 支援雙撥片、長短音自動連發、全時點劃記憶 (Element Memory)、
-     * 夾片交替 (Squeeze Iambic Mode B / Mode A)、左右反轉 (Paddle Reverse)。
-     */
-    class IambicKeyer {
+ * UI CONTROLLER: QsoMode
+ * Workspace 3: 擬真電台 CW QSO 通聯工作台控制器
+ * (100% Zero-Emoji, Material Design Icons, Dual-Track Architecture)
+ */
+
+    /**
+ * UI CONTROLLER: QsoMode
+ * Workspace 3: 擬真電台 CW QSO 通聯工作台控制器
+ * (100% Zero-Emoji, Material Design Icons, Dual-Track Architecture)
+ */
+
+    /**
+ * UI CONTROLLER: QsoMode
+ * Workspace 3: 擬真電台 CW QSO 通聯工作台控制器
+ * (100% Zero-Emoji, Material Design Icons, Dual-Track Architecture)
+ */
+
+    /**
+ * UI CONTROLLER: QsoMode
+ * Workspace 3: 擬真電台 CW QSO 通聯工作台控制器
+ * (100% Zero-Emoji, Material Design Icons, Dual-Track Architecture)
+ */
+
+class QsoMode {
+  constructor(options = {}) {
+    this.qsoManager = options.qsoManager || (typeof window !== 'undefined' ? window.qsoManager : null);
+    this.qsoLogManager = options.qsoLogManager || (typeof window !== 'undefined' ? window.qsoLogManager : null);
+    this.qslRenderer = options.qslRenderer || (typeof window !== 'undefined' ? (window.qslCardRenderer || (window.QslCardRenderer ? new window.QslCardRenderer() : null)) : null);
+    this.cwPlayer = options.cwPlayer || (typeof window !== 'undefined' ? window.cwPlayer : null);
+    this.synth = options.synth || (typeof window !== 'undefined' ? window.synth : null);
+    this.engine = options.engine || (typeof window !== 'undefined' ? window.engine : null);
+
+    this.qrnEnabled = false;
+    this.qsbEnabled = true;
+    this.bfoPitch = 660;
+
+    this.currentQslTheme = 'cyber-brass';
+    this.activeQslData = null;
+
+    this._liveLineEl = null;
+    this._liveContentEl = null;
+    this._liveTxText = '';
+    this._autoFinalizeTimer = null;
+    this._isDemoPlaying = false;
+    this._txBlipTimer = null;
+    this._originalSidetoneFreq = null;
+
+    this._boundCwPulseStart = null;
+    this._boundCwPulseEnd = null;
+    this._boundCwPlaybackComplete = null;
+    this._isRemotePlaying = false;
+    this._qsbTimer = null;
+    this._initialized = false;
+  }
+
+  isWorkspaceActive() {
+    if (typeof document === 'undefined') return false;
+    const ws = document.getElementById('ws-container-qso');
+    return !!(ws && (ws.classList.contains('active') || ws.style.display === 'flex' || ws.style.display === 'block'));
+  }
+
+  init() {
+    if (typeof document === 'undefined') return;
+
+    // Cache elements
+    this.el = {
+      wsContainer: document.getElementById('ws-container-qso'),
+      submodePills: document.querySelectorAll('.qso-mode-pill'),
+      cockpitStage: document.getElementById('qso-cockpit-stage'),
+      logbookStage: document.getElementById('qso-logbook-stage'),
+
+      // VFO & SDR Bar
+      bandButtons: document.querySelectorAll('.qso-band-btn'),
+      vfoFreq: document.getElementById('qso-vfo-freq'),
+
+      // S-Meter & Carrier
+      smeterNeedle: document.getElementById('qso-smeter-needle-group'),
+      smeterReadout: document.getElementById('qso-smeter-readout'),
+      smeterLadder: document.getElementById('qso-smeter-ladder'),
+      carrierDot: document.getElementById('qso-carrier-dot'),
+      carrierText: document.getElementById('qso-carrier-text'),
+
+      // RF Controls
+      chkQrn: document.getElementById('chk-qso-qrn'),
+      chkQsb: document.getElementById('chk-qso-qsb'),
+      selBfo: document.getElementById('sel-qso-bfo'),
+
+      // Guided Step Info
+      stageGuide: document.getElementById('qso-stage-guide'),
+      stepBadges: document.querySelectorAll('.qso-step-badge'),
+      guidePrompt: document.getElementById('qso-guide-prompt'),
+      guideHint: document.getElementById('qso-guide-hint'),
+      btnPlayDemo: document.getElementById('btn-qso-play-demo'),
+
+      // Terminal
+      terminalFeed: document.getElementById('qso-terminal-feed'),
+      remoteCall: document.getElementById('qso-remote-call'),
+      remoteDetails: document.getElementById('qso-remote-details'),
+      myCall: document.getElementById('qso-my-call'),
+      myDetails: document.getElementById('qso-my-details'),
+      btnReplayRx: document.getElementById('btn-qso-replay-rx'),
+      btnNewStation: document.getElementById('btn-qso-new-station'),
+
+      // Live Keying Telemetry Deck
+      telemSeq: document.getElementById('qso-telem-seq'),
+      telemChar: document.getElementById('qso-telem-char'),
+      telemWpm: document.getElementById('qso-telem-wpm'),
+      gapBar: document.getElementById('qso-gap-bar'),
+      btnTxOver: document.getElementById('btn-qso-tx-over'),
+      btnClearFeed: document.getElementById('btn-qso-clear-feed'),
+
+      // Macros
+      macroButtons: document.querySelectorAll('.qso-macro-btn'),
+
+      // Status Bar
+      lastAck: document.getElementById('qso-last-ack'),
+
+      // Logbook
+      logbookTbody: document.getElementById('qso-logbook-tbody'),
+      logbookEmpty: document.getElementById('qso-logbook-empty'),
+      btnExportAdif: document.getElementById('btn-qso-export-adif'),
+      btnExportCsv: document.getElementById('btn-qso-export-csv'),
+      btnClearLogs: document.getElementById('btn-qso-clear-logs'),
+      btnBackCockpit: document.getElementById('btn-qso-back-cockpit'),
+
+      // QSL Modal
+      qslModal: document.getElementById('qsl-modal'),
+      qslModalBackdrop: document.getElementById('qsl-modal-backdrop'),
+      btnCloseQsl: document.getElementById('btn-close-qsl'),
+      qslCanvas: document.getElementById('qsl-card-canvas'),
+      qslThemePills: document.querySelectorAll('.qsl-theme-pill'),
+      btnQslDownload: document.getElementById('btn-qsl-download'),
+      btnQslCopy: document.getElementById('btn-qsl-copy'),
+      qslMetaHint: document.getElementById('qsl-modal-meta-hint')
+    };
+
+    this.bindEvents();
+    this.bindManagerEvents();
+    this.syncOperatorSettings();
+    this.updateStationMeta();
+    this.updateGuidedUI();
+    this.setSmeterLevel(1, false);
+
+    // Initial system print
+    this.printFeed('SYS', 'SDR 接收機就緒 · VFO 鎖定於 14.025.00 MHz (20M)');
+    if (this.qsoManager && this.qsoManager.remoteStation) {
+      this.printFeed('SYS', `偵測到遠端電台呼叫訊號 [${this.qsoManager.remoteStation.call}]，等待建立通聯...`);
+    }
+
+    this._initialized = true;
+  }
+
+  // ==========================================
+  // EVENT BINDINGS
+  // ==========================================
+  bindEvents() {
+    // 1. Submode Navigation
+    if (this.el.submodePills) {
+      this.el.submodePills.forEach(pill => {
+        pill.addEventListener('click', () => {
+          const submode = pill.getAttribute('data-submode');
+          this.switchSubmode(submode);
+        });
+      });
+    }
+
+    // 2. Band Switcher
+    if (this.el.bandButtons) {
+      this.el.bandButtons.forEach(btn => {
+        btn.addEventListener('click', () => {
+          const band = btn.getAttribute('data-band');
+          this.setBand(band);
+        });
+      });
+    }
+
+    // 3. RF Atmosphere Controls
+    if (this.el.chkQrn) {
+      this.el.chkQrn.addEventListener('change', (e) => {
+        this.qrnEnabled = e.target.checked;
+        if (this.isWorkspaceActive()) {
+          if (this.qrnEnabled) {
+            if (this.synth && typeof this.synth.startNoise === 'function') this.synth.startNoise();
+          } else {
+            if (this.synth && typeof this.synth.stopNoise === 'function') this.synth.stopNoise();
+          }
+        }
+      });
+    }
+
+    if (this.el.chkQsb) {
+      this.el.chkQsb.addEventListener('change', (e) => {
+        this.qsbEnabled = e.target.checked;
+      });
+    }
+
+    if (this.el.selBfo) {
+      this.el.selBfo.addEventListener('change', (e) => {
+        this.bfoPitch = parseInt(e.target.value, 10) || 660;
+        if (this.synth) this.synth.frequency = this.bfoPitch;
+      });
+    }
+
+    // 4. Guided Hint Demo Playback (示範播放)
+    if (this.el.btnPlayDemo) {
+      this.el.btnPlayDemo.addEventListener('click', () => {
+        const step = this.qsoManager ? this.qsoManager.getGuidedStepInfo() : null;
+        const text = (step && step.hint) ? step.hint : 'CQ CQ CQ DE BV2TT BV2TT K';
+        this.playDemoTransmission(text);
+      });
+    }
+
+    // 5. Terminal Actions
+    if (this.el.btnReplayRx) {
+      this.el.btnReplayRx.addEventListener('click', () => {
+        if (this.qsoManager && this.qsoManager.lastRemoteMessage) {
+          this.playRemoteCw(this.qsoManager.lastRemoteMessage, 200);
+        }
+      });
+    }
+
+    if (this.el.btnNewStation) {
+      this.el.btnNewStation.addEventListener('click', () => {
+        if (this.qsoManager) {
+          this.qsoManager.resetQso();
+          this.updateStationMeta();
+          this.updateGuidedUI();
+          this.printFeed('SYS', `已切換至新遠端電台呼號: ${this.qsoManager.remoteStation ? this.qsoManager.remoteStation.call : 'DX'}`);
+        }
+      });
+    }
+
+    // 6. Macro Buttons Deck (點擊自動示範發報)
+    if (this.el.macroButtons) {
+      this.el.macroButtons.forEach(btn => {
+        btn.addEventListener('click', () => {
+          const macro = btn.getAttribute('data-macro');
+          if (this.qsoManager) {
+            const text = this.qsoManager.generateMacroText(macro);
+            if (text) {
+              this.playDemoTransmission(text);
+            }
+          }
+        });
+      });
+    }
+
+    // 7. Live Telemetry Deck Actions
+    if (this.el.btnTxOver) {
+      this.el.btnTxOver.addEventListener('click', () => {
+        this.finalizeLiveTx();
+      });
+    }
+
+    if (this.el.btnClearFeed) {
+      this.el.btnClearFeed.addEventListener('click', () => {
+        if (this.el.terminalFeed) {
+          this.el.terminalFeed.innerHTML = '';
+          this._liveLineEl = null;
+          this._liveContentEl = null;
+          this._liveTxText = '';
+          this.printFeed('SYS', '電傳記錄已清空。');
+        }
+      });
+    }
+
+    // 8. Logbook Action Buttons
+    if (this.el.btnBackCockpit) {
+      this.el.btnBackCockpit.addEventListener('click', () => {
+        this.switchSubmode('guided');
+      });
+    }
+
+    if (this.el.btnExportAdif) {
+      this.el.btnExportAdif.addEventListener('click', () => {
+        this.exportADIF();
+      });
+    }
+
+    if (this.el.btnExportCsv) {
+      this.el.btnExportCsv.addEventListener('click', () => {
+        this.exportCSV();
+      });
+    }
+
+    if (this.el.btnClearLogs) {
+      this.el.btnClearLogs.addEventListener('click', () => {
+        if (confirm('確定要清空所有電台通聯日誌嗎？此動作無法復原。')) {
+          if (this.qsoLogManager) {
+            this.qsoLogManager.clearLogs();
+            this.renderLogbook();
+          }
+        }
+      });
+    }
+
+    // 9. QSL Confirmation Modal Controls
+    if (this.el.btnCloseQsl) {
+      this.el.btnCloseQsl.addEventListener('click', () => {
+        this.closeQslModal();
+      });
+    }
+
+    if (this.el.qslModalBackdrop) {
+      this.el.qslModalBackdrop.addEventListener('click', () => {
+        this.closeQslModal();
+      });
+    }
+
+    if (this.el.qslThemePills) {
+      this.el.qslThemePills.forEach(pill => {
+        pill.addEventListener('click', () => {
+          const theme = pill.getAttribute('data-qsl-theme');
+          this.setQslTheme(theme);
+        });
+      });
+    }
+
+    if (this.el.btnQslDownload) {
+      this.el.btnQslDownload.addEventListener('click', () => {
+        this.downloadQslCard();
+      });
+    }
+
+    if (this.el.btnQslCopy) {
+      this.el.btnQslCopy.addEventListener('click', () => {
+        this.copyQslCard();
+      });
+    }
+  }
+
+  bindManagerEvents() {
+    if (!this.qsoManager) return;
+
+    this.qsoManager.on('phaseChanged', () => {
+      this.updateGuidedUI();
+    });
+
+    this.qsoManager.on('botResponseReady', (data) => {
+      if (data && data.text) {
+        this.playRemoteCw(data.text, data.delay || 800);
+      }
+    });
+
+    this.qsoManager.on('qsoComplete', (logEntry) => {
+      let savedLog = logEntry;
+      if (this.qsoLogManager && logEntry) {
+        savedLog = this.qsoLogManager.addLog(logEntry);
+      }
+      this.printFeed('SYS', `73! 通聯圓滿完成！日誌已記錄 [${logEntry ? logEntry.dxCall : 'DX'}]`);
+      if (this.el.lastAck) {
+        this.el.lastAck.innerHTML = `通聯完成！已自動記錄至電台日誌 · <button type="button" class="btn-xs-util" id="btn-quick-qsl" style="margin-left:6px; cursor:pointer;"><i class="mdi mdi-card-account-details"></i> 簽發 QSL 卡</button>`;
+        const btnQuick = document.getElementById('btn-quick-qsl');
+        if (btnQuick) {
+          btnQuick.addEventListener('click', () => {
+            this.openQslModal(savedLog || logEntry);
+          });
+        }
+      }
+    });
+
+    this.qsoManager.on('validationWarning', (data) => {
+      if (data && data.feedback) {
+        this.printFeed('SYS', `[發報提示] ${data.feedback}`);
+      }
+    });
+
+    this.qsoManager.on('bandChanged', (data) => {
+      if (this.el.vfoFreq && data) {
+        this.el.vfoFreq.textContent = `${data.freq}.00`;
+      }
+      this.printFeed('SYS', `VFO 已切換至 ${data.band} 頻段 (${data.freq}.00 MHz)`);
+    });
+  }
+
+  syncOperatorSettings() {
+    const settings = (typeof window !== 'undefined' && window.settingsManager) ? window.settingsManager.settings : null;
+    if (settings && this.qsoManager) {
+      this.qsoManager.setMyStation({
+        call: settings.operatorCallsign || 'BV2TT',
+        name: settings.operatorName || 'EDDIE',
+        qth: settings.operatorQth || 'TAIPEI',
+        grid: settings.operatorGrid || 'PL05',
+        rig: settings.operatorRig || '100W',
+        ant: settings.operatorAnt || 'DIPOLE'
+      });
+    }
+  }
+
+  // ==========================================
+  // WORKSPACE LIFECYCLE & K5 DOCK REPARENTING
+  // ==========================================
+  onEnterQso() {
+    this.syncOperatorSettings();
+    this.updateStationMeta();
+    this.updateGuidedUI();
+
+    // Cache user's original sidetone frequency for safe restoration
+    if (typeof window !== 'undefined' && window.settingsManager && window.settingsManager.settings) {
+      this._originalSidetoneFreq = window.settingsManager.settings.sidetoneFreq;
+    } else if (this.synth) {
+      this._originalSidetoneFreq = this.synth.frequency;
+    }
+
+    // Dynamically reparent K5 Dock into ws-container-qso so keyer is immediately available
+    if (typeof document !== 'undefined') {
+      const k5Dock = document.getElementById('k5-dock');
+      const wsQso = document.getElementById('ws-container-qso');
+      if (k5Dock && wsQso && k5Dock.parentElement !== wsQso) {
+        wsQso.appendChild(k5Dock);
+      }
+    }
+
+    // Start QRN noise if enabled
+    if (this.qrnEnabled && this.synth && typeof this.synth.startNoise === 'function') {
+      this.synth.startNoise();
+    }
+
+    // Scroll terminal to latest
+    if (this.el && this.el.terminalFeed) {
+      this.el.terminalFeed.scrollTop = this.el.terminalFeed.scrollHeight;
+    }
+  }
+
+  onLeaveQso() {
+    // Reparent K5 Dock back into ws-container-tx
+    if (typeof document !== 'undefined') {
+      const k5Dock = document.getElementById('k5-dock');
+      const wsTx = document.getElementById('ws-container-tx');
+      if (k5Dock && wsTx && k5Dock.parentElement !== wsTx) {
+        wsTx.appendChild(k5Dock);
+      }
+    }
+
+    // Stop demo playback if running
+    if (this._isDemoPlaying) {
+      this.stopDemoTransmission();
+    }
+
+    // Stop remote audio playback if in progress
+    if (this.cwPlayer && this.cwPlayer.isPlaying) {
+      this.cwPlayer.stop();
+    }
+
+    // Clear timers
+    if (this._autoFinalizeTimer) {
+      clearTimeout(this._autoFinalizeTimer);
+      this._autoFinalizeTimer = null;
+    }
+
+    // Stop QRN noise
+    if (this.synth && typeof this.synth.stopNoise === 'function') {
+      this.synth.stopNoise();
+    }
+
+    // Restore user's original sidetone frequency
+    if (this.synth && this._originalSidetoneFreq) {
+      this.synth.frequency = this._originalSidetoneFreq;
+    }
+
+    // Reset S-meter
+    this.setSmeterLevel(0, false);
+    this.setCarrierState('IDLE');
+  }
+
+  // ==========================================
+  // SUBMODE & BAND SWITCHING
+  // ==========================================
+  switchSubmode(submode) {
+    if (!submode) return;
+
+    if (this.el.submodePills) {
+      this.el.submodePills.forEach(pill => {
+        const pSub = pill.getAttribute('data-submode');
+        pill.classList.toggle('active', pSub === submode);
+      });
+    }
+
+    if (submode === 'logbook') {
+      if (this.el.cockpitStage) this.el.cockpitStage.style.display = 'none';
+      if (this.el.logbookStage) this.el.logbookStage.style.display = 'flex';
+      this.renderLogbook();
+    } else {
+      if (this.el.cockpitStage) this.el.cockpitStage.style.display = 'flex';
+      if (this.el.logbookStage) this.el.logbookStage.style.display = 'none';
+
+      if (this.el.stageGuide) {
+        this.el.stageGuide.style.display = (submode === 'guided') ? 'flex' : 'none';
+      }
+
+      if (this.qsoManager) {
+        this.qsoManager.setSubmode(submode);
+        this.updateStationMeta();
+        this.updateGuidedUI();
+      }
+
+      const labelMap = { guided: '標準引導模式 (Guided)', free: '空中自由頻段 (Free)', contest: '競賽連珠模式 (Contest)' };
+      this.printFeed('SYS', `工作台子模式切換為: ${labelMap[submode] || submode}`);
+    }
+  }
+
+  setBand(bandId) {
+    if (!bandId) return;
+
+    if (this.el.bandButtons) {
+      this.el.bandButtons.forEach(btn => {
+        btn.classList.toggle('active', btn.getAttribute('data-band') === bandId);
+      });
+    }
+
+    if (this.qsoManager) {
+      this.qsoManager.setBand(bandId);
+    }
+  }
+
+  // ==========================================
+  // TRANSMISSION, TELEMETRY & STREAMING TERMINAL
+  // ==========================================
+  updateKeyingTelemetry(symbol, durationMs, currentSeq) {
+    if (this.el.telemSeq) {
+      this.el.telemSeq.textContent = currentSeq || symbol || '—';
+    }
+    if (this.el.telemChar) {
+      const char = (this.engine && currentSeq) ? this.engine.getLetterForSequence(currentSeq) : '—';
+      this.el.telemChar.textContent = char || '—';
+    }
+    if (this.el.telemWpm && durationMs) {
+      const wpm = Math.round(1200 / durationMs);
+      this.el.telemWpm.textContent = `${Math.round(durationMs)} ms (${wpm} WPM)`;
+    }
+  }
+
+  _createLiveLine() {
+    if (typeof document === 'undefined') return;
+    if (!this.el.terminalFeed) return;
+
+    const line = document.createElement('div');
+    line.className = 'qso-feed-line live';
+
+    const now = new Date();
+    const timeStr = `${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}:${String(now.getSeconds()).padStart(2, '0')}`;
+
+    const timeSpan = document.createElement('span');
+    timeSpan.className = 'qso-feed-time';
+    timeSpan.textContent = timeStr;
+    line.appendChild(timeSpan);
+
+    const myCall = (this.qsoManager && this.qsoManager.myStation && this.qsoManager.myStation.call) ? this.qsoManager.myStation.call : 'BV2TT';
+    const tagSpan = document.createElement('span');
+    tagSpan.className = 'qso-feed-tag tx';
+    tagSpan.textContent = `TX ${myCall}`;
+    line.appendChild(tagSpan);
+
+    const textSpan = document.createElement('span');
+    textSpan.className = 'qso-feed-text tx';
+
+    const contentSpan = document.createElement('span');
+    contentSpan.className = 'qso-live-content';
+    textSpan.appendChild(contentSpan);
+
+    const cursorSpan = document.createElement('span');
+    cursorSpan.className = 'qso-cursor';
+    textSpan.appendChild(cursorSpan);
+
+    line.appendChild(textSpan);
+    this.el.terminalFeed.appendChild(line);
+    this.el.terminalFeed.scrollTop = this.el.terminalFeed.scrollHeight;
+
+    this._liveLineEl = line;
+    this._liveContentEl = contentSpan;
+    this._liveTxText = '';
+  }
+
+  _appendLiveTxChar(char) {
+    if (!this._liveLineEl && typeof document !== 'undefined') {
+      this._createLiveLine();
+    }
+    this._liveTxText += char;
+    if (this._liveContentEl) {
+      this._liveContentEl.textContent = this._liveTxText;
+    }
+    if (this.el.terminalFeed) {
+      this.el.terminalFeed.scrollTop = this.el.terminalFeed.scrollHeight;
+    }
+  }
+
+  handleLetterDecoded(char) {
+    if (!this.isWorkspaceActive()) return;
+
+    if (char === '<HH>') {
+      // Erase last word (prosign 8 dots)
+      if (this._liveTxText) {
+        const trimmed = this._liveTxText.trimEnd();
+        const lastSpace = trimmed.lastIndexOf(' ');
+        this._liveTxText = (lastSpace !== -1) ? trimmed.slice(0, lastSpace + 1) : '';
+        if (this._liveContentEl) {
+          this._liveContentEl.textContent = this._liveTxText;
+        }
+      }
+      if (this.el.telemSeq) this.el.telemSeq.textContent = '—';
+      if (this.el.telemChar) this.el.telemChar.textContent = '<HH>';
+      return;
+    }
+
+    this._appendLiveTxChar(char);
+
+    if (this.el.telemChar) this.el.telemChar.textContent = char;
+    if (this.el.telemSeq) this.el.telemSeq.textContent = '—';
+
+    // Carrier TX blip
+    this.setCarrierState('TX');
+    clearTimeout(this._txBlipTimer);
+    this._txBlipTimer = setTimeout(() => {
+      if (!this._isRemotePlaying && !this._isDemoPlaying) this.setCarrierState('IDLE');
+    }, 300);
+
+    // Auto-finalize countdown timer
+    clearTimeout(this._autoFinalizeTimer);
+    const trimmed = this._liveTxText.trim();
+    if (trimmed.endsWith(' K') || trimmed === 'K' || trimmed.endsWith(' AR') || trimmed.endsWith(' SK')) {
+      this._autoFinalizeTimer = setTimeout(() => {
+        this.finalizeLiveTx();
+      }, 1800);
+    } else {
+      this._autoFinalizeTimer = setTimeout(() => {
+        this.finalizeLiveTx();
+      }, 6000);
+    }
+  }
+
+  finalizeLiveTx() {
+    clearTimeout(this._autoFinalizeTimer);
+    if (!this._liveTxText || !this._liveTxText.trim()) {
+      if (this._liveLineEl && this._liveLineEl.parentElement) {
+        this._liveLineEl.parentElement.removeChild(this._liveLineEl);
+      }
+      this._liveLineEl = null;
+      this._liveContentEl = null;
+      this._liveTxText = '';
+      return;
+    }
+
+    const text = this._liveTxText.trim();
+
+    // Remove live class and cursor
+    if (this._liveLineEl) {
+      this._liveLineEl.classList.remove('live');
+      const cursor = this._liveLineEl.querySelector('.qso-cursor');
+      if (cursor) cursor.remove();
+    }
+
+    this._liveLineEl = null;
+    this._liveContentEl = null;
+    this._liveTxText = '';
+
+    if (this.qsoManager) {
+      const res = this.qsoManager.handleUserTransmit(text);
+      if (this.el.lastAck) {
+        this.el.lastAck.textContent = (res && res.feedback) ? res.feedback : '電文已發射';
+      }
+    }
+  }
+
+  stopDemoTransmission() {
+    if (this.cwPlayer && this.cwPlayer.isPlaying) {
+      this.cwPlayer.stop();
+    }
+    this._isDemoPlaying = false;
+    if (this.el.btnPlayDemo) {
+      this.el.btnPlayDemo.innerHTML = '<i class="mdi mdi-play"></i> 示範播放';
+    }
+  }
+
+  async playDemoTransmission(text) {
+    if (!text) {
+      const step = this.qsoManager ? this.qsoManager.getGuidedStepInfo() : null;
+      text = (step && step.hint) ? step.hint : 'CQ CQ CQ DE BV2TT BV2TT K';
+    }
+
+    if (this._isDemoPlaying) {
+      this.stopDemoTransmission();
+      return;
+    }
+
+    if (!this.isWorkspaceActive()) return;
+
+    // Finalize any previous live transmission first
+    if (this._liveTxText && this._liveTxText.trim()) {
+      this.finalizeLiveTx();
+    }
+
+    this._isDemoPlaying = true;
+    if (this.el.btnPlayDemo) {
+      this.el.btnPlayDemo.innerHTML = '<i class="mdi mdi-stop"></i> 停止播放';
+    }
+
+    // Create live line for demo stream
+    this._createLiveLine();
+
+    const keyBtn = document.getElementById('key-button');
+    const k2Straight = document.querySelector('.k2-thumb-wing.mode-straight');
+
+    const onPulseStart = (sym, dur) => {
+      this.setCarrierState('TX');
+      if (window.ribbon && typeof window.ribbon.startPulse === 'function') {
+        window.ribbon.startPulse();
+      }
+      if (keyBtn) keyBtn.classList.add('active');
+      if (k2Straight) k2Straight.classList.add('active');
+    };
+
+    const onPulseEnd = () => {
+      if (window.ribbon && typeof window.ribbon.endPulse === 'function') {
+        window.ribbon.endPulse();
+      }
+      if (keyBtn) keyBtn.classList.remove('active');
+      if (k2Straight) k2Straight.classList.remove('active');
+    };
+
+    const onCharStart = (char, seq) => {
+      if (this.el.telemChar) this.el.telemChar.textContent = char;
+      if (this.el.telemSeq) this.el.telemSeq.textContent = seq || '—';
+      if (this.el.telemWpm) {
+        const wpm = this.cwPlayer ? (this.cwPlayer.charWpm || 20) : 20;
+        this.el.telemWpm.textContent = `示範 (${wpm} WPM)`;
+      }
+    };
+
+    const onCharComplete = (char) => {
+      this._appendLiveTxChar(char);
+    };
+
+    const onWordGapStart = () => {
+      this._appendLiveTxChar(' ');
+    };
+
+    if (this.cwPlayer) {
+      this.cwPlayer.on('pulseStart', onPulseStart);
+      this.cwPlayer.on('pulseEnd', onPulseEnd);
+      this.cwPlayer.on('charStart', onCharStart);
+      this.cwPlayer.on('charComplete', onCharComplete);
+      this.cwPlayer.on('wordGapStart', onWordGapStart);
+    }
+
+    try {
+      if (this.synth) {
+        this.synth.frequency = this.bfoPitch;
+      }
+      if (this.cwPlayer) {
+        await this.cwPlayer.playText(text);
+      }
+    } catch (e) {
+      console.error('[QsoMode] Demo transmission error:', e);
+    } finally {
+      if (this.cwPlayer) {
+        this.cwPlayer.off('pulseStart', onPulseStart);
+        this.cwPlayer.off('pulseEnd', onPulseEnd);
+        this.cwPlayer.off('charStart', onCharStart);
+        this.cwPlayer.off('charComplete', onCharComplete);
+        this.cwPlayer.off('wordGapStart', onWordGapStart);
+      }
+      if (keyBtn) keyBtn.classList.remove('active');
+      if (k2Straight) k2Straight.classList.remove('active');
+      this._isDemoPlaying = false;
+      this.setCarrierState('IDLE');
+      if (this.el.btnPlayDemo) {
+        this.el.btnPlayDemo.innerHTML = '<i class="mdi mdi-play"></i> 示範播放';
+      }
+      this.finalizeLiveTx();
+    }
+  }
+
+  printFeed(sender, text, callsign = '') {
+    if (typeof document === 'undefined') return;
+    if (!this.el.terminalFeed || !text) return;
+
+    const line = document.createElement('div');
+    line.className = 'qso-feed-line';
+
+    const now = new Date();
+    const timeStr = `${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}:${String(now.getSeconds()).padStart(2, '0')}`;
+
+    const timeSpan = document.createElement('span');
+    timeSpan.className = 'qso-feed-time';
+    timeSpan.textContent = timeStr;
+    line.appendChild(timeSpan);
+
+    const tagSpan = document.createElement('span');
+    tagSpan.className = `qso-feed-tag ${sender.toLowerCase()}`;
+    tagSpan.textContent = callsign ? `${sender} ${callsign}` : sender;
+    line.appendChild(tagSpan);
+
+    const textSpan = document.createElement('span');
+    textSpan.className = `qso-feed-text ${sender.toLowerCase()}`;
+    textSpan.textContent = text;
+    line.appendChild(textSpan);
+
+    this.el.terminalFeed.appendChild(line);
+    this.el.terminalFeed.scrollTop = this.el.terminalFeed.scrollHeight;
+  }
+
+  // ==========================================
+  // REMOTE CW PLAYBACK & S-METER
+  // ==========================================
+  async playRemoteCw(text, delayMs = 600) {
+    if (!text) return;
+
+    if (delayMs > 0) {
+      await new Promise(r => setTimeout(r, delayMs));
+    }
+
+    if (!this.isWorkspaceActive()) return;
+
+    this._isRemotePlaying = true;
+    this.setCarrierState('RX');
+
+    // Calculate target S-meter level (S7 to S9+20dB with QSB)
+    let targetS = 9;
+    if (this.qsbEnabled) {
+      targetS = Math.floor(Math.random() * 5) + 6; // S6 ~ S10 (S9+10dB)
+    }
+
+    // Attach transient CWPlayer pulse listeners to drive S-Meter
+    const onPulseStart = () => {
+      const flutter = this.qsbEnabled ? (Math.random() * 2 - 1) : 0;
+      this.setSmeterLevel(targetS + flutter, true);
+    };
+
+    const onPulseEnd = () => {
+      this.setSmeterLevel(1, false);
+    };
+
+    if (this.cwPlayer) {
+      this.cwPlayer.on('pulseStart', onPulseStart);
+      this.cwPlayer.on('pulseEnd', onPulseEnd);
+    }
+
+    try {
+      if (this.cwPlayer) {
+        // Adjust tone to remote station pitch if available
+        const originalFreq = this.synth ? this.synth.frequency : 650;
+        if (this.synth && this.qsoManager && this.qsoManager.remoteStation && this.qsoManager.remoteStation.pitchHz) {
+          this.synth.frequency = this.qsoManager.remoteStation.pitchHz;
+        }
+
+        await this.cwPlayer.playText(text);
+
+        // Restore BFO pitch
+        if (this.synth) this.synth.frequency = this.bfoPitch;
+      }
+    } catch (e) {
+      console.error('[QsoMode] Audio playback error:', e);
+    } finally {
+      if (this.cwPlayer) {
+        this.cwPlayer.off('pulseStart', onPulseStart);
+        this.cwPlayer.off('pulseEnd', onPulseEnd);
+      }
+
+      this._isRemotePlaying = false;
+      this.setCarrierState('IDLE');
+      this.setSmeterLevel(1, false);
+
+      // Print received message into terminal feed
+      const remoteCall = (this.qsoManager && this.qsoManager.remoteStation) ? this.qsoManager.remoteStation.call : 'DX';
+      this.printFeed('RX', text, remoteCall);
+    }
+  }
+
+  setCarrierState(state) {
+    if (!this.el || !this.el.carrierDot || !this.el.carrierText) return;
+
+    this.el.carrierDot.className = 'qso-carrier-dot';
+    if (state === 'RX') {
+      this.el.carrierDot.classList.add('active-rx');
+      this.el.carrierText.textContent = 'CARRIER ACTIVE (RX)';
+      this.el.carrierText.style.color = '#00e676';
+    } else if (state === 'TX') {
+      this.el.carrierDot.classList.add('active-tx');
+      this.el.carrierText.textContent = 'CARRIER ACTIVE (TX)';
+      this.el.carrierText.style.color = 'var(--gold)';
+    } else {
+      this.el.carrierText.textContent = 'CARRIER IDLE';
+      this.el.carrierText.style.color = '#6e7d94';
+    }
+  }
+
+  setSmeterLevel(level, active = true) {
+    if (!this.el) return;
+    const clampedLevel = Math.max(0, Math.min(11, level));
+
+    // Map level 0~11 to rotation angle: -45deg (S0) to +45deg (S9+30dB)
+    // S0: -45deg, S5: -10deg, S9: +18deg, S9+30dB: +45deg
+    const angle = -45 + (clampedLevel / 11) * 90;
+
+    if (this.el.smeterNeedle) {
+      this.el.smeterNeedle.style.transform = `rotate(${angle.toFixed(1)}deg)`;
+    }
+
+    // Readout badge text
+    if (this.el.smeterReadout) {
+      if (!active || clampedLevel <= 1) {
+        this.el.smeterReadout.textContent = 'S1 (NOISE)';
+        this.el.smeterReadout.style.color = '#6e7d94';
+      } else if (clampedLevel <= 9) {
+        this.el.smeterReadout.textContent = `S${Math.round(clampedLevel)}`;
+        this.el.smeterReadout.style.color = '#00e676';
+      } else if (clampedLevel <= 10) {
+        this.el.smeterReadout.textContent = 'S9 +10dB';
+        this.el.smeterReadout.style.color = 'var(--gold)';
+      } else {
+        this.el.smeterReadout.textContent = 'S9 +30dB';
+        this.el.smeterReadout.style.color = '#ff3d00';
+      }
+    }
+
+    // LED ladder segments
+    if (this.el.smeterLadder) {
+      const leds = this.el.smeterLadder.querySelectorAll('.smeter-led');
+      leds.forEach(led => {
+        const segLevel = parseInt(led.getAttribute('data-level'), 10);
+        led.classList.toggle('active', active && segLevel <= clampedLevel);
+      });
+    }
+  }
+
+  // ==========================================
+  // METADATA & GUIDED UI UPDATES
+  // ==========================================
+  updateStationMeta() {
+    if (!this.qsoManager || !this.el) return;
+
+    const my = this.qsoManager.myStation;
+    if (this.el.myCall) this.el.myCall.textContent = my.call;
+    if (this.el.myDetails) this.el.myDetails.textContent = `(${my.name} · ${my.qth} · ${my.rig})`;
+
+    const dx = this.qsoManager.remoteStation;
+    if (dx) {
+      if (this.el.remoteCall) this.el.remoteCall.textContent = dx.call;
+      if (this.el.remoteDetails) this.el.remoteDetails.textContent = `(${dx.name} · ${dx.qth}, ${dx.country} · RST ${dx.rstRcvd} · ${dx.speedWpm} WPM)`;
+    } else {
+      if (this.el.remoteCall) this.el.remoteCall.textContent = 'FREE AIRWAVES';
+      if (this.el.remoteDetails) this.el.remoteDetails.textContent = '(尚未建立呼叫)';
+    }
+  }
+
+  updateGuidedUI() {
+    if (!this.qsoManager || !this.el) return;
+    const stepInfo = this.qsoManager.getGuidedStepInfo();
+    if (!stepInfo) return;
+
+    if (this.el.guidePrompt) this.el.guidePrompt.textContent = stepInfo.prompt;
+    if (this.el.guideHint) this.el.guideHint.textContent = stepInfo.hint;
+
+    if (this.el.stepBadges) {
+      this.el.stepBadges.forEach(badge => {
+        const bStep = parseInt(badge.getAttribute('data-step'), 10);
+        badge.classList.toggle('active', bStep === stepInfo.step);
+        badge.classList.toggle('completed', bStep < stepInfo.step || this.qsoManager.guidedCompleted);
+      });
+    }
+  }
+
+  // ==========================================
+  // LOGBOOK VIEW & EXPORTS
+  // ==========================================
+  renderLogbook() {
+    if (!this.qsoLogManager || !this.el.logbookTbody) return;
+
+    const logs = this.qsoLogManager.getLogs();
+    this.el.logbookTbody.innerHTML = '';
+
+    if (logs.length === 0) {
+      if (this.el.logbookEmpty) this.el.logbookEmpty.style.display = 'flex';
+      return;
+    }
+
+    if (this.el.logbookEmpty) this.el.logbookEmpty.style.display = 'none';
+
+    logs.forEach(log => {
+      const tr = document.createElement('tr');
+      tr.innerHTML = `
+        <td>${log.dateDisplay} ${log.timeDisplay}</td>
+        <td style="color:var(--gold); font-weight:700;">${log.dxCall}</td>
+        <td>${log.band}</td>
+        <td>${log.freq}</td>
+        <td>${log.mode}</td>
+        <td>${log.rstSent} / ${log.rstRcvd}</td>
+        <td>${log.name || '—'}</td>
+        <td>${log.qth || '—'}</td>
+        <td>${log.grid || '—'}</td>
+        <td style="color:#00e676;"><i class="mdi mdi-check-circle-outline"></i> 確認</td>
+        <td>
+          <div style="display:flex; gap:4px; align-items:center;">
+            <button type="button" class="btn-xs-util btn-view-qsl" data-id="${log.id}" title="檢視與下載 QSL 卡片">
+              <i class="mdi mdi-card-account-details"></i> QSL
+            </button>
+            <button type="button" class="btn-xs-util btn-del-log" data-id="${log.id}" title="刪除通聯記錄" style="color:#ff5252;">
+              <i class="mdi mdi-delete-outline"></i>
+            </button>
+          </div>
+        </td>
+      `;
+      this.el.logbookTbody.appendChild(tr);
+    });
+
+    // Bind row action buttons
+    const qslBtns = this.el.logbookTbody.querySelectorAll('.btn-view-qsl');
+    qslBtns.forEach(btn => {
+      btn.addEventListener('click', () => {
+        const id = btn.getAttribute('data-id');
+        const targetLog = logs.find(l => String(l.id) === String(id));
+        if (targetLog) {
+          this.openQslModal(targetLog);
+        }
+      });
+    });
+
+    const delBtns = this.el.logbookTbody.querySelectorAll('.btn-del-log');
+    delBtns.forEach(btn => {
+      btn.addEventListener('click', () => {
+        const id = btn.getAttribute('data-id');
+        if (confirm('確定要刪除這筆通聯記錄嗎？')) {
+          this.qsoLogManager.deleteLog(id);
+          this.renderLogbook();
+        }
+      });
+    });
+  }
+
+  exportADIF() {
+    if (!this.qsoLogManager) return;
+    const adif = this.qsoLogManager.exportADIF();
+    this._downloadFile(adif, `morse_qso_log_${new Date().toISOString().slice(0, 10)}.adi`, 'text/plain');
+  }
+
+  exportCSV() {
+    if (!this.qsoLogManager) return;
+    const csv = this.qsoLogManager.exportCSV();
+    this._downloadFile(csv, `morse_qso_log_${new Date().toISOString().slice(0, 10)}.csv`, 'text/csv');
+  }
+
+  _downloadFile(content, fileName, mimeType) {
+    if (typeof document === 'undefined') return;
+    const blob = new Blob([content], { type: mimeType });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = fileName;
+    document.body.appendChild(a);
+    a.click();
+    setTimeout(() => {
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+    }, 100);
+  }
+
+  // ==========================================
+  // QSL CONFIRMATION CARD MODAL & EXPORT
+  // ==========================================
+  _buildCurrentQsoData() {
+    const my = (this.qsoManager && this.qsoManager.myStation) ? this.qsoManager.myStation : {};
+    const dx = (this.qsoManager && this.qsoManager.remoteStation) ? this.qsoManager.remoteStation : {};
+    const now = new Date();
+    return {
+      myCall: my.call || 'BV2TT',
+      dxCall: dx.call || 'JA1ABC',
+      dateDisplay: now.toISOString().slice(0, 10),
+      timeDisplay: now.toISOString().slice(11, 16) + ' UTC',
+      band: (this.qsoManager && this.qsoManager.band) || '20M',
+      freq: (this.qsoManager && this.qsoManager.freq) || '14.025',
+      mode: 'CW',
+      rstSent: dx.rstSent || '599',
+      rstRcvd: dx.rstRcvd || '599',
+      myName: my.name || 'EDDIE',
+      dxName: dx.name || 'KEN',
+      myQth: my.qth || 'TAIPEI, TAIWAN',
+      dxQth: dx.qth ? `${dx.qth}, ${dx.country || ''}`.trim() : 'TOKYO, JAPAN',
+      myGrid: my.grid || 'PL05',
+      dxGrid: dx.grid || 'PM95',
+      rig: my.rig || '100W',
+      ant: my.ant || 'DIPOLE',
+      notes: 'TNX FER FB CW QSO! 73 ES GL'
+    };
+  }
+
+  openQslModal(qsoData = null) {
+    this.activeQslData = qsoData || this._buildCurrentQsoData();
+
+    if (this.el.qslModal) this.el.qslModal.style.display = 'flex';
+    if (this.el.qslModalBackdrop) this.el.qslModalBackdrop.style.display = 'block';
+
+    this.renderCurrentQslCard();
+  }
+
+  closeQslModal() {
+    if (this.el.qslModal) this.el.qslModal.style.display = 'none';
+    if (this.el.qslModalBackdrop) this.el.qslModalBackdrop.style.display = 'none';
+  }
+
+  setQslTheme(theme) {
+    if (!theme) return;
+    this.currentQslTheme = theme;
+
+    if (this.el.qslThemePills) {
+      this.el.qslThemePills.forEach(pill => {
+        pill.classList.toggle('active', pill.getAttribute('data-qsl-theme') === theme);
+      });
+    }
+
+    this.renderCurrentQslCard();
+  }
+
+  renderCurrentQslCard() {
+    if (!this.qslRenderer) {
+      if (typeof window !== 'undefined' && window.QslCardRenderer) {
+        this.qslRenderer = new window.QslCardRenderer();
+      } else if (typeof QslCardRenderer !== 'undefined') {
+        this.qslRenderer = new QslCardRenderer();
+      }
+    }
+
+    if (!this.qslRenderer || !this.el.qslCanvas) return;
+
+    const data = this.activeQslData || this._buildCurrentQsoData();
+    this.qslRenderer.render(this.el.qslCanvas, data, this.currentQslTheme);
+  }
+
+  downloadQslCard() {
+    if (!this.qslRenderer || !this.el.qslCanvas) return;
+    const data = this.activeQslData || this._buildCurrentQsoData();
+    const dateStr = (data.dateDisplay || '').replace(/[^0-9]/g, '') || new Date().toISOString().slice(0, 10).replace(/-/g, '');
+    const filename = `QSL_${data.myCall || 'BV2TT'}_${data.dxCall || 'STATION'}_${dateStr}.png`;
+    this.qslRenderer.downloadCard(this.el.qslCanvas, filename);
+  }
+
+  async copyQslCard() {
+    if (!this.qslRenderer || !this.el.qslCanvas) return;
+    const ok = await this.qslRenderer.copyToClipboard(this.el.qslCanvas);
+    if (this.el.btnQslCopy) {
+      const originalHTML = this.el.btnQslCopy.innerHTML;
+      if (ok) {
+        this.el.btnQslCopy.innerHTML = '<i class="mdi mdi-check"></i> 已複製卡片圖片';
+        this.el.btnQslCopy.style.color = '#00e676';
+        this.el.btnQslCopy.style.borderColor = '#00e676';
+      } else {
+        this.el.btnQslCopy.innerHTML = '<i class="mdi mdi-alert-circle-outline"></i> 請直接點擊下載';
+      }
+      setTimeout(() => {
+        if (this.el.btnQslCopy) {
+          this.el.btnQslCopy.innerHTML = originalHTML;
+          this.el.btnQslCopy.style.color = '';
+          this.el.btnQslCopy.style.borderColor = '';
+        }
+      }, 2000);
+    }
+  }
+}
+
+// Global window registration
+if (typeof window !== 'undefined') {
+  window.QsoMode = QsoMode;
+}
+
+// Export for Node.js test environment
+if (typeof module !== 'undefined' && module.exports) {
+  module.exports = { QsoMode };
+}
+
+class IambicKeyer {
       constructor(engine, synth) {
         this.engine = engine;
         this.synth = synth;
@@ -13487,6 +13958,8 @@
         const pct = Math.min(100, (elapsed / maxGapScale) * 100);
 
         gapBar.style.width = pct + '%';
+        const qsoGapBar = document.getElementById('qso-gap-bar');
+        if (qsoGapBar) qsoGapBar.style.width = pct + '%';
         if (haloGapArc) {
           let haloGapPct = 0;
           if (elapsed <= letterGap) {
@@ -13591,6 +14064,8 @@
       }
 
       gapBar.style.width = '0%';
+      const qsoGapBarReset = document.getElementById('qso-gap-bar');
+      if (qsoGapBarReset) qsoGapBarReset.style.width = '0%';
       gapCountdownReadout.textContent = '-- ms';
       gapCountdownReadout.style.color = '#fff';
       gapStatusBadge.textContent = '發報中...';
@@ -13660,6 +14135,12 @@
       if (hudSeq) hudSeq.textContent = res.sequence || '';
       stateDuration.textContent = `${res.duration} ms`;
 
+      if (typeof window !== 'undefined' && window.qsoMode && typeof window.qsoMode.isWorkspaceActive === 'function' && window.qsoMode.isWorkspaceActive()) {
+        if (typeof window.qsoMode.updateKeyingTelemetry === 'function') {
+          window.qsoMode.updateKeyingTelemetry(res.sequence, res.letter || (res.isValid ? '...' : ''), res.duration, Math.round(1200 / engine.getEffectiveUnitT()));
+        }
+      }
+
       if (res.letter === '<HH>') {
         evalStatus.innerHTML = '<i class="mdi mdi-alert"></i> 檢測到更正訊號 (Error: 8 Dits)';
         evalStatus.style.color = '#ff9100';
@@ -13705,6 +14186,16 @@
       const res = engine.commitCurrentSequence();
       if (!res) return;
 
+      // Forward decoded character to QSO workspace transmitter if active
+      if (typeof window !== 'undefined' && window.qsoMode && typeof window.qsoMode.isWorkspaceActive === 'function' && window.qsoMode.isWorkspaceActive()) {
+        if (res.isErrorSignal || res.letter === '<HH>') {
+          window.qsoMode.handleLetterDecoded('<HH>');
+        } else if (res.isValid) {
+          window.qsoMode.handleLetterDecoded(res.letter);
+        }
+        return;
+      }
+
       if (currentMode === 'text') {
         finalizeLetterTextMode(res);
         return;
@@ -13737,14 +14228,6 @@
         highlightPath('', false);
       }
 
-      // Forward decoded character to QSO workspace transmitter if active
-      if (typeof window !== 'undefined' && window.qsoMode && typeof window.qsoMode.isWorkspaceActive === 'function' && window.qsoMode.isWorkspaceActive()) {
-        if (res.isErrorSignal || res.letter === '<HH>') {
-          window.qsoMode.handleLetterDecoded('<HH>');
-        } else if (res.isValid) {
-          window.qsoMode.handleLetterDecoded(res.letter);
-        }
-      }
 
       setTimeout(() => {
         highlightPath('', false);
