@@ -81,6 +81,7 @@ class RxMode {
       topConfusionsGrid: document.getElementById('rx-top-confusions-grid'),
       weakCharsList: document.getElementById('rx-weak-chars-list'),
       latencyTrend: document.getElementById('rx-latency-trend'),
+      scBreakthroughBox: document.getElementById('rx-sc-breakthrough-box'),
       softKeypad: document.getElementById('rx-soft-keypad'),
       kochStageBar: document.getElementById('rx-koch-stage-bar'),
       kochStageBadge: document.getElementById('rx-koch-stage-badge'),
@@ -94,6 +95,19 @@ class RxMode {
       kochMatrixGrid: document.getElementById('rx-koch-matrix-grid'),
       btnStageAdvance: document.getElementById('btn-rx-stage-advance')
     };
+
+    if (this.el.wsContainer) {
+      this.el.wsContainer.addEventListener('click', (e) => {
+        const drillBtn = e.target.closest('.rx-btn-drill-pair');
+        if (drillBtn) {
+          const pair = drillBtn.dataset.pair;
+          if (pair) {
+            const [exp, act] = pair.split('->');
+            this.startTargetedDrill(exp, act);
+          }
+        }
+      });
+    }
 
     if (this.el.btnToggleAnalytics) {
       this.el.btnToggleAnalytics.addEventListener('click', () => {
@@ -284,6 +298,13 @@ class RxMode {
 
   setSubmode(submode) {
     this.submode = submode;
+    if (submode !== 'drill') {
+      this.drillTarget = null;
+      if (this.el && this.el.scBreakthroughBox) {
+        this.el.scBreakthroughBox.style.display = 'none';
+        this.el.scBreakthroughBox.innerHTML = '';
+      }
+    }
     if (this.el && this.el.navPills) {
       this.el.navPills.forEach(pill => {
         pill.classList.toggle('active', pill.dataset.submode === submode);
@@ -603,6 +624,16 @@ class RxMode {
         }
         return 'QTH';
       }
+      case 'drill': {
+        if (this.drillTarget) {
+          if (typeof generateWeaknessTargets === 'function') {
+            const arr = generateWeaknessTargets([this.drillTarget.expected, this.drillTarget.actual], 1);
+            return arr[0] || this.drillTarget.expected;
+          }
+          return Math.random() < 0.5 ? this.drillTarget.expected : this.drillTarget.actual;
+        }
+        return 'B';
+      }
       default:
         return 'CQ';
     }
@@ -688,7 +719,11 @@ class RxMode {
     const answeredCount = this.trials.length;
     const correctCount = this.trials.filter(t => t.isCorrect).length;
     const acc = answeredCount > 0 ? Math.round((correctCount / answeredCount) * 100) : 100;
-    this.el.progressBadge.textContent = `進度: ${this.currentTrialIndex + 1}/${this.totalTrials} · 正確率: ${acc}%`;
+    if (this.submode === 'drill' && this.drillTarget) {
+      this.el.progressBadge.innerHTML = `<i class="mdi mdi-sword-cross"></i> 弱點專攻: ${this.drillTarget.expected} <i class="mdi mdi-sword-cross"></i> ${this.drillTarget.actual} (${this.currentTrialIndex + 1}/${this.totalTrials})`;
+    } else {
+      this.el.progressBadge.textContent = `進度: ${this.currentTrialIndex + 1}/${this.totalTrials} · 正確率: ${acc}%`;
+    }
   }
 
   startAudio() {
@@ -990,7 +1025,13 @@ class RxMode {
 
     if (this.el) {
       if (this.el.scorecard) this.el.scorecard.style.display = 'block';
-      if (this.el.scModeTag) this.el.scModeTag.textContent = this.getSubmodeDisplayName(this.submode);
+      if (this.el.scModeTag) {
+        if (this.submode === 'drill' && this.drillTarget) {
+          this.el.scModeTag.innerHTML = `<i class="mdi mdi-sword-cross"></i> 弱點專攻 (${this.drillTarget.expected} <i class="mdi mdi-sword-cross"></i> ${this.drillTarget.actual})`;
+        } else {
+          this.el.scModeTag.textContent = this.getSubmodeDisplayName(this.submode);
+        }
+      }
       if (this.el.scAccuracy) {
         this.el.scAccuracy.textContent = `${accuracy}%`;
         this.el.scAccuracy.style.color = accuracy >= 90 ? '#00e676' : (accuracy >= 70 ? 'var(--gold)' : '#ff5252');
@@ -998,6 +1039,40 @@ class RxMode {
       if (this.el.scWpm) this.el.scWpm.textContent = `${wpm} WPM`;
       if (this.el.scLatency) this.el.scLatency.textContent = `${avgLatency} ms`;
       if (this.el.scTotal) this.el.scTotal.textContent = `${correctCount} / ${total} (正確率 ${accuracy}%)`;
+
+      // Breakthrough Box in Drill Mode
+      if (this.submode === 'drill' && this.drillTarget) {
+        if (this.el.scBreakthroughBox) {
+          this.el.scBreakthroughBox.style.display = 'block';
+          if (accuracy >= 90) {
+            if (this.statsManager && typeof this.statsManager.demoteConfusion === 'function') {
+              this.statsManager.demoteConfusion(this.drillTarget.pairKey);
+            }
+            this.el.scBreakthroughBox.innerHTML = `
+              <div class="rx-sc-breakthrough success">
+                <i class="mdi mdi-trophy-variant"></i> 突破成功！已成功調降 ${this.drillTarget.expected} <i class="mdi mdi-sword-cross"></i> ${this.drillTarget.actual} 混淆權重
+              </div>
+            `;
+            if (this.el.feedbackMsg) {
+              this.el.feedbackMsg.innerHTML = '<span style="color:#00e676;"><i class="mdi mdi-check-decagram"></i> 特訓合格！混淆對已成功降權</span>';
+            }
+          } else {
+            this.el.scBreakthroughBox.innerHTML = `
+              <div class="rx-sc-breakthrough warning">
+                <i class="mdi mdi-shield-alert"></i> 特訓未達 90% 門檻，建議再次特訓以鞏固節奏反射
+              </div>
+            `;
+            if (this.el.feedbackMsg) {
+              this.el.feedbackMsg.innerHTML = '<span style="color:var(--gold);"><i class="mdi mdi-alert-circle"></i> 正確率未達 90%，請再接再厲</span>';
+            }
+          }
+        }
+      } else {
+        if (this.el.scBreakthroughBox) {
+          this.el.scBreakthroughBox.style.display = 'none';
+          this.el.scBreakthroughBox.innerHTML = '';
+        }
+      }
 
       // Confusion List
       if (this.el.scConfusionBox && this.el.scConfusionList) {
@@ -1016,10 +1091,15 @@ class RxMode {
               severityText = '中度';
             }
             return `<div class="rx-confusion-item">
-              <span class="confusion-exp">${exp}</span>
-              <i class="mdi mdi-arrow-right"></i>
-              <span class="confusion-act">${act}</span>
-              <span class="rx-severity-badge ${severity}">${severityText} (${count} 次)</span>
+              <div style="display:flex; align-items:center; gap:6px;">
+                <span class="confusion-exp">${exp}</span>
+                <i class="mdi mdi-arrow-right"></i>
+                <span class="confusion-act">${act}</span>
+                <span class="rx-severity-badge ${severity}">${severityText} (${count} 次)</span>
+              </div>
+              <button type="button" class="rx-btn-drill-pair rx-btn-ghost" data-pair="${pair}" title="特訓此配對">
+                <i class="mdi mdi-sword-cross"></i> 特訓
+              </button>
             </div>`;
           }).join('');
         } else {
@@ -1145,6 +1225,9 @@ class RxMode {
               <div style="display:flex; align-items:center; gap:6px;">
                 <span class="rx-severity-badge ${item.severity}">${badgeText}</span>
                 <span style="color:#889; font-size:0.72rem;">${item.count} 次</span>
+                <button type="button" class="rx-btn-drill-pair rx-btn-ghost" data-pair="${item.pair}" title="特訓此配對">
+                  <i class="mdi mdi-sword-cross"></i> 特訓
+                </button>
               </div>
             </div>
           `;
@@ -1197,6 +1280,34 @@ class RxMode {
     }
   }
 
+  startTargetedDrill(expected, actual) {
+    const exp = (expected || 'B').toUpperCase().trim();
+    const act = (actual || 'D').toUpperCase().trim();
+    this.drillTarget = { expected: exp, actual: act, pairKey: `${exp}->${act}` };
+    this.submode = 'drill';
+
+    if (this.el && this.el.scorecard) {
+      this.el.scorecard.style.display = 'none';
+    }
+    if (this.el && this.el.kochStageBar) {
+      this.el.kochStageBar.style.display = 'none';
+    }
+
+    let drillTargets = [];
+    if (typeof generateWeaknessTargets === 'function') {
+      drillTargets = generateWeaknessTargets([exp, act], 10);
+    } else if (typeof window !== 'undefined' && typeof window.generateWeaknessTargets === 'function') {
+      drillTargets = window.generateWeaknessTargets([exp, act], 10);
+    } else {
+      drillTargets = [exp, act, exp, act, exp, act, 'E', 'T', 'A', 'N'];
+    }
+
+    this.startSession('drill', drillTargets);
+    if (this.el && this.el.feedbackMsg) {
+      this.el.feedbackMsg.innerHTML = `<span style="color:var(--gold);"><i class="mdi mdi-sword-cross"></i> 弱點專攻：${exp} <i class="mdi mdi-sword-cross"></i> ${act}（60% 針對混淆出題）</span>`;
+    }
+  }
+
   retryErrors() {
     const errorTargets = this.trials.filter(t => !t.isCorrect).map(t => t.target);
     if (errorTargets.length === 0) return;
@@ -1209,6 +1320,7 @@ class RxMode {
       case 'callsign': return '呼號抄收';
       case 'groups': return '五字電碼群';
       case 'qcodes': return 'Q簡語與常用';
+      case 'drill': return this.drillTarget ? `弱點專攻 (${this.drillTarget.expected} vs ${this.drillTarget.actual})` : '弱點專攻';
       default: return '聽力抄收';
     }
   }

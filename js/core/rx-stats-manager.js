@@ -194,6 +194,45 @@ class RxStatsManager {
     return chars.slice(0, limit);
   }
 
+  demoteConfusion(pairOrExpected, actual = null) {
+    if (!this.confusionProfile || !this.confusionProfile.confusionPairs) {
+      return { pairKey: '', previousCount: 0, newCount: 0, resolved: true };
+    }
+
+    let pairKey = '';
+    if (actual) {
+      pairKey = `${pairOrExpected}->${actual}`;
+    } else if (typeof pairOrExpected === 'string') {
+      pairKey = pairOrExpected;
+    }
+
+    const previousCount = this.confusionProfile.confusionPairs[pairKey] || 0;
+    if (previousCount <= 0) {
+      return { pairKey, previousCount: 0, newCount: 0, resolved: true };
+    }
+
+    let newCount = Math.floor(previousCount / 2);
+    if (newCount <= 1 && previousCount > 1) {
+      newCount = 1;
+    } else if (previousCount <= 1) {
+      newCount = 0;
+    }
+
+    if (newCount <= 0) {
+      delete this.confusionProfile.confusionPairs[pairKey];
+    } else {
+      this.confusionProfile.confusionPairs[pairKey] = newCount;
+    }
+
+    this.save();
+    return {
+      pairKey,
+      previousCount,
+      newCount,
+      resolved: newCount === 0
+    };
+  }
+
   clearHistory() {
     this.sessions = [];
     this.confusionProfile = {

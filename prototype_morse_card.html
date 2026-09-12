@@ -2699,6 +2699,7 @@
     .rx-confusion-item {
       display: flex;
       align-items: center;
+      justify-content: space-between;
       gap: 6px;
       padding: 3px 0;
       font-family: monospace;
@@ -2710,6 +2711,47 @@
     .rx-confusion-item .confusion-act {
       color: #ff5252;
       font-weight: bold;
+    }
+
+    .rx-btn-drill-pair {
+      padding: 2px 7px;
+      font-size: 0.72rem;
+      color: var(--gold);
+      border-color: rgba(255, 183, 3, 0.4);
+      background: rgba(255, 183, 3, 0.08);
+      border-radius: 4px;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 3px;
+      transition: all 0.2s ease;
+    }
+    .rx-btn-drill-pair:hover {
+      background: rgba(255, 183, 3, 0.25);
+      border-color: var(--gold);
+      color: #fff;
+      box-shadow: 0 0 8px rgba(255, 183, 3, 0.4);
+    }
+
+    .rx-sc-breakthrough {
+      margin-top: 10px;
+      padding: 8px 12px;
+      border-radius: 6px;
+      font-size: 0.8rem;
+      font-weight: bold;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .rx-sc-breakthrough.success {
+      background: rgba(0, 230, 118, 0.15);
+      border: 1px solid #00e676;
+      color: #00e676;
+    }
+    .rx-sc-breakthrough.warning {
+      background: rgba(255, 183, 3, 0.15);
+      border: 1px solid var(--gold);
+      color: var(--gold);
     }
 
     /* Koch Rx Stage Control Bar & Pool Display */
@@ -4379,6 +4421,8 @@
           <button type="button" class="rx-sc-clear-btn" id="btn-rx-clear-history" title="清除歷史紀錄"><i class="mdi mdi-delete-sweep-outline"></i></button>
         </div>
 
+        <div id="rx-sc-breakthrough-box" style="display:none; margin-bottom:14px;"></div>
+
         <div id="rx-sc-confusion-box" style="display:none; background:#1e1a18; border:1px solid #ff9100; border-radius:6px; padding:10px; margin-bottom:16px; font-size:0.8rem; color:#ffb703;">
           <div style="font-weight:bold; margin-bottom:4px;"><i class="mdi mdi-alert-circle-outline"></i> 易混淆音形診斷：</div>
           <div id="rx-sc-confusion-list"></div>
@@ -5455,6 +5499,45 @@
         return chars.slice(0, limit);
       }
 
+      demoteConfusion(pairOrExpected, actual = null) {
+        if (!this.confusionProfile || !this.confusionProfile.confusionPairs) {
+          return { pairKey: '', previousCount: 0, newCount: 0, resolved: true };
+        }
+
+        let pairKey = '';
+        if (actual) {
+          pairKey = `${pairOrExpected}->${actual}`;
+        } else if (typeof pairOrExpected === 'string') {
+          pairKey = pairOrExpected;
+        }
+
+        const previousCount = this.confusionProfile.confusionPairs[pairKey] || 0;
+        if (previousCount <= 0) {
+          return { pairKey, previousCount: 0, newCount: 0, resolved: true };
+        }
+
+        let newCount = Math.floor(previousCount / 2);
+        if (newCount <= 1 && previousCount > 1) {
+          newCount = 1;
+        } else if (previousCount <= 1) {
+          newCount = 0;
+        }
+
+        if (newCount <= 0) {
+          delete this.confusionProfile.confusionPairs[pairKey];
+        } else {
+          this.confusionProfile.confusionPairs[pairKey] = newCount;
+        }
+
+        this.save();
+        return {
+          pairKey,
+          previousCount,
+          newCount,
+          resolved: newCount === 0
+        };
+      }
+
       clearHistory() {
         this.sessions = [];
         this.confusionProfile = {
@@ -5549,6 +5632,7 @@
           topConfusionsGrid: document.getElementById('rx-top-confusions-grid'),
           weakCharsList: document.getElementById('rx-weak-chars-list'),
           latencyTrend: document.getElementById('rx-latency-trend'),
+          scBreakthroughBox: document.getElementById('rx-sc-breakthrough-box'),
           softKeypad: document.getElementById('rx-soft-keypad'),
           kochStageBar: document.getElementById('rx-koch-stage-bar'),
           kochStageBadge: document.getElementById('rx-koch-stage-badge'),
@@ -5562,6 +5646,19 @@
           kochMatrixGrid: document.getElementById('rx-koch-matrix-grid'),
           btnStageAdvance: document.getElementById('btn-rx-stage-advance')
         };
+
+        if (this.el.wsContainer) {
+          this.el.wsContainer.addEventListener('click', (e) => {
+            const drillBtn = e.target.closest('.rx-btn-drill-pair');
+            if (drillBtn) {
+              const pair = drillBtn.dataset.pair;
+              if (pair) {
+                const [exp, act] = pair.split('->');
+                this.startTargetedDrill(exp, act);
+              }
+            }
+          });
+        }
 
         if (this.el.btnToggleAnalytics) {
           this.el.btnToggleAnalytics.addEventListener('click', () => {
@@ -5741,6 +5838,13 @@
 
       setSubmode(submode) {
         this.submode = submode;
+        if (submode !== 'drill') {
+          this.drillTarget = null;
+          if (this.el && this.el.scBreakthroughBox) {
+            this.el.scBreakthroughBox.style.display = 'none';
+            this.el.scBreakthroughBox.innerHTML = '';
+          }
+        }
         if (this.el && this.el.navPills) {
           this.el.navPills.forEach(pill => {
             pill.classList.toggle('active', pill.dataset.submode === submode);
@@ -6059,6 +6163,16 @@
             }
             return 'QTH';
           }
+          case 'drill': {
+            if (this.drillTarget) {
+              if (typeof generateWeaknessTargets === 'function') {
+                const arr = generateWeaknessTargets([this.drillTarget.expected, this.drillTarget.actual], 1);
+                return arr[0] || this.drillTarget.expected;
+              }
+              return Math.random() < 0.5 ? this.drillTarget.expected : this.drillTarget.actual;
+            }
+            return 'B';
+          }
           default:
             return 'CQ';
         }
@@ -6142,7 +6256,11 @@
         const answeredCount = this.trials.length;
         const correctCount = this.trials.filter(t => t.isCorrect).length;
         const acc = answeredCount > 0 ? Math.round((correctCount / answeredCount) * 100) : 100;
-        this.el.progressBadge.textContent = `進度: ${this.currentTrialIndex + 1}/${this.totalTrials} · 正確率: ${acc}%`;
+        if (this.submode === 'drill' && this.drillTarget) {
+          this.el.progressBadge.innerHTML = `<i class="mdi mdi-sword-cross"></i> 弱點專攻: ${this.drillTarget.expected} <i class="mdi mdi-sword-cross"></i> ${this.drillTarget.actual} (${this.currentTrialIndex + 1}/${this.totalTrials})`;
+        } else {
+          this.el.progressBadge.textContent = `進度: ${this.currentTrialIndex + 1}/${this.totalTrials} · 正確率: ${acc}%`;
+        }
       }
 
       startAudio() {
@@ -6435,7 +6553,13 @@
 
         if (this.el) {
           if (this.el.scorecard) this.el.scorecard.style.display = 'block';
-          if (this.el.scModeTag) this.el.scModeTag.textContent = this.getSubmodeDisplayName(this.submode);
+          if (this.el.scModeTag) {
+            if (this.submode === 'drill' && this.drillTarget) {
+              this.el.scModeTag.innerHTML = `<i class="mdi mdi-sword-cross"></i> 弱點專攻 (${this.drillTarget.expected} <i class="mdi mdi-sword-cross"></i> ${this.drillTarget.actual})`;
+            } else {
+              this.el.scModeTag.textContent = this.getSubmodeDisplayName(this.submode);
+            }
+          }
           if (this.el.scAccuracy) {
             this.el.scAccuracy.textContent = `${accuracy}%`;
             this.el.scAccuracy.style.color = accuracy >= 90 ? '#00e676' : (accuracy >= 70 ? 'var(--gold)' : '#ff5252');
@@ -6443,6 +6567,40 @@
           if (this.el.scWpm) this.el.scWpm.textContent = `${wpm} WPM`;
           if (this.el.scLatency) this.el.scLatency.textContent = `${avgLatency} ms`;
           if (this.el.scTotal) this.el.scTotal.textContent = `${correctCount} / ${total} (正確率 ${accuracy}%)`;
+
+          // Breakthrough Box in Drill Mode
+          if (this.submode === 'drill' && this.drillTarget) {
+            if (this.el.scBreakthroughBox) {
+              this.el.scBreakthroughBox.style.display = 'block';
+              if (accuracy >= 90) {
+                if (this.statsManager && typeof this.statsManager.demoteConfusion === 'function') {
+                  this.statsManager.demoteConfusion(this.drillTarget.pairKey);
+                }
+                this.el.scBreakthroughBox.innerHTML = `
+                  <div class="rx-sc-breakthrough success">
+                    <i class="mdi mdi-trophy-variant"></i> 突破成功！已成功調降 ${this.drillTarget.expected} <i class="mdi mdi-sword-cross"></i> ${this.drillTarget.actual} 混淆權重
+                  </div>
+                `;
+                if (this.el.feedbackMsg) {
+                  this.el.feedbackMsg.innerHTML = '<span style="color:#00e676;"><i class="mdi mdi-check-decagram"></i> 特訓合格！混淆對已成功降權</span>';
+                }
+              } else {
+                this.el.scBreakthroughBox.innerHTML = `
+                  <div class="rx-sc-breakthrough warning">
+                    <i class="mdi mdi-shield-alert"></i> 特訓未達 90% 門檻，建議再次特訓以鞏固節奏反射
+                  </div>
+                `;
+                if (this.el.feedbackMsg) {
+                  this.el.feedbackMsg.innerHTML = '<span style="color:var(--gold);"><i class="mdi mdi-alert-circle"></i> 正確率未達 90%，請再接再厲</span>';
+                }
+              }
+            }
+          } else {
+            if (this.el.scBreakthroughBox) {
+              this.el.scBreakthroughBox.style.display = 'none';
+              this.el.scBreakthroughBox.innerHTML = '';
+            }
+          }
 
           if (this.el.scConfusionBox && this.el.scConfusionList) {
             const confusions = Object.entries(this.confusionMatrix).sort((a, b) => b[1] - a[1]);
@@ -6460,10 +6618,15 @@
                   severityText = '中度';
                 }
                 return `<div class="rx-confusion-item">
-                  <span class="confusion-exp">${exp}</span>
-                  <i class="mdi mdi-arrow-right"></i>
-                  <span class="confusion-act">${act}</span>
-                  <span class="rx-severity-badge ${severity}">${severityText} (${count} 次)</span>
+                  <div style="display:flex; align-items:center; gap:6px;">
+                    <span class="confusion-exp">${exp}</span>
+                    <i class="mdi mdi-arrow-right"></i>
+                    <span class="confusion-act">${act}</span>
+                    <span class="rx-severity-badge ${severity}">${severityText} (${count} 次)</span>
+                  </div>
+                  <button type="button" class="rx-btn-drill-pair rx-btn-ghost" data-pair="${pair}" title="特訓此配對">
+                    <i class="mdi mdi-sword-cross"></i> 特訓
+                  </button>
                 </div>`;
               }).join('');
             } else {
@@ -6588,6 +6751,9 @@
                   <div style="display:flex; align-items:center; gap:6px;">
                     <span class="rx-severity-badge ${item.severity}">${badgeText}</span>
                     <span style="color:#889; font-size:0.72rem;">${item.count} 次</span>
+                    <button type="button" class="rx-btn-drill-pair rx-btn-ghost" data-pair="${item.pair}" title="特訓此配對">
+                      <i class="mdi mdi-sword-cross"></i> 特訓
+                    </button>
                   </div>
                 </div>
               `;
@@ -6640,6 +6806,34 @@
         }
       }
 
+      startTargetedDrill(expected, actual) {
+        const exp = (expected || 'B').toUpperCase().trim();
+        const act = (actual || 'D').toUpperCase().trim();
+        this.drillTarget = { expected: exp, actual: act, pairKey: `${exp}->${act}` };
+        this.submode = 'drill';
+
+        if (this.el && this.el.scorecard) {
+          this.el.scorecard.style.display = 'none';
+        }
+        if (this.el && this.el.kochStageBar) {
+          this.el.kochStageBar.style.display = 'none';
+        }
+
+        let drillTargets = [];
+        if (typeof generateWeaknessTargets === 'function') {
+          drillTargets = generateWeaknessTargets([exp, act], 10);
+        } else if (typeof window !== 'undefined' && typeof window.generateWeaknessTargets === 'function') {
+          drillTargets = window.generateWeaknessTargets([exp, act], 10);
+        } else {
+          drillTargets = [exp, act, exp, act, exp, act, 'E', 'T', 'A', 'N'];
+        }
+
+        this.startSession('drill', drillTargets);
+        if (this.el && this.el.feedbackMsg) {
+          this.el.feedbackMsg.innerHTML = `<span style="color:var(--gold);"><i class="mdi mdi-sword-cross"></i> 弱點專攻：${exp} <i class="mdi mdi-sword-cross"></i> ${act}（60% 針對混淆出題）</span>`;
+        }
+      }
+
       retryErrors() {
         const errorTargets = this.trials.filter(t => !t.isCorrect).map(t => t.target);
         if (errorTargets.length === 0) return;
@@ -6652,6 +6846,7 @@
           case 'callsign': return '呼號抄收';
           case 'groups': return '五字電碼群';
           case 'qcodes': return 'Q簡語與常用';
+          case 'drill': return this.drillTarget ? `弱點專攻 (${this.drillTarget.expected} vs ${this.drillTarget.actual})` : '弱點專攻';
           default: return '聽力抄收';
         }
       }
@@ -7925,6 +8120,57 @@
         const item = CW_ABBREVIATIONS[Math.floor(Math.random() * CW_ABBREVIATIONS.length)];
         return { text: item.word, desc: item.desc, type: 'abbreviation' };
       }
+    }
+
+    function generateWeaknessTargets(pairOrChars, totalTrials = 10, distractorPool = null) {
+      let targets = [];
+      if (typeof pairOrChars === 'string') {
+        if (pairOrChars.includes('->')) {
+          targets = pairOrChars.split('->').map(s => s.trim().toUpperCase());
+        } else if (pairOrChars.includes(',')) {
+          targets = pairOrChars.split(',').map(s => s.trim().toUpperCase());
+        } else {
+          targets = pairOrChars.trim().toUpperCase().split('');
+        }
+      } else if (Array.isArray(pairOrChars)) {
+        targets = pairOrChars.map(s => String(s).trim().toUpperCase());
+      }
+
+      targets = targets.filter(c => c && c.length === 1);
+      if (targets.length === 0) {
+        targets = ['B', 'D'];
+      }
+
+      const defaultDistractors = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789'
+        .split('')
+        .filter(c => !targets.includes(c));
+      const pool = distractorPool || defaultDistractors;
+
+      const targetCount = Math.max(Math.ceil(totalTrials * 0.6), targets.length);
+      const distractorCount = Math.max(0, totalTrials - targetCount);
+
+      const result = [];
+      for (let i = 0; i < targetCount; i++) {
+        const char = targets[i % targets.length];
+        result.push(char);
+      }
+
+      for (let i = 0; i < distractorCount; i++) {
+        const randChar = pool[Math.floor(Math.random() * pool.length)];
+        result.push(randChar);
+      }
+
+      // Fisher-Yates Shuffle
+      for (let i = result.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [result[i], result[j]] = [result[j], result[i]];
+      }
+
+      return result;
+    }
+
+    if (typeof window !== 'undefined') {
+      window.generateWeaknessTargets = generateWeaknessTargets;
     }
 
     function applySpeedPreset(key, saveToSettings = true) {

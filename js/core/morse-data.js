@@ -328,6 +328,53 @@ function generateQSignalOrAbbreviation() {
   }
 }
 
+function generateWeaknessTargets(pairOrChars, totalTrials = 10, distractorPool = null) {
+  let targets = [];
+  if (typeof pairOrChars === 'string') {
+    if (pairOrChars.includes('->')) {
+      targets = pairOrChars.split('->').map(s => s.trim().toUpperCase());
+    } else if (pairOrChars.includes(',')) {
+      targets = pairOrChars.split(',').map(s => s.trim().toUpperCase());
+    } else {
+      targets = pairOrChars.trim().toUpperCase().split('');
+    }
+  } else if (Array.isArray(pairOrChars)) {
+    targets = pairOrChars.map(s => String(s).trim().toUpperCase());
+  }
+
+  targets = targets.filter(c => c && c.length === 1);
+  if (targets.length === 0) {
+    targets = ['B', 'D'];
+  }
+
+  const defaultDistractors = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789'
+    .split('')
+    .filter(c => !targets.includes(c));
+  const pool = distractorPool || defaultDistractors;
+
+  const targetCount = Math.max(Math.ceil(totalTrials * 0.6), targets.length);
+  const distractorCount = Math.max(0, totalTrials - targetCount);
+
+  const result = [];
+  for (let i = 0; i < targetCount; i++) {
+    const char = targets[i % targets.length];
+    result.push(char);
+  }
+
+  for (let i = 0; i < distractorCount; i++) {
+    const randChar = pool[Math.floor(Math.random() * pool.length)];
+    result.push(randChar);
+  }
+
+  // Fisher-Yates Shuffle
+  for (let i = result.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [result[i], result[j]] = [result[j], result[i]];
+  }
+
+  return result;
+}
+
 // Global window registration
 if (typeof window !== 'undefined') {
   window.CALLSIGN_PREFIXES = CALLSIGN_PREFIXES;
@@ -337,6 +384,7 @@ if (typeof window !== 'undefined') {
   window.generateCallsign = generateCallsign;
   window.generateCodeGroup = generateCodeGroup;
   window.generateQSignalOrAbbreviation = generateQSignalOrAbbreviation;
+  window.generateWeaknessTargets = generateWeaknessTargets;
 }
 
 // Export for Node.js test environment
@@ -356,6 +404,7 @@ if (typeof module !== 'undefined' && module.exports) {
     generateKochRxTargets,
     generateCallsign,
     generateCodeGroup,
-    generateQSignalOrAbbreviation
+    generateQSignalOrAbbreviation,
+    generateWeaknessTargets
   };
 }
