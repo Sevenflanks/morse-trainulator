@@ -9,8 +9,29 @@
   width: 100%;
   max-width: 1200px;
   margin: 0 auto;
-  padding: 12px 16px 140px;
+  padding: 12px 16px 280px 16px;
   box-sizing: border-box;
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  scroll-behavior: smooth;
+  scroll-padding-bottom: 280px;
+}
+
+.rx-workspace-stage.dock-collapsed {
+  padding-bottom: 100px;
+  scroll-padding-bottom: 100px;
+}
+
+.rx-workspace-stage::-webkit-scrollbar {
+  width: 6px;
+}
+.rx-workspace-stage::-webkit-scrollbar-track {
+  background: transparent;
+}
+.rx-workspace-stage::-webkit-scrollbar-thumb {
+  background: #232b3b;
+  border-radius: 3px;
 }
 
 /* Mode Selection Pills */
@@ -731,6 +752,15 @@
   padding: 6px 12px 10px;
   z-index: 100;
   box-shadow: 0 -4px 15px rgba(0, 0, 0, 0.6);
+  transition: all 0.2s ease-in-out;
+}
+
+.rx-dock.collapsed {
+  padding: 4px 12px 6px;
+}
+
+.rx-dock.collapsed .telegraph-keypad {
+  display: none !important;
 }
 
 .rx-dock-container {
@@ -738,7 +768,46 @@
   margin: 0 auto;
   display: flex;
   flex-direction: column;
-  gap: 6px;
+  gap: 5px;
+}
+
+.rx-dock-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  padding: 0 4px;
+}
+
+.rx-dock-label {
+  font-size: 0.72rem;
+  color: #728299;
+  font-weight: 600;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  letter-spacing: 0.5px;
+}
+
+.rx-dock-toggle-btn {
+  background: #181c26;
+  border: 1px solid #2e374a;
+  color: #8c9cb2;
+  font-size: 0.7rem;
+  font-weight: 600;
+  padding: 2px 8px;
+  border-radius: 4px;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  transition: all 0.15s ease;
+}
+
+.rx-dock-toggle-btn:hover {
+  background: #222938;
+  border-color: var(--neon-blue);
+  color: #fff;
 }
 
 .telegraph-keypad {
