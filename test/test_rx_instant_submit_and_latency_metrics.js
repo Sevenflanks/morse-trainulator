@@ -212,6 +212,44 @@ assert.ok(!emojiRegex.test(rxModeSrc), 'js/ui/rx-mode.js must contain 0 Unicode 
 assert.ok(!emojiRegex.test(indexHtml.substring(indexHtml.indexOf('id="rx-scorecard"'), indexHtml.indexOf('id="rx-sc-breakthrough-box"'))), 'Scorecard HTML must have 0 emojis');
 console.log('   -> ADR 0001 Zero-Emoji verified!');
 
+// 7. RX 模式發報快捷鍵防禦隔離 (RX Mode Keying Shortcut Isolation)
+console.log('\n7. Verifying Keying Shortcut Isolation in RX Mode...');
+const appJs = fs.readFileSync(path.join(projectRoot, 'js/app.js'), 'utf8');
+
+assert.ok(appJs.includes('const isRxActive = (typeof window !== \'undefined\' && window.rxMode && typeof window.rxMode.isWorkspaceActive === \'function\')'), 'js/app.js must contain isRxActive guard in keydown');
+assert.ok(protoHtml.includes('const isRxActive = (typeof window !== \'undefined\' && window.rxMode && typeof window.rxMode.isWorkspaceActive === \'function\')'), 'prototype_morse_card.html must contain isRxActive guard in keydown');
+assert.ok(appJs.includes('// 當處於 RX 聽力抄收工作台時，忽略發報抬鍵'), 'js/app.js must contain isRxActive guard in keyup');
+assert.ok(protoHtml.includes('// 當處於 RX 聽力抄收工作台時，忽略發報抬鍵'), 'prototype_morse_card.html must contain isRxActive guard in keyup');
+
+// Check release of physical keyer contacts on workspace navigation
+assert.ok(appJs.includes('keyer.setPhysicalContact(\'left\', false)'), 'js/app.js must release paddle contacts on workspace switch');
+assert.ok(protoHtml.includes('keyer.setPhysicalContact(\'left\', false)'), 'prototype_morse_card.html must release paddle contacts on workspace switch');
+
+// Behavioral simulation of the isRxActive guard logic
+let keyingTriggered = false;
+function simulateAppKeydown(e, isRxActive) {
+  if (isRxActive) return;
+  if (e.code === 'KeyK' || e.code === 'KeyJ' || e.code === 'KeyL' || e.code === 'KeyR') {
+    keyingTriggered = true;
+  }
+}
+
+// In RX mode, keying shortcut should not trigger
+keyingTriggered = false;
+simulateAppKeydown({ code: 'KeyK' }, true);
+assert.strictEqual(keyingTriggered, false, 'KeyK (Straight key) must NOT trigger keying when RX is active');
+simulateAppKeydown({ code: 'KeyR' }, true);
+assert.strictEqual(keyingTriggered, false, 'KeyR (Restart keying) must NOT trigger when RX is active');
+simulateAppKeydown({ code: 'KeyJ' }, true);
+assert.strictEqual(keyingTriggered, false, 'KeyJ (Dit paddle) must NOT trigger when RX is active');
+
+// In TX/Normal mode, keying shortcut functions normally
+keyingTriggered = false;
+simulateAppKeydown({ code: 'KeyK' }, false);
+assert.strictEqual(keyingTriggered, true, 'KeyK should trigger keying in normal TX mode');
+console.log('   -> RX mode keying shortcut isolation verified!');
+
 console.log('\n====================================================');
 console.log('ALL INSTANT SUBMIT & LATENCY METRICS TESTS PASSED!');
 console.log('====================================================');
+

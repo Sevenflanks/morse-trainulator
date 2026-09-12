@@ -1157,6 +1157,18 @@ function setupEventListeners() {
     if (e.repeat) return;
     if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return;
 
+    // 當處於 RX 聽力抄收工作台時，發報快捷鍵 (電鍵、雙槳、重設發報等) 絕不觸發發報
+    const isRxActive = (typeof window !== 'undefined' && window.rxMode && typeof window.rxMode.isWorkspaceActive === 'function')
+      ? window.rxMode.isWorkspaceActive()
+      : (() => {
+          const wsRx = typeof document !== 'undefined' ? document.getElementById('ws-container-rx') : null;
+          return !!(wsRx && (wsRx.classList?.contains?.('active') || wsRx.style?.display === 'flex' || wsRx.style?.display === 'block'));
+        })();
+
+    if (isRxActive) {
+      return;
+    }
+
     if (keybindingManager.recordingTarget) {
       e.preventDefault();
       e.stopPropagation();
@@ -1215,6 +1227,18 @@ function setupEventListeners() {
 
   window.addEventListener('keyup', (e) => {
     if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return;
+
+    // 當處於 RX 聽力抄收工作台時，忽略發報抬鍵
+    const isRxActive = (typeof window !== 'undefined' && window.rxMode && typeof window.rxMode.isWorkspaceActive === 'function')
+      ? window.rxMode.isWorkspaceActive()
+      : (() => {
+          const wsRx = typeof document !== 'undefined' ? document.getElementById('ws-container-rx') : null;
+          return !!(wsRx && (wsRx.classList?.contains?.('active') || wsRx.style?.display === 'flex' || wsRx.style?.display === 'block'));
+        })();
+
+    if (isRxActive) {
+      return;
+    }
 
     if (currentKeyerDevice === 'straight') {
       if (keybindingManager.isStraight(e)) {
@@ -2028,6 +2052,14 @@ function setupWorkspaceNavigation() {
       }
       if (typeof window !== 'undefined' && window.rxMode) {
         window.rxMode.onLeaveRx();
+      }
+
+      // Release any physical keyer contacts when switching workspaces
+      if (typeof currentKeyerDevice !== 'undefined' && currentKeyerDevice === 'straight') {
+        if (typeof handleKeyUp === 'function') handleKeyUp();
+      } else if (typeof keyer !== 'undefined' && keyer && typeof keyer.setPhysicalContact === 'function') {
+        keyer.setPhysicalContact('left', false);
+        keyer.setPhysicalContact('right', false);
       }
 
       wsTabs.forEach(t => {
