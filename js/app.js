@@ -1869,6 +1869,9 @@ function updateK5MorphingUI() {
 
   if (!wingLeft || !wingRight) return;
 
+  wingLeft.classList.toggle('mode-straight', currentKeyerDevice === 'straight');
+  wingRight.classList.toggle('mode-straight', currentKeyerDevice === 'straight');
+
   if (pillPaddle) pillPaddle.classList.toggle('active', currentKeyerDevice === 'paddle');
   if (pillStraight) pillStraight.classList.toggle('active', currentKeyerDevice === 'straight');
   if (pillBug) pillBug.classList.toggle('active', currentKeyerDevice === 'bug');
