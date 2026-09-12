@@ -27,7 +27,8 @@ const _DEFAULT_SETTINGS = (typeof DEFAULT_SETTINGS !== 'undefined') ? DEFAULT_SE
   textShowHints: true,
   textStrictMode: false,
   kochShowHints: false,
-  layoutMode: '2col' // '2col' | '3col'
+  layoutMode: '2col', // '2col' | '3col'
+  themePreset: 'cyber-brass' // 'cyber-brass' | 'classic-amber' | 'green-phosphor'
 };
 
 class SettingsManager {
@@ -54,9 +55,17 @@ class SettingsManager {
             }
           }
         }
+        // Theme preset synchronization (supports direct morse_theme_preset and settings.themePreset)
+        const directTheme = this.storage.getItem('morse_theme_preset');
+        if (directTheme) {
+          this.settings.themePreset = directTheme;
+        }
       }
     } catch(e) {
       console.warn('Failed to load settings:', e);
+    }
+    if (!this.settings.themePreset) {
+      this.settings.themePreset = 'cyber-brass';
     }
     return this.settings;
   }
@@ -65,6 +74,9 @@ class SettingsManager {
     try {
       if (this.storage) {
         this.storage.setItem(this.storageKey, JSON.stringify(this.settings));
+        if (this.settings.themePreset) {
+          this.storage.setItem('morse_theme_preset', this.settings.themePreset);
+        }
       }
     } catch(e) {
       console.warn('Failed to save settings:', e);
@@ -75,6 +87,7 @@ class SettingsManager {
     try {
       if (this.storage) {
         this.storage.removeItem(this.storageKey);
+        this.storage.removeItem('morse_theme_preset');
       }
     } catch(_) {}
     this.settings = Object.assign({}, this.defaults);

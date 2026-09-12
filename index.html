@@ -25,6 +25,22 @@
   <link rel="stylesheet" href="css/controls.css?v=1.3.3">
   <link rel="stylesheet" href="css/modes.css?v=1.3.3">
   <link rel="stylesheet" href="css/rx-mode.css?v=1.3.3">
+
+  <!-- Early Theme Hydration (Zero-FOUC) -->
+  <script>
+    (function() {
+      try {
+        var saved = localStorage.getItem('morse_theme_preset');
+        if (!saved) {
+          var s = localStorage.getItem('morse_card_settings_v1');
+          if (s) saved = JSON.parse(s).themePreset;
+        }
+        if (saved && (saved === 'classic-amber' || saved === 'green-phosphor' || saved === 'cyber-brass')) {
+          document.documentElement.setAttribute('data-theme', saved);
+        }
+      } catch(e) {}
+    })();
+  </script>
 </head>
 <body>
 
@@ -1239,6 +1255,31 @@
       <button type="button" id="btn-close-settings" class="btn-icon" title="關閉"><i class="mdi mdi-close"></i></button>
     </div>
     <div class="drawer-body" id="drawer-settings-content">
+
+      <!-- CRT Theme Presets Box -->
+      <div id="theme-settings-box" class="settings-card-section" style="background:#14161f; border:1px solid #282d3c; border-radius:8px; padding:12px; margin-bottom:12px;">
+        <div style="font-size:0.8rem; font-weight:bold; color:var(--gold); margin-bottom:10px; display:flex; justify-content:space-between; align-items:center;">
+          <span><i class="mdi mdi-palette-outline"></i> 電台螢光主題 (CRT Theme Preset)</span>
+          <span id="tag-current-theme" style="font-size:0.7rem; color:var(--text-dim);">Cyber Brass</span>
+        </div>
+        <div class="theme-preset-grid">
+          <button type="button" class="theme-preset-btn active" id="btn-theme-cyber-brass" data-theme="cyber-brass" title="帝國黃金 / 霓虹青 (Cyber Brass)">
+            <div class="theme-preview-dot dot-cyber-brass"></div>
+            <div class="theme-btn-title">Cyber Brass</div>
+            <div class="theme-btn-sub">帝國黃金</div>
+          </button>
+          <button type="button" class="theme-preset-btn" id="btn-theme-classic-amber" data-theme="classic-amber" title="短波琥珀黃 (Classic Amber，低炫光護眼)">
+            <div class="theme-preview-dot dot-classic-amber"></div>
+            <div class="theme-btn-title">Classic Amber</div>
+            <div class="theme-btn-sub">短波琥珀</div>
+          </button>
+          <button type="button" class="theme-preset-btn" id="btn-theme-green-phosphor" data-theme="green-phosphor" title="雷達磷光綠 (Green Phosphor，雷達示波器)">
+            <div class="theme-preview-dot dot-green-phosphor"></div>
+            <div class="theme-btn-title">Green Phosphor</div>
+            <div class="theme-btn-sub">雷達磷光</div>
+          </button>
+        </div>
+      </div>
 
       <!-- Sidetone Frequency & Volume -->
       <div class="settings-card-section" style="background:#14161f; border:1px solid #282d3c; border-radius:8px; padding:12px;">
