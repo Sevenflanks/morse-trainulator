@@ -103,6 +103,9 @@ requiredCssSelectors.forEach(sel => {
   assert.ok(protoHtml.includes(sel), `prototype_morse_card.html must define ${sel}`);
 });
 console.log('   -> Workstation CSS selectors verified in base.css and prototype_morse_card.html!');
+assert.ok(baseCss.includes('align-self: center;'), 'base.css must center .va-topbar on wide screens');
+assert.ok(protoHtml.includes('align-self: center;'), 'prototype_morse_card.html must center .va-topbar on wide screens');
+console.log('   -> .va-topbar wide-screen centering verified!');
 
 // 3. Responsive Breakpoints Verification
 console.log('\n3. Verifying Responsive Breakpoints in CSS...');

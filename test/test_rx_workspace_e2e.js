@@ -64,7 +64,9 @@ const requiredElements = [
   'id="btn-rx-retry-errors"',
   'id="btn-rx-next-round"',
   'id="rx-dock"',
-  'id="rx-soft-keypad"'
+  'id="rx-soft-keypad"',
+  'id="ribbon-blind-shield"',
+  'class="blind-shield-badge"'
 ];
 
 [
@@ -124,7 +126,10 @@ const requiredCssTokens = [
   '.rx-btn-advance',
   '.ribbon-blind-mode',
   '.rx-pool-preview-row',
-  '#rx-koch-target-info'
+  '#rx-koch-target-info',
+  '.ribbon-blind-shield',
+  '.blind-shield-badge',
+  'blindShieldPulse'
 ];
 
 requiredCssTokens.forEach(token => {

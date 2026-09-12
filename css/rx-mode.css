@@ -331,9 +331,72 @@
   display: none !important;
 }
 
-/* Blind Mode Top Oscilloscope Paper Tape Concealment */
+/* Blind Mode Top Oscilloscope Shutter & Privacy Shield (Preserves 75px height, strictly zero text) */
 .p3b-top-ribbon.ribbon-blind-mode {
-  display: none !important;
+  display: flex !important;
+}
+
+.p3b-top-ribbon.ribbon-blind-mode .scope-canvas {
+  filter: grayscale(1) brightness(0.2) blur(1px);
+  opacity: 0.25;
+}
+
+.p3b-top-ribbon.ribbon-blind-mode .scope-graticule {
+  opacity: 0.1;
+}
+
+.p3b-top-ribbon.ribbon-blind-mode .scope-bezel-text {
+  opacity: 0.15;
+}
+
+.p3b-top-ribbon .ribbon-blind-shield {
+  display: none;
+  position: absolute;
+  inset: 0;
+  align-items: center;
+  justify-content: center;
+  pointer-events: none;
+  z-index: 5;
+  background: repeating-linear-gradient(
+    -45deg,
+    rgba(8, 11, 17, 0.88),
+    rgba(8, 11, 17, 0.88) 12px,
+    rgba(14, 18, 28, 0.88) 12px,
+    rgba(14, 18, 28, 0.88) 24px
+  );
+  border-bottom: 1px dashed rgba(255, 215, 0, 0.2);
+}
+
+.p3b-top-ribbon.ribbon-blind-mode .ribbon-blind-shield {
+  display: flex;
+}
+
+.ribbon-blind-shield .blind-shield-badge {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  background: rgba(13, 17, 25, 0.92);
+  border: 1.5px solid rgba(255, 215, 0, 0.4);
+  box-shadow: 0 0 16px rgba(0, 0, 0, 0.8), 0 0 8px rgba(255, 215, 0, 0.2);
+  color: var(--gold);
+  font-size: 1.5rem;
+  animation: blindShieldPulse 2.4s ease-in-out infinite;
+}
+
+@keyframes blindShieldPulse {
+  0%, 100% {
+    transform: scale(1);
+    border-color: rgba(255, 215, 0, 0.3);
+    box-shadow: 0 0 12px rgba(0, 0, 0, 0.8), 0 0 6px rgba(255, 215, 0, 0.15);
+  }
+  50% {
+    transform: scale(1.06);
+    border-color: rgba(255, 215, 0, 0.6);
+    box-shadow: 0 0 18px rgba(0, 0, 0, 0.9), 0 0 12px rgba(255, 215, 0, 0.35);
+  }
 }
 
 .pcb-blind-mode {

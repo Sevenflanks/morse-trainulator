@@ -53,8 +53,6 @@ body {
 
 header {
   text-align: center;
-  margin-bottom: 12px;
-  max-width: 960px;
 }
 
 h1 {
@@ -255,8 +253,8 @@ h1 {
    Three-Zone Shell: Top Bar, Workspaces, and Navigation
    ========================================================================== */
 .va-topbar {
-  width: 100%;
-  max-width: 1280px;
+  width: calc(100% - 24px);
+  max-width: 1650px;
   height: 52px;
   background: #13151c;
   border: 1px solid #282f3d;
@@ -265,7 +263,9 @@ h1 {
   align-items: center;
   justify-content: space-between;
   padding: 0 16px;
-  margin-bottom: 12px;
+  margin: 6px auto 10px;
+  align-self: center;
+  box-sizing: border-box;
   flex-shrink: 0;
   box-shadow: 0 4px 16px rgba(0, 0, 0, 0.4);
 }
@@ -1049,6 +1049,11 @@ h1 {
 /* Mobile & Portrait Adaptation (375px - 768px) */
 @media (max-width: 768px) {
   .va-topbar {
+    width: 100%;
+    border-radius: 0;
+    margin: 0 0 6px 0;
+    border-left: none;
+    border-right: none;
     padding: 0 8px;
     height: 48px;
     gap: 4px;
