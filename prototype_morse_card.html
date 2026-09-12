@@ -2361,6 +2361,73 @@
       animation: pulse-glow 1s infinite alternate;
     }
 
+    /* 5-Stage Signal Level Ladder (Signal S-Meter) */
+    .rx-signal-ladder {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 4px 10px;
+      background: rgba(13, 16, 23, 0.7);
+      border: 1px solid #283042;
+      border-radius: 4px;
+      box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.5);
+    }
+
+    .signal-ladder-label {
+      font-family: var(--font-mono);
+      font-size: 0.65rem;
+      font-weight: 800;
+      letter-spacing: 1.5px;
+      color: var(--text-dim);
+      text-transform: uppercase;
+    }
+
+    .signal-ladder-bars {
+      display: flex;
+      align-items: flex-end;
+      gap: 3px;
+      height: 14px;
+    }
+
+    .signal-bar {
+      width: 5px;
+      border-radius: 1px;
+      background: rgba(255, 255, 255, 0.08);
+      border: 1px solid rgba(255, 255, 255, 0.05);
+      transition: background 0.06s ease, box-shadow 0.06s ease, border-color 0.06s ease;
+    }
+
+    .signal-bar.bar-1 { height: 4px; }
+    .signal-bar.bar-2 { height: 6px; }
+    .signal-bar.bar-3 { height: 9px; }
+    .signal-bar.bar-4 { height: 11px; }
+    .signal-bar.bar-5 { height: 14px; }
+
+    .signal-bar.bar-1.active,
+    .signal-bar.bar-2.active {
+      background: #00e676;
+      border-color: #00e676;
+      box-shadow: 0 0 6px rgba(0, 230, 118, 0.8);
+    }
+
+    .signal-bar.bar-3.active {
+      background: #ffd700;
+      border-color: #ffd700;
+      box-shadow: 0 0 6px rgba(255, 215, 0, 0.8);
+    }
+
+    .signal-bar.bar-4.active {
+      background: #ff9100;
+      border-color: #ff9100;
+      box-shadow: 0 0 7px rgba(255, 145, 0, 0.85);
+    }
+
+    .signal-bar.bar-5.active {
+      background: #ff3d00;
+      border-color: #ff3d00;
+      box-shadow: 0 0 8px rgba(255, 61, 0, 0.9);
+    }
+
     .rx-control-btn {
       background: #1f2434;
       border: 1px solid #3c445c;
@@ -2418,6 +2485,45 @@
       animation: rx-blink 0.8s infinite;
       vertical-align: bottom;
       margin-left: 2px;
+    }
+
+    /* Teletype Strike & Ink Impression on Immediate Submit (120ms) */
+    .rx-input-display.teletype-strike {
+      animation: teletype-impression 0.12s cubic-bezier(0.2, 0.9, 0.3, 1);
+    }
+    .rx-input-display.teletype-strike #rx-input-buffer {
+      animation: teletype-afterglow 0.12s ease-out;
+    }
+
+    @keyframes teletype-impression {
+      0% {
+        transform: scale(0.985) translateY(1.5px);
+        border-color: var(--neon-blue);
+        box-shadow: 0 0 16px rgba(0, 229, 255, 0.45), inset 0 0 10px rgba(0, 229, 255, 0.25);
+      }
+      40% {
+        transform: scale(1.015) translateY(-0.8px);
+        box-shadow: 0 0 20px rgba(255, 215, 0, 0.5), inset 0 0 12px rgba(255, 215, 0, 0.3);
+      }
+      100% {
+        transform: scale(1) translateY(0);
+        box-shadow: 0 0 15px rgba(0, 229, 255, 0.25);
+      }
+    }
+
+    @keyframes teletype-afterglow {
+      0% {
+        text-shadow: 0 0 4px #fff, 0 0 12px var(--neon-blue), 0 0 24px rgba(0, 229, 255, 0.9);
+        filter: brightness(1.6);
+      }
+      50% {
+        text-shadow: 0 0 3px #fff, 0 0 10px var(--gold), 0 0 20px rgba(255, 215, 0, 0.8);
+        filter: brightness(1.3);
+      }
+      100% {
+        text-shadow: 0 0 10px rgba(255, 215, 0, 0.4);
+        filter: brightness(1);
+      }
     }
 
     .rx-feedback-msg {
@@ -2799,6 +2905,103 @@
     .rx-blind-active #rx-koch-target-info,
     .rx-blind-active .rx-pool-preview-row {
       display: none !important;
+    }
+
+    /* Acoustic Sonar Pulse (Blind Mode Audio Radar Ripple) */
+    .rx-sonar-pulse {
+      display: none;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+      min-height: 38px;
+      margin: 2px 0;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.35s ease;
+    }
+
+    .rx-blind-active .rx-sonar-pulse,
+    .rx-blind-mode .rx-sonar-pulse {
+      display: flex;
+    }
+
+    .rx-sonar-pulse.active {
+      opacity: 1;
+    }
+
+    .sonar-core {
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+      background: rgba(13, 22, 35, 0.85);
+      border: 1.5px solid rgba(0, 229, 255, 0.6);
+      box-shadow: 0 0 10px rgba(0, 229, 255, 0.4), inset 0 0 6px rgba(0, 229, 255, 0.2);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--neon-blue);
+      font-size: 1rem;
+      z-index: 2;
+      animation: sonar-core-pulse 1.4s infinite ease-in-out;
+    }
+
+    @keyframes sonar-core-pulse {
+      0%, 100% {
+        transform: scale(1);
+        box-shadow: 0 0 8px rgba(0, 229, 255, 0.3), inset 0 0 4px rgba(0, 229, 255, 0.2);
+      }
+      50% {
+        transform: scale(1.1);
+        box-shadow: 0 0 16px rgba(0, 229, 255, 0.7), inset 0 0 8px rgba(0, 229, 255, 0.4);
+        color: #fff;
+      }
+    }
+
+    .sonar-ring {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      width: 26px;
+      height: 26px;
+      margin-top: -13px;
+      margin-left: -13px;
+      border-radius: 50%;
+      border: 1.5px solid rgba(0, 229, 255, 0.5);
+      box-shadow: 0 0 8px rgba(0, 229, 255, 0.3);
+      pointer-events: none;
+      opacity: 0;
+    }
+
+    .rx-sonar-pulse.active .sonar-ring.ring-1 {
+      animation: sonar-expand 1.8s infinite cubic-bezier(0.2, 0.75, 0.35, 1);
+      animation-delay: 0s;
+    }
+
+    .rx-sonar-pulse.active .sonar-ring.ring-2 {
+      animation: sonar-expand 1.8s infinite cubic-bezier(0.2, 0.75, 0.35, 1);
+      animation-delay: 0.6s;
+    }
+
+    .rx-sonar-pulse.active .sonar-ring.ring-3 {
+      animation: sonar-expand 1.8s infinite cubic-bezier(0.2, 0.75, 0.35, 1);
+      animation-delay: 1.2s;
+    }
+
+    @keyframes sonar-expand {
+      0% {
+        transform: scale(0.6);
+        opacity: 0.85;
+        border-color: rgba(0, 229, 255, 0.7);
+      }
+      60% {
+        opacity: 0.4;
+        border-color: rgba(0, 229, 255, 0.35);
+      }
+      100% {
+        transform: scale(4.4);
+        opacity: 0;
+        border-color: rgba(0, 229, 255, 0);
+      }
     }
 
     /* Blind Mode Top Oscilloscope Shutter & Privacy Shield (Preserves 75px height, strictly zero text) */
@@ -4603,6 +4806,18 @@
             <i class="mdi mdi-headphones"></i> <span id="rx-audio-status-text">準備就緒 · 請點擊開始</span>
           </div>
 
+          <!-- 5-Stage Signal Level Ladder (S-Meter) -->
+          <div class="rx-signal-ladder" id="rx-signal-ladder" title="接收訊號強度電平 (Signal Level Ladder)">
+            <span class="signal-ladder-label">SIG</span>
+            <div class="signal-ladder-bars">
+              <span class="signal-bar bar-1"></span>
+              <span class="signal-bar bar-2"></span>
+              <span class="signal-bar bar-3"></span>
+              <span class="signal-bar bar-4"></span>
+              <span class="signal-bar bar-5"></span>
+            </div>
+          </div>
+
           <div style="display:flex; gap:8px; flex-wrap:wrap; align-items:center;">
             <button type="button" id="btn-rx-start" class="rx-control-btn rx-btn-start" title="開始播放題目音訊 (快捷鍵: Space)">
               <i class="mdi mdi-play"></i> 開始 (Space)
@@ -4627,6 +4842,14 @@
 
         <!-- Visual Aid Cue (Shown only when blind mode is off) -->
         <div class="rx-visual-cue" id="rx-visual-cue"></div>
+
+        <!-- Acoustic Sonar Pulse (Shown only during blind mode audio playback) -->
+        <div class="rx-sonar-pulse" id="rx-sonar-pulse">
+          <div class="sonar-ring ring-1"></div>
+          <div class="sonar-ring ring-2"></div>
+          <div class="sonar-ring ring-3"></div>
+          <div class="sonar-core"><i class="mdi mdi-access-point"></i></div>
+        </div>
 
         <!-- Telegraph Input Display Line -->
         <div class="rx-input-display has-focus" id="rx-input-display" tabindex="0">
@@ -5868,6 +6091,8 @@
           chkAutoAdvance: document.getElementById('chk-rx-auto-advance'),
           chkBlindMode: document.getElementById('chk-rx-blind-mode'),
           visualCue: document.getElementById('rx-visual-cue'),
+          sonarPulse: document.getElementById('rx-sonar-pulse'),
+          signalLadder: document.getElementById('rx-signal-ladder'),
           audioIndicator: document.getElementById('rx-audio-indicator'),
           audioStatusText: document.getElementById('rx-audio-status-text'),
           btnStart: document.getElementById('btn-rx-start'),
@@ -6084,15 +6309,30 @@
         this.updateButtonsState();
       }
 
+      setSignalLevel(level) {
+        if (!this.el || !this.el.signalLadder) return;
+        const bars = this.el.signalLadder.querySelectorAll('.signal-bar');
+        bars.forEach((bar, idx) => {
+          bar.classList.toggle('active', idx < level);
+        });
+      }
+
       attachPlayerHooks(player) {
         if (!player || typeof player.on !== 'function') return;
         player.on('pulseStart', (sym) => {
+          if (this.isWorkspaceActive()) {
+            const level = (sym === '.') ? (Math.random() > 0.4 ? 4 : 3) : (Math.random() > 0.3 ? 5 : 4);
+            this.setSignalLevel(level);
+          }
           if (this.isWorkspaceActive() && this.blindMode) return;
           if (typeof window !== 'undefined' && window.ribbon) {
             window.ribbon.startPulse(performance.now(), sym);
           }
         });
         player.on('pulseEnd', (sym) => {
+          if (this.isWorkspaceActive()) {
+            this.setSignalLevel(0);
+          }
           if (this.isWorkspaceActive() && this.blindMode) return;
           if (typeof window !== 'undefined' && window.ribbon) {
             window.ribbon.endPulse(performance.now(), sym);
@@ -6357,6 +6597,13 @@
         }
 
         this.updateVisualCue();
+        if (this.el && this.el.sonarPulse) {
+          if (!this.blindMode || this.state !== 'PLAYING') {
+            this.el.sonarPulse.classList.remove('active');
+          } else if (this.blindMode && this.state === 'PLAYING') {
+            this.el.sonarPulse.classList.add('active');
+          }
+        }
         if (this.submode === 'koch') {
           this.updateKochStageUI();
         }
@@ -6511,6 +6758,8 @@
         if (this.el) {
           if (this.el.inputBuffer) this.el.inputBuffer.textContent = '';
           if (this.el.audioIndicator) this.el.audioIndicator.classList.remove('playing');
+          if (this.el.sonarPulse) this.el.sonarPulse.classList.remove('active');
+          this.setSignalLevel(0);
           if (this.el.audioStatusText) {
             this.el.audioStatusText.innerHTML = '<i class="mdi mdi-headphones"></i> 準備就緒 · 請點擊【開始播報】或按 [Space]';
           }
@@ -6545,6 +6794,9 @@
         this.state = 'PLAYING';
         if (this.el) {
           if (this.el.audioIndicator) this.el.audioIndicator.classList.add('playing');
+          if (this.blindMode && this.el.sonarPulse) {
+            this.el.sonarPulse.classList.add('active');
+          }
           if (this.el.audioStatusText) {
             this.el.audioStatusText.innerHTML = '<i class="mdi mdi-volume-high"></i> 正在播放電報信號...';
           }
@@ -6569,6 +6821,8 @@
 
           if (this.el) {
             if (this.el.audioIndicator) this.el.audioIndicator.classList.remove('playing');
+            if (this.el.sonarPulse) this.el.sonarPulse.classList.remove('active');
+            this.setSignalLevel(0);
             if (this.el.audioStatusText) {
               this.el.audioStatusText.innerHTML = '<i class="mdi mdi-keyboard-outline"></i> 播放完畢，請鍵入抄收電文';
             }
@@ -6591,10 +6845,12 @@
           this.state = 'WAITING_INPUT';
           if (this.el) {
             if (this.el.audioIndicator) this.el.audioIndicator.classList.remove('playing');
+            if (this.el.sonarPulse) this.el.sonarPulse.classList.remove('active');
             if (this.el.audioStatusText) {
               this.el.audioStatusText.innerHTML = '<i class="mdi mdi-pause-circle-outline"></i> 播報已停止，可按 [Space] 重播或鍵入電文';
             }
           }
+          this.setSignalLevel(0);
           this.updateButtonsState();
         }
       }
@@ -6696,6 +6952,21 @@
 
         if (this.el) {
           if (this.el.audioIndicator) this.el.audioIndicator.classList.remove('playing');
+          if (this.el.sonarPulse) this.el.sonarPulse.classList.remove('active');
+          this.setSignalLevel(0);
+
+          // Teletype strike animation on input display (120ms)
+          if (this.el.inputDisplay) {
+            this.el.inputDisplay.classList.remove('teletype-strike');
+            void this.el.inputDisplay.offsetWidth;
+            this.el.inputDisplay.classList.add('teletype-strike');
+            setTimeout(() => {
+              if (this.el && this.el.inputDisplay) {
+                this.el.inputDisplay.classList.remove('teletype-strike');
+              }
+            }, 120);
+          }
+
           if (this.el.audioStatusText) {
             this.el.audioStatusText.innerHTML = isCorrect
               ? '<i class="mdi mdi-check-circle" style="color:#00e676;"></i> 抄收正確！'

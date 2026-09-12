@@ -1024,6 +1024,18 @@
             <i class="mdi mdi-headphones"></i> <span id="rx-audio-status-text">準備就緒 · 請點擊開始</span>
           </div>
 
+          <!-- 5-Stage Signal Level Ladder (S-Meter) -->
+          <div class="rx-signal-ladder" id="rx-signal-ladder" title="接收訊號強度電平 (Signal Level Ladder)">
+            <span class="signal-ladder-label">SIG</span>
+            <div class="signal-ladder-bars">
+              <span class="signal-bar bar-1"></span>
+              <span class="signal-bar bar-2"></span>
+              <span class="signal-bar bar-3"></span>
+              <span class="signal-bar bar-4"></span>
+              <span class="signal-bar bar-5"></span>
+            </div>
+          </div>
+
           <div style="display:flex; gap:8px; flex-wrap:wrap; align-items:center;">
             <button type="button" id="btn-rx-start" class="rx-control-btn rx-btn-start" title="開始播放題目音訊 (快捷鍵: Space)">
               <i class="mdi mdi-play"></i> 開始 (Space)
@@ -1048,6 +1060,14 @@
 
         <!-- Visual Aid Cue (Shown only when blind mode is off) -->
         <div class="rx-visual-cue" id="rx-visual-cue"></div>
+
+        <!-- Acoustic Sonar Pulse (Shown only during blind mode audio playback) -->
+        <div class="rx-sonar-pulse" id="rx-sonar-pulse">
+          <div class="sonar-ring ring-1"></div>
+          <div class="sonar-ring ring-2"></div>
+          <div class="sonar-ring ring-3"></div>
+          <div class="sonar-core"><i class="mdi mdi-access-point"></i></div>
+        </div>
 
         <!-- Telegraph Input Display Line -->
         <div class="rx-input-display has-focus" id="rx-input-display" tabindex="0">

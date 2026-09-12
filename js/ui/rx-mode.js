@@ -48,6 +48,8 @@ class RxMode {
       chkAutoAdvance: document.getElementById('chk-rx-auto-advance'),
       chkBlindMode: document.getElementById('chk-rx-blind-mode'),
       visualCue: document.getElementById('rx-visual-cue'),
+      sonarPulse: document.getElementById('rx-sonar-pulse'),
+      signalLadder: document.getElementById('rx-signal-ladder'),
       audioIndicator: document.getElementById('rx-audio-indicator'),
       audioStatusText: document.getElementById('rx-audio-status-text'),
       btnStart: document.getElementById('btn-rx-start'),
@@ -275,15 +277,30 @@ class RxMode {
     this.updateButtonsState();
   }
 
+  setSignalLevel(level) {
+    if (!this.el || !this.el.signalLadder) return;
+    const bars = this.el.signalLadder.querySelectorAll('.signal-bar');
+    bars.forEach((bar, idx) => {
+      bar.classList.toggle('active', idx < level);
+    });
+  }
+
   attachPlayerHooks(player) {
     if (!player || typeof player.on !== 'function') return;
     player.on('pulseStart', (sym) => {
+      if (this.isWorkspaceActive()) {
+        const level = (sym === '.') ? (Math.random() > 0.4 ? 4 : 3) : (Math.random() > 0.3 ? 5 : 4);
+        this.setSignalLevel(level);
+      }
       if (this.isWorkspaceActive() && this.blindMode) return;
       if (typeof window !== 'undefined' && window.ribbon) {
         window.ribbon.startPulse(performance.now(), sym);
       }
     });
     player.on('pulseEnd', (sym) => {
+      if (this.isWorkspaceActive()) {
+        this.setSignalLevel(0);
+      }
       if (this.isWorkspaceActive() && this.blindMode) return;
       if (typeof window !== 'undefined' && window.ribbon) {
         window.ribbon.endPulse(performance.now(), sym);
@@ -549,6 +566,13 @@ class RxMode {
     }
 
     this.updateVisualCue();
+    if (this.el && this.el.sonarPulse) {
+      if (!this.blindMode || this.state !== 'PLAYING') {
+        this.el.sonarPulse.classList.remove('active');
+      } else if (this.blindMode && this.state === 'PLAYING') {
+        this.el.sonarPulse.classList.add('active');
+      }
+    }
     if (this.submode === 'koch') {
       this.updateKochStageUI();
     }
@@ -705,6 +729,8 @@ class RxMode {
     if (this.el) {
       if (this.el.inputBuffer) this.el.inputBuffer.textContent = '';
       if (this.el.audioIndicator) this.el.audioIndicator.classList.remove('playing');
+      if (this.el.sonarPulse) this.el.sonarPulse.classList.remove('active');
+      this.setSignalLevel(0);
       if (this.el.audioStatusText) {
         this.el.audioStatusText.innerHTML = '<i class="mdi mdi-headphones"></i> 準備就緒 · 請點擊【開始播報】或按 [Space]';
       }
@@ -739,6 +765,9 @@ class RxMode {
     this.state = 'PLAYING';
     if (this.el) {
       if (this.el.audioIndicator) this.el.audioIndicator.classList.add('playing');
+      if (this.blindMode && this.el.sonarPulse) {
+        this.el.sonarPulse.classList.add('active');
+      }
       if (this.el.audioStatusText) {
         this.el.audioStatusText.innerHTML = '<i class="mdi mdi-volume-high"></i> 正在播放電報信號...';
       }
@@ -764,6 +793,8 @@ class RxMode {
 
       if (this.el) {
         if (this.el.audioIndicator) this.el.audioIndicator.classList.remove('playing');
+        if (this.el.sonarPulse) this.el.sonarPulse.classList.remove('active');
+        this.setSignalLevel(0);
         if (this.el.audioStatusText) {
           this.el.audioStatusText.innerHTML = '<i class="mdi mdi-keyboard-outline"></i> 播放完畢，請鍵入抄收電文';
         }
@@ -786,10 +817,12 @@ class RxMode {
       this.state = 'WAITING_INPUT';
       if (this.el) {
         if (this.el.audioIndicator) this.el.audioIndicator.classList.remove('playing');
+        if (this.el.sonarPulse) this.el.sonarPulse.classList.remove('active');
         if (this.el.audioStatusText) {
           this.el.audioStatusText.innerHTML = '<i class="mdi mdi-pause-circle-outline"></i> 播報已停止，可按 [Space] 重播或鍵入電文';
         }
       }
+      this.setSignalLevel(0);
       this.updateButtonsState();
     }
   }
@@ -896,6 +929,21 @@ class RxMode {
     // Render Immediate Live Feedback
     if (this.el) {
       if (this.el.audioIndicator) this.el.audioIndicator.classList.remove('playing');
+      if (this.el.sonarPulse) this.el.sonarPulse.classList.remove('active');
+      this.setSignalLevel(0);
+
+      // Teletype strike animation on input display (120ms)
+      if (this.el.inputDisplay) {
+        this.el.inputDisplay.classList.remove('teletype-strike');
+        void this.el.inputDisplay.offsetWidth;
+        this.el.inputDisplay.classList.add('teletype-strike');
+        setTimeout(() => {
+          if (this.el && this.el.inputDisplay) {
+            this.el.inputDisplay.classList.remove('teletype-strike');
+          }
+        }, 120);
+      }
+
       if (this.el.audioStatusText) {
         this.el.audioStatusText.innerHTML = isCorrect
           ? '<i class="mdi mdi-check-circle" style="color:#00e676;"></i> 抄收正確！'
