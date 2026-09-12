@@ -945,6 +945,40 @@
           </div>
         </div>
 
+        <!-- Koch Rx Stage Control Bar (Shown only in Koch submode) -->
+        <div class="rx-koch-stage-bar" id="rx-koch-stage-bar" style="display:none;">
+          <div class="rx-koch-stage-header">
+            <div class="rx-koch-stage-left">
+              <span class="rx-badge rx-badge-cyan" id="rx-koch-stage-badge">
+                <i class="mdi mdi-school"></i> 第 1 關 / 共 35 關
+              </span>
+              <select id="rx-koch-stage-select" class="terminal-select" title="快速跳轉已解鎖關卡">
+                <!-- Dynamically populated with unlocked stages -->
+              </select>
+              <span class="rx-target-chip" id="rx-koch-target-info">
+                本關新字元: <strong id="rx-koch-target-char" style="color:var(--neon-blue);">K, M</strong>
+              </span>
+            </div>
+
+            <div class="rx-koch-stage-right">
+              <button type="button" id="btn-rx-toggle-matrix" class="rx-btn-ghost" title="展開/收合 35 關地圖">
+                <i class="mdi mdi-map-marker-path"></i> 關卡地圖 <i class="mdi mdi-chevron-down" id="rx-matrix-chevron"></i>
+              </button>
+            </div>
+          </div>
+
+          <!-- 解鎖字元池預覽列 -->
+          <div class="rx-pool-preview-row">
+            <span class="rx-pool-label"><i class="mdi mdi-format-list-checks"></i> 已解鎖字元池:</span>
+            <div class="rx-pool-chips" id="rx-koch-pool-chips"></div>
+          </div>
+
+          <!-- 可折疊 35 關地圖矩陣 -->
+          <div class="rx-koch-matrix-collapse" id="rx-koch-matrix-panel" style="display:none;">
+            <div class="koch-stage-grid" id="rx-koch-matrix-grid"></div>
+          </div>
+        </div>
+
         <!-- Audio Indicator & Primary Transport Controls -->
         <div class="rx-audio-box">
           <div class="rx-audio-indicator" id="rx-audio-indicator">
@@ -1026,7 +1060,10 @@
           <div id="rx-sc-confusion-list"></div>
         </div>
 
-        <div style="display:flex; gap:10px; justify-content:flex-end;">
+        <div style="display:flex; gap:10px; justify-content:flex-end; flex-wrap:wrap; align-items:center;">
+          <button type="button" id="btn-rx-stage-advance" class="rx-control-btn rx-btn-advance" style="display:none;">
+            <span><i class="mdi mdi-arrow-up-bold-circle"></i> 晉級至下一關 <i class="mdi mdi-arrow-right"></i></span>
+          </button>
           <button type="button" id="btn-rx-retry-errors" class="rx-control-btn" style="display:none;">
             <i class="mdi mdi-refresh"></i> 重試錯題
           </button>

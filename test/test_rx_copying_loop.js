@@ -162,15 +162,65 @@ rx.retryErrors();
 assert.ok(retryStarted, 'retryErrors should trigger startSession with error targets');
 console.log('   -> Scorecard calculation and Retry Errors verified!');
 
-// 7. Zero Emoji Check on rx-mode.js
-console.log('\n7. Verifying Zero Emoji in js/ui/rx-mode.js...');
+// 7. Koch Stage Integration & Progression Controls
+console.log('\n7. Verifying Koch Stage Integration & Progression Controls...');
+class MockKochManager {
+  constructor() {
+    this.currentLevel = 1;
+    this.maxUnlockedLevel = 1;
+    this.clears = {};
+  }
+  getUnlockedPool(lvl = this.currentLevel) {
+    const seq = ['K', 'M', 'R', 'S', 'U', 'A', 'P'];
+    return seq.slice(0, lvl + 1);
+  }
+  getTargetChar(lvl = this.currentLevel) {
+    const seq = ['K', 'M', 'R', 'S', 'U', 'A', 'P'];
+    return seq[lvl] || 'K';
+  }
+  recordClear(stage, mode, acc) {
+    this.clears[stage] = { mode, acc };
+  }
+  saveProgress() {}
+}
+
+const mockKm = new MockKochManager();
+const rxKoch = new RxMode({ cwPlayer: player, kochManager: mockKm, submode: 'koch' });
+assert.strictEqual(rxKoch.getKochManager(), mockKm, 'rxKoch should return assigned kochManager');
+
+// Level switching
+rxKoch.setKochLevel(1);
+assert.strictEqual(mockKm.currentLevel, 1);
+assert.strictEqual(rxKoch.generateTargetForSubmode('koch').length, 1, 'Stage 1 target should be 1 char');
+
+// Advance level
+rxKoch.advanceToNextStage();
+assert.strictEqual(mockKm.currentLevel, 2, 'advanceToNextStage should move currentLevel to 2');
+assert.strictEqual(mockKm.maxUnlockedLevel, 2, 'advanceToNextStage should unlock level 2');
+
+// Test stage advance button setup in completeSession on 90%+ pass
+rxKoch.submode = 'koch';
+rxKoch.trials = [
+  { isCorrect: true, reflexLatency: 200 },
+  { isCorrect: true, reflexLatency: 210 }
+]; // 100% accuracy
+const mockAdvanceBtn = { style: {}, innerHTML: '' };
+rxKoch.el = { btnStageAdvance: mockAdvanceBtn };
+rxKoch.completeSession();
+assert.strictEqual(mockAdvanceBtn.style.display, 'inline-flex', 'btnStageAdvance must be shown on >=90% accuracy in Koch submode');
+assert.ok(mockAdvanceBtn.innerHTML.includes('晉級第 3 關'), 'btnStageAdvance text should show next stage');
+assert.strictEqual(mockKm.clears[2].acc, 100, 'recordClear should record 100% clear for stage 2');
+console.log('   -> Koch Stage integration, level switching & advance button verified!');
+
+// 8. Zero Emoji Check on rx-mode.js
+console.log('\n8. Verifying Zero Emoji in js/ui/rx-mode.js...');
 const rxModeSrc = fs.readFileSync(path.join(projectRoot, 'js/ui/rx-mode.js'), 'utf8');
 const emojiRegex = /[\u{1F300}-\u{1FAFF}\u{2600}-\u{27BF}]/u;
 assert.ok(!emojiRegex.test(rxModeSrc), 'js/ui/rx-mode.js must contain 0 Unicode emojis');
 console.log('   -> js/ui/rx-mode.js has 0 emojis!');
 
-// 8. Dual-Track Inclusion
-console.log('\n8. Verifying Dual-Track inclusion of RxMode...');
+// 9. Dual-Track Inclusion
+console.log('\n9. Verifying Dual-Track inclusion of RxMode...');
 const indexHtml = fs.readFileSync(path.join(projectRoot, 'index.html'), 'utf8');
 const protoHtml = fs.readFileSync(path.join(projectRoot, 'prototype_morse_card.html'), 'utf8');
 assert.ok(indexHtml.includes('js/ui/rx-mode.js'), 'index.html must reference js/ui/rx-mode.js');

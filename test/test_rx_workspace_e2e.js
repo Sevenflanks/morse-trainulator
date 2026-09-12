@@ -38,6 +38,16 @@ const requiredElements = [
   'id="btn-rx-skip"',
   'id="btn-rx-next"',
   'id="btn-rx-restart"',
+  'id="rx-koch-stage-bar"',
+  'id="rx-koch-stage-badge"',
+  'id="rx-koch-stage-select"',
+  'id="rx-koch-target-info"',
+  'id="rx-koch-target-char"',
+  'id="rx-koch-pool-chips"',
+  'id="btn-rx-toggle-matrix"',
+  'id="rx-koch-matrix-panel"',
+  'id="rx-koch-matrix-grid"',
+  'id="btn-rx-stage-advance"',
   'id="rx-input-display"',
   'id="rx-input-buffer"',
   'class="rx-cursor"',
@@ -107,7 +117,10 @@ const requiredCssTokens = [
   '.keypad-key',
   '.pcb-blind-mode',
   '.keypad-key.active-press',
-  '.rx-confusion-item'
+  '.rx-confusion-item',
+  '.rx-koch-stage-bar',
+  '.rx-pool-chip',
+  '.rx-btn-advance'
 ];
 
 requiredCssTokens.forEach(token => {
@@ -176,6 +189,10 @@ const mdiCheckPatterns = [
   'mdi-arrow-right',
   'mdi-restart',
   'mdi-fast-forward',
+  'mdi-map-marker-path',
+  'mdi-chevron-down',
+  'mdi-format-list-checks',
+  'mdi-arrow-up-bold-circle',
   'mdi-backspace-outline',
   'mdi-check-bold',
   'mdi-trophy-outline',

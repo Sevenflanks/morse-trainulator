@@ -413,3 +413,136 @@
   color: #ff5252;
   font-weight: bold;
 }
+
+/* Koch Rx Stage Control Bar & Pool Display */
+.rx-koch-stage-bar {
+  background: #0b141d;
+  border: 1px solid #1c2b3d;
+  border-radius: 8px;
+  padding: 10px 14px;
+  margin-bottom: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.25);
+}
+
+.rx-koch-stage-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.rx-koch-stage-left {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.rx-badge-cyan {
+  background: #002d3d;
+  color: var(--neon-blue);
+  border: 1px solid #005a78;
+}
+
+.rx-target-chip {
+  font-size: 0.78rem;
+  color: #aaa;
+  background: #141c26;
+  border: 1px solid #27374b;
+  padding: 3px 8px;
+  border-radius: 4px;
+}
+
+.rx-btn-ghost {
+  background: transparent;
+  border: 1px solid #2e3e52;
+  color: #9ab;
+  padding: 4px 10px;
+  border-radius: 5px;
+  font-size: 0.75rem;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  transition: all 0.2s ease;
+}
+.rx-btn-ghost:hover {
+  background: #1c2b3d;
+  color: #fff;
+  border-color: var(--neon-blue);
+}
+
+.rx-pool-preview-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+  padding-top: 6px;
+  border-top: 1px solid #152230;
+}
+
+.rx-pool-label {
+  font-size: 0.75rem;
+  color: #889;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  white-space: nowrap;
+}
+
+.rx-pool-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 5px;
+  align-items: center;
+}
+
+.rx-pool-chip {
+  display: inline-flex;
+  align-items: center;
+  background: #141d29;
+  border: 1px solid #27374b;
+  border-radius: 4px;
+  padding: 2px 7px;
+  font-size: 0.75rem;
+  font-weight: bold;
+  color: #cde;
+  cursor: pointer;
+  user-select: none;
+  transition: all 0.15s ease;
+}
+.rx-pool-chip:hover {
+  border-color: var(--neon-blue);
+  background: #1c2c40;
+  color: #fff;
+  box-shadow: 0 0 6px rgba(0, 229, 255, 0.3);
+}
+.rx-pool-chip.is-target {
+  border-color: var(--gold);
+  color: var(--gold-light);
+  background: #241e0b;
+}
+
+.rx-koch-matrix-collapse {
+  margin-top: 4px;
+  padding-top: 8px;
+  border-top: 1px solid #192433;
+}
+
+.rx-btn-advance {
+  background: linear-gradient(135deg, #00e5ff, #0088cc) !important;
+  color: #000 !important;
+  font-weight: bold !important;
+  border: none !important;
+  box-shadow: 0 0 12px rgba(0, 229, 255, 0.4) !important;
+  animation: pulseAdvance 1.5s infinite alternate ease-in-out;
+}
+@keyframes pulseAdvance {
+  from { box-shadow: 0 0 8px rgba(0, 229, 255, 0.3); transform: scale(1); }
+  to { box-shadow: 0 0 16px rgba(0, 229, 255, 0.7); transform: scale(1.03); }
+}
+

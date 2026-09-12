@@ -7,6 +7,7 @@
 class RxMode {
   constructor(options = {}) {
     this.cwPlayer = options.cwPlayer || (typeof window !== 'undefined' ? window.cwPlayer : null);
+    this.kochManager = options.kochManager || (typeof window !== 'undefined' ? window.kochManager : null);
     this.submode = options.submode || 'koch'; // 'koch' | 'callsign' | 'groups' | 'qcodes'
     this.state = 'IDLE'; // 'IDLE' | 'READY' | 'PLAYING' | 'WAITING_INPUT' | 'EVALUATED' | 'COMPLETED'
     this.blindMode = (options.blindMode !== undefined) ? !!options.blindMode : true;
@@ -18,6 +19,7 @@ class RxMode {
     this.inputBuffer = '';
     this.confusionMatrix = {}; // { 'B->D': 2 }
     this.customQueue = null;
+    this._matrixOpen = false;
 
     this._boundKeyDown = null;
     this._initialized = false;
@@ -27,6 +29,10 @@ class RxMode {
     return (typeof performance !== 'undefined' && typeof performance.now === 'function')
       ? performance.now()
       : Date.now();
+  }
+
+  getKochManager() {
+    return this.kochManager || (typeof window !== 'undefined' ? window.kochManager : null);
   }
 
   init() {
@@ -63,7 +69,18 @@ class RxMode {
       scConfusionList: document.getElementById('rx-sc-confusion-list'),
       btnRetryErrors: document.getElementById('btn-rx-retry-errors'),
       btnNextRound: document.getElementById('btn-rx-next-round'),
-      softKeypad: document.getElementById('rx-soft-keypad')
+      softKeypad: document.getElementById('rx-soft-keypad'),
+      kochStageBar: document.getElementById('rx-koch-stage-bar'),
+      kochStageBadge: document.getElementById('rx-koch-stage-badge'),
+      kochStageSelect: document.getElementById('rx-koch-stage-select'),
+      kochTargetInfo: document.getElementById('rx-koch-target-info'),
+      kochTargetChar: document.getElementById('rx-koch-target-char'),
+      kochPoolChips: document.getElementById('rx-koch-pool-chips'),
+      btnToggleMatrix: document.getElementById('btn-rx-toggle-matrix'),
+      matrixChevron: document.getElementById('rx-matrix-chevron'),
+      kochMatrixPanel: document.getElementById('rx-koch-matrix-panel'),
+      kochMatrixGrid: document.getElementById('rx-koch-matrix-grid'),
+      btnStageAdvance: document.getElementById('btn-rx-stage-advance')
     };
 
     // 1. Submode Navigation Pills
@@ -101,6 +118,26 @@ class RxMode {
     }
     if (this.el.btnNextRound) {
       this.el.btnNextRound.addEventListener('click', () => this.startSession(this.submode));
+    }
+
+    // 2.1 Koch Stage Controls
+    if (this.el.btnToggleMatrix) {
+      this.el.btnToggleMatrix.addEventListener('click', () => {
+        this.toggleMatrixPanel();
+      });
+    }
+    if (this.el.kochStageSelect) {
+      this.el.kochStageSelect.addEventListener('change', (e) => {
+        const lvl = parseInt(e.target.value, 10);
+        if (!isNaN(lvl)) {
+          this.setKochLevel(lvl);
+        }
+      });
+    }
+    if (this.el.btnStageAdvance) {
+      this.el.btnStageAdvance.addEventListener('click', () => {
+        this.advanceToNextStage();
+      });
     }
 
     // 3. Option Switches
@@ -222,6 +259,216 @@ class RxMode {
         pill.classList.toggle('active', pill.dataset.submode === submode);
       });
     }
+
+    // Toggle Koch stage bar display
+    if (this.el && this.el.kochStageBar) {
+      if (submode === 'koch') {
+        this.el.kochStageBar.style.display = 'flex';
+        this.updateKochStageUI();
+      } else {
+        this.el.kochStageBar.style.display = 'none';
+        if (this.el.kochMatrixPanel) {
+          this.el.kochMatrixPanel.style.display = 'none';
+          this._matrixOpen = false;
+          if (this.el.matrixChevron) {
+            this.el.matrixChevron.className = 'mdi mdi-chevron-down';
+          }
+        }
+      }
+    }
+  }
+
+  toggleMatrixPanel(forceState = null) {
+    this._matrixOpen = (forceState !== null) ? !!forceState : !this._matrixOpen;
+    if (this.el && this.el.kochMatrixPanel) {
+      this.el.kochMatrixPanel.style.display = this._matrixOpen ? 'block' : 'none';
+    }
+    if (this.el && this.el.matrixChevron) {
+      this.el.matrixChevron.className = this._matrixOpen ? 'mdi mdi-chevron-up' : 'mdi mdi-chevron-down';
+    }
+    if (this._matrixOpen) {
+      this.renderStageMatrix();
+    }
+  }
+
+  setKochLevel(lvl) {
+    const km = this.getKochManager();
+    if (!km) return;
+    lvl = Math.max(1, Math.min(km.maxUnlockedLevel || 1, lvl));
+    km.currentLevel = lvl;
+
+    // Synchronize TX mode UI if present
+    if (typeof window !== 'undefined') {
+      if (typeof window.updateKochUI === 'function') {
+        try { window.updateKochUI(); } catch (_) {}
+      }
+      if (typeof window.updatePcbKochVisuals === 'function') {
+        try { window.updatePcbKochVisuals(); } catch (_) {}
+      }
+    }
+
+    this.updateKochStageUI();
+    this.startSession('koch');
+  }
+
+  advanceToNextStage() {
+    const km = this.getKochManager();
+    if (!km) return;
+    const curLvl = km.currentLevel || 1;
+    if (curLvl < 35) {
+      const nextLvl = curLvl + 1;
+      if (nextLvl > (km.maxUnlockedLevel || 1)) {
+        km.maxUnlockedLevel = nextLvl;
+        if (typeof km.saveProgress === 'function') {
+          km.saveProgress();
+        }
+      }
+      this.setKochLevel(nextLvl);
+    }
+  }
+
+  updateKochStageUI() {
+    if (!this.el || !this.el.kochStageBar) return;
+    const km = this.getKochManager();
+    const curLvl = km ? (km.currentLevel || 1) : 1;
+    const maxLvl = km ? (km.maxUnlockedLevel || 1) : 1;
+
+    // 1. Stage Badge
+    if (this.el.kochStageBadge) {
+      this.el.kochStageBadge.innerHTML = `<i class="mdi mdi-school"></i> 第 ${curLvl} 關 / 共 35 關`;
+    }
+
+    // 2. Stage Select Dropdown
+    if (this.el.kochStageSelect) {
+      this.el.kochStageSelect.innerHTML = '';
+      const seqList = (typeof KOCH_SEQUENCE !== 'undefined') ? KOCH_SEQUENCE : [
+        'K', 'M', 'R', 'S', 'U', 'A', 'P', 'T', 'L', 'O',
+        'W', 'I', 'N', 'J', 'E', 'F', '0', 'Y', 'V', 'G',
+        '5', 'Q', '9', 'Z', 'H', '3', '8', 'B', '4', '2',
+        '7', 'C', '1', 'D', '6', 'X'
+      ];
+      for (let i = 1; i <= maxLvl; i++) {
+        const opt = document.createElement('option');
+        opt.value = i;
+        const charLabel = (i === 1) ? 'K, M' : (seqList[i] || (km && typeof km.getTargetChar === 'function' ? km.getTargetChar(i) : i));
+        opt.textContent = `第 ${i} 關 (${charLabel})`;
+        if (i === curLvl) opt.selected = true;
+        this.el.kochStageSelect.appendChild(opt);
+      }
+    }
+
+    // 3. Target Char Display
+    if (this.el.kochTargetChar) {
+      if (curLvl === 1) {
+        this.el.kochTargetChar.textContent = 'K, M';
+      } else {
+        const targetChar = (km && typeof km.getTargetChar === 'function') ? km.getTargetChar(curLvl) : 'K';
+        this.el.kochTargetChar.textContent = targetChar;
+      }
+    }
+
+    // 4. Pool Chips with Sound Preview
+    if (this.el.kochPoolChips) {
+      this.el.kochPoolChips.innerHTML = '';
+      const pool = (km && typeof km.getUnlockedPool === 'function') ? km.getUnlockedPool(curLvl) : ['K', 'M'];
+      const targetChars = (curLvl === 1) ? ['K', 'M'] : [(km && typeof km.getTargetChar === 'function') ? km.getTargetChar(curLvl) : 'K'];
+      const engine = (typeof window !== 'undefined') ? window.engine : null;
+
+      pool.forEach(c => {
+        const chip = document.createElement('span');
+        chip.className = 'rx-pool-chip' + (targetChars.includes(c) ? ' is-target' : '');
+        const seq = (engine && typeof engine.getSequenceForLetter === 'function')
+          ? (engine.getSequenceForLetter(c) || '')
+          : '';
+        chip.innerHTML = `${c}${seq ? ` <span style="font-family:monospace; color:var(--gold); font-size:0.7rem; margin-left:3px;">${seq}</span>` : ''}`;
+        chip.title = `點擊試聽 ${c} (${seq})`;
+
+        chip.addEventListener('click', (e) => {
+          e.stopPropagation();
+          if (this.cwPlayer && typeof this.cwPlayer.playText === 'function') {
+            this.cwPlayer.playText(c);
+          }
+        });
+
+        this.el.kochPoolChips.appendChild(chip);
+      });
+    }
+
+    // 5. If matrix is open, re-render
+    if (this._matrixOpen) {
+      this.renderStageMatrix();
+    }
+  }
+
+  renderStageMatrix() {
+    if (!this.el || !this.el.kochMatrixGrid) return;
+    const km = this.getKochManager();
+    const curLvl = km ? (km.currentLevel || 1) : 1;
+    const maxLvl = km ? (km.maxUnlockedLevel || 1) : 1;
+    const seqList = (typeof KOCH_SEQUENCE !== 'undefined') ? KOCH_SEQUENCE : [
+      'K', 'M', 'R', 'S', 'U', 'A', 'P', 'T', 'L', 'O',
+      'W', 'I', 'N', 'J', 'E', 'F', '0', 'Y', 'V', 'G',
+      '5', 'Q', '9', 'Z', 'H', '3', '8', 'B', '4', '2',
+      '7', 'C', '1', 'D', '6', 'X'
+    ];
+
+    this.el.kochMatrixGrid.innerHTML = '';
+
+    for (let i = 1; i <= 35; i++) {
+      const isUnlocked = (i <= maxLvl);
+      const clearInfo = (km && typeof km.getStageClear === 'function') ? km.getStageClear(i) : null;
+      const charLabel = (i === 1) ? 'K,M' : (seqList[i] || i);
+
+      const btn = document.createElement('button');
+      btn.type = 'button';
+      btn.className = 'stage-cell';
+      btn.dataset.level = i;
+
+      let medalIcon = '';
+      if (!isUnlocked) {
+        btn.classList.add('cell-locked');
+        btn.disabled = true;
+        btn.title = `第 ${i} 關 (${charLabel}) - 尚未解鎖`;
+        medalIcon = '<i class="mdi mdi-lock"></i>';
+      } else {
+        if (i === curLvl) {
+          btn.classList.add('active-stage');
+        }
+        if (clearInfo && clearInfo.highest) {
+          if (clearInfo.highest === 'challenge') {
+            btn.classList.add('cell-cleared-challenge');
+            btn.title = `第 ${i} 關 (${charLabel}) · 極限挑戰征服`;
+            medalIcon = '<i class="mdi mdi-crown"></i>';
+          } else if (clearInfo.highest === 'standard') {
+            btn.classList.add('cell-cleared-standard');
+            btn.title = `第 ${i} 關 (${charLabel}) · 正規考核合格`;
+            medalIcon = '<i class="mdi mdi-trophy"></i>';
+          } else if (clearInfo.highest === 'quick') {
+            btn.classList.add('cell-cleared-quick');
+            btn.title = `第 ${i} 關 (${charLabel}) · 基礎練習通過`;
+            medalIcon = '<i class="mdi mdi-check-circle"></i>';
+          }
+        } else {
+          btn.classList.add('cell-unlocked');
+          btn.title = `第 ${i} 關 (${charLabel}) · 已解鎖 (未通關)`;
+        }
+
+        btn.addEventListener('click', (e) => {
+          e.stopPropagation();
+          this.setKochLevel(i);
+        });
+      }
+
+      btn.innerHTML = `
+        <div class="stage-cell-top">
+          <span class="stage-num">${i}</span>
+          <span class="stage-medal">${medalIcon}</span>
+        </div>
+        <span class="stage-char">${charLabel}</span>
+      `;
+
+      this.el.kochMatrixGrid.appendChild(btn);
+    }
   }
 
   updateBlindMode(enabled) {
@@ -281,14 +528,14 @@ class RxMode {
 
     switch (submode) {
       case 'koch': {
-        const lvl = (typeof window !== 'undefined' && window.kochManager)
-          ? (window.kochManager.maxUnlockedLevel || window.kochManager.currentLevel || 1)
-          : 1;
+        const km = this.getKochManager();
+        const lvl = km ? (km.currentLevel || 1) : 1;
         if (typeof generateKochRxTargets === 'function') {
           const arr = generateKochRxTargets(lvl, 1);
           return arr[0] || 'K';
         }
-        return 'K';
+        const pool = (km && typeof km.getUnlockedPool === 'function') ? km.getUnlockedPool(lvl) : ['K', 'M'];
+        return pool[Math.floor(Math.random() * pool.length)] || 'K';
       }
       case 'callsign': {
         if (typeof generateCallsign === 'function') {
@@ -337,6 +584,7 @@ class RxMode {
       if (this.el.scorecard) this.el.scorecard.style.display = 'none';
       if (this.el.historyLog) this.el.historyLog.innerHTML = '';
       if (this.el.inputBuffer) this.el.inputBuffer.textContent = '';
+      if (this.el.btnStageAdvance) this.el.btnStageAdvance.style.display = 'none';
       if (this.el.wpmBadge && this.cwPlayer) {
         this.el.wpmBadge.textContent = `速度: ${this.cwPlayer.charWpm || 20} WPM`;
       }
@@ -721,6 +969,29 @@ class RxMode {
       // Retry Errors button visibility
       if (this.el.btnRetryErrors) {
         this.el.btnRetryErrors.style.display = (correctCount < total) ? 'inline-flex' : 'none';
+      }
+
+      // Koch Stage Advance handling
+      if (this.submode === 'koch') {
+        const km = this.getKochManager();
+        if (km && accuracy >= 90) {
+          if (typeof km.recordClear === 'function') {
+            try { km.recordClear(km.currentLevel || 1, 'quick', accuracy); } catch (_) {}
+          }
+          const curLvl = km.currentLevel || 1;
+          if (curLvl < 35 && this.el && this.el.btnStageAdvance) {
+            this.el.btnStageAdvance.style.display = 'inline-flex';
+            this.el.btnStageAdvance.innerHTML = `<span><i class="mdi mdi-arrow-up-bold-circle"></i> 晉級第 ${curLvl + 1} 關 <i class="mdi mdi-arrow-right"></i></span>`;
+          }
+        } else {
+          if (this.el && this.el.btnStageAdvance) {
+            this.el.btnStageAdvance.style.display = 'none';
+          }
+        }
+      } else {
+        if (this.el && this.el.btnStageAdvance) {
+          this.el.btnStageAdvance.style.display = 'none';
+        }
       }
 
       if (this.el.feedbackMsg) {
