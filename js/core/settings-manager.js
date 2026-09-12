@@ -28,7 +28,13 @@ const _DEFAULT_SETTINGS = (typeof DEFAULT_SETTINGS !== 'undefined') ? DEFAULT_SE
   textStrictMode: false,
   kochShowHints: false,
   layoutMode: '2col', // '2col' | '3col'
-  themePreset: 'cyber-brass' // 'cyber-brass' | 'classic-amber' | 'green-phosphor'
+  themePreset: 'cyber-brass', // 'cyber-brass' | 'classic-amber' | 'green-phosphor'
+  operatorCallsign: 'BV2TT',
+  operatorName: 'EDDIE',
+  operatorQth: 'TAIPEI',
+  operatorGrid: 'PL05',
+  operatorRig: '100W',
+  operatorAnt: 'DIPOLE'
 };
 
 class SettingsManager {
