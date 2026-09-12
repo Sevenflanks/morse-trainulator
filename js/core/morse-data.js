@@ -181,7 +181,13 @@ const DEFAULT_SETTINGS = {
   textStrictMode: false,
   kochShowHints: false,
   layoutMode: '2col', // '2col' | '3col'
-  themePreset: 'cyber-brass' // 'cyber-brass' | 'classic-amber' | 'green-phosphor'
+  themePreset: 'cyber-brass', // 'cyber-brass' | 'classic-amber' | 'green-phosphor'
+  operatorCallsign: 'BV2TT',
+  operatorName: 'EDDIE',
+  operatorQth: 'TAIPEI',
+  operatorGrid: 'PL05',
+  operatorRig: '100W',
+  operatorAnt: 'DIPOLE'
 };
 
 const speedPresets = {
@@ -286,6 +292,71 @@ const CW_ABBREVIATIONS = [
   { word: 'HW', desc: '如何？(How copy?)' }
 ];
 
+// ==========================================
+// VIRTUAL CW QSO STATIONS & BANDS (Issue #53)
+// ==========================================
+const QSO_REMOTE_STATIONS = [
+  { call: 'JA1ABC', name: 'KEN', qth: 'TOKYO', country: 'JAPAN', grid: 'PM95', rstSent: '599', rstRcvd: '579', speedWpm: 20, pitchHz: 660 },
+  { call: 'W6XYZ', name: 'BOB', qth: 'LOS ANGELES', country: 'USA', grid: 'DM04', rstSent: '599', rstRcvd: '589', speedWpm: 18, pitchHz: 600 },
+  { call: 'DL3HEX', name: 'HANS', qth: 'BERLIN', country: 'GERMANY', grid: 'JO62', rstSent: '599', rstRcvd: '599', speedWpm: 22, pitchHz: 720 },
+  { call: 'G4XYZ', name: 'JOHN', qth: 'LONDON', country: 'ENGLAND', grid: 'IO91', rstSent: '599', rstRcvd: '569', speedWpm: 19, pitchHz: 640 },
+  { call: 'VK2AA', name: 'DAVE', qth: 'SYDNEY', country: 'AUSTRALIA', grid: 'QF56', rstSent: '599', rstRcvd: '579', speedWpm: 21, pitchHz: 680 },
+  { call: 'HL1VA', name: 'MIN', qth: 'SEOUL', country: 'KOREA', grid: 'PM37', rstSent: '599', rstRcvd: '599', speedWpm: 20, pitchHz: 700 },
+  { call: 'BY1AA', name: 'CHEN', qth: 'BEIJING', country: 'CHINA', grid: 'OM89', rstSent: '599', rstRcvd: '589', speedWpm: 18, pitchHz: 620 },
+  { call: 'F6KOP', name: 'LUC', qth: 'PARIS', country: 'FRANCE', grid: 'JN18', rstSent: '599', rstRcvd: '579', speedWpm: 22, pitchHz: 650 },
+  { call: 'I2BBB', name: 'MARCO', qth: 'MILAN', country: 'ITALY', grid: 'JN45', rstSent: '599', rstRcvd: '599', speedWpm: 20, pitchHz: 690 },
+  { call: 'BV2AB', name: 'LIN', qth: 'TAIPEI', country: 'TAIWAN', grid: 'PL05', rstSent: '599', rstRcvd: '599', speedWpm: 20, pitchHz: 670 }
+];
+
+const QSO_BANDS = [
+  { id: '40M', freq: '7.025', band: '40M', name: '40M CW', minFreq: 7.000, maxFreq: 7.040 },
+  { id: '20M', freq: '14.025', band: '20M', name: '20M CW', minFreq: 14.000, maxFreq: 14.070 },
+  { id: '15M', freq: '21.025', band: '15M', name: '15M CW', minFreq: 21.000, maxFreq: 21.070 }
+];
+
+const QSO_GUIDED_STEPS = [
+  {
+    step: 1,
+    key: 'CQ',
+    title: '發送 CQ 呼叫 (Call CQ)',
+    prompt: '請發送通用呼叫 CQ，邀請空中電台建立通聯。',
+    expectedKeywords: ['CQ'],
+    hintTemplate: 'CQ CQ CQ DE {MY_CALL} {MY_CALL} K'
+  },
+  {
+    step: 2,
+    key: 'RST',
+    title: '交換訊號報告 (Signal Report)',
+    prompt: '抄收對方呼叫，並回覆 RST 訊號報告 (如 599)。',
+    expectedKeywords: ['RST', '599', '5NN'],
+    hintTemplate: '{DX_CALL} DE {MY_CALL} UR RST 599 BK'
+  },
+  {
+    step: 3,
+    key: 'QTH_NAME',
+    title: '交換地點與姓名 (QTH & Name)',
+    prompt: '通報你的所在地 QTH 與台長姓名 OP。',
+    expectedKeywords: ['QTH', 'OP', 'NAME'],
+    hintTemplate: 'QTH {MY_QTH} OP {MY_NAME} BK'
+  },
+  {
+    step: 4,
+    key: 'SIGNOFF',
+    title: '致謝並發送 73 告別 (Sign-off & 73)',
+    prompt: '感謝本次美好通聯，祝願 73 並發送結束符號 SK。',
+    expectedKeywords: ['73', 'SK', 'TU'],
+    hintTemplate: 'TNX FER QSO 73 GL TU EE SK'
+  },
+  {
+    step: 5,
+    key: 'COMPLETE',
+    title: '通聯成功！(QSO Confirmed)',
+    prompt: '恭喜！已成功建立雙向通聯，可簽發專屬 QSL 確認卡！',
+    expectedKeywords: [],
+    hintTemplate: 'QSL READY'
+  }
+];
+
 function generateKochRxTargets(maxLevel, count = 10) {
   const maxIdx = Math.max(2, Math.min(36, maxLevel + 1));
   const pool = KOCH_SEQUENCE.slice(0, maxIdx);
@@ -381,6 +452,9 @@ if (typeof window !== 'undefined') {
   window.CALLSIGN_PREFIXES = CALLSIGN_PREFIXES;
   window.CW_Q_CODES = CW_Q_CODES;
   window.CW_ABBREVIATIONS = CW_ABBREVIATIONS;
+  window.QSO_REMOTE_STATIONS = QSO_REMOTE_STATIONS;
+  window.QSO_BANDS = QSO_BANDS;
+  window.QSO_GUIDED_STEPS = QSO_GUIDED_STEPS;
   window.generateKochRxTargets = generateKochRxTargets;
   window.generateCallsign = generateCallsign;
   window.generateCodeGroup = generateCodeGroup;
@@ -402,6 +476,9 @@ if (typeof module !== 'undefined' && module.exports) {
     CALLSIGN_PREFIXES,
     CW_Q_CODES,
     CW_ABBREVIATIONS,
+    QSO_REMOTE_STATIONS,
+    QSO_BANDS,
+    QSO_GUIDED_STEPS,
     generateKochRxTargets,
     generateCallsign,
     generateCodeGroup,

@@ -6337,6 +6337,638 @@
     }
 
     /**
+     * DOMAIN MODULE: QsoManager
+     * 業餘無線電 CW QSO 通聯狀態機、電台生成與對話腳本引擎
+     */
+    class QsoManager {
+      constructor(options = {}) {
+        this.submode = options.submode || 'guided';
+        this.activeBand = options.activeBand || '20M';
+        this.currentFreq = options.currentFreq || '14.025';
+
+        this.myStation = {
+          call: options.operatorCallsign || 'BV2TT',
+          name: options.operatorName || 'EDDIE',
+          qth: options.operatorQth || 'TAIPEI',
+          grid: options.operatorGrid || 'PL05',
+          rig: options.operatorRig || '100W',
+          ant: options.operatorAnt || 'DIPOLE',
+          rstSent: '599'
+        };
+
+        this.remoteStation = null;
+        this.guidedPhase = 1;
+        this.guidedCompleted = false;
+        this.contestSerial = 1;
+        this.freeStations = [];
+        this.sessionHistory = [];
+        this.lastRemoteMessage = '';
+        this.isRemoteTransmitting = false;
+
+        this._listeners = {};
+        this.init();
+      }
+
+      init() {
+        this.resetQso();
+      }
+
+      on(event, callback) {
+        if (!this._listeners[event]) this._listeners[event] = [];
+        this._listeners[event].push(callback);
+        return this;
+      }
+
+      off(event, callback) {
+        if (!this._listeners[event]) return this;
+        this._listeners[event] = this._listeners[event].filter(cb => cb !== callback);
+        return this;
+      }
+
+      emit(event, ...args) {
+        const cbs = this._listeners[event];
+        if (cbs) {
+          cbs.forEach(cb => {
+            try { cb(...args); } catch (e) { console.error('[QsoManager]', e); }
+          });
+        }
+      }
+
+      setMyStation(profile = {}) {
+        if (profile.call) this.myStation.call = profile.call.trim().toUpperCase();
+        if (profile.name) this.myStation.name = profile.name.trim().toUpperCase();
+        if (profile.qth) this.myStation.qth = profile.qth.trim().toUpperCase();
+        if (profile.grid) this.myStation.grid = profile.grid.trim().toUpperCase();
+        if (profile.rig) this.myStation.rig = profile.rig.trim().toUpperCase();
+        if (profile.ant) this.myStation.ant = profile.ant.trim().toUpperCase();
+        this.emit('stationUpdated', this.myStation);
+      }
+
+      setSubmode(submode) {
+        const valid = ['guided', 'free', 'contest', 'logbook'];
+        if (!valid.includes(submode)) submode = 'guided';
+        this.submode = submode;
+        this.resetQso();
+        this.emit('submodeChanged', this.submode);
+      }
+
+      setBand(bandId) {
+        const bands = (typeof QSO_BANDS !== 'undefined') ? QSO_BANDS : [
+          { id: '40M', freq: '7.025', band: '40M', name: '40M CW' },
+          { id: '20M', freq: '14.025', band: '20M', name: '20M CW' },
+          { id: '15M', freq: '21.025', band: '15M', name: '15M CW' }
+        ];
+        const found = bands.find(b => b.id === bandId || b.band === bandId);
+        if (found) {
+          this.activeBand = found.band;
+          this.currentFreq = found.freq;
+          this.emit('bandChanged', { band: this.activeBand, freq: this.currentFreq });
+        }
+      }
+
+      setFrequency(freqStr) {
+        this.currentFreq = String(freqStr).trim();
+        this.emit('frequencyChanged', this.currentFreq);
+      }
+
+      pickRandomRemoteStation() {
+        const stations = (typeof QSO_REMOTE_STATIONS !== 'undefined') ? QSO_REMOTE_STATIONS : [
+          { call: 'JA1ABC', name: 'KEN', qth: 'TOKYO', country: 'JAPAN', grid: 'PM95', rstSent: '599', rstRcvd: '579', speedWpm: 20, pitchHz: 660 },
+          { call: 'W6XYZ', name: 'BOB', qth: 'LOS ANGELES', country: 'USA', grid: 'DM04', rstSent: '599', rstRcvd: '589', speedWpm: 18, pitchHz: 600 },
+          { call: 'DL3HEX', name: 'HANS', qth: 'BERLIN', country: 'GERMANY', grid: 'JO62', rstSent: '599', rstRcvd: '599', speedWpm: 22, pitchHz: 720 },
+          { call: 'G4XYZ', name: 'JOHN', qth: 'LONDON', country: 'ENGLAND', grid: 'IO91', rstSent: '599', rstRcvd: '569', speedWpm: 19, pitchHz: 640 },
+          { call: 'VK2AA', name: 'DAVE', qth: 'SYDNEY', country: 'AUSTRALIA', grid: 'QF56', rstSent: '599', rstRcvd: '579', speedWpm: 21, pitchHz: 680 }
+        ];
+        const idx = Math.floor(Math.random() * stations.length);
+        const chosen = Object.assign({}, stations[idx]);
+        chosen.rstSent = chosen.rstSent || '599';
+        chosen.rstRcvd = chosen.rstRcvd || '599';
+        return chosen;
+      }
+
+      resetQso(remoteStation = null) {
+        this.guidedPhase = 1;
+        this.guidedCompleted = false;
+        this.sessionHistory = [];
+        this.lastRemoteMessage = '';
+        this.isRemoteTransmitting = false;
+
+        if (this.submode === 'guided') {
+          this.remoteStation = remoteStation || this.pickRandomRemoteStation();
+        } else if (this.submode === 'contest') {
+          this.remoteStation = this.pickRandomRemoteStation();
+        } else {
+          this.remoteStation = null;
+        }
+
+        this.emit('qsoReset', {
+          submode: this.submode,
+          phase: this.guidedPhase,
+          remoteStation: this.remoteStation
+        });
+      }
+
+      getGuidedStepInfo() {
+        const steps = (typeof QSO_GUIDED_STEPS !== 'undefined') ? QSO_GUIDED_STEPS : [
+          { step: 1, key: 'CQ', title: '發送 CQ 呼叫 (Call CQ)', prompt: '請發送通用呼叫 CQ，邀請空中電台建立通聯。', expectedKeywords: ['CQ'], hintTemplate: 'CQ CQ CQ DE {MY_CALL} {MY_CALL} K' },
+          { step: 2, key: 'RST', title: '交換訊號報告 (Signal Report)', prompt: '抄收對方呼叫，並回覆 RST 訊號報告 (如 599)。', expectedKeywords: ['RST', '599', '5NN'], hintTemplate: '{DX_CALL} DE {MY_CALL} UR RST 599 BK' },
+          { step: 3, key: 'QTH_NAME', title: '交換地點與姓名 (QTH & Name)', prompt: '通報你的所在地 QTH 與台長姓名 OP。', expectedKeywords: ['QTH', 'OP', 'NAME'], hintTemplate: 'QTH {MY_QTH} OP {MY_NAME} BK' },
+          { step: 4, key: 'SIGNOFF', title: '致謝並發送 73 告別 (Sign-off & 73)', prompt: '感謝本次美好通聯，祝願 73 並發送結束符號 SK。', expectedKeywords: ['73', 'SK', 'TU'], hintTemplate: 'TNX FER QSO 73 GL TU EE SK' },
+          { step: 5, key: 'COMPLETE', title: '通聯成功！(QSO Confirmed)', prompt: '恭喜！已成功建立雙向通聯，可簽發專屬 QSL 確認卡！', expectedKeywords: [], hintTemplate: 'QSL READY' }
+        ];
+
+        const current = steps.find(s => s.step === this.guidedPhase) || steps[0];
+        const dxCall = this.remoteStation ? this.remoteStation.call : 'DX';
+        const hint = current.hintTemplate
+          .replace(/{MY_CALL}/g, this.myStation.call)
+          .replace(/{DX_CALL}/g, dxCall)
+          .replace(/{MY_QTH}/g, this.myStation.qth)
+          .replace(/{MY_NAME}/g, this.myStation.name);
+
+        return {
+          step: current.step,
+          key: current.key,
+          title: current.title,
+          prompt: current.prompt,
+          hint,
+          expectedKeywords: current.expectedKeywords
+        };
+      }
+
+      normalizeMessage(text) {
+        if (!text) return '';
+        return String(text)
+          .toUpperCase()
+          .replace(/[^A-Z0-9\/\?\s]/g, ' ')
+          .replace(/\s+/g, ' ')
+          .trim();
+      }
+
+      handleUserTransmit(rawText) {
+        const text = this.normalizeMessage(rawText);
+        if (!text) return { valid: false, message: '請輸入有效的摩斯電報字元' };
+
+        const txEntry = {
+          sender: 'TX',
+          text,
+          timestamp: Date.now()
+        };
+        this.sessionHistory.push(txEntry);
+        this.emit('localTransmit', txEntry);
+
+        if (text === '?' || text === 'AGN' || text === 'AGN?' || text.endsWith('AGN?')) {
+          if (this.lastRemoteMessage) {
+            this.emit('botResponseReady', {
+              sender: 'RX',
+              text: this.lastRemoteMessage,
+              delay: 800,
+              isRepeat: true
+            });
+            return { valid: true, repeat: true };
+          }
+        }
+
+        if (this.submode === 'guided') {
+          return this._handleGuidedTransmit(text);
+        } else if (this.submode === 'contest') {
+          return this._handleContestTransmit(text);
+        } else {
+          return this._handleFreeTransmit(text);
+        }
+      }
+
+      _handleGuidedTransmit(text) {
+        const stepInfo = this.getGuidedStepInfo();
+        const tokens = text.split(' ');
+
+        let valid = false;
+        let feedback = '';
+
+        switch (this.guidedPhase) {
+          case 1:
+            valid = tokens.includes('CQ') || text.includes('CQ');
+            if (!valid) {
+              feedback = '未偵測到 CQ 關鍵字。建議格式：CQ CQ CQ DE ' + this.myStation.call + ' K';
+            }
+            break;
+
+          case 2:
+            valid = tokens.includes('599') || tokens.includes('5NN') || tokens.includes('RST') || text.includes('599') || text.includes('5NN');
+            if (!valid) {
+              feedback = '未偵測到 RST 報告 (如 599)。建議格式：' + (this.remoteStation ? this.remoteStation.call : 'DX') + ' DE ' + this.myStation.call + ' UR RST 599 BK';
+            }
+            break;
+
+          case 3:
+            valid = tokens.includes('QTH') || tokens.includes('NAME') || tokens.includes('OP') || text.includes('QTH') || text.includes('OP');
+            if (!valid) {
+              feedback = '未偵測到 QTH 或 OP/NAME 標記。建議格式：QTH ' + this.myStation.qth + ' OP ' + this.myStation.name + ' BK';
+            }
+            break;
+
+          case 4:
+            valid = tokens.includes('73') || tokens.includes('SK') || tokens.includes('TU') || text.includes('73') || text.includes('SK');
+            if (!valid) {
+              feedback = '未偵測到 73、SK 或 TU 告別信號。建議格式：TNX FER QSO 73 GL TU EE SK';
+            }
+            break;
+
+          case 5:
+            valid = true;
+            break;
+        }
+
+        if (valid) {
+          const currentPhase = this.guidedPhase;
+          const botResponse = this.generateBotResponse(currentPhase, text);
+
+          if (this.guidedPhase < 5) {
+            this.guidedPhase++;
+          }
+
+          if (botResponse) {
+            this.lastRemoteMessage = botResponse;
+            this.emit('botResponseReady', {
+              sender: 'RX',
+              text: botResponse,
+              delay: 1000,
+              nextPhase: this.guidedPhase
+            });
+          }
+
+          if (currentPhase === 4) {
+            this.guidedCompleted = true;
+            const logEntry = this.buildLogEntry();
+            this.emit('qsoComplete', logEntry);
+          }
+
+          this.emit('phaseChanged', {
+            phase: this.guidedPhase,
+            completed: this.guidedCompleted
+          });
+
+          return { valid: true, feedback: '信號收悉，對方正在回覆...' };
+        } else {
+          this.emit('validationWarning', {
+            expected: stepInfo.hint,
+            received: text,
+            feedback
+          });
+          return { valid: false, feedback };
+        }
+      }
+
+      _handleContestTransmit(text) {
+        const valid = text.includes('5NN') || text.includes('599');
+        if (valid) {
+          const mySerial = String(this.contestSerial).padStart(3, '0');
+          const dxSerial = String(Math.floor(Math.random() * 80) + 1).padStart(3, '0');
+          const botResponse = `TU 5NN ${dxSerial}`;
+          this.contestSerial++;
+
+          this.lastRemoteMessage = botResponse;
+          this.emit('botResponseReady', {
+            sender: 'RX',
+            text: botResponse,
+            delay: 600
+          });
+
+          const logEntry = this.buildLogEntry({
+            notes: `Contest QSO #${mySerial} (DX #${dxSerial})`
+          });
+          this.emit('qsoComplete', logEntry);
+
+          return { valid: true, feedback: '競賽通聯完成！' };
+        } else {
+          return { valid: false, feedback: '競賽格式需包含 5NN 或 599。' };
+        }
+      }
+
+      _handleFreeTransmit(text) {
+        if (!this.remoteStation) {
+          this.remoteStation = this.pickRandomRemoteStation();
+        }
+        const dxCall = this.remoteStation.call;
+        let botResponse = '';
+
+        if (text.includes('CQ')) {
+          botResponse = `${this.myStation.call} DE ${dxCall} ${dxCall} K`;
+        } else if (text.includes('RST') || text.includes('599') || text.includes('5NN')) {
+          botResponse = `${this.myStation.call} DE ${dxCall} UR RST 599 BK`;
+        } else if (text.includes('73') || text.includes('SK')) {
+          botResponse = `${this.myStation.call} DE ${dxCall} 73 TU EE SK`;
+          const logEntry = this.buildLogEntry({ notes: 'Free Airwaves QSO' });
+          this.emit('qsoComplete', logEntry);
+        } else {
+          botResponse = `${this.myStation.call} DE ${dxCall} R FB OM K`;
+        }
+
+        this.lastRemoteMessage = botResponse;
+        this.emit('botResponseReady', {
+          sender: 'RX',
+          text: botResponse,
+          delay: 1000
+        });
+
+        return { valid: true, feedback: '正在發送...' };
+      }
+
+      generateBotResponse(phase, userText) {
+        if (!this.remoteStation) {
+          this.remoteStation = this.pickRandomRemoteStation();
+        }
+        const myCall = this.myStation.call;
+        const dxCall = this.remoteStation.call;
+        const dxQth = this.remoteStation.qth;
+        const dxName = this.remoteStation.name;
+
+        switch (phase) {
+          case 1:
+            return `${myCall} DE ${dxCall} ${dxCall} K`;
+          case 2:
+            return `${myCall} DE ${dxCall} TNX FER RPRT UR RST 599 5NN BK`;
+          case 3:
+            return `${myCall} DE ${dxCall} QTH ${dxQth} ${dxQth} OP ${dxName} ${dxName} BK`;
+          case 4:
+            return `${myCall} DE ${dxCall} TNX FER FB QSO 73 GL TU EE SK`;
+          default:
+            return `${myCall} DE ${dxCall} R TU EE`;
+        }
+      }
+
+      generateMacroText(key) {
+        const dxCall = this.remoteStation ? this.remoteStation.call : 'DX';
+        switch (key) {
+          case 'CQ':
+            return `CQ CQ CQ DE ${this.myStation.call} ${this.myStation.call} K`;
+          case 'RST':
+            return `${dxCall} DE ${this.myStation.call} UR RST 599 BK`;
+          case 'QTH':
+            return `QTH ${this.myStation.qth} OP ${this.myStation.name} BK`;
+          case '73':
+            return `TNX FER QSO 73 GL TU EE SK`;
+          case 'TU':
+            return `TU EE`;
+          case 'AGN':
+            return `AGN?`;
+          default:
+            return '';
+        }
+      }
+
+      buildLogEntry(customFields = {}) {
+        const now = new Date();
+        const dateUtc = now.toISOString().slice(0, 10).replace(/-/g, '');
+        const timeUtc = now.toISOString().slice(11, 19).replace(/:/g, '');
+        const dx = this.remoteStation || {
+          call: 'DX1CALL',
+          name: 'OPERATOR',
+          qth: 'UNKNOWN',
+          grid: 'PL00'
+        };
+
+        return Object.assign({
+          id: `qso_${now.getTime()}_${Math.random().toString(36).substring(2, 6)}`,
+          timestamp: now.getTime(),
+          dateUtc,
+          timeUtc,
+          dateDisplay: now.toISOString().slice(0, 10),
+          timeDisplay: now.toISOString().slice(11, 16) + ' UTC',
+          myCall: this.myStation.call,
+          dxCall: dx.call,
+          band: this.activeBand,
+          freq: this.currentFreq,
+          mode: 'CW',
+          rstSent: this.myStation.rstSent || '599',
+          rstRcvd: dx.rstRcvd || '599',
+          name: dx.name || 'OM',
+          qth: dx.qth || 'GLOBAL',
+          grid: dx.grid || '',
+          country: dx.country || 'DX',
+          operator: this.myStation.call,
+          notes: `Guided CW QSO completed on ${this.activeBand}`,
+          confirmed: true
+        }, customFields);
+      }
+    }
+
+    /**
+     * DOMAIN MODULE: QsoLogManager
+     * 業餘無線電通聯日誌持久化管理器、CRUD 與標準 ADIF 3.1.4 / CSV 匯出引擎
+     */
+    class QsoLogManager {
+      constructor(storage = null, options = {}) {
+        this.storage = storage || (typeof localStorage !== 'undefined' ? localStorage : null);
+        this.storageKey = options.storageKey || 'morse_qso_logbook';
+        this.maxEntries = options.maxEntries || 100;
+        this.logs = [];
+        this.load();
+      }
+
+      load() {
+        this.logs = [];
+        if (!this.storage) return;
+
+        try {
+          const raw = this.storage.getItem(this.storageKey);
+          if (raw) {
+            const parsed = JSON.parse(raw);
+            if (Array.isArray(parsed)) {
+              this.logs = parsed;
+            }
+          }
+        } catch (e) {
+          console.warn('[QsoLogManager] Failed to load logbook from storage:', e);
+          this.logs = [];
+        }
+      }
+
+      save() {
+        if (!this.storage) return;
+        try {
+          this.storage.setItem(this.storageKey, JSON.stringify(this.logs));
+        } catch (e) {
+          console.warn('[QsoLogManager] Failed to save logbook to storage:', e);
+        }
+      }
+
+      addLog(rawEntry) {
+        if (!rawEntry || !rawEntry.dxCall) {
+          throw new Error('[QsoLogManager] Invalid entry: dxCall is required');
+        }
+
+        const now = new Date();
+        const dateUtc = (rawEntry.dateUtc || now.toISOString().slice(0, 10).replace(/-/g, '')).replace(/[^0-9]/g, '');
+        const timeUtc = (rawEntry.timeUtc || now.toISOString().slice(11, 19).replace(/:/g, '')).replace(/[^0-9]/g, '');
+
+        const entry = {
+          id: rawEntry.id || `qso_${now.getTime()}_${Math.random().toString(36).substring(2, 6)}`,
+          timestamp: rawEntry.timestamp || now.getTime(),
+          dateUtc: dateUtc.slice(0, 8),
+          timeUtc: (timeUtc + '000000').slice(0, 6),
+          dateDisplay: rawEntry.dateDisplay || `${dateUtc.slice(0, 4)}-${dateUtc.slice(4, 6)}-${dateUtc.slice(6, 8)}`,
+          timeDisplay: rawEntry.timeDisplay || `${timeUtc.slice(0, 2)}:${timeUtc.slice(2, 4)} UTC`,
+          myCall: String(rawEntry.myCall || 'BV2TT').trim().toUpperCase(),
+          dxCall: String(rawEntry.dxCall).trim().toUpperCase(),
+          band: String(rawEntry.band || '20M').trim().toUpperCase(),
+          freq: String(rawEntry.freq || '14.025').trim(),
+          mode: 'CW',
+          rstSent: String(rawEntry.rstSent || '599').trim(),
+          rstRcvd: String(rawEntry.rstRcvd || '599').trim(),
+          name: String(rawEntry.name || '').trim().toUpperCase(),
+          qth: String(rawEntry.qth || '').trim().toUpperCase(),
+          grid: String(rawEntry.grid || '').trim().toUpperCase(),
+          country: String(rawEntry.country || '').trim().toUpperCase(),
+          operator: String(rawEntry.operator || rawEntry.myCall || 'BV2TT').trim().toUpperCase(),
+          notes: String(rawEntry.notes || 'Morse Trainulator CW QSO').trim(),
+          confirmed: (rawEntry.confirmed !== undefined) ? !!rawEntry.confirmed : true
+        };
+
+        this.logs.unshift(entry);
+
+        if (this.logs.length > this.maxEntries) {
+          this.logs = this.logs.slice(0, this.maxEntries);
+        }
+
+        this.save();
+        return entry;
+      }
+
+      getLog(id) {
+        return this.logs.find(item => item.id === id) || null;
+      }
+
+      deleteLog(id) {
+        const initialLen = this.logs.length;
+        this.logs = this.logs.filter(item => item.id !== id);
+        if (this.logs.length !== initialLen) {
+          this.save();
+          return true;
+        }
+        return false;
+      }
+
+      clearLogs() {
+        this.logs = [];
+        this.save();
+      }
+
+      getStats() {
+        const total = this.logs.length;
+        const uniqueCalls = new Set(this.logs.map(l => l.dxCall)).size;
+        const bands = {};
+
+        this.logs.forEach(l => {
+          const b = l.band || 'OTHER';
+          bands[b] = (bands[b] || 0) + 1;
+        });
+
+        return {
+          total,
+          uniqueCalls,
+          bands,
+          lastQso: this.logs.length > 0 ? this.logs[0] : null
+        };
+      }
+
+      exportADIF(filterFn = null) {
+        const records = filterFn ? this.logs.filter(filterFn) : this.logs;
+        const lines = [];
+
+        lines.push('Morse Trainulator CW Logbook');
+        lines.push('<ADIF_VER:5>3.1.4');
+        lines.push('<PROGRAMID:17>MorseTrainulator');
+        lines.push('<PROGRAMVERSION:5>1.3.3');
+        lines.push('<EOH>\n');
+
+        records.forEach(r => {
+          const parts = [];
+
+          const addTag = (tag, val) => {
+            if (val !== undefined && val !== null && String(val).length > 0) {
+              const str = String(val);
+              parts.push(`<${tag}:${str.length}>${str}`);
+            }
+          };
+
+          addTag('CALL', r.dxCall);
+          addTag('QSO_DATE', r.dateUtc);
+          addTag('TIME_ON', r.timeUtc);
+          addTag('BAND', r.band);
+          addTag('FREQ', r.freq);
+          addTag('MODE', r.mode || 'CW');
+          addTag('RST_SENT', r.rstSent);
+          addTag('RST_RCVD', r.rstRcvd);
+          addTag('NAME', r.name);
+          addTag('QTH', r.qth);
+          addTag('GRIDSQUARE', r.grid);
+          addTag('OPERATOR', r.myCall);
+          addTag('COMMENT', r.notes);
+          parts.push('<EOR>');
+
+          lines.push(parts.join(' '));
+        });
+
+        return lines.join('\n');
+      }
+
+      exportCSV(filterFn = null) {
+        const records = filterFn ? this.logs.filter(filterFn) : this.logs;
+        const headers = [
+          'ID',
+          'Date_UTC',
+          'Time_UTC',
+          'DX_Callsign',
+          'My_Callsign',
+          'Band',
+          'Freq_MHz',
+          'Mode',
+          'RST_Sent',
+          'RST_Rcvd',
+          'Name',
+          'QTH',
+          'Grid_Locator',
+          'Notes'
+        ];
+
+        const escapeCsv = (str) => {
+          if (str === undefined || str === null) return '';
+          const s = String(str).replace(/"/g, '""');
+          return `"${s}"`;
+        };
+
+        const rows = [headers.join(',')];
+
+        records.forEach(r => {
+          const row = [
+            escapeCsv(r.id),
+            escapeCsv(r.dateUtc),
+            escapeCsv(r.timeUtc),
+            escapeCsv(r.dxCall),
+            escapeCsv(r.myCall),
+            escapeCsv(r.band),
+            escapeCsv(r.freq),
+            escapeCsv(r.mode),
+            escapeCsv(r.rstSent),
+            escapeCsv(r.rstRcvd),
+            escapeCsv(r.name),
+            escapeCsv(r.qth),
+            escapeCsv(r.grid),
+            escapeCsv(r.notes)
+          ];
+          rows.push(row.join(','));
+        });
+
+        return rows.join('\r\n');
+      }
+    }
+
+    if (typeof window !== 'undefined') {
+      window.QsoManager = QsoManager;
+      window.QsoLogManager = QsoLogManager;
+    }
+
+    /**
      * RX COPYING WORKSPACE CONTROLLER: RxMode
      * 聽力抄收工作台控制器、狀態機、評測模型與軟鍵盤交互
      */
@@ -8608,7 +9240,13 @@
       textStrictMode: false,
       kochShowHints: false,
       layoutMode: '2col', // '2col' | '3col'
-      themePreset: 'cyber-brass' // 'cyber-brass' | 'classic-amber' | 'green-phosphor'
+      themePreset: 'cyber-brass', // 'cyber-brass' | 'classic-amber' | 'green-phosphor'
+      operatorCallsign: 'BV2TT',
+      operatorName: 'EDDIE',
+      operatorQth: 'TAIPEI',
+      operatorGrid: 'PL05',
+      operatorRig: '100W',
+      operatorAnt: 'DIPOLE'
     };
 
     class SettingsManager {
@@ -9130,6 +9768,71 @@
       { word: 'ANT', desc: '天線 (Antenna)' },
       { word: 'WX', desc: '天氣 (Weather)' },
       { word: 'HW', desc: '如何？(How copy?)' }
+    ];
+
+    // ==========================================
+    // VIRTUAL CW QSO STATIONS & BANDS (Issue #53)
+    // ==========================================
+    const QSO_REMOTE_STATIONS = [
+      { call: 'JA1ABC', name: 'KEN', qth: 'TOKYO', country: 'JAPAN', grid: 'PM95', rstSent: '599', rstRcvd: '579', speedWpm: 20, pitchHz: 660 },
+      { call: 'W6XYZ', name: 'BOB', qth: 'LOS ANGELES', country: 'USA', grid: 'DM04', rstSent: '599', rstRcvd: '589', speedWpm: 18, pitchHz: 600 },
+      { call: 'DL3HEX', name: 'HANS', qth: 'BERLIN', country: 'GERMANY', grid: 'JO62', rstSent: '599', rstRcvd: '599', speedWpm: 22, pitchHz: 720 },
+      { call: 'G4XYZ', name: 'JOHN', qth: 'LONDON', country: 'ENGLAND', grid: 'IO91', rstSent: '599', rstRcvd: '569', speedWpm: 19, pitchHz: 640 },
+      { call: 'VK2AA', name: 'DAVE', qth: 'SYDNEY', country: 'AUSTRALIA', grid: 'QF56', rstSent: '599', rstRcvd: '579', speedWpm: 21, pitchHz: 680 },
+      { call: 'HL1VA', name: 'MIN', qth: 'SEOUL', country: 'KOREA', grid: 'PM37', rstSent: '599', rstRcvd: '599', speedWpm: 20, pitchHz: 700 },
+      { call: 'BY1AA', name: 'CHEN', qth: 'BEIJING', country: 'CHINA', grid: 'OM89', rstSent: '599', rstRcvd: '589', speedWpm: 18, pitchHz: 620 },
+      { call: 'F6KOP', name: 'LUC', qth: 'PARIS', country: 'FRANCE', grid: 'JN18', rstSent: '599', rstRcvd: '579', speedWpm: 22, pitchHz: 650 },
+      { call: 'I2BBB', name: 'MARCO', qth: 'MILAN', country: 'ITALY', grid: 'JN45', rstSent: '599', rstRcvd: '599', speedWpm: 20, pitchHz: 690 },
+      { call: 'BV2AB', name: 'LIN', qth: 'TAIPEI', country: 'TAIWAN', grid: 'PL05', rstSent: '599', rstRcvd: '599', speedWpm: 20, pitchHz: 670 }
+    ];
+
+    const QSO_BANDS = [
+      { id: '40M', freq: '7.025', band: '40M', name: '40M CW', minFreq: 7.000, maxFreq: 7.040 },
+      { id: '20M', freq: '14.025', band: '20M', name: '20M CW', minFreq: 14.000, maxFreq: 14.070 },
+      { id: '15M', freq: '21.025', band: '15M', name: '15M CW', minFreq: 21.000, maxFreq: 21.070 }
+    ];
+
+    const QSO_GUIDED_STEPS = [
+      {
+        step: 1,
+        key: 'CQ',
+        title: '發送 CQ 呼叫 (Call CQ)',
+        prompt: '請發送通用呼叫 CQ，邀請空中電台建立通聯。',
+        expectedKeywords: ['CQ'],
+        hintTemplate: 'CQ CQ CQ DE {MY_CALL} {MY_CALL} K'
+      },
+      {
+        step: 2,
+        key: 'RST',
+        title: '交換訊號報告 (Signal Report)',
+        prompt: '抄收對方呼叫，並回覆 RST 訊號報告 (如 599)。',
+        expectedKeywords: ['RST', '599', '5NN'],
+        hintTemplate: '{DX_CALL} DE {MY_CALL} UR RST 599 BK'
+      },
+      {
+        step: 3,
+        key: 'QTH_NAME',
+        title: '交換地點與姓名 (QTH & Name)',
+        prompt: '通報你的所在地 QTH 與台長姓名 OP。',
+        expectedKeywords: ['QTH', 'OP', 'NAME'],
+        hintTemplate: 'QTH {MY_QTH} OP {MY_NAME} BK'
+      },
+      {
+        step: 4,
+        key: 'SIGNOFF',
+        title: '致謝並發送 73 告別 (Sign-off & 73)',
+        prompt: '感謝本次美好通聯，祝願 73 並發送結束符號 SK。',
+        expectedKeywords: ['73', 'SK', 'TU'],
+        hintTemplate: 'TNX FER QSO 73 GL TU EE SK'
+      },
+      {
+        step: 5,
+        key: 'COMPLETE',
+        title: '通聯成功！(QSO Confirmed)',
+        prompt: '恭喜！已成功建立雙向通聯，可簽發專屬 QSL 確認卡！',
+        expectedKeywords: [],
+        hintTemplate: 'QSL READY'
+      }
     ];
 
     function generateKochRxTargets(maxLevel, count = 10) {
