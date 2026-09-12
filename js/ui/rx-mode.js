@@ -11,7 +11,7 @@ class RxMode {
     this.submode = options.submode || 'koch'; // 'koch' | 'callsign' | 'groups' | 'qcodes'
     this.state = 'IDLE'; // 'IDLE' | 'READY' | 'PLAYING' | 'WAITING_INPUT' | 'EVALUATED' | 'COMPLETED'
     this.blindMode = (options.blindMode !== undefined) ? !!options.blindMode : true;
-    this.autoAdvance = (options.autoAdvance !== undefined) ? !!options.autoAdvance : false;
+    this.autoAdvance = (options.autoAdvance !== undefined) ? !!options.autoAdvance : true;
     this.totalTrials = options.totalTrials || 10;
     this.currentTrialIndex = 0;
     this.trials = [];
@@ -234,11 +234,13 @@ class RxMode {
   attachPlayerHooks(player) {
     if (!player || typeof player.on !== 'function') return;
     player.on('pulseStart', (sym) => {
+      if (this.isWorkspaceActive() && this.blindMode) return;
       if (typeof window !== 'undefined' && window.ribbon) {
         window.ribbon.startPulse(performance.now(), sym);
       }
     });
     player.on('pulseEnd', (sym) => {
+      if (this.isWorkspaceActive() && this.blindMode) return;
       if (typeof window !== 'undefined' && window.ribbon) {
         window.ribbon.endPulse(performance.now(), sym);
       }
@@ -483,9 +485,22 @@ class RxMode {
       if (pcbCard) {
         pcbCard.classList.remove('pcb-blind-mode');
       }
+
+      // Hide/Show top oscilloscope ribbon in blind mode
+      const topRibbon = document.getElementById('cockpit-top-ribbon');
+      if (topRibbon) {
+        if (this.isWorkspaceActive() && this.blindMode) {
+          topRibbon.classList.add('ribbon-blind-mode');
+        } else {
+          topRibbon.classList.remove('ribbon-blind-mode');
+        }
+      }
     }
 
     this.updateVisualCue();
+    if (this.submode === 'koch') {
+      this.updateKochStageUI();
+    }
   }
 
   onLeaveRx() {
@@ -496,6 +511,10 @@ class RxMode {
       const pcbCard = document.querySelector('.pcb-card');
       if (pcbCard) {
         pcbCard.classList.remove('pcb-blind-mode');
+      }
+      const topRibbon = document.getElementById('cockpit-top-ribbon');
+      if (topRibbon) {
+        topRibbon.classList.remove('ribbon-blind-mode');
       }
     }
   }

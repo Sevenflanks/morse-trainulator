@@ -74,7 +74,8 @@ const requiredElements = [
   requiredElements.forEach(elem => {
     assert.ok(content.includes(elem), `${name} must contain ${elem}`);
   });
-  console.log(`   -> ${name} verified with all ${requiredElements.length} Rx DOM elements!`);
+  assert.ok(content.includes('id="chk-rx-auto-advance" class="switch-input switch-gold" checked'), `${name} must have #chk-rx-auto-advance checked by default`);
+  console.log(`   -> ${name} verified with all ${requiredElements.length} Rx DOM elements & auto-advance default!`);
 });
 
 // 2. Zone 3 Soft Keypad Complete 36-Key Alphanumeric Verification
@@ -120,7 +121,10 @@ const requiredCssTokens = [
   '.rx-confusion-item',
   '.rx-koch-stage-bar',
   '.rx-pool-chip',
-  '.rx-btn-advance'
+  '.rx-btn-advance',
+  '.ribbon-blind-mode',
+  '.rx-pool-preview-row',
+  '#rx-koch-target-info'
 ];
 
 requiredCssTokens.forEach(token => {

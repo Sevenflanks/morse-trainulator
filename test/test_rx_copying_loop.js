@@ -60,7 +60,8 @@ const rx = new RxMode({ cwPlayer: player, submode: 'koch' });
 assert.strictEqual(rx.state, 'IDLE', 'Initial state should be IDLE');
 assert.strictEqual(rx.submode, 'koch', 'Initial submode should be koch');
 assert.strictEqual(rx.blindMode, true, 'Blind mode should default to true');
-assert.strictEqual(rx.autoAdvance, false, 'Auto-advance should default to false');
+assert.strictEqual(rx.autoAdvance, true, 'Auto-advance should default to true');
+rx.autoAdvance = false; // Disable for synchronous step-by-step assertions
 assert.strictEqual(rx.currentTrialIndex, 0);
 console.log('   -> Instantiation and defaults verified!');
 
@@ -227,6 +228,83 @@ assert.ok(indexHtml.includes('js/ui/rx-mode.js'), 'index.html must reference js/
 assert.ok(protoHtml.includes('class RxMode'), 'prototype_morse_card.html must embed class RxMode');
 assert.ok(protoHtml.includes('window.rxMode = rxMode'), 'prototype_morse_card.html must instantiate rxMode');
 console.log('   -> Dual-track inclusion verified!');
+
+// 10. Blind Mode Oscilloscope & Ribbon Concealment Verification
+console.log('\n10. Verifying Blind Mode Oscilloscope & Ribbon Concealment...');
+let pulseStartCalls = 0;
+let pulseEndCalls = 0;
+global.window = {
+  ribbon: {
+    startPulse: () => { pulseStartCalls++; },
+    endPulse: () => { pulseEndCalls++; }
+  }
+};
+global.performance = { now: () => 1000 };
+
+const ribbonElement = {
+  classList: {
+    classes: new Set(),
+    add(c) { this.classes.add(c); },
+    remove(c) { this.classes.delete(c); },
+    contains(c) { return this.classes.has(c); }
+  }
+};
+
+const wsRxElement = {
+  classList: {
+    classes: new Set(['active']),
+    add(c) { this.classes.add(c); },
+    remove(c) { this.classes.delete(c); },
+    toggle(c, force) { if (force) this.classes.add(c); else this.classes.delete(c); },
+    contains(c) { return this.classes.has(c); }
+  },
+  style: { display: 'flex' }
+};
+
+global.document = {
+  getElementById: (id) => {
+    if (id === 'cockpit-top-ribbon') return ribbonElement;
+    if (id === 'ws-container-rx') return wsRxElement;
+    return null;
+  },
+  querySelector: (sel) => {
+    if (sel === '.pcb-card') return { classList: { remove: () => {} } };
+    return null;
+  }
+};
+
+const testPlayer = new MockCWPlayer();
+const rxBlindTest = new RxMode({ cwPlayer: testPlayer });
+rxBlindTest.el = { wsContainer: wsRxElement };
+rxBlindTest.attachPlayerHooks(testPlayer);
+
+// In blind mode: pulses should be suppressed
+rxBlindTest.blindMode = true;
+testPlayer.emit('pulseStart', '.');
+testPlayer.emit('pulseEnd', '.');
+assert.strictEqual(pulseStartCalls, 0, 'Pulses must NOT be emitted to ribbon when blindMode is true');
+assert.strictEqual(pulseEndCalls, 0, 'Pulses must NOT be emitted to ribbon when blindMode is true');
+
+// In visual mode (blindMode = false): pulses should pass through
+rxBlindTest.blindMode = false;
+testPlayer.emit('pulseStart', '-');
+testPlayer.emit('pulseEnd', '-');
+assert.strictEqual(pulseStartCalls, 1, 'Pulses should be emitted when blindMode is false');
+assert.strictEqual(pulseEndCalls, 1, 'Pulses should be emitted when blindMode is false');
+
+// Verify updateBlindMode toggles ribbon-blind-mode class
+rxBlindTest.updateBlindMode(true);
+assert.ok(ribbonElement.classList.contains('ribbon-blind-mode'), 'Ribbon must have ribbon-blind-mode class when blindMode is enabled');
+
+rxBlindTest.updateBlindMode(false);
+assert.ok(!ribbonElement.classList.contains('ribbon-blind-mode'), 'Ribbon must NOT have ribbon-blind-mode class when blindMode is disabled');
+
+// Verify onLeaveRx removes ribbon-blind-mode
+ribbonElement.classList.add('ribbon-blind-mode');
+rxBlindTest.onLeaveRx();
+assert.ok(!ribbonElement.classList.contains('ribbon-blind-mode'), 'onLeaveRx must clear ribbon-blind-mode class');
+
+console.log('   -> Blind mode oscilloscope and ribbon concealment verified!');
 
 console.log('\n====================================================');
 console.log('ALL RX COPYING LOOP & SCORECARD TESTS PASSED!');

@@ -323,9 +323,16 @@
   padding: 4px;
 }
 
-/* Rx Blind Mode Visual Cue & PCB Safety */
+/* Rx Blind Mode Visual Cue, Target & Pool Concealment, and PCB Safety */
 .rx-blind-mode #rx-visual-cue,
-.rx-blind-active #rx-visual-cue {
+.rx-blind-active #rx-visual-cue,
+.rx-blind-active #rx-koch-target-info,
+.rx-blind-active .rx-pool-preview-row {
+  display: none !important;
+}
+
+/* Blind Mode Top Oscilloscope Paper Tape Concealment */
+.p3b-top-ribbon.ribbon-blind-mode {
   display: none !important;
 }
 

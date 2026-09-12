@@ -2028,14 +2028,19 @@ function setupWorkspaceNavigation() {
         targetView.classList.add('active');
       }
 
-      // If returning to TX, guarantee PCB tree is pristine
+      // If returning to TX, guarantee PCB tree is pristine and ribbon is visible
       if (item.viewId === 'ws-container-tx') {
         const pcb = document.querySelector('.pcb-card');
         if (pcb) pcb.classList.remove('pcb-blind-mode');
+        const ribbon = document.getElementById('cockpit-top-ribbon');
+        if (ribbon) ribbon.classList.remove('ribbon-blind-mode');
       }
 
-      // Auto prepare Rx session on first entry if IDLE
+      // Auto prepare Rx session on first entry if IDLE, and update blind mode ribbon
       if (item.viewId === 'ws-container-rx' && typeof window !== 'undefined' && window.rxMode) {
+        if (typeof window.rxMode.updateBlindMode === 'function') {
+          window.rxMode.updateBlindMode(window.rxMode.blindMode);
+        }
         if (window.rxMode.state === 'IDLE') {
           window.rxMode.startSession();
         }

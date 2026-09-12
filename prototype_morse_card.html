@@ -2267,9 +2267,16 @@
       padding: 4px;
     }
 
-    /* Rx Blind Mode Visual Cue & PCB Safety */
+    /* Rx Blind Mode Visual Cue, Target & Pool Concealment, and PCB Safety */
     .rx-blind-mode #rx-visual-cue,
-    .rx-blind-active #rx-visual-cue {
+    .rx-blind-active #rx-visual-cue,
+    .rx-blind-active #rx-koch-target-info,
+    .rx-blind-active .rx-pool-preview-row {
+      display: none !important;
+    }
+
+    /* Blind Mode Top Oscilloscope Paper Tape Concealment */
+    .p3b-top-ribbon.ribbon-blind-mode {
       display: none !important;
     }
 
@@ -3853,7 +3860,7 @@
 
           <div style="display:flex; align-items:center; gap:16px; flex-wrap:wrap;">
             <label style="display:flex; align-items:center; gap:6px; cursor:pointer; font-size:0.8rem; color:#ccc;" title="送出答案後是否自動播報下一題">
-              <input type="checkbox" id="chk-rx-auto-advance" class="switch-input switch-gold">
+              <input type="checkbox" id="chk-rx-auto-advance" class="switch-input switch-gold" checked>
               <span><i class="mdi mdi-fast-forward"></i> 作答後自動前進</span>
             </label>
 
@@ -4866,7 +4873,7 @@
         this.submode = options.submode || 'koch';
         this.state = 'IDLE';
         this.blindMode = (options.blindMode !== undefined) ? !!options.blindMode : true;
-        this.autoAdvance = (options.autoAdvance !== undefined) ? !!options.autoAdvance : false;
+        this.autoAdvance = (options.autoAdvance !== undefined) ? !!options.autoAdvance : true;
         this.totalTrials = options.totalTrials || 10;
         this.currentTrialIndex = 0;
         this.trials = [];
@@ -5077,11 +5084,13 @@
       attachPlayerHooks(player) {
         if (!player || typeof player.on !== 'function') return;
         player.on('pulseStart', (sym) => {
+          if (this.isWorkspaceActive() && this.blindMode) return;
           if (typeof window !== 'undefined' && window.ribbon) {
             window.ribbon.startPulse(performance.now(), sym);
           }
         });
         player.on('pulseEnd', (sym) => {
+          if (this.isWorkspaceActive() && this.blindMode) return;
           if (typeof window !== 'undefined' && window.ribbon) {
             window.ribbon.endPulse(performance.now(), sym);
           }
@@ -5325,9 +5334,22 @@
           if (pcbCard) {
             pcbCard.classList.remove('pcb-blind-mode');
           }
+
+          // Hide/Show top oscilloscope ribbon in blind mode
+          const topRibbon = document.getElementById('cockpit-top-ribbon');
+          if (topRibbon) {
+            if (this.isWorkspaceActive() && this.blindMode) {
+              topRibbon.classList.add('ribbon-blind-mode');
+            } else {
+              topRibbon.classList.remove('ribbon-blind-mode');
+            }
+          }
         }
 
         this.updateVisualCue();
+        if (this.submode === 'koch') {
+          this.updateKochStageUI();
+        }
       }
 
       onLeaveRx() {
@@ -5338,6 +5360,10 @@
           const pcbCard = document.querySelector('.pcb-card');
           if (pcbCard) {
             pcbCard.classList.remove('pcb-blind-mode');
+          }
+          const topRibbon = document.getElementById('cockpit-top-ribbon');
+          if (topRibbon) {
+            topRibbon.classList.remove('ribbon-blind-mode');
           }
         }
       }
@@ -10737,14 +10763,19 @@ function setStageView(view) {
             targetView.classList.add('active');
           }
 
-          // If returning to TX, guarantee PCB tree is pristine
+          // If returning to TX, guarantee PCB tree is pristine and ribbon is visible
           if (item.viewId === 'ws-container-tx') {
             const pcb = document.querySelector('.pcb-card');
             if (pcb) pcb.classList.remove('pcb-blind-mode');
+            const ribbon = document.getElementById('cockpit-top-ribbon');
+            if (ribbon) ribbon.classList.remove('ribbon-blind-mode');
           }
 
-          // Auto prepare Rx session on first entry if IDLE
+          // Auto prepare Rx session on first entry if IDLE, and update blind mode ribbon
           if (item.viewId === 'ws-container-rx' && typeof window !== 'undefined' && window.rxMode) {
+            if (typeof window.rxMode.updateBlindMode === 'function') {
+              window.rxMode.updateBlindMode(window.rxMode.blindMode);
+            }
             if (window.rxMode.state === 'IDLE') {
               window.rxMode.startSession();
             }
