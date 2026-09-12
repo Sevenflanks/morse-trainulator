@@ -663,6 +663,15 @@ function finalizeLetter() {
     highlightPath('', false, engine, dom.antennaShape);
   }
 
+  // Forward decoded character to QSO workspace transmitter if active
+  if (typeof window !== 'undefined' && window.qsoMode && typeof window.qsoMode.isWorkspaceActive === 'function' && window.qsoMode.isWorkspaceActive()) {
+    if (res.isErrorSignal || res.letter === '<HH>') {
+      window.qsoMode.handleLetterDecoded('<HH>');
+    } else if (res.isValid) {
+      window.qsoMode.handleLetterDecoded(res.letter);
+    }
+  }
+
   setTimeout(() => {
     highlightPath('', false, engine, dom.antennaShape);
     if (dom.evalStatus) {
@@ -1613,6 +1622,34 @@ function initApp() {
     window.rxMode.init();
   }
 
+  if (typeof QsoManager !== 'undefined') {
+    const s = (typeof settingsManager !== 'undefined' && settingsManager.settings) ? settingsManager.settings : {};
+    window.qsoManager = new QsoManager({
+      operatorCallsign: s.operatorCallsign || 'BV2TT',
+      operatorName: s.operatorName || 'EDDIE',
+      operatorQth: s.operatorQth || 'TAIPEI',
+      operatorGrid: s.operatorGrid || 'PL05',
+      operatorRig: s.operatorRig || '100W',
+      operatorAnt: s.operatorAnt || 'DIPOLE',
+      submode: 'guided'
+    });
+  }
+
+  if (typeof QsoLogManager !== 'undefined') {
+    window.qsoLogManager = new QsoLogManager();
+  }
+
+  if (typeof QsoMode !== 'undefined') {
+    window.qsoMode = new QsoMode({
+      qsoManager: window.qsoManager,
+      qsoLogManager: window.qsoLogManager,
+      cwPlayer: window.cwPlayer,
+      synth: window.synth,
+      engine: window.engine
+    });
+    window.qsoMode.init();
+  }
+
   setupKeyerCallbacks();
   setupEventListeners();
 
@@ -2061,6 +2098,9 @@ function setupWorkspaceNavigation() {
       if (typeof window !== 'undefined' && window.rxMode) {
         window.rxMode.onLeaveRx();
       }
+      if (typeof window !== 'undefined' && window.qsoMode) {
+        window.qsoMode.onLeaveQso();
+      }
 
       // Release any physical keyer contacts when switching workspaces
       if (typeof currentKeyerDevice !== 'undefined' && currentKeyerDevice === 'straight') {
@@ -2117,6 +2157,13 @@ function setupWorkspaceNavigation() {
         }
         if (window.rxMode.state === 'IDLE') {
           window.rxMode.startSession();
+        }
+      }
+
+      // Prepare QSO session on entry
+      if (item.viewId === 'ws-container-qso' && typeof window !== 'undefined' && window.qsoMode) {
+        if (typeof window.qsoMode.onEnterQso === 'function') {
+          window.qsoMode.onEnterQso();
         }
       }
     });

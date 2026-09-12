@@ -401,6 +401,10 @@ function commitWordSpace() {
       }
     }
   }
+
+  if (typeof window !== 'undefined' && window.qsoMode && typeof window.qsoMode.isWorkspaceActive === 'function' && window.qsoMode.isWorkspaceActive()) {
+    window.qsoMode.handleLetterDecoded(' ');
+  }
 }
 
 if (typeof window !== 'undefined') {

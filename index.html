@@ -25,6 +25,7 @@
   <link rel="stylesheet" href="css/controls.css?v=1.3.3">
   <link rel="stylesheet" href="css/modes.css?v=1.3.3">
   <link rel="stylesheet" href="css/rx-mode.css?v=1.3.3">
+  <link rel="stylesheet" href="css/qso-mode.css?v=1.3.3">
 
   <!-- Early Theme Hydration (Zero-FOUC) -->
   <script>
@@ -1239,13 +1240,266 @@
 
   <!-- Workspace 3: QSO (通聯) -->
   <div id="ws-container-qso" class="workspace-view" style="display:none;">
-    <div class="placeholder-workspace">
-      <i class="mdi mdi-radio-tower placeholder-icon"></i>
-      <h2 style="color:#fff; margin-bottom:8px;">QSO (通聯工作台)</h2>
-      <p style="color:var(--text-muted); font-size:0.9rem;">業餘無線電虛擬頻段、訊號雜音與通聯程序模擬 (Virtual CW QSO Simulation)</p>
-      <div class="placeholder-badge">即將推出 · Coming Soon</div>
-    </div>
+    <div class="qso-workspace-stage">
+
+      <!-- Submode Navigation Bar -->
+      <div class="qso-mode-nav">
+        <button type="button" id="qso-submode-guided" class="qso-mode-pill active" data-submode="guided">
+          <i class="mdi mdi-map-marker-path"></i> 標準引導 (Guided)
+        </button>
+        <button type="button" id="qso-submode-free" class="qso-mode-pill" data-submode="free">
+          <i class="mdi mdi-radio-tower"></i> 自由頻段 (Free)
+        </button>
+        <button type="button" id="qso-submode-contest" class="qso-mode-pill" data-submode="contest">
+          <i class="mdi mdi-trophy-outline"></i> 競賽連珠 (Contest)
+        </button>
+        <button type="button" id="qso-submode-logbook" class="qso-mode-pill" data-submode="logbook">
+          <i class="mdi mdi-book-open-outline"></i> 電台日誌 (Logbook)
+        </button>
+      </div>
+
+      <!-- QSO Main Cockpit Stage -->
+      <div class="qso-cockpit-card" id="qso-cockpit-stage">
+
+        <!-- SDR VFO & Meter Bar -->
+        <div class="qso-sdr-deck">
+          
+          <!-- Left: Band Selector & VFO Frequency -->
+          <div class="qso-vfo-panel">
+            <div class="qso-deck-label"><i class="mdi mdi-tune"></i> 虛擬頻段與頻率 (VFO TUNER)</div>
+            <div class="qso-band-buttons">
+              <button type="button" class="qso-band-btn" data-band="40M" id="btn-band-40m">40M</button>
+              <button type="button" class="qso-band-btn active" data-band="20M" id="btn-band-20m">20M</button>
+              <button type="button" class="qso-band-btn" data-band="15M" id="btn-band-15m">15M</button>
+            </div>
+            <div class="qso-freq-display">
+              <span class="qso-freq-val" id="qso-vfo-freq">14.025.00</span>
+              <span class="qso-freq-unit">MHz CW</span>
+            </div>
+          </div>
+
+          <!-- Center: Dynamic Analog S-Meter Dial -->
+          <div class="qso-smeter-panel">
+            <div class="qso-smeter-header">
+              <span class="qso-deck-label"><i class="mdi mdi-gauge"></i> 訊號強度錶 (SIGNAL METER)</span>
+              <span class="qso-smeter-val" id="qso-smeter-readout">S9 +10dB</span>
+            </div>
+            
+            <div class="qso-smeter-bezel">
+              <svg class="qso-smeter-svg" viewBox="0 0 200 80" id="qso-smeter-svg">
+                <!-- Scale Arc Background -->
+                <path d="M 25 70 A 85 85 0 0 1 175 70" fill="none" stroke="#2a3345" stroke-width="6" stroke-linecap="round" />
+                <path d="M 25 70 A 85 85 0 0 1 125 21" fill="none" stroke="#00e676" stroke-width="6" stroke-linecap="round" />
+                <path d="M 125 21 A 85 85 0 0 1 175 70" fill="none" stroke="#ff3d00" stroke-width="6" stroke-linecap="round" />
+                
+                <!-- Tick Marks & Scale Labels -->
+                <text x="25" y="78" class="qso-meter-text">1</text>
+                <text x="42" y="55" class="qso-meter-text">3</text>
+                <text x="68" y="38" class="qso-meter-text">5</text>
+                <text x="96" y="30" class="qso-meter-text">7</text>
+                <text x="125" y="32" class="qso-meter-text">9</text>
+                <text x="150" y="44" class="qso-meter-text red">+10</text>
+                <text x="175" y="78" class="qso-meter-text red">+30</text>
+
+                <!-- Rotating Pointer Needle Pivot at (100, 80) -->
+                <g id="qso-smeter-needle-group" transform="rotate(-40, 100, 80)">
+                  <line x1="100" y1="80" x2="100" y2="15" stroke="#ffd700" stroke-width="2" stroke-linecap="round" />
+                  <circle cx="100" cy="80" r="5" fill="#ffd700" />
+                </g>
+              </svg>
+
+              <!-- Dynamic 11-Segment S-Meter LED Ladder -->
+              <div class="qso-smeter-led-ladder" id="qso-smeter-ladder">
+                <span class="smeter-led" data-level="1"></span>
+                <span class="smeter-led" data-level="2"></span>
+                <span class="smeter-led" data-level="3"></span>
+                <span class="smeter-led" data-level="4"></span>
+                <span class="smeter-led" data-level="5"></span>
+                <span class="smeter-led" data-level="6"></span>
+                <span class="smeter-led" data-level="7"></span>
+                <span class="smeter-led" data-level="8"></span>
+                <span class="smeter-led" data-level="9"></span>
+                <span class="smeter-led red" data-level="10"></span>
+                <span class="smeter-led red" data-level="11"></span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Right: RF Atmosphere Controls & Carrier Indicator -->
+          <div class="qso-rf-panel">
+            <div class="qso-carrier-indicator" id="qso-carrier-box">
+              <span class="qso-carrier-dot" id="qso-carrier-dot"></span>
+              <span class="qso-carrier-text" id="qso-carrier-text">CARRIER IDLE</span>
+            </div>
+
+            <div class="qso-rf-controls">
+              <!-- QRN Atmospheric Noise Toggle -->
+              <div class="qso-rf-item">
+                <label class="qso-rf-label" for="chk-qso-qrn">
+                  <i class="mdi mdi-weather-lightning"></i> 天電雜音 QRN
+                </label>
+                <input type="checkbox" id="chk-qso-qrn" class="qso-checkbox">
+              </div>
+
+              <!-- QSB Ionospheric Fading Toggle -->
+              <div class="qso-rf-item">
+                <label class="qso-rf-label" for="chk-qso-qsb">
+                  <i class="mdi mdi-waves"></i> 電離層衰落 QSB
+                </label>
+                <input type="checkbox" id="chk-qso-qsb" class="qso-checkbox" checked>
+              </div>
+
+              <!-- BFO Pitch Selector -->
+              <div class="qso-rf-item">
+                <label class="qso-rf-label"><i class="mdi mdi-sine-wave"></i> 拍頻 BFO</label>
+                <select id="sel-qso-bfo" class="qso-select">
+                  <option value="600">600 Hz</option>
+                  <option value="660" selected>660 Hz</option>
+                  <option value="720">720 Hz</option>
+                  <option value="800">800 Hz</option>
+                </select>
+              </div>
+            </div>
+          </div>
+
+        </div> <!-- /qso-sdr-deck -->
+
+        <!-- Step Guidance Banner (Guided Mode) -->
+        <div class="qso-stage-guide" id="qso-stage-guide">
+          <div class="qso-guide-steps-bar">
+            <div class="qso-step-badge active" data-step="1">1. CQ 呼叫</div>
+            <div class="qso-step-badge" data-step="2">2. 交換 RST</div>
+            <div class="qso-step-badge" data-step="3">3. QTH / OP</div>
+            <div class="qso-step-badge" data-step="4">4. 73 告別</div>
+            <div class="qso-step-badge" data-step="5">5. 通聯確認</div>
+          </div>
+          <div class="qso-guide-info">
+            <div class="qso-guide-instruction" id="qso-guide-instruction">
+              <i class="mdi mdi-compass-outline"></i> <span id="qso-guide-prompt">請發送通用呼叫 CQ，邀請空中電台建立通聯。</span>
+            </div>
+            <div class="qso-guide-hint-box">
+              <span class="qso-hint-title">建議發報格式：</span>
+              <code class="qso-hint-code" id="qso-guide-hint">CQ CQ CQ DE BV2TT BV2TT K</code>
+              <button type="button" class="btn-xs-util" id="btn-qso-use-hint" title="將建議填入發報框">
+                <i class="mdi mdi-content-copy"></i> 填入
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Teletype Feed Window -->
+        <div class="qso-terminal">
+          <div class="qso-terminal-header">
+            <div class="qso-remote-meta" id="qso-remote-meta">
+              <span class="meta-label"><i class="mdi mdi-satellite-variant"></i> 目標電台:</span>
+              <span class="meta-val highlight" id="qso-remote-call">JA1ABC</span>
+              <span class="meta-val" id="qso-remote-details">(KEN · TOKYO, JAPAN · RST 599 · 20 WPM)</span>
+            </div>
+            <div class="qso-my-meta" id="qso-my-meta">
+              <span class="meta-label"><i class="mdi mdi-account"></i> 本台:</span>
+              <span class="meta-val" id="qso-my-call">BV2TT</span>
+              <span class="meta-val" id="qso-my-details">(EDDIE · TAIPEI · 100W)</span>
+            </div>
+            <div class="qso-terminal-actions">
+              <button type="button" class="btn-xs-util" id="btn-qso-replay-rx" title="重聽對方上一條電文 (Replay)"><i class="mdi mdi-replay"></i> 重聽</button>
+              <button type="button" class="btn-xs-util" id="btn-qso-new-station" title="呼叫新電台 (Next Station)"><i class="mdi mdi-account-switch-outline"></i> 換台</button>
+            </div>
+          </div>
+
+          <div class="qso-terminal-feed" id="qso-terminal-feed">
+            <!-- Dynamic teletype entries will be inserted here -->
+          </div>
+        </div>
+
+        <!-- Macro Button Deck -->
+        <div class="qso-macro-deck">
+          <button type="button" class="qso-macro-btn" data-macro="CQ" id="macro-btn-cq">
+            <span class="macro-badge">CQ</span>
+            <span class="macro-label">呼叫 CQ</span>
+          </button>
+          <button type="button" class="qso-macro-btn" data-macro="RST" id="macro-btn-rst">
+            <span class="macro-badge">RST</span>
+            <span class="macro-label">回報 599</span>
+          </button>
+          <button type="button" class="qso-macro-btn" data-macro="QTH" id="macro-btn-qth">
+            <span class="macro-badge">QTH</span>
+            <span class="macro-label">通報 QTH/OP</span>
+          </button>
+          <button type="button" class="qso-macro-btn" data-macro="73" id="macro-btn-73">
+            <span class="macro-badge">73</span>
+            <span class="macro-label">告別 73/SK</span>
+          </button>
+          <button type="button" class="qso-macro-btn" data-macro="TU" id="macro-btn-tu">
+            <span class="macro-badge">TU</span>
+            <span class="macro-label">短促 TU EE</span>
+          </button>
+          <button type="button" class="qso-macro-btn" data-macro="AGN" id="macro-btn-agn">
+            <span class="macro-badge">AGN?</span>
+            <span class="macro-label">請求重發</span>
+          </button>
+        </div>
+
+        <!-- Transmitter Input Cockpit -->
+        <div class="qso-tx-strip">
+          <div class="qso-tx-input-wrapper">
+            <input type="text" id="qso-tx-buffer" class="qso-tx-input" placeholder="透過電鍵發報或直接鍵入電文 (例如: CQ CQ DE BV2TT K)..." autocomplete="off" spellcheck="false">
+            <button type="button" id="btn-qso-tx-clear" class="btn-qso-icon" title="清空輸入"><i class="mdi mdi-backspace-outline"></i></button>
+          </div>
+          <button type="button" id="btn-qso-tx-send" class="btn-qso-send">
+            <i class="mdi mdi-send"></i> 發射電文 (TX)
+          </button>
+        </div>
+
+        <div class="qso-tx-status-bar">
+          <span id="qso-tx-hint"><i class="mdi mdi-information-outline"></i> 提示：可直接於下方 K5 電鍵操作發報，解碼字元將自動即時加入發射緩衝區</span>
+          <span id="qso-last-ack" class="qso-ack-text"></span>
+        </div>
+
+      </div> <!-- /qso-cockpit-card -->
+
+      <!-- Station Logbook View (When in 'logbook' submode) -->
+      <div class="qso-cockpit-card" id="qso-logbook-stage" style="display:none;">
+        <div class="qso-logbook-header">
+          <div class="qso-logbook-title">
+            <i class="mdi mdi-book-open-page-variant"></i> 電台日誌看板 (STATION LOGBOOK)
+          </div>
+          <div class="qso-logbook-actions">
+            <button type="button" class="btn-qso-action" id="btn-qso-export-adif"><i class="mdi mdi-download"></i> 匯出 ADIF 3.1.4</button>
+            <button type="button" class="btn-qso-action" id="btn-qso-export-csv"><i class="mdi mdi-file-delimited-outline"></i> 匯出 CSV</button>
+            <button type="button" class="btn-qso-action danger" id="btn-qso-clear-logs"><i class="mdi mdi-delete-outline"></i> 清空日誌</button>
+            <button type="button" class="btn-qso-action" id="btn-qso-back-cockpit"><i class="mdi mdi-radio-tower"></i> 返回通聯台</button>
+          </div>
+        </div>
+
+        <div class="qso-logbook-table-wrapper">
+          <table class="qso-logbook-table">
+            <thead>
+              <tr>
+                <th>UTC 時間</th>
+                <th>對方呼號</th>
+                <th>波段</th>
+                <th>頻率 (MHz)</th>
+                <th>模式</th>
+                <th>RST (發/收)</th>
+                <th>姓名 (OP)</th>
+                <th>地點 (QTH)</th>
+                <th>網格</th>
+                <th>狀態</th>
+              </tr>
+            </thead>
+            <tbody id="qso-logbook-tbody">
+              <!-- Rendered via JS -->
+            </tbody>
+          </table>
+          <div class="qso-logbook-empty" id="qso-logbook-empty" style="display:none;">
+            <i class="mdi mdi-text-box-remove-outline"></i> 尚無通聯日誌記錄。快去完成你的第一筆 CW QSO 吧！
+          </div>
+        </div>
+      </div> <!-- /qso-logbook-stage -->
+
+    </div> <!-- /qso-workspace-stage -->
   </div>
+  <!-- /ws-container-qso -->
 
   <!-- Slide-up Settings Drawer Skeleton -->
   <div id="settings-drawer-backdrop" class="drawer-backdrop" style="display:none;"></div>
@@ -1458,6 +1712,7 @@
   <script src="js/ui/text-mode.js?v=1.3.3"></script>
   <script src="js/ui/koch-mode.js?v=1.3.3"></script>
   <script src="js/ui/rx-mode.js?v=1.3.3"></script>
+  <script src="js/ui/qso-mode.js?v=1.3.3"></script>
 
   <!-- Application Bootstrap -->
   <script src="js/app.js?v=1.3.3"></script>
