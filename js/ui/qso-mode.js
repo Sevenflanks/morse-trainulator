@@ -19,6 +19,7 @@ class QsoMode {
 
     this.currentQslTheme = 'cyber-brass';
     this.activeQslData = null;
+    this.blindEnabled = false;
 
     this._liveLineEl = null;
     this._liveContentEl = null;
@@ -59,6 +60,8 @@ class QsoMode {
       // S-Meter & Carrier
       smeterNeedle: document.getElementById('qso-smeter-needle-group'),
       smeterReadout: document.getElementById('qso-smeter-readout'),
+      smeterLevel: document.getElementById('qso-smeter-level'),
+      smeterDb: document.getElementById('qso-smeter-db'),
       smeterLadder: document.getElementById('qso-smeter-ladder'),
       carrierDot: document.getElementById('qso-carrier-dot'),
       carrierText: document.getElementById('qso-carrier-text'),
@@ -66,6 +69,7 @@ class QsoMode {
       // RF Controls
       chkQrn: document.getElementById('chk-qso-qrn'),
       chkQsb: document.getElementById('chk-qso-qsb'),
+      chkBlind: document.getElementById('chk-qso-blind'),
       selBfo: document.getElementById('sel-qso-bfo'),
 
       // Guided Step Info
@@ -81,6 +85,7 @@ class QsoMode {
       remoteDetails: document.getElementById('qso-remote-details'),
       myCall: document.getElementById('qso-my-call'),
       myDetails: document.getElementById('qso-my-details'),
+      btnEditMyCall: document.getElementById('btn-qso-edit-my-call'),
       btnReplayRx: document.getElementById('btn-qso-replay-rx'),
       btnNewStation: document.getElementById('btn-qso-new-station'),
 
@@ -174,6 +179,15 @@ class QsoMode {
     if (this.el.chkQsb) {
       this.el.chkQsb.addEventListener('change', (e) => {
         this.qsbEnabled = e.target.checked;
+      });
+    }
+
+    if (this.el.chkBlind) {
+      this.el.chkBlind.addEventListener('change', (e) => {
+        this.blindEnabled = e.target.checked;
+        if (!this.blindEnabled) {
+          this.revealAllBlindMessages();
+        }
       });
     }
 
@@ -367,7 +381,33 @@ class QsoMode {
         rig: settings.operatorRig || '100W',
         ant: settings.operatorAnt || 'DIPOLE'
       });
+      this.updateStationMeta();
     }
+  }
+
+  syncWpmFromSettings() {
+    if (!this.cwPlayer) return;
+    const eng = this.engine || (typeof window !== 'undefined' ? window.engine : null);
+    if (eng) {
+      this.cwPlayer.setUnitT(eng.getEffectiveUnitT());
+      this.cwPlayer.setFarnsworth(
+        !!(eng.config && eng.config.farnsworthEnabled),
+        (eng.config && eng.config.charWpm) ? eng.config.charWpm : 20
+      );
+    } else if (typeof window !== 'undefined' && window.settingsManager && window.settingsManager.settings) {
+      const s = window.settingsManager.settings;
+      const unitT = s.unitT || 80;
+      this.cwPlayer.setUnitT(unitT);
+      this.cwPlayer.setFarnsworth(!!s.farnsworthEnabled, s.farnsworthWpm || 20);
+    }
+  }
+
+  revealAllBlindMessages() {
+    if (!this.el || !this.el.terminalFeed) return;
+    const reveals = this.el.terminalFeed.querySelectorAll('.btn-qso-reveal');
+    reveals.forEach(btn => {
+      try { btn.click(); } catch (e) {}
+    });
   }
 
   // ==========================================
@@ -375,6 +415,7 @@ class QsoMode {
   // ==========================================
   onEnterQso() {
     this.syncOperatorSettings();
+    this.syncWpmFromSettings();
     this.updateStationMeta();
     this.updateGuidedUI();
 
@@ -667,6 +708,8 @@ class QsoMode {
 
     if (!this.isWorkspaceActive()) return;
 
+    this.syncWpmFromSettings();
+
     // Finalize any previous live transmission first
     if (this._liveTxText && this._liveTxText.trim()) {
       this.finalizeLiveTx();
@@ -704,7 +747,9 @@ class QsoMode {
       if (this.el.telemChar) this.el.telemChar.textContent = char;
       if (this.el.telemSeq) this.el.telemSeq.textContent = seq || '—';
       if (this.el.telemWpm) {
-        const wpm = this.cwPlayer ? (this.cwPlayer.charWpm || 20) : 20;
+        const wpm = this.cwPlayer
+          ? (this.cwPlayer.farnsworthEnabled ? this.cwPlayer.charWpm : Math.round(1200 / this.cwPlayer.getUnitT()))
+          : 20;
         this.el.telemWpm.textContent = `示範 (${wpm} WPM)`;
       }
     };
@@ -782,6 +827,46 @@ class QsoMode {
     this.el.terminalFeed.scrollTop = this.el.terminalFeed.scrollHeight;
   }
 
+  _createRxLiveLine(remoteCall = 'DX') {
+    if (typeof document === 'undefined' || !this.el || !this.el.terminalFeed) return null;
+
+    const line = document.createElement('div');
+    line.className = 'qso-feed-line live rx-live';
+
+    const now = new Date();
+    const timeStr = `${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}:${String(now.getSeconds()).padStart(2, '0')}`;
+
+    const timeSpan = document.createElement('span');
+    timeSpan.className = 'qso-feed-time';
+    timeSpan.textContent = timeStr;
+    line.appendChild(timeSpan);
+
+    const tagSpan = document.createElement('span');
+    tagSpan.className = 'qso-feed-tag rx';
+    tagSpan.textContent = `RX ${remoteCall}`;
+    line.appendChild(tagSpan);
+
+    const textSpan = document.createElement('span');
+    textSpan.className = 'qso-feed-text rx';
+
+    const contentSpan = document.createElement('span');
+    contentSpan.className = 'qso-rx-content';
+    if (this.blindEnabled) {
+      contentSpan.classList.add('qso-blind-masked');
+    }
+    textSpan.appendChild(contentSpan);
+
+    const cursorSpan = document.createElement('span');
+    cursorSpan.className = 'qso-cursor rx-cursor';
+    textSpan.appendChild(cursorSpan);
+
+    line.appendChild(textSpan);
+    this.el.terminalFeed.appendChild(line);
+    this.el.terminalFeed.scrollTop = this.el.terminalFeed.scrollHeight;
+
+    return { line, contentSpan, cursorSpan };
+  }
+
   // ==========================================
   // REMOTE CW PLAYBACK & S-METER
   // ==========================================
@@ -794,6 +879,8 @@ class QsoMode {
 
     if (!this.isWorkspaceActive()) return;
 
+    this.syncWpmFromSettings();
+
     this._isRemotePlaying = true;
     this.setCarrierState('RX');
 
@@ -802,6 +889,11 @@ class QsoMode {
     if (this.qsbEnabled) {
       targetS = Math.floor(Math.random() * 5) + 6; // S6 ~ S10 (S9+10dB)
     }
+
+    const remoteCall = (this.qsoManager && this.qsoManager.remoteStation) ? this.qsoManager.remoteStation.call : 'DX';
+    const rxLineObj = this._createRxLiveLine(remoteCall);
+    const isBlind = !!this.blindEnabled;
+    let streamedDisplay = '';
 
     // Attach transient CWPlayer pulse listeners to drive S-Meter
     const onPulseStart = () => {
@@ -813,9 +905,35 @@ class QsoMode {
       this.setSmeterLevel(1, false);
     };
 
+    const onCharComplete = (char) => {
+      if (rxLineObj && rxLineObj.contentSpan) {
+        if (isBlind) {
+          streamedDisplay += '*';
+        } else {
+          streamedDisplay += char;
+        }
+        rxLineObj.contentSpan.textContent = streamedDisplay;
+        if (this.el.terminalFeed) {
+          this.el.terminalFeed.scrollTop = this.el.terminalFeed.scrollHeight;
+        }
+      }
+    };
+
+    const onWordGapStart = () => {
+      if (rxLineObj && rxLineObj.contentSpan) {
+        streamedDisplay += ' ';
+        rxLineObj.contentSpan.textContent = streamedDisplay;
+        if (this.el.terminalFeed) {
+          this.el.terminalFeed.scrollTop = this.el.terminalFeed.scrollHeight;
+        }
+      }
+    };
+
     if (this.cwPlayer) {
       this.cwPlayer.on('pulseStart', onPulseStart);
       this.cwPlayer.on('pulseEnd', onPulseEnd);
+      this.cwPlayer.on('charComplete', onCharComplete);
+      this.cwPlayer.on('wordGapStart', onWordGapStart);
     }
 
     try {
@@ -837,15 +955,50 @@ class QsoMode {
       if (this.cwPlayer) {
         this.cwPlayer.off('pulseStart', onPulseStart);
         this.cwPlayer.off('pulseEnd', onPulseEnd);
+        this.cwPlayer.off('charComplete', onCharComplete);
+        this.cwPlayer.off('wordGapStart', onWordGapStart);
       }
 
       this._isRemotePlaying = false;
       this.setCarrierState('IDLE');
       this.setSmeterLevel(1, false);
 
-      // Print received message into terminal feed
-      const remoteCall = (this.qsoManager && this.qsoManager.remoteStation) ? this.qsoManager.remoteStation.call : 'DX';
-      this.printFeed('RX', text, remoteCall);
+      if (rxLineObj) {
+        if (rxLineObj.line) {
+          rxLineObj.line.classList.remove('live', 'rx-live');
+        }
+        if (rxLineObj.cursorSpan) {
+          rxLineObj.cursorSpan.remove();
+        }
+
+        if (!isBlind) {
+          if (rxLineObj.contentSpan) {
+            rxLineObj.contentSpan.textContent = text;
+          }
+        } else {
+          if (rxLineObj.line) {
+            const btnReveal = document.createElement('button');
+            btnReveal.type = 'button';
+            btnReveal.className = 'btn-xs-util btn-qso-reveal';
+            btnReveal.title = '揭曉此電文內容 (Reveal)';
+            btnReveal.innerHTML = '<i class="mdi mdi-eye-outline"></i> 揭曉';
+            btnReveal.addEventListener('click', () => {
+              if (rxLineObj.contentSpan) {
+                rxLineObj.contentSpan.textContent = text;
+                rxLineObj.contentSpan.classList.remove('qso-blind-masked');
+              }
+              const tag = document.createElement('span');
+              tag.className = 'qso-revealed-tag';
+              tag.innerHTML = '<i class="mdi mdi-check"></i> 已揭曉';
+              btnReveal.replaceWith(tag);
+            });
+            rxLineObj.line.appendChild(btnReveal);
+          }
+        }
+      } else {
+        // Non-DOM / mock environment fallback
+        this.printFeed('RX', text, remoteCall);
+      }
     }
   }
 
@@ -879,8 +1032,32 @@ class QsoMode {
       this.el.smeterNeedle.style.transform = `rotate(${angle.toFixed(1)}deg)`;
     }
 
-    // Readout badge text
-    if (this.el.smeterReadout) {
+    const lvlEl = this.el.smeterLevel || (this.el.smeterReadout && typeof this.el.smeterReadout.querySelector === 'function' ? this.el.smeterReadout.querySelector('.smeter-s-tag') : null);
+    const dbEl = this.el.smeterDb || (this.el.smeterReadout && typeof this.el.smeterReadout.querySelector === 'function' ? this.el.smeterReadout.querySelector('.smeter-s-db') : null);
+
+    if (lvlEl && dbEl) {
+      if (!active || clampedLevel <= 1) {
+        lvlEl.textContent = 'S1';
+        dbEl.textContent = '(NOISE)';
+        lvlEl.style.color = '#6e7d94';
+        dbEl.style.color = '#6e7d94';
+      } else if (clampedLevel <= 9) {
+        lvlEl.textContent = `S${Math.round(clampedLevel)}`;
+        dbEl.textContent = '';
+        lvlEl.style.color = '#00e676';
+        dbEl.style.color = '#00e676';
+      } else if (clampedLevel <= 10) {
+        lvlEl.textContent = 'S9';
+        dbEl.textContent = '+10dB';
+        lvlEl.style.color = 'var(--gold)';
+        dbEl.style.color = 'var(--gold)';
+      } else {
+        lvlEl.textContent = 'S9';
+        dbEl.textContent = '+30dB';
+        lvlEl.style.color = '#ff3d00';
+        dbEl.style.color = '#ff3d00';
+      }
+    } else if (this.el.smeterReadout) {
       if (!active || clampedLevel <= 1) {
         this.el.smeterReadout.textContent = 'S1 (NOISE)';
         this.el.smeterReadout.style.color = '#6e7d94';
@@ -897,7 +1074,7 @@ class QsoMode {
     }
 
     // LED ladder segments
-    if (this.el.smeterLadder) {
+    if (this.el.smeterLadder && typeof this.el.smeterLadder.querySelectorAll === 'function') {
       const leds = this.el.smeterLadder.querySelectorAll('.smeter-led');
       leds.forEach(led => {
         const segLevel = parseInt(led.getAttribute('data-level'), 10);

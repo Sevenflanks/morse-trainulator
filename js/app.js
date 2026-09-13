@@ -1018,6 +1018,16 @@ function applyLoadedSettings() {
     setLayoutMode(s.layoutMode);
   }
 
+  // 10. Operator Station Profile
+  const paramCall = document.getElementById('param-operator-callsign');
+  const paramName = document.getElementById('param-operator-name');
+  const paramQth = document.getElementById('param-operator-qth');
+  const paramRig = document.getElementById('param-operator-rig');
+  if (paramCall) paramCall.value = s.operatorCallsign || 'BV2TT';
+  if (paramName) paramName.value = s.operatorName || 'EDDIE';
+  if (paramQth) paramQth.value = s.operatorQth || 'TAIPEI';
+  if (paramRig) paramRig.value = s.operatorRig || '100W';
+
   if (typeof updateWpmDisplays === 'function') {
     updateWpmDisplays();
   } else if (typeof updateTopbarWpm === 'function' && engine && engine.config && engine.config.unitT) {
@@ -1288,6 +1298,7 @@ function setupEventListeners() {
       updateMeterMarkers();
       const currentWpm = Math.round(1200 / val);
       if (typeof updateTopbarWpm === 'function') updateTopbarWpm(currentWpm);
+      if (typeof updateWpmDisplays === 'function') updateWpmDisplays();
       settingsManager.settings.unitT = val;
       settingsManager.settings.speedPreset = null;
       settingsManager.save();
@@ -1417,6 +1428,51 @@ function setupEventListeners() {
   const btnResetSettings = document.getElementById('reset-settings-btn');
   if (btnResetSettings) {
     btnResetSettings.addEventListener('click', () => applySpeedPreset('intermediate'));
+  }
+
+  // Operator Station Profile Listeners
+  const bindStationInput = (id, key) => {
+    const el = document.getElementById(id);
+    if (el) {
+      el.addEventListener('input', (e) => {
+        let val = e.target.value.trim();
+        if (key === 'operatorCallsign' || key === 'operatorName' || key === 'operatorQth') {
+          val = val.toUpperCase();
+        }
+        settingsManager.settings[key] = val;
+        settingsManager.save();
+        if (window.qsoMode && typeof window.qsoMode.syncOperatorSettings === 'function') {
+          window.qsoMode.syncOperatorSettings();
+          if (typeof window.qsoMode.updateStationMeta === 'function') {
+            window.qsoMode.updateStationMeta();
+          }
+        }
+      });
+    }
+  };
+  bindStationInput('param-operator-callsign', 'operatorCallsign');
+  bindStationInput('param-operator-name', 'operatorName');
+  bindStationInput('param-operator-qth', 'operatorQth');
+  bindStationInput('param-operator-rig', 'operatorRig');
+
+  // Edit My Callsign shortcut in QSO
+  const btnEditMyCall = document.getElementById('btn-qso-edit-my-call');
+  if (btnEditMyCall) {
+    btnEditMyCall.addEventListener('click', () => {
+      const drawer = document.getElementById('settings-drawer');
+      const backdrop = document.getElementById('drawer-backdrop');
+      if (drawer && backdrop) {
+        drawer.classList.add('open');
+        backdrop.classList.add('open');
+      }
+      const callInput = document.getElementById('param-operator-callsign');
+      if (callInput) {
+        setTimeout(() => {
+          callInput.focus();
+          callInput.select();
+        }, 200);
+      }
+    });
   }
 
   // Mode Tabs
@@ -1809,6 +1865,11 @@ function updateWpmDisplays() {
   const isFarnsworth = !!(engine && engine.config && engine.config.farnsworthEnabled);
   const baseWpm = (engine && engine.config && engine.config.unitT) ? Math.max(1, Math.round(1200 / engine.config.unitT)) : 15;
   const charWpm = (engine && engine.config && engine.config.charWpm) ? engine.config.charWpm : 20;
+
+  if (window.cwPlayer && engine) {
+    window.cwPlayer.setUnitT(engine.getEffectiveUnitT());
+    window.cwPlayer.setFarnsworth(isFarnsworth, charWpm);
+  }
 
   const k5WpmVal = document.getElementById('k5-wpm-val');
   const topbarWpmVal = document.getElementById('topbar-wpm-val');

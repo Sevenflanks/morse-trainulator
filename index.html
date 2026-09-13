@@ -1289,7 +1289,10 @@
           <div class="qso-smeter-panel">
             <div class="qso-smeter-header">
               <span class="qso-deck-label"><i class="mdi mdi-gauge"></i> 訊號強度錶 (SIGNAL METER)</span>
-              <span class="qso-smeter-val" id="qso-smeter-readout">S9 +10dB</span>
+              <span class="qso-smeter-val" id="qso-smeter-readout">
+                <span class="smeter-s-tag" id="qso-smeter-level">S1</span>
+                <span class="smeter-s-db" id="qso-smeter-db">(NOISE)</span>
+              </span>
             </div>
             
             <div class="qso-smeter-bezel">
@@ -1356,6 +1359,14 @@
                 <input type="checkbox" id="chk-qso-qsb" class="switch-input switch-neon" checked>
               </div>
 
+              <!-- Blind Copy Toggle (盲聽抄收) -->
+              <div class="qso-rf-item">
+                <label class="qso-rf-label" for="chk-qso-blind">
+                  <i class="mdi mdi-eye-off-outline"></i> 盲聽抄收
+                </label>
+                <input type="checkbox" id="chk-qso-blind" class="switch-input switch-neon">
+              </div>
+
               <!-- BFO Pitch Selector -->
               <div class="qso-rf-item">
                 <label class="qso-rf-label"><i class="mdi mdi-sine-wave"></i> 拍頻 BFO</label>
@@ -1406,6 +1417,7 @@
               <span class="meta-label"><i class="mdi mdi-account"></i> 本台:</span>
               <span class="meta-val" id="qso-my-call">BV2TT</span>
               <span class="meta-val" id="qso-my-details">(EDDIE · TAIPEI · 100W)</span>
+              <button type="button" class="btn-xs-util" id="btn-qso-edit-my-call" title="修改本台電台設定 (Edit Operator Profile)"><i class="mdi mdi-pencil-outline"></i> 修改</button>
             </div>
             <div class="qso-terminal-actions">
               <button type="button" class="btn-xs-util" id="btn-qso-replay-rx" title="重聽對方上一條電文 (Replay)"><i class="mdi mdi-replay"></i> 重聽</button>
@@ -1605,6 +1617,38 @@
             <div class="theme-btn-title">Green Phosphor</div>
             <div class="theme-btn-sub">雷達磷光</div>
           </button>
+        </div>
+      </div>
+
+      <!-- Operator Station Profile (本台電台與呼號設定) -->
+      <div id="station-settings-box" class="settings-card-section" style="background:#14161f; border:1px solid #282d3c; border-radius:8px; padding:12px; margin-bottom:12px;">
+        <div style="font-size:0.8rem; font-weight:bold; color:var(--gold); margin-bottom:10px; display:flex; justify-content:space-between; align-items:center;">
+          <span><i class="mdi mdi-card-account-details-outline"></i> 本台電台台號 (Station Profile)</span>
+          <span style="font-size:0.7rem; color:var(--text-dim);">QSO & QSL 簽發</span>
+        </div>
+        <div class="settings-row-text">
+          <label>台長呼號 (Callsign)
+            <span>業餘無線電台呼號</span>
+          </label>
+          <input type="text" id="param-operator-callsign" class="console-text-input" value="BV2TT" maxlength="10" style="text-transform:uppercase; font-family:monospace; font-weight:bold; width:100px; text-align:center;">
+        </div>
+        <div class="settings-row-text">
+          <label>台長姓名/代號 (Name)
+            <span>OP 姓名或簡稱</span>
+          </label>
+          <input type="text" id="param-operator-name" class="console-text-input" value="EDDIE" maxlength="15" style="text-transform:uppercase; font-family:monospace; width:100px; text-align:center;">
+        </div>
+        <div class="settings-row-text">
+          <label>電台 QTH (Location)
+            <span>電台所在城市或位置</span>
+          </label>
+          <input type="text" id="param-operator-qth" class="console-text-input" value="TAIPEI" maxlength="20" style="text-transform:uppercase; font-family:monospace; width:100px; text-align:center;">
+        </div>
+        <div class="settings-row-text" style="margin-bottom:0;">
+          <label>電台功率 (Rig Power)
+            <span>發射機功率</span>
+          </label>
+          <input type="text" id="param-operator-rig" class="console-text-input" value="100W" maxlength="10" style="font-family:monospace; width:100px; text-align:center;">
         </div>
       </div>
 
