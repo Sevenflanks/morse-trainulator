@@ -8228,7 +8228,7 @@
         this.emit('frequencyChanged', this.currentFreq);
       }
 
-      pickRandomRemoteStation() {
+      pickRandomRemoteStation(excludeCall = null) {
         const stations = (typeof QSO_REMOTE_STATIONS !== 'undefined') ? QSO_REMOTE_STATIONS : [
           { call: 'JA1ABC', name: 'KEN', qth: 'TOKYO', country: 'JAPAN', grid: 'PM95', rstSent: '599', rstRcvd: '579', speedWpm: 20, pitchHz: 660 },
           { call: 'W6XYZ', name: 'BOB', qth: 'LOS ANGELES', country: 'USA', grid: 'DM04', rstSent: '599', rstRcvd: '589', speedWpm: 18, pitchHz: 600 },
@@ -8236,8 +8236,13 @@
           { call: 'G4XYZ', name: 'JOHN', qth: 'LONDON', country: 'ENGLAND', grid: 'IO91', rstSent: '599', rstRcvd: '569', speedWpm: 19, pitchHz: 640 },
           { call: 'VK2AA', name: 'DAVE', qth: 'SYDNEY', country: 'AUSTRALIA', grid: 'QF56', rstSent: '599', rstRcvd: '579', speedWpm: 21, pitchHz: 680 }
         ];
-        const idx = Math.floor(Math.random() * stations.length);
-        const chosen = Object.assign({}, stations[idx]);
+        let pool = stations;
+        if (excludeCall && stations.length > 1) {
+          const filtered = stations.filter(s => s.call !== excludeCall);
+          if (filtered.length > 0) pool = filtered;
+        }
+        const idx = Math.floor(Math.random() * pool.length);
+        const chosen = Object.assign({}, pool[idx]);
         chosen.rstSent = chosen.rstSent || '599';
         chosen.rstRcvd = chosen.rstRcvd || '599';
         return chosen;
@@ -8250,10 +8255,12 @@
         this.lastRemoteMessage = '';
         this.isRemoteTransmitting = false;
 
+        const currentCall = (this.remoteStation && this.remoteStation.call) ? this.remoteStation.call : null;
+
         if (this.submode === 'guided') {
-          this.remoteStation = remoteStation || this.pickRandomRemoteStation();
+          this.remoteStation = remoteStation || this.pickRandomRemoteStation(currentCall);
         } else if (this.submode === 'contest') {
-          this.remoteStation = this.pickRandomRemoteStation();
+          this.remoteStation = this.pickRandomRemoteStation(currentCall);
         } else {
           this.remoteStation = null;
         }
@@ -8263,6 +8270,125 @@
           phase: this.guidedPhase,
           remoteStation: this.remoteStation
         });
+      }
+
+      // ==========================================
+      // CALLSIGN RESOLUTION & EXTRACTION
+      // ==========================================
+      extractCallsignFromText(text) {
+        if (!text) return null;
+        const clean = String(text).toUpperCase().replace(/[^A-Z0-9\/\?\s]/g, ' ').replace(/\s+/g, ' ').trim();
+        const tokens = clean.split(' ');
+        const myCall = (this.myStation && this.myStation.call) ? this.myStation.call : '';
+        const excluded = new Set([
+          'CQ', 'TEST', 'UR', 'RST', '5NN', '599', '579', '589', '569',
+          '73', '88', 'BK', 'SK', 'K', 'AR', 'TU', 'AGN', 'QTH', 'OP',
+          'NAME', 'RIG', 'ANT', 'WX', 'HW', 'OM', 'GM', 'GA', 'GE', 'ES',
+          'DE', 'FER', 'RPRT', 'FB', 'GL', 'EE', 'READY', 'OK', 'R'
+        ]);
+        if (myCall) excluded.add(myCall);
+
+        const isCallsign = (str) => {
+          return str && !excluded.has(str) && /^[A-Z0-9\/]{3,10}$/.test(str) && /[A-Z]/.test(str) && /[0-9]/.test(str);
+        };
+
+        for (let i = 0; i < tokens.length - 1; i++) {
+          if (tokens[i] === 'DE') {
+            const candidate = tokens[i + 1];
+            if (isCallsign(candidate)) {
+              return candidate;
+            }
+          }
+        }
+
+        for (let i = 1; i < tokens.length; i++) {
+          if (tokens[i] === 'DE') {
+            const target = tokens[i - 1];
+            if (isCallsign(target)) {
+              return target;
+            }
+          }
+        }
+
+        for (const token of tokens) {
+          if (isCallsign(token)) {
+            return token;
+          }
+        }
+
+        return null;
+      }
+
+      getEffectiveDxCall() {
+        if (this.lastRemoteMessage) {
+          const extracted = this.extractCallsignFromText(this.lastRemoteMessage);
+          if (extracted) return extracted;
+        }
+
+        if (this.remoteStation && this.remoteStation.call) {
+          return this.remoteStation.call;
+        }
+
+        if (Array.isArray(this.sessionHistory)) {
+          for (let i = this.sessionHistory.length - 1; i >= 0; i--) {
+            const entry = this.sessionHistory[i];
+            if (entry.sender === 'RX' && entry.text) {
+              const call = this.extractCallsignFromText(entry.text);
+              if (call) return call;
+            }
+          }
+        }
+
+        if (this.submode === 'guided') {
+          this.remoteStation = this.pickRandomRemoteStation();
+          return this.remoteStation.call;
+        }
+
+        return 'DX';
+      }
+
+      getEffectiveDxStation() {
+        const call = this.getEffectiveDxCall();
+        if (this.remoteStation && this.remoteStation.call === call) {
+          return this.remoteStation;
+        }
+
+        const stations = (typeof QSO_REMOTE_STATIONS !== 'undefined') ? QSO_REMOTE_STATIONS : [
+          { call: 'JA1ABC', name: 'KEN', qth: 'TOKYO', country: 'JAPAN', grid: 'PM95', rstSent: '599', rstRcvd: '579', speedWpm: 20, pitchHz: 660 },
+          { call: 'W6XYZ', name: 'BOB', qth: 'LOS ANGELES', country: 'USA', grid: 'DM04', rstSent: '599', rstRcvd: '589', speedWpm: 18, pitchHz: 600 },
+          { call: 'DL3HEX', name: 'HANS', qth: 'BERLIN', country: 'GERMANY', grid: 'JO62', rstSent: '599', rstRcvd: '599', speedWpm: 22, pitchHz: 720 },
+          { call: 'G4XYZ', name: 'JOHN', qth: 'LONDON', country: 'ENGLAND', grid: 'IO91', rstSent: '599', rstRcvd: '569', speedWpm: 19, pitchHz: 640 },
+          { call: 'VK2AA', name: 'DAVE', qth: 'SYDNEY', country: 'AUSTRALIA', grid: 'QF56', rstSent: '599', rstRcvd: '579', speedWpm: 21, pitchHz: 680 }
+        ];
+
+        const found = stations.find(s => s.call === call);
+        if (found) {
+          this.remoteStation = Object.assign({}, found);
+          return this.remoteStation;
+        }
+
+        if (call && call !== 'DX') {
+          const adHocStation = {
+            call,
+            name: 'OM',
+            qth: 'GLOBAL',
+            country: 'DX',
+            grid: '',
+            rstSent: '599',
+            rstRcvd: '599',
+            speedWpm: 20,
+            pitchHz: 650
+          };
+          this.remoteStation = adHocStation;
+          return adHocStation;
+        }
+
+        return this.remoteStation || {
+          call: 'DX1CALL',
+          name: 'OPERATOR',
+          qth: 'UNKNOWN',
+          grid: 'PL00'
+        };
       }
 
       getGuidedStepInfo() {
@@ -8275,7 +8401,7 @@
         ];
 
         const current = steps.find(s => s.step === this.guidedPhase) || steps[0];
-        const dxCall = this.remoteStation ? this.remoteStation.call : 'DX';
+        const dxCall = this.getEffectiveDxCall();
         const hint = current.hintTemplate
           .replace(/{MY_CALL}/g, this.myStation.call)
           .replace(/{DX_CALL}/g, dxCall)
@@ -8315,6 +8441,12 @@
 
         if (text === '?' || text === 'AGN' || text === 'AGN?' || text.endsWith('AGN?')) {
           if (this.lastRemoteMessage) {
+            this.sessionHistory.push({
+              sender: 'RX',
+              text: this.lastRemoteMessage,
+              timestamp: Date.now(),
+              isRepeat: true
+            });
             this.emit('botResponseReady', {
               sender: 'RX',
               text: this.lastRemoteMessage,
@@ -8352,7 +8484,7 @@
           case 2:
             valid = tokens.includes('599') || tokens.includes('5NN') || tokens.includes('RST') || text.includes('599') || text.includes('5NN');
             if (!valid) {
-              feedback = '未偵測到 RST 報告 (如 599)。建議格式：' + (this.remoteStation ? this.remoteStation.call : 'DX') + ' DE ' + this.myStation.call + ' UR RST 599 BK';
+              feedback = '未偵測到 RST 報告 (如 599)。建議格式：' + this.getEffectiveDxCall() + ' DE ' + this.myStation.call + ' UR RST 599 BK';
             }
             break;
 
@@ -8366,7 +8498,7 @@
           case 4:
             valid = tokens.includes('73') || tokens.includes('SK') || tokens.includes('TU') || text.includes('73') || text.includes('SK');
             if (!valid) {
-              feedback = '未偵測到 73、SK 或 TU 告別信號。建議格式：TNX FER QSO 73 GL TU EE SK';
+              feedback = '未偵測到 73、SK 或 TU 告別信號。建議格式：' + this.getEffectiveDxCall() + ' DE ' + this.myStation.call + ' 73 GL TU EE SK';
             }
             break;
 
@@ -8385,6 +8517,11 @@
 
           if (botResponse) {
             this.lastRemoteMessage = botResponse;
+            this.sessionHistory.push({
+              sender: 'RX',
+              text: botResponse,
+              timestamp: Date.now()
+            });
             this.emit('botResponseReady', {
               sender: 'RX',
               text: botResponse,
@@ -8424,6 +8561,11 @@
           this.contestSerial++;
 
           this.lastRemoteMessage = botResponse;
+          this.sessionHistory.push({
+            sender: 'RX',
+            text: botResponse,
+            timestamp: Date.now()
+          });
           this.emit('botResponseReady', {
             sender: 'RX',
             text: botResponse,
@@ -8442,8 +8584,27 @@
       }
 
       _handleFreeTransmit(text) {
-        if (!this.remoteStation) {
+        const targetCall = this.extractCallsignFromText(text);
+        if (targetCall && targetCall !== 'CQ' && targetCall !== this.myStation.call) {
+          if (!this.remoteStation || this.remoteStation.call !== targetCall) {
+            const stations = (typeof QSO_REMOTE_STATIONS !== 'undefined') ? QSO_REMOTE_STATIONS : [];
+            const found = stations.find(s => s.call === targetCall);
+            this.remoteStation = found ? Object.assign({}, found) : {
+              call: targetCall,
+              name: 'OM',
+              qth: 'GLOBAL',
+              country: 'DX',
+              grid: '',
+              rstSent: '599',
+              rstRcvd: '599',
+              speedWpm: 20,
+              pitchHz: 650
+            };
+            this.emit('stationUpdated', this.remoteStation);
+          }
+        } else if (!this.remoteStation) {
           this.remoteStation = this.pickRandomRemoteStation();
+          this.emit('stationUpdated', this.remoteStation);
         }
         const dxCall = this.remoteStation.call;
         let botResponse = '';
@@ -8461,6 +8622,11 @@
         }
 
         this.lastRemoteMessage = botResponse;
+        this.sessionHistory.push({
+          sender: 'RX',
+          text: botResponse,
+          timestamp: Date.now()
+        });
         this.emit('botResponseReady', {
           sender: 'RX',
           text: botResponse,
@@ -8494,7 +8660,7 @@
       }
 
       generateMacroText(key) {
-        const dxCall = this.remoteStation ? this.remoteStation.call : 'DX';
+        const dxCall = this.getEffectiveDxCall();
         switch (key) {
           case 'CQ':
             return `CQ CQ CQ DE ${this.myStation.call} ${this.myStation.call} K`;
@@ -8503,7 +8669,9 @@
           case 'QTH':
             return `QTH ${this.myStation.qth} OP ${this.myStation.name} BK`;
           case '73':
-            return `TNX FER QSO 73 GL TU EE SK`;
+            return (dxCall && dxCall !== 'DX')
+              ? `${dxCall} DE ${this.myStation.call} 73 GL TU EE SK`
+              : `TNX FER QSO 73 GL TU EE SK`;
           case 'TU':
             return `TU EE`;
           case 'AGN':
@@ -8517,12 +8685,7 @@
         const now = new Date();
         const dateUtc = now.toISOString().slice(0, 10).replace(/-/g, '');
         const timeUtc = now.toISOString().slice(11, 19).replace(/:/g, '');
-        const dx = this.remoteStation || {
-          call: 'DX1CALL',
-          name: 'OPERATOR',
-          qth: 'UNKNOWN',
-          grid: 'PL00'
-        };
+        const dx = this.getEffectiveDxStation();
 
         return Object.assign({
           id: `qso_${now.getTime()}_${Math.random().toString(36).substring(2, 6)}`,
@@ -11393,7 +11556,14 @@ class QsoMode {
       this.updateGuidedUI();
     });
 
+    this.qsoManager.on('stationUpdated', () => {
+      this.updateStationMeta();
+      this.updateGuidedUI();
+    });
+
     this.qsoManager.on('botResponseReady', (data) => {
+      this.updateStationMeta();
+      this.updateGuidedUI();
       if (data && data.text) {
         this.playRemoteCw(data.text, data.delay || 800);
       }
@@ -11887,8 +12057,14 @@ class QsoMode {
     this.el.terminalFeed.scrollTop = this.el.terminalFeed.scrollHeight;
   }
 
-  _createRxLiveLine(remoteCall = 'DX') {
+  _createRxLiveLine(remoteCall = '') {
     if (typeof document === 'undefined' || !this.el || !this.el.terminalFeed) return null;
+
+    if (!remoteCall) {
+      remoteCall = (this.qsoManager && typeof this.qsoManager.getEffectiveDxCall === 'function')
+        ? this.qsoManager.getEffectiveDxCall()
+        : 'DX';
+    }
 
     const line = document.createElement('div');
     line.className = 'qso-feed-line live rx-live';
@@ -11950,7 +12126,9 @@ class QsoMode {
       targetS = Math.floor(Math.random() * 5) + 6; // S6 ~ S10 (S9+10dB)
     }
 
-    const remoteCall = (this.qsoManager && this.qsoManager.remoteStation) ? this.qsoManager.remoteStation.call : 'DX';
+    const remoteCall = (this.qsoManager && typeof this.qsoManager.getEffectiveDxCall === 'function')
+      ? this.qsoManager.getEffectiveDxCall()
+      : ((this.qsoManager && this.qsoManager.remoteStation) ? this.qsoManager.remoteStation.call : 'DX');
     const rxLineObj = this._createRxLiveLine(remoteCall);
     const isBlind = !!this.blindEnabled;
     let streamedDisplay = '';
@@ -12153,10 +12331,19 @@ class QsoMode {
     if (this.el.myCall) this.el.myCall.textContent = my.call;
     if (this.el.myDetails) this.el.myDetails.textContent = `(${my.name} · ${my.qth} · ${my.rig})`;
 
-    const dx = this.qsoManager.remoteStation;
-    if (dx) {
+    const dxCall = (typeof this.qsoManager.getEffectiveDxCall === 'function')
+      ? this.qsoManager.getEffectiveDxCall()
+      : (this.qsoManager.remoteStation ? this.qsoManager.remoteStation.call : 'DX');
+
+    const dx = (typeof this.qsoManager.getEffectiveDxStation === 'function')
+      ? this.qsoManager.getEffectiveDxStation()
+      : this.qsoManager.remoteStation;
+
+    if (dx && dxCall !== 'DX') {
       if (this.el.remoteCall) this.el.remoteCall.textContent = dx.call;
-      if (this.el.remoteDetails) this.el.remoteDetails.textContent = `(${dx.name} · ${dx.qth}, ${dx.country} · RST ${dx.rstRcvd} · ${dx.speedWpm} WPM)`;
+      if (this.el.remoteDetails) {
+        this.el.remoteDetails.textContent = `(${dx.name || 'OM'} · ${dx.qth || 'GLOBAL'}${dx.country ? ', ' + dx.country : ''} · RST ${dx.rstRcvd || '599'} · ${dx.speedWpm || 20} WPM)`;
+      }
     } else {
       if (this.el.remoteCall) this.el.remoteCall.textContent = 'FREE AIRWAVES';
       if (this.el.remoteDetails) this.el.remoteDetails.textContent = '(尚未建立呼叫)';
@@ -12279,24 +12466,26 @@ class QsoMode {
   // ==========================================
   _buildCurrentQsoData() {
     const my = (this.qsoManager && this.qsoManager.myStation) ? this.qsoManager.myStation : {};
-    const dx = (this.qsoManager && this.qsoManager.remoteStation) ? this.qsoManager.remoteStation : {};
+    const dx = (this.qsoManager && typeof this.qsoManager.getEffectiveDxStation === 'function')
+      ? this.qsoManager.getEffectiveDxStation()
+      : ((this.qsoManager && this.qsoManager.remoteStation) ? this.qsoManager.remoteStation : {});
     const now = new Date();
     return {
       myCall: my.call || 'BV2TT',
-      dxCall: dx.call || 'JA1ABC',
+      dxCall: dx.call || 'DX',
       dateDisplay: now.toISOString().slice(0, 10),
       timeDisplay: now.toISOString().slice(11, 16) + ' UTC',
-      band: (this.qsoManager && this.qsoManager.band) || '20M',
-      freq: (this.qsoManager && this.qsoManager.freq) || '14.025',
+      band: (this.qsoManager && (this.qsoManager.activeBand || this.qsoManager.band)) || '20M',
+      freq: (this.qsoManager && (this.qsoManager.currentFreq || this.qsoManager.freq)) || '14.025',
       mode: 'CW',
       rstSent: dx.rstSent || '599',
       rstRcvd: dx.rstRcvd || '599',
       myName: my.name || 'EDDIE',
-      dxName: dx.name || 'KEN',
+      dxName: dx.name || 'OM',
       myQth: my.qth || 'TAIPEI, TAIWAN',
-      dxQth: dx.qth ? `${dx.qth}, ${dx.country || ''}`.trim() : 'TOKYO, JAPAN',
+      dxQth: dx.qth ? `${dx.qth}, ${dx.country || ''}`.trim() : 'GLOBAL',
       myGrid: my.grid || 'PL05',
-      dxGrid: dx.grid || 'PM95',
+      dxGrid: dx.grid || '',
       rig: my.rig || '100W',
       ant: my.ant || 'DIPOLE',
       notes: 'TNX FER FB CW QSO! 73 ES GL'
@@ -13215,245 +13404,6 @@ class IambicKeyer {
       }
     }
 
-    // Initialize Managers, Engine, Synth, Keyer & Ribbon
-    const settingsManager = new SettingsManager();
-    const keybindingManager = new KeybindingManager();
-    const engine = new MorseEngine();
-    const synth = new MorseAudio();
-    const keyer = new IambicKeyer(engine, synth);
-    const ribbon = new CWRibbon('cw-ribbon');
-    window.ribbon = ribbon;
-
-    const cwPlayer = new CWPlayer({
-      synth,
-      unitT: engine ? engine.getEffectiveUnitT() : 80,
-      farnsworthEnabled: engine && engine.config ? engine.config.farnsworthEnabled : false,
-      charWpm: engine && engine.config ? engine.config.charWpm : 20,
-      getSequence: (char) => (engine ? engine.getSequenceForLetter(char) : '')
-    });
-    window.cwPlayer = cwPlayer;
-
-    const rxStatsManager = new RxStatsManager();
-    window.rxStatsManager = rxStatsManager;
-
-    const rxMode = new RxMode({
-      cwPlayer,
-      statsManager: rxStatsManager,
-      submode: 'koch'
-    });
-    window.rxMode = rxMode;
-    rxMode.init();
-
-    const s = (typeof settingsManager !== 'undefined' && settingsManager.settings) ? settingsManager.settings : {};
-    const qsoManager = new QsoManager({
-      operatorCallsign: s.operatorCallsign || 'BV2TT',
-      operatorName: s.operatorName || 'EDDIE',
-      operatorQth: s.operatorQth || 'TAIPEI',
-      operatorGrid: s.operatorGrid || 'PL05',
-      operatorRig: s.operatorRig || '100W',
-      operatorAnt: s.operatorAnt || 'DIPOLE',
-      submode: 'guided'
-    });
-    window.qsoManager = qsoManager;
-
-    const qsoLogManager = new QsoLogManager();
-    window.qsoLogManager = qsoLogManager;
-
-    const qslCardRenderer = new QslCardRenderer();
-    window.qslCardRenderer = qslCardRenderer;
-
-    const qsoMode = new QsoMode({
-      qsoManager,
-      qsoLogManager,
-      qslRenderer: qslCardRenderer,
-      cwPlayer,
-      synth,
-      engine
-    });
-    window.qsoMode = qsoMode;
-    qsoMode.init();
-
-    let currentKeyerDevice = 'straight'; // 'straight' | 'paddle' | 'bug'
-
-    // DOM Elements
-    const wiresLayer = document.getElementById('wires-layer');
-    const nodesLayer = document.getElementById('nodes-layer');
-    const antennaShape = document.getElementById('antenna-shape');
-    const keyTrigger = document.getElementById('key-trigger');
-
-    // Keyer device DOM elements
-    const devStraight = document.getElementById('dev-straight');
-    const devPaddle = document.getElementById('dev-paddle');
-    const devBug = document.getElementById('dev-bug');
-    const paddleContainer = document.getElementById('paddle-container');
-    const paddleLeft = document.getElementById('paddle-left');
-    const paddleRight = document.getElementById('paddle-right');
-    const paddleLeftName = document.getElementById('paddle-left-name');
-    const paddleRightName = document.getElementById('paddle-right-name');
-    const ledDitMem = document.getElementById('led-dit-mem');
-    const ledDahMem = document.getElementById('led-dah-mem');
-    const squeezeBanner = document.getElementById('squeeze-banner');
-    const squeezeStatus = document.getElementById('squeeze-status');
-    const chkPaddleReverse = document.getElementById('chk-paddle-reverse');
-    const radioModeB = document.getElementById('radio-mode-b');
-    const radioModeA = document.getElementById('radio-mode-a');
-    const meterBar = document.getElementById('meter-bar');
-    const meterGhost = document.getElementById('meter-ghost');
-    const meterMarkers = document.getElementById('meter-markers');
-    const meterStatus = document.getElementById('meter-status');
-    const meterWpmBadge = document.getElementById('meter-wpm-badge');
-    const readoutTime = document.getElementById('readout-time');
-    const readoutWpm = document.getElementById('readout-wpm');
-    const readoutSymbol = document.getElementById('readout-symbol');
-    const readoutMax = document.getElementById('readout-max');
-    const readoutThresholdTag = document.getElementById('readout-threshold-tag');
-    const gapBar = document.getElementById('gap-bar');
-    const gapGhost = document.getElementById('gap-ghost');
-    const gapMarkers = document.getElementById('gap-markers');
-    const gapStatusBadge = document.getElementById('gap-status-badge');
-    const gapTimeReadout = document.getElementById('gap-time-readout');
-    const gapCountdownReadout = document.getElementById('gap-countdown-readout');
-    const gapMaxReadout = document.getElementById('gap-max-readout');
-    let maxGapScale = 640;
-    let letterSettled = false;
-    let wordSettled = false;
-    const stateSeq = document.getElementById('state-seq');
-    const stateLetter = document.getElementById('state-letter');
-    const stateCommitted = document.getElementById('state-committed');
-    const stateDuration = document.getElementById('state-duration');
-    const stateWpm = document.getElementById('state-wpm');
-    const evalStatus = document.getElementById('eval-status');
-
-    // Settings elements
-    const paramUnitT = document.getElementById('param-unit-t');
-    const paramThreshold = document.getElementById('param-threshold');
-    const paramGap = document.getElementById('param-gap');
-    const paramWordGap = document.getElementById('param-word-gap');
-    const paramFreq = document.getElementById('param-freq');
-    const paramSidetoneVol = document.getElementById('param-sidetone-vol');
-    const tagUnitT = document.getElementById('tag-unit-t');
-    const tagThreshold = document.getElementById('tag-threshold');
-    const tagGap = document.getElementById('tag-gap');
-    const tagWordGap = document.getElementById('tag-word-gap');
-    const tagFreq = document.getElementById('tag-freq');
-    const tagSidetoneVol = document.getElementById('tag-sidetone-vol');
-    const wordTotalReadout = document.getElementById('word-total-readout');
-    const presetDescBox = document.getElementById('preset-desc-box');
-
-    // Farnsworth & QRN elements
-    const chkFarnsworth = document.getElementById('chk-farnsworth');
-    const tagFarnsworthStatus = document.getElementById('tag-farnsworth-status');
-    const farnsworthControls = document.getElementById('farnsworth-controls');
-    const paramFarnsworthWpm = document.getElementById('param-farnsworth-wpm');
-    const tagFarnsworthWpm = document.getElementById('tag-farnsworth-wpm');
-
-    const chkQrn = document.getElementById('chk-qrn');
-    const tagQrnStatus = document.getElementById('tag-qrn-status');
-    const qrnControls = document.getElementById('qrn-controls');
-    const paramQrnVol = document.getElementById('param-qrn-vol');
-    const tagQrnVol = document.getElementById('tag-qrn-vol');
-
-    // Top Bar & K5 Dock WPM Display Synchronization
-    function updateTopbarWpm(wpm) {
-      const valEl = document.getElementById('topbar-wpm-val');
-      if (valEl) valEl.textContent = wpm;
-      const k5WpmVal = document.getElementById('k5-wpm-val');
-      if (k5WpmVal) k5WpmVal.textContent = `${wpm} WPM`;
-      if (window.cwPlayer && engine) {
-        window.cwPlayer.setUnitT(engine.getEffectiveUnitT());
-        window.cwPlayer.setFarnsworth(
-          !!(engine.config && engine.config.farnsworthEnabled),
-          (engine.config && engine.config.charWpm) ? engine.config.charWpm : 20
-        );
-      }
-    }
-    window.updateTopbarWpm = updateTopbarWpm;
-
-    // Mode Switching Elements
-    let currentMode = 'free'; // 'free' | 'text' | 'koch'
-    const tabModeFree = document.getElementById('tab-mode-free');
-    const tabModeText = document.getElementById('tab-mode-text');
-    const tabModeKoch = document.getElementById('tab-mode-koch');
-    const textModeContainer = document.getElementById('text-mode-container');
-    const freeModeContainer = document.getElementById('free-mode-container');
-    const kochModeContainer = document.getElementById('koch-mode-container');
-    const freeModeScenarios = document.getElementById('free-mode-scenarios');
-
-    // Koch Mode Elements
-    const kochStageBadge = document.getElementById('koch-stage-badge');
-    const kochStageSelect = document.getElementById('koch-stage-select');
-    const btnResetKoch = document.getElementById('btn-reset-koch');
-    const kochMasteryText = document.getElementById('koch-mastery-text');
-    const kochMasteryBar = document.getElementById('koch-mastery-bar');
-    const kochTargetChar = document.getElementById('koch-target-char');
-    const kochTargetSeq = document.getElementById('koch-target-seq');
-    const btnKochTargetListen = document.getElementById('btn-koch-target-listen');
-    const kochPoolText = document.getElementById('koch-pool-text');
-    const btnStartKochDrill = document.getElementById('btn-start-koch-drill');
-    const btnStopKochDrill = document.getElementById('btn-stop-koch-drill');
-    const btnStopKochPanel = document.getElementById('btn-stop-koch-panel');
-    const kochDrillPanel = document.getElementById('koch-drill-panel');
-    const kochProgressBadge = document.getElementById('koch-progress-badge');
-    const kochPassageContainer = document.getElementById('koch-passage-container');
-    const kochFbTarget = document.getElementById('koch-fb-target');
-    const kochFbInput = document.getElementById('koch-fb-input');
-    const kochFbResult = document.getElementById('koch-fb-result');
-    const kochReflexContainer = document.getElementById('koch-reflex-container');
-    const kochReflexBar = document.getElementById('koch-reflex-bar');
-    const kochScorecard = document.getElementById('koch-scorecard');
-    const kochScTitle = document.getElementById('koch-sc-title');
-    const kochScModeTag = document.getElementById('koch-sc-mode-tag');
-    const kochScThresholdTag = document.getElementById('koch-sc-threshold-tag');
-    const kochScTotal = document.getElementById('koch-sc-total');
-    const kochScCorrect = document.getElementById('koch-sc-correct');
-    const kochScErrors = document.getElementById('koch-sc-errors');
-    const kochScTimeouts = document.getElementById('koch-sc-timeouts');
-    const kochScAccuracy = document.getElementById('koch-sc-accuracy');
-    const kochScDesc = document.getElementById('koch-sc-desc');
-    const btnKochRetry = document.getElementById('btn-koch-retry');
-    const btnKochNextStage = document.getElementById('btn-koch-next-stage');
-    const chkKochHints = document.getElementById('chk-koch-hints');
-
-    // Text Mode Elements
-    const textInput = document.getElementById('text-input');
-    const btnApplyText = document.getElementById('btn-apply-text');
-    const btnPlayAuto = document.getElementById('btn-play-auto');
-    const btnPauseAuto = document.getElementById('btn-pause-auto');
-    const btnStopAuto = document.getElementById('btn-stop-auto');
-    const btnRestartText = document.getElementById('btn-restart-text');
-    const chkShowHints = document.getElementById('chk-show-hints');
-    const chkStrictMode = document.getElementById('chk-strict-mode');
-    const textModeStatus = document.getElementById('text-mode-status');
-    const passageContainer = document.getElementById('passage-container');
-    const textProgressBadge = document.getElementById('text-progress-badge');
-    const fbTarget = document.getElementById('fb-target');
-    const fbInput = document.getElementById('fb-input');
-    const fbResult = document.getElementById('fb-result');
-    const textScorecard = document.getElementById('text-scorecard');
-    const scorecardSpeedTag = document.getElementById('scorecard-speed-tag');
-    const scTotal = document.getElementById('sc-total');
-    const scCorrect = document.getElementById('sc-correct');
-    const scErrors = document.getElementById('sc-errors');
-    const scAccuracy = document.getElementById('sc-accuracy');
-    const btnScorecardRetry = document.getElementById('btn-scorecard-retry');
-    const btnRetryErrors = document.getElementById('btn-retry-errors');
-
-    // Text Mode State
-    const textState = {
-      rawText: 'SOS CQ',
-      targetChars: [],
-      currentIndex: 0,
-      charResults: [],
-      showHints: true,
-      strictMode: false,
-      isFinished: false,
-      startTime: null,
-      endTime: null,
-      autoPlayRunning: false,
-      autoPlayPaused: false,
-      autoPlayAbort: false
-    };
-
     // ==========================================
     // KOCH METHOD SEQUENCE & LOGIC MANAGER
     // ==========================================
@@ -13869,6 +13819,247 @@ class IambicKeyer {
     if (typeof window !== 'undefined') {
       window.generateWeaknessTargets = generateWeaknessTargets;
     }
+
+    // Initialize Managers, Engine, Synth, Keyer & Ribbon
+    const settingsManager = new SettingsManager();
+    const keybindingManager = new KeybindingManager();
+    const engine = new MorseEngine();
+    const synth = new MorseAudio();
+    const keyer = new IambicKeyer(engine, synth);
+    const ribbon = new CWRibbon('cw-ribbon');
+    window.ribbon = ribbon;
+
+    const cwPlayer = new CWPlayer({
+      synth,
+      unitT: engine ? engine.getEffectiveUnitT() : 80,
+      farnsworthEnabled: engine && engine.config ? engine.config.farnsworthEnabled : false,
+      charWpm: engine && engine.config ? engine.config.charWpm : 20,
+      getSequence: (char) => (engine ? engine.getSequenceForLetter(char) : '')
+    });
+    window.cwPlayer = cwPlayer;
+
+    const rxStatsManager = new RxStatsManager();
+    window.rxStatsManager = rxStatsManager;
+
+    const rxMode = new RxMode({
+      cwPlayer,
+      statsManager: rxStatsManager,
+      submode: 'koch'
+    });
+    window.rxMode = rxMode;
+    rxMode.init();
+
+    const s = (typeof settingsManager !== 'undefined' && settingsManager.settings) ? settingsManager.settings : {};
+    const qsoManager = new QsoManager({
+      operatorCallsign: s.operatorCallsign || 'BV2TT',
+      operatorName: s.operatorName || 'EDDIE',
+      operatorQth: s.operatorQth || 'TAIPEI',
+      operatorGrid: s.operatorGrid || 'PL05',
+      operatorRig: s.operatorRig || '100W',
+      operatorAnt: s.operatorAnt || 'DIPOLE',
+      submode: 'guided'
+    });
+    window.qsoManager = qsoManager;
+
+    const qsoLogManager = new QsoLogManager();
+    window.qsoLogManager = qsoLogManager;
+
+    const qslCardRenderer = new QslCardRenderer();
+    window.qslCardRenderer = qslCardRenderer;
+
+    const qsoMode = new QsoMode({
+      qsoManager,
+      qsoLogManager,
+      qslRenderer: qslCardRenderer,
+      cwPlayer,
+      synth,
+      engine
+    });
+    window.qsoMode = qsoMode;
+    qsoMode.init();
+
+    let currentKeyerDevice = 'straight'; // 'straight' | 'paddle' | 'bug'
+
+    // DOM Elements
+    const wiresLayer = document.getElementById('wires-layer');
+    const nodesLayer = document.getElementById('nodes-layer');
+    const antennaShape = document.getElementById('antenna-shape');
+    const keyTrigger = document.getElementById('key-trigger');
+
+    // Keyer device DOM elements
+    const devStraight = document.getElementById('dev-straight');
+    const devPaddle = document.getElementById('dev-paddle');
+    const devBug = document.getElementById('dev-bug');
+    const paddleContainer = document.getElementById('paddle-container');
+    const paddleLeft = document.getElementById('paddle-left');
+    const paddleRight = document.getElementById('paddle-right');
+    const paddleLeftName = document.getElementById('paddle-left-name');
+    const paddleRightName = document.getElementById('paddle-right-name');
+    const ledDitMem = document.getElementById('led-dit-mem');
+    const ledDahMem = document.getElementById('led-dah-mem');
+    const squeezeBanner = document.getElementById('squeeze-banner');
+    const squeezeStatus = document.getElementById('squeeze-status');
+    const chkPaddleReverse = document.getElementById('chk-paddle-reverse');
+    const radioModeB = document.getElementById('radio-mode-b');
+    const radioModeA = document.getElementById('radio-mode-a');
+    const meterBar = document.getElementById('meter-bar');
+    const meterGhost = document.getElementById('meter-ghost');
+    const meterMarkers = document.getElementById('meter-markers');
+    const meterStatus = document.getElementById('meter-status');
+    const meterWpmBadge = document.getElementById('meter-wpm-badge');
+    const readoutTime = document.getElementById('readout-time');
+    const readoutWpm = document.getElementById('readout-wpm');
+    const readoutSymbol = document.getElementById('readout-symbol');
+    const readoutMax = document.getElementById('readout-max');
+    const readoutThresholdTag = document.getElementById('readout-threshold-tag');
+    const gapBar = document.getElementById('gap-bar');
+    const gapGhost = document.getElementById('gap-ghost');
+    const gapMarkers = document.getElementById('gap-markers');
+    const gapStatusBadge = document.getElementById('gap-status-badge');
+    const gapTimeReadout = document.getElementById('gap-time-readout');
+    const gapCountdownReadout = document.getElementById('gap-countdown-readout');
+    const gapMaxReadout = document.getElementById('gap-max-readout');
+    let maxGapScale = 640;
+    let letterSettled = false;
+    let wordSettled = false;
+    const stateSeq = document.getElementById('state-seq');
+    const stateLetter = document.getElementById('state-letter');
+    const stateCommitted = document.getElementById('state-committed');
+    const stateDuration = document.getElementById('state-duration');
+    const stateWpm = document.getElementById('state-wpm');
+    const evalStatus = document.getElementById('eval-status');
+
+    // Settings elements
+    const paramUnitT = document.getElementById('param-unit-t');
+    const paramThreshold = document.getElementById('param-threshold');
+    const paramGap = document.getElementById('param-gap');
+    const paramWordGap = document.getElementById('param-word-gap');
+    const paramFreq = document.getElementById('param-freq');
+    const paramSidetoneVol = document.getElementById('param-sidetone-vol');
+    const tagUnitT = document.getElementById('tag-unit-t');
+    const tagThreshold = document.getElementById('tag-threshold');
+    const tagGap = document.getElementById('tag-gap');
+    const tagWordGap = document.getElementById('tag-word-gap');
+    const tagFreq = document.getElementById('tag-freq');
+    const tagSidetoneVol = document.getElementById('tag-sidetone-vol');
+    const wordTotalReadout = document.getElementById('word-total-readout');
+    const presetDescBox = document.getElementById('preset-desc-box');
+
+    // Farnsworth & QRN elements
+    const chkFarnsworth = document.getElementById('chk-farnsworth');
+    const tagFarnsworthStatus = document.getElementById('tag-farnsworth-status');
+    const farnsworthControls = document.getElementById('farnsworth-controls');
+    const paramFarnsworthWpm = document.getElementById('param-farnsworth-wpm');
+    const tagFarnsworthWpm = document.getElementById('tag-farnsworth-wpm');
+
+    const chkQrn = document.getElementById('chk-qrn');
+    const tagQrnStatus = document.getElementById('tag-qrn-status');
+    const qrnControls = document.getElementById('qrn-controls');
+    const paramQrnVol = document.getElementById('param-qrn-vol');
+    const tagQrnVol = document.getElementById('tag-qrn-vol');
+
+    // Top Bar & K5 Dock WPM Display Synchronization
+    function updateTopbarWpm(wpm) {
+      const valEl = document.getElementById('topbar-wpm-val');
+      if (valEl) valEl.textContent = wpm;
+      const k5WpmVal = document.getElementById('k5-wpm-val');
+      if (k5WpmVal) k5WpmVal.textContent = `${wpm} WPM`;
+      if (window.cwPlayer && engine) {
+        window.cwPlayer.setUnitT(engine.getEffectiveUnitT());
+        window.cwPlayer.setFarnsworth(
+          !!(engine.config && engine.config.farnsworthEnabled),
+          (engine.config && engine.config.charWpm) ? engine.config.charWpm : 20
+        );
+      }
+    }
+    window.updateTopbarWpm = updateTopbarWpm;
+
+    // Mode Switching Elements
+    let currentMode = 'free'; // 'free' | 'text' | 'koch'
+    const tabModeFree = document.getElementById('tab-mode-free');
+    const tabModeText = document.getElementById('tab-mode-text');
+    const tabModeKoch = document.getElementById('tab-mode-koch');
+    const textModeContainer = document.getElementById('text-mode-container');
+    const freeModeContainer = document.getElementById('free-mode-container');
+    const kochModeContainer = document.getElementById('koch-mode-container');
+    const freeModeScenarios = document.getElementById('free-mode-scenarios');
+
+    // Koch Mode Elements
+    const kochStageBadge = document.getElementById('koch-stage-badge');
+    const kochStageSelect = document.getElementById('koch-stage-select');
+    const btnResetKoch = document.getElementById('btn-reset-koch');
+    const kochMasteryText = document.getElementById('koch-mastery-text');
+    const kochMasteryBar = document.getElementById('koch-mastery-bar');
+    const kochTargetChar = document.getElementById('koch-target-char');
+    const kochTargetSeq = document.getElementById('koch-target-seq');
+    const btnKochTargetListen = document.getElementById('btn-koch-target-listen');
+    const kochPoolText = document.getElementById('koch-pool-text');
+    const btnStartKochDrill = document.getElementById('btn-start-koch-drill');
+    const btnStopKochDrill = document.getElementById('btn-stop-koch-drill');
+    const btnStopKochPanel = document.getElementById('btn-stop-koch-panel');
+    const kochDrillPanel = document.getElementById('koch-drill-panel');
+    const kochProgressBadge = document.getElementById('koch-progress-badge');
+    const kochPassageContainer = document.getElementById('koch-passage-container');
+    const kochFbTarget = document.getElementById('koch-fb-target');
+    const kochFbInput = document.getElementById('koch-fb-input');
+    const kochFbResult = document.getElementById('koch-fb-result');
+    const kochReflexContainer = document.getElementById('koch-reflex-container');
+    const kochReflexBar = document.getElementById('koch-reflex-bar');
+    const kochScorecard = document.getElementById('koch-scorecard');
+    const kochScTitle = document.getElementById('koch-sc-title');
+    const kochScModeTag = document.getElementById('koch-sc-mode-tag');
+    const kochScThresholdTag = document.getElementById('koch-sc-threshold-tag');
+    const kochScTotal = document.getElementById('koch-sc-total');
+    const kochScCorrect = document.getElementById('koch-sc-correct');
+    const kochScErrors = document.getElementById('koch-sc-errors');
+    const kochScTimeouts = document.getElementById('koch-sc-timeouts');
+    const kochScAccuracy = document.getElementById('koch-sc-accuracy');
+    const kochScDesc = document.getElementById('koch-sc-desc');
+    const btnKochRetry = document.getElementById('btn-koch-retry');
+    const btnKochNextStage = document.getElementById('btn-koch-next-stage');
+    const chkKochHints = document.getElementById('chk-koch-hints');
+
+    // Text Mode Elements
+    const textInput = document.getElementById('text-input');
+    const btnApplyText = document.getElementById('btn-apply-text');
+    const btnPlayAuto = document.getElementById('btn-play-auto');
+    const btnPauseAuto = document.getElementById('btn-pause-auto');
+    const btnStopAuto = document.getElementById('btn-stop-auto');
+    const btnRestartText = document.getElementById('btn-restart-text');
+    const chkShowHints = document.getElementById('chk-show-hints');
+    const chkStrictMode = document.getElementById('chk-strict-mode');
+    const textModeStatus = document.getElementById('text-mode-status');
+    const passageContainer = document.getElementById('passage-container');
+    const textProgressBadge = document.getElementById('text-progress-badge');
+    const fbTarget = document.getElementById('fb-target');
+    const fbInput = document.getElementById('fb-input');
+    const fbResult = document.getElementById('fb-result');
+    const textScorecard = document.getElementById('text-scorecard');
+    const scorecardSpeedTag = document.getElementById('scorecard-speed-tag');
+    const scTotal = document.getElementById('sc-total');
+    const scCorrect = document.getElementById('sc-correct');
+    const scErrors = document.getElementById('sc-errors');
+    const scAccuracy = document.getElementById('sc-accuracy');
+    const btnScorecardRetry = document.getElementById('btn-scorecard-retry');
+    const btnRetryErrors = document.getElementById('btn-retry-errors');
+
+    // Text Mode State
+    const textState = {
+      rawText: 'SOS CQ',
+      targetChars: [],
+      currentIndex: 0,
+      charResults: [],
+      showHints: true,
+      strictMode: false,
+      isFinished: false,
+      startTime: null,
+      endTime: null,
+      autoPlayRunning: false,
+      autoPlayPaused: false,
+      autoPlayAbort: false
+    };
+
+
 
     function applySpeedPreset(key, saveToSettings = true) {
       const p = speedPresets[key];

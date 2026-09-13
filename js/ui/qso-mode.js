@@ -333,7 +333,14 @@ class QsoMode {
       this.updateGuidedUI();
     });
 
+    this.qsoManager.on('stationUpdated', () => {
+      this.updateStationMeta();
+      this.updateGuidedUI();
+    });
+
     this.qsoManager.on('botResponseReady', (data) => {
+      this.updateStationMeta();
+      this.updateGuidedUI();
       if (data && data.text) {
         this.playRemoteCw(data.text, data.delay || 800);
       }
@@ -827,8 +834,14 @@ class QsoMode {
     this.el.terminalFeed.scrollTop = this.el.terminalFeed.scrollHeight;
   }
 
-  _createRxLiveLine(remoteCall = 'DX') {
+  _createRxLiveLine(remoteCall = '') {
     if (typeof document === 'undefined' || !this.el || !this.el.terminalFeed) return null;
+
+    if (!remoteCall) {
+      remoteCall = (this.qsoManager && typeof this.qsoManager.getEffectiveDxCall === 'function')
+        ? this.qsoManager.getEffectiveDxCall()
+        : 'DX';
+    }
 
     const line = document.createElement('div');
     line.className = 'qso-feed-line live rx-live';
@@ -890,7 +903,9 @@ class QsoMode {
       targetS = Math.floor(Math.random() * 5) + 6; // S6 ~ S10 (S9+10dB)
     }
 
-    const remoteCall = (this.qsoManager && this.qsoManager.remoteStation) ? this.qsoManager.remoteStation.call : 'DX';
+    const remoteCall = (this.qsoManager && typeof this.qsoManager.getEffectiveDxCall === 'function')
+      ? this.qsoManager.getEffectiveDxCall()
+      : ((this.qsoManager && this.qsoManager.remoteStation) ? this.qsoManager.remoteStation.call : 'DX');
     const rxLineObj = this._createRxLiveLine(remoteCall);
     const isBlind = !!this.blindEnabled;
     let streamedDisplay = '';
@@ -1093,10 +1108,19 @@ class QsoMode {
     if (this.el.myCall) this.el.myCall.textContent = my.call;
     if (this.el.myDetails) this.el.myDetails.textContent = `(${my.name} · ${my.qth} · ${my.rig})`;
 
-    const dx = this.qsoManager.remoteStation;
-    if (dx) {
+    const dxCall = (typeof this.qsoManager.getEffectiveDxCall === 'function')
+      ? this.qsoManager.getEffectiveDxCall()
+      : (this.qsoManager.remoteStation ? this.qsoManager.remoteStation.call : 'DX');
+
+    const dx = (typeof this.qsoManager.getEffectiveDxStation === 'function')
+      ? this.qsoManager.getEffectiveDxStation()
+      : this.qsoManager.remoteStation;
+
+    if (dx && dxCall !== 'DX') {
       if (this.el.remoteCall) this.el.remoteCall.textContent = dx.call;
-      if (this.el.remoteDetails) this.el.remoteDetails.textContent = `(${dx.name} · ${dx.qth}, ${dx.country} · RST ${dx.rstRcvd} · ${dx.speedWpm} WPM)`;
+      if (this.el.remoteDetails) {
+        this.el.remoteDetails.textContent = `(${dx.name || 'OM'} · ${dx.qth || 'GLOBAL'}${dx.country ? ', ' + dx.country : ''} · RST ${dx.rstRcvd || '599'} · ${dx.speedWpm || 20} WPM)`;
+      }
     } else {
       if (this.el.remoteCall) this.el.remoteCall.textContent = 'FREE AIRWAVES';
       if (this.el.remoteDetails) this.el.remoteDetails.textContent = '(尚未建立呼叫)';
@@ -1219,24 +1243,26 @@ class QsoMode {
   // ==========================================
   _buildCurrentQsoData() {
     const my = (this.qsoManager && this.qsoManager.myStation) ? this.qsoManager.myStation : {};
-    const dx = (this.qsoManager && this.qsoManager.remoteStation) ? this.qsoManager.remoteStation : {};
+    const dx = (this.qsoManager && typeof this.qsoManager.getEffectiveDxStation === 'function')
+      ? this.qsoManager.getEffectiveDxStation()
+      : ((this.qsoManager && this.qsoManager.remoteStation) ? this.qsoManager.remoteStation : {});
     const now = new Date();
     return {
       myCall: my.call || 'BV2TT',
-      dxCall: dx.call || 'JA1ABC',
+      dxCall: dx.call || 'DX',
       dateDisplay: now.toISOString().slice(0, 10),
       timeDisplay: now.toISOString().slice(11, 16) + ' UTC',
-      band: (this.qsoManager && this.qsoManager.band) || '20M',
-      freq: (this.qsoManager && this.qsoManager.freq) || '14.025',
+      band: (this.qsoManager && (this.qsoManager.activeBand || this.qsoManager.band)) || '20M',
+      freq: (this.qsoManager && (this.qsoManager.currentFreq || this.qsoManager.freq)) || '14.025',
       mode: 'CW',
       rstSent: dx.rstSent || '599',
       rstRcvd: dx.rstRcvd || '599',
       myName: my.name || 'EDDIE',
-      dxName: dx.name || 'KEN',
+      dxName: dx.name || 'OM',
       myQth: my.qth || 'TAIPEI, TAIWAN',
-      dxQth: dx.qth ? `${dx.qth}, ${dx.country || ''}`.trim() : 'TOKYO, JAPAN',
+      dxQth: dx.qth ? `${dx.qth}, ${dx.country || ''}`.trim() : 'GLOBAL',
       myGrid: my.grid || 'PL05',
-      dxGrid: dx.grid || 'PM95',
+      dxGrid: dx.grid || '',
       rig: my.rig || '100W',
       ant: my.ant || 'DIPOLE',
       notes: 'TNX FER FB CW QSO! 73 ES GL'

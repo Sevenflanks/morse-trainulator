@@ -112,7 +112,7 @@ class QsoManager {
   // ==========================================
   // REMOTE STATION GENERATION
   // ==========================================
-  pickRandomRemoteStation() {
+  pickRandomRemoteStation(excludeCall = null) {
     const stations = (typeof QSO_REMOTE_STATIONS !== 'undefined') ? QSO_REMOTE_STATIONS : [
       { call: 'JA1ABC', name: 'KEN', qth: 'TOKYO', country: 'JAPAN', grid: 'PM95', rstSent: '599', rstRcvd: '579', speedWpm: 20, pitchHz: 660 },
       { call: 'W6XYZ', name: 'BOB', qth: 'LOS ANGELES', country: 'USA', grid: 'DM04', rstSent: '599', rstRcvd: '589', speedWpm: 18, pitchHz: 600 },
@@ -120,8 +120,13 @@ class QsoManager {
       { call: 'G4XYZ', name: 'JOHN', qth: 'LONDON', country: 'ENGLAND', grid: 'IO91', rstSent: '599', rstRcvd: '569', speedWpm: 19, pitchHz: 640 },
       { call: 'VK2AA', name: 'DAVE', qth: 'SYDNEY', country: 'AUSTRALIA', grid: 'QF56', rstSent: '599', rstRcvd: '579', speedWpm: 21, pitchHz: 680 }
     ];
-    const idx = Math.floor(Math.random() * stations.length);
-    const chosen = Object.assign({}, stations[idx]);
+    let pool = stations;
+    if (excludeCall && stations.length > 1) {
+      const filtered = stations.filter(s => s.call !== excludeCall);
+      if (filtered.length > 0) pool = filtered;
+    }
+    const idx = Math.floor(Math.random() * pool.length);
+    const chosen = Object.assign({}, pool[idx]);
     chosen.rstSent = chosen.rstSent || '599';
     chosen.rstRcvd = chosen.rstRcvd || '599';
     return chosen;
@@ -137,10 +142,12 @@ class QsoManager {
     this.lastRemoteMessage = '';
     this.isRemoteTransmitting = false;
 
+    const currentCall = (this.remoteStation && this.remoteStation.call) ? this.remoteStation.call : null;
+
     if (this.submode === 'guided') {
-      this.remoteStation = remoteStation || this.pickRandomRemoteStation();
+      this.remoteStation = remoteStation || this.pickRandomRemoteStation(currentCall);
     } else if (this.submode === 'contest') {
-      this.remoteStation = this.pickRandomRemoteStation();
+      this.remoteStation = this.pickRandomRemoteStation(currentCall);
     } else {
       this.remoteStation = null;
     }
@@ -150,6 +157,132 @@ class QsoManager {
       phase: this.guidedPhase,
       remoteStation: this.remoteStation
     });
+  }
+
+  // ==========================================
+  // CALLSIGN RESOLUTION & EXTRACTION
+  // ==========================================
+  extractCallsignFromText(text) {
+    if (!text) return null;
+    const clean = String(text).toUpperCase().replace(/[^A-Z0-9\/\?\s]/g, ' ').replace(/\s+/g, ' ').trim();
+    const tokens = clean.split(' ');
+    const myCall = (this.myStation && this.myStation.call) ? this.myStation.call : '';
+    const excluded = new Set([
+      'CQ', 'TEST', 'UR', 'RST', '5NN', '599', '579', '589', '569',
+      '73', '88', 'BK', 'SK', 'K', 'AR', 'TU', 'AGN', 'QTH', 'OP',
+      'NAME', 'RIG', 'ANT', 'WX', 'HW', 'OM', 'GM', 'GA', 'GE', 'ES',
+      'DE', 'FER', 'RPRT', 'FB', 'GL', 'EE', 'READY', 'OK', 'R'
+    ]);
+    if (myCall) excluded.add(myCall);
+
+    const isCallsign = (str) => {
+      return str && !excluded.has(str) && /^[A-Z0-9\/]{3,10}$/.test(str) && /[A-Z]/.test(str) && /[0-9]/.test(str);
+    };
+
+    // 1. Check pattern: ... DE <CALL> ... (Remote station sending: TARGET DE SENDER)
+    for (let i = 0; i < tokens.length - 1; i++) {
+      if (tokens[i] === 'DE') {
+        const candidate = tokens[i + 1];
+        if (isCallsign(candidate)) {
+          return candidate;
+        }
+      }
+    }
+
+    // 2. Check pattern: <TARGET> DE <MY_CALL> (User calling remote station)
+    for (let i = 1; i < tokens.length; i++) {
+      if (tokens[i] === 'DE') {
+        const target = tokens[i - 1];
+        if (isCallsign(target)) {
+          return target;
+        }
+      }
+    }
+
+    // 3. Fallback: look for any valid callsign token (excluding myStation call & excluded set)
+    for (const token of tokens) {
+      if (isCallsign(token)) {
+        return token;
+      }
+    }
+
+    return null;
+  }
+
+  getEffectiveDxCall() {
+    // 1. From last remote message
+    if (this.lastRemoteMessage) {
+      const extracted = this.extractCallsignFromText(this.lastRemoteMessage);
+      if (extracted) return extracted;
+    }
+
+    // 2. From currently assigned remoteStation
+    if (this.remoteStation && this.remoteStation.call) {
+      return this.remoteStation.call;
+    }
+
+    // 3. Search backwards in session history for last RX message
+    if (Array.isArray(this.sessionHistory)) {
+      for (let i = this.sessionHistory.length - 1; i >= 0; i--) {
+        const entry = this.sessionHistory[i];
+        if (entry.sender === 'RX' && entry.text) {
+          const call = this.extractCallsignFromText(entry.text);
+          if (call) return call;
+        }
+      }
+    }
+
+    // 4. In guided mode, ensure station is instantiated if missing
+    if (this.submode === 'guided') {
+      this.remoteStation = this.pickRandomRemoteStation();
+      return this.remoteStation.call;
+    }
+
+    return 'DX';
+  }
+
+  getEffectiveDxStation() {
+    const call = this.getEffectiveDxCall();
+    if (this.remoteStation && this.remoteStation.call === call) {
+      return this.remoteStation;
+    }
+
+    const stations = (typeof QSO_REMOTE_STATIONS !== 'undefined') ? QSO_REMOTE_STATIONS : [
+      { call: 'JA1ABC', name: 'KEN', qth: 'TOKYO', country: 'JAPAN', grid: 'PM95', rstSent: '599', rstRcvd: '579', speedWpm: 20, pitchHz: 660 },
+      { call: 'W6XYZ', name: 'BOB', qth: 'LOS ANGELES', country: 'USA', grid: 'DM04', rstSent: '599', rstRcvd: '589', speedWpm: 18, pitchHz: 600 },
+      { call: 'DL3HEX', name: 'HANS', qth: 'BERLIN', country: 'GERMANY', grid: 'JO62', rstSent: '599', rstRcvd: '599', speedWpm: 22, pitchHz: 720 },
+      { call: 'G4XYZ', name: 'JOHN', qth: 'LONDON', country: 'ENGLAND', grid: 'IO91', rstSent: '599', rstRcvd: '569', speedWpm: 19, pitchHz: 640 },
+      { call: 'VK2AA', name: 'DAVE', qth: 'SYDNEY', country: 'AUSTRALIA', grid: 'QF56', rstSent: '599', rstRcvd: '579', speedWpm: 21, pitchHz: 680 }
+    ];
+
+    const found = stations.find(s => s.call === call);
+    if (found) {
+      this.remoteStation = Object.assign({}, found);
+      return this.remoteStation;
+    }
+
+    if (call && call !== 'DX') {
+      const adHocStation = {
+        call,
+        name: 'OM',
+        qth: 'GLOBAL',
+        country: 'DX',
+        grid: '',
+        rstSent: '599',
+        rstRcvd: '599',
+        speedWpm: 20,
+        pitchHz: 650
+      };
+      this.remoteStation = adHocStation;
+      return adHocStation;
+    }
+
+    return this.remoteStation || {
+      call: 'DX1CALL',
+      name: 'OPERATOR',
+      qth: 'UNKNOWN',
+      grid: 'PL00'
+    };
   }
 
   getGuidedStepInfo() {
@@ -162,7 +295,7 @@ class QsoManager {
     ];
 
     const current = steps.find(s => s.step === this.guidedPhase) || steps[0];
-    const dxCall = this.remoteStation ? this.remoteStation.call : 'DX';
+    const dxCall = this.getEffectiveDxCall();
     const hint = current.hintTemplate
       .replace(/{MY_CALL}/g, this.myStation.call)
       .replace(/{DX_CALL}/g, dxCall)
@@ -207,6 +340,12 @@ class QsoManager {
     // Handle Repeat request (AGN? / ?)
     if (text === '?' || text === 'AGN' || text === 'AGN?' || text.endsWith('AGN?')) {
       if (this.lastRemoteMessage) {
+        this.sessionHistory.push({
+          sender: 'RX',
+          text: this.lastRemoteMessage,
+          timestamp: Date.now(),
+          isRepeat: true
+        });
         this.emit('botResponseReady', {
           sender: 'RX',
           text: this.lastRemoteMessage,
@@ -244,7 +383,7 @@ class QsoManager {
       case 2: // RST Exchange
         valid = tokens.includes('599') || tokens.includes('5NN') || tokens.includes('RST') || text.includes('599') || text.includes('5NN');
         if (!valid) {
-          feedback = '未偵測到 RST 報告 (如 599)。建議格式：' + (this.remoteStation ? this.remoteStation.call : 'DX') + ' DE ' + this.myStation.call + ' UR RST 599 BK';
+          feedback = '未偵測到 RST 報告 (如 599)。建議格式：' + this.getEffectiveDxCall() + ' DE ' + this.myStation.call + ' UR RST 599 BK';
         }
         break;
 
@@ -258,7 +397,7 @@ class QsoManager {
       case 4: // Sign-off & 73
         valid = tokens.includes('73') || tokens.includes('SK') || tokens.includes('TU') || text.includes('73') || text.includes('SK');
         if (!valid) {
-          feedback = '未偵測到 73、SK 或 TU 告別信號。建議格式：TNX FER QSO 73 GL TU EE SK';
+          feedback = '未偵測到 73、SK 或 TU 告別信號。建議格式：' + this.getEffectiveDxCall() + ' DE ' + this.myStation.call + ' 73 GL TU EE SK';
         }
         break;
 
@@ -278,6 +417,11 @@ class QsoManager {
 
       if (botResponse) {
         this.lastRemoteMessage = botResponse;
+        this.sessionHistory.push({
+          sender: 'RX',
+          text: botResponse,
+          timestamp: Date.now()
+        });
         this.emit('botResponseReady', {
           sender: 'RX',
           text: botResponse,
@@ -319,6 +463,11 @@ class QsoManager {
       this.contestSerial++;
 
       this.lastRemoteMessage = botResponse;
+      this.sessionHistory.push({
+        sender: 'RX',
+        text: botResponse,
+        timestamp: Date.now()
+      });
       this.emit('botResponseReady', {
         sender: 'RX',
         text: botResponse,
@@ -337,9 +486,28 @@ class QsoManager {
   }
 
   _handleFreeTransmit(text) {
-    // In free airwaves mode, respond based on CQ or callsign
-    if (!this.remoteStation) {
+    // In free airwaves mode, check if user specifically called a remote station (e.g. JA1ABC DE BV2TT K)
+    const targetCall = this.extractCallsignFromText(text);
+    if (targetCall && targetCall !== 'CQ' && targetCall !== this.myStation.call) {
+      if (!this.remoteStation || this.remoteStation.call !== targetCall) {
+        const stations = (typeof QSO_REMOTE_STATIONS !== 'undefined') ? QSO_REMOTE_STATIONS : [];
+        const found = stations.find(s => s.call === targetCall);
+        this.remoteStation = found ? Object.assign({}, found) : {
+          call: targetCall,
+          name: 'OM',
+          qth: 'GLOBAL',
+          country: 'DX',
+          grid: '',
+          rstSent: '599',
+          rstRcvd: '599',
+          speedWpm: 20,
+          pitchHz: 650
+        };
+        this.emit('stationUpdated', this.remoteStation);
+      }
+    } else if (!this.remoteStation) {
       this.remoteStation = this.pickRandomRemoteStation();
+      this.emit('stationUpdated', this.remoteStation);
     }
     const dxCall = this.remoteStation.call;
     let botResponse = '';
@@ -357,6 +525,11 @@ class QsoManager {
     }
 
     this.lastRemoteMessage = botResponse;
+    this.sessionHistory.push({
+      sender: 'RX',
+      text: botResponse,
+      timestamp: Date.now()
+    });
     this.emit('botResponseReady', {
       sender: 'RX',
       text: botResponse,
@@ -404,7 +577,7 @@ class QsoManager {
   // MACRO & LOG BUILDER
   // ==========================================
   generateMacroText(key) {
-    const dxCall = this.remoteStation ? this.remoteStation.call : 'DX';
+    const dxCall = this.getEffectiveDxCall();
     switch (key) {
       case 'CQ':
         return `CQ CQ CQ DE ${this.myStation.call} ${this.myStation.call} K`;
@@ -413,7 +586,9 @@ class QsoManager {
       case 'QTH':
         return `QTH ${this.myStation.qth} OP ${this.myStation.name} BK`;
       case '73':
-        return `TNX FER QSO 73 GL TU EE SK`;
+        return (dxCall && dxCall !== 'DX')
+          ? `${dxCall} DE ${this.myStation.call} 73 GL TU EE SK`
+          : `TNX FER QSO 73 GL TU EE SK`;
       case 'TU':
         return `TU EE`;
       case 'AGN':
@@ -427,12 +602,7 @@ class QsoManager {
     const now = new Date();
     const dateUtc = now.toISOString().slice(0, 10).replace(/-/g, '');
     const timeUtc = now.toISOString().slice(11, 19).replace(/:/g, '');
-    const dx = this.remoteStation || {
-      call: 'DX1CALL',
-      name: 'OPERATOR',
-      qth: 'UNKNOWN',
-      grid: 'PL00'
-    };
+    const dx = this.getEffectiveDxStation();
 
     return Object.assign({
       id: `qso_${now.getTime()}_${Math.random().toString(36).substring(2, 6)}`,
