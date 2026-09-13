@@ -232,7 +232,22 @@
   text-shadow: 0 0 6px rgba(0, 229, 255, 0.4);
   min-width: 90px;
   text-align: right;
-  display: inline-block;
+  display: inline-flex;
+  justify-content: flex-end;
+  align-items: center;
+  gap: 2px;
+}
+
+.smeter-s-tag {
+  width: 24px;
+  text-align: left;
+  flex-shrink: 0;
+}
+
+.smeter-s-db {
+  width: 62px;
+  text-align: left;
+  flex-shrink: 0;
 }
 
 .qso-smeter-bezel {
@@ -674,6 +689,89 @@
   color: #8c9bb0;
   font-size: 0.78rem;
   font-style: italic;
+}
+
+.qso-feed-line.rx-live {
+  border-left-color: #00e676;
+  background: rgba(0, 230, 118, 0.06);
+}
+
+.qso-cursor.rx-cursor {
+  background: #00e676;
+}
+
+.qso-blind-masked {
+  letter-spacing: 2px;
+  color: #7b889d;
+  font-weight: 700;
+}
+
+.btn-qso-reveal {
+  margin-left: 8px;
+  padding: 1px 6px;
+  font-size: 0.7rem;
+  font-weight: 700;
+  color: var(--neon-blue);
+  background: rgba(0, 229, 255, 0.1);
+  border: 1px solid rgba(0, 229, 255, 0.3);
+  border-radius: 3px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  vertical-align: middle;
+}
+
+.btn-qso-reveal:hover {
+  background: rgba(0, 229, 255, 0.2);
+  border-color: var(--neon-blue);
+  box-shadow: 0 0 6px rgba(0, 229, 255, 0.4);
+}
+
+.qso-revealed-tag {
+  margin-left: 8px;
+  font-size: 0.68rem;
+  color: #00e676;
+  font-weight: 700;
+  padding: 1px 4px;
+  background: rgba(0, 230, 118, 0.1);
+  border-radius: 3px;
+  vertical-align: middle;
+}
+
+.settings-row-text {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 8px;
+  font-size: 0.8rem;
+}
+
+.settings-row-text label {
+  color: #bbb;
+  display: flex;
+  flex-direction: column;
+}
+
+.settings-row-text label span {
+  font-size: 0.7rem;
+  color: var(--text-muted);
+}
+
+.console-text-input {
+  background: #090a0f;
+  border: 1px solid #283142;
+  border-radius: 4px;
+  color: #00e5ff;
+  font-family: 'SF Mono', Consolas, monospace;
+  font-size: 0.8rem;
+  font-weight: 700;
+  padding: 4px 8px;
+  outline: none;
+  transition: all 0.2s ease;
+}
+
+.console-text-input:focus {
+  border-color: var(--gold);
+  box-shadow: 0 0 6px rgba(255, 215, 0, 0.3);
 }
 
 /* ==========================================================================
